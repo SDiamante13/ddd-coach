@@ -67,6 +67,16 @@ describe("askCoach", () => {
     });
   });
 
+  it("reports a message too long, not worth retrying, for a 413 whose body is not JSON", async () => {
+    respondWith(new Response("Payload Too Large", { status: 413 }));
+
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: "This message is too long for the coach. Shorten it and send it again.",
+      retryable: false,
+    });
+  });
+
   it("reports an unavailable coach for any other error whose body is not JSON", async () => {
     respondWith(new Response("TimeoutError: task timed out", { status: 500 }));
 
