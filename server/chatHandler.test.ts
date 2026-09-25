@@ -39,8 +39,11 @@ function postMessage(message: unknown, history: unknown = []): Request {
 }
 
 function paddedBodyOf(bytes: number): string {
-  const unpadded = JSON.stringify({ message: "Hello coach", history: [], pad: "" });
-  return JSON.stringify({ message: "Hello coach", history: [], pad: "x".repeat(bytes - unpadded.length) });
+  return bodyPaddedWith("x".repeat(bytes - bodyPaddedWith("").length));
+}
+
+function bodyPaddedWith(pad: string): string {
+  return JSON.stringify({ message: "Hello coach", history: [], pad });
 }
 
 describe("chat handler", () => {
