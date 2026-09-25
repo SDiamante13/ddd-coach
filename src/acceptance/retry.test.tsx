@@ -35,6 +35,17 @@ describe("Retry", () => {
     expect(within(log()).queryByRole("alert")).not.toBeInTheDocument();
   });
 
+  it("keeps focus on the entry after Retry", async () => {
+    const server = stubFetch();
+    const { user, input, log } = await renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    server.reply(0, 502, { error: "The coach is unavailable." });
+    await user.click(await within(log()).findByRole("button", { name: "Retry" }));
+
+    expect(within(log()).getByRole("listitem")).toHaveFocus();
+  });
+
   it("disables Retry while another exchange is pending, then enables it once that settles", async () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();

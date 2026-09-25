@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { isBusy } from "../domain/exchange.ts";
+import { isBusy, type Prompt } from "../domain/exchange.ts";
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
 import { AccessGate } from "./AccessGate.tsx";
@@ -30,6 +30,10 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
     boxRef.current?.focus();
   });
   const busy = isBusy(exchanges);
+  const sendFromBox = (prompt: Prompt) => {
+    send(prompt);
+    boxRef.current?.focus();
+  };
   const conversation = () => conversationText(exchanges);
   const tryExample = () => {
     flushSync(() => setDraft(EXAMPLE_THREAD));
@@ -57,7 +61,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
           {UNLOCKED_FOR}
         </p>
       )}
-      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} boxRef={boxRef}>
+      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={sendFromBox} boxRef={boxRef}>
         <ComposerActions
           started={exchanges.length > 0}
           draftBlank={draft.trim() === ""}

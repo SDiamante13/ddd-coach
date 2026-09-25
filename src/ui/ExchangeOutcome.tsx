@@ -28,9 +28,7 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
               onStartNew={FIXED_BY_A_NEW_CONVERSATION.includes(exchange.error) ? onStartNew : undefined}
             />
           ) : (
-            <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>
-              Retry
-            </button>
+            <RetryButton disabled={busy} onRetry={() => onRetry(exchange)} />
           )}
         </>
       );
@@ -50,4 +48,23 @@ function RefusalActions({ conversation, onStartNew }: RefusalActionsProps) {
       )}
     </span>
   );
+}
+
+function RetryButton({ disabled, onRetry }: { disabled: boolean; onRetry: () => void }) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={(event) => {
+        focusEntryOf(event.currentTarget);
+        onRetry();
+      }}
+    >
+      Retry
+    </button>
+  );
+}
+
+function focusEntryOf(button: HTMLElement) {
+  button.closest("li")?.focus();
 }

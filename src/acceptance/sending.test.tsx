@@ -56,6 +56,16 @@ describe("Sending a message", () => {
     expect(sendButton()).toBeDisabled();
   });
 
+  it("returns focus to the message box after sending with the Send button", async () => {
+    stubFetch();
+    const { user, input, sendButton } = await renderApp();
+
+    await user.type(input(), "Hello coach");
+    await user.click(sendButton());
+
+    expect(input()).toHaveFocus();
+  });
+
   it("sends with Ctrl+Enter", async () => {
     const server = stubFetch();
     const { user, input } = await renderApp();

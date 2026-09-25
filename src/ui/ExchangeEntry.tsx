@@ -4,7 +4,7 @@ import { PromptText } from "./PromptText.tsx";
 
 export function ExchangeEntry({ exchange, children }: { exchange: Exchange; children: ReactNode }) {
   return (
-    <li data-status={shownStatus(exchange)}>
+    <li data-status={shownStatus(exchange)} tabIndex={-1}>
       <PromptText prompt={exchange.prompt} />
       {children}
     </li>
