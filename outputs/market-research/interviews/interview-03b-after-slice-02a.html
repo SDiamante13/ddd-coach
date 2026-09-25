@@ -1,0 +1,710 @@
+<title>Priya Raman Interview 03b</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Notice checklist */
+.notice-quote {
+  margin: 0 0 24px; padding: 16px 20px; background: var(--surface);
+  border: 1px solid var(--rule); border-left: 6px solid var(--policy); border-radius: 4px;
+  font-family: var(--mono); font-size: 14px; line-height: 1.55; color: var(--ink-soft);
+}
+.notice-quote .label { display: block; margin-bottom: 6px; }
+.checklist { display: grid; border-top: 1px solid var(--rule); }
+.check {
+  display: grid; grid-template-columns: 92px minmax(0, 1fr) minmax(0, 1fr); gap: 20px;
+  padding: 18px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.check .tag {
+  justify-self: start; font-family: var(--display); font-weight: 800; font-size: 13px;
+  padding: 4px 10px; border-radius: 2px; transform: rotate(-2deg);
+}
+.tag.met { background: var(--command); color: var(--command-ink); }
+.tag.partly { background: var(--actor); color: var(--actor-ink); }
+.tag.missing { background: var(--hotspot); color: var(--hotspot-ink); }
+.check h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.check .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.check q { font-size: 15.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 600px) {
+  .check { grid-template-columns: 1fr; gap: 10px; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 03b · after slice 2a (hosted)</div>
+      <h1>“Who runs it? My honest answer is ‘a guy who interviews me.’” <em>Priya</em> on the hosted app.</h1>
+      <p class="dek">We showed the tech lead the live app, its real data-flow notice and the 8,000-character rejection. The notice moved one and a half of her five checklist items. A bring-your-own-key field wouldn't move her at all: she can't get a key, and security forbids pasting one into a website.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 29 questions</span>
+        <span class="chip">Live app viewed, nothing sent</span>
+        <span class="chip">Restyle #42 · not live, described</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC, due 30 October</dd></div>
+        <div><dt>Since 02</dt><dd>A third hour with Dana. One left before she's away from the 15th</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“Take my twelve-thousand-character sanitized thread in one go, and give me <strong>the words that don't match as a table</strong> I can paste into the glossary.”</blockquote>
+      <cite class="label">Priya, Q28. “The paste has to fit and the table has to paste.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>The shipped notice meets 1.5 of 5 items.</b> OpenRouter is named, but not the company behind it. “An AI model provider” mislabels a router. No retention, training, link or operator.</span>
+        <div class="tags"><span>strong</span><span>#2 · #34</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>A forwardable page covers her. It doesn't approve you.</b> Security's April review wanted a DPA, SOC 2, subprocessors and SSO. A side project “gets a no.”</span>
+        <div class="tags"><span>strong</span><span>#2 · #34</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">03</span>
+        <span><b>Bring-your-own key doesn't unlock her.</b> No personal API keys exist (per-service, in Vault). Pasting credentials into a site is against policy.</span>
+        <div class="tags"><span>strong</span><span>#34</span></div>
+      </div>
+      <div class="sticky s-hotspot weak">
+        <span class="n">04</span>
+        <span><b>Self-hosting with a company key is the only work-legal path.</b> “Internal tool, not a vendor.” But only after a solo win.</span>
+        <div class="tags"><span>weak</span><span>#34 · B10/B19/B20</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">05</span>
+        <span><b>Her real paste doesn't fit.</b> 18k raw, about 12k sanitized, against an 8k cap. The one-line box flattens who-said-what. The 413 clears her draft.</span>
+        <div class="tags"><span>strong</span><span>#4 · B40 · #50 · #51</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">06</span>
+        <span><b>Trimming has to keep the paste.</b> The oldest turn is her source. “Keep the paste, squash the chat.”</span>
+        <div class="tags"><span>strong</span><span>B38 · #7</span></div>
+      </div>
+      <div class="sticky s-neutral">
+        <span class="n">07</span>
+        <span><b>The restyle won't earn Dana's trust.</b> Dana judged a Retool view on one wrong word in ten seconds, then asked for Excel. A named operator matters more than fonts.</span>
+        <div class="tags"><span>strong</span><span>#42 · #52</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">08</span>
+        <span><b>She already confirms with the expert, by hand.</b> A “did I get this right?” DM to Dana. The correction now lives in three places, none of them the RFC.</span>
+        <div class="tags"><span>strong</span><span>#6 · B22</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="checklist-h">
+    <div class="section-head">
+      <h2 id="checklist-h">Notice checklist</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch" style="background: var(--command)"></i>met</span>
+        <span><i class="swatch" style="background: var(--actor)"></i>partly</span>
+        <span><i class="swatch" style="background: var(--hotspot)"></i>missing</span>
+      </div>
+    </div>
+    <p class="notice-quote"><span class="label">Live notice · ddd-coach.netlify.app</span>Your messages are sent to OpenRouter, an AI model provider, to generate replies. Nothing is stored on our server. Don't paste customer names or rates.</p>
+    <div class="checklist">
+      <div class="check">
+        <span class="tag partly">Partly</span>
+        <div><h3>The processing company is named</h3><div class="ref">interview 02 · item 1</div></div>
+        <q>The notice was true in September with a Claude model, and it's still word-for-word true today with an OpenAI one, which means it tells me nothing about who processes my text.</q>
+      </div>
+      <div class="check">
+        <span class="tag missing">Missing</span>
+        <div><h3>Retention at OpenRouter and at the provider</h3><div class="ref">interview 02 · item 2</div></div>
+        <q>“Nothing is stored on our server” is the only retention sentence, and it's about the one party I was least worried about.</q>
+      </div>
+      <div class="check">
+        <span class="tag missing">Missing</span>
+        <div><h3>Training use, with a policy link</h3><div class="ref">interview 02 · item 3</div></div>
+        <q>There's no training line and no link anywhere on the page. You don't even need a new decision for the links.</q>
+      </div>
+      <div class="check">
+        <span class="tag missing">Missing</span>
+        <div><h3>A page she can forward to security</h3><div class="ref">interview 02 · item 4</div></div>
+        <q>No page. No link at all, actually, apart from the Netlify bubble in the corner.</q>
+      </div>
+      <div class="check">
+        <span class="tag missing">Missing</span>
+        <div><h3>The operator is named</h3><div class="ref">interview 02 · “our server: whose?”</div></div>
+        <q>If anyone at work asked me who runs it, my honest answer is “a guy who interviews me.”</q>
+      </div>
+      <div class="check">
+        <span class="tag met">Met</span>
+        <div><h3>A line saying what not to paste</h3><div class="ref">interview 02 · extra ask</div></div>
+        <q>The first thing on this page that sounds like it's read a policy like mine.</q>
+      </div>
+      <div class="check">
+        <span class="tag met">Met</span>
+        <div><h3>Visible, no dialog, doesn't block the first reply</h3><div class="ref">interview 02 · placement</div></div>
+        <q>The placement is still right: visible, no dialog, doesn't block anything.</q>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since last time</a>
+      <a href="#part-b">B · The notice</a>
+      <a href="#part-c">C · 8,000 chars</a>
+      <a href="#part-d">D · Your own key</a>
+      <a href="#part-e">E · The look</a>
+      <a href="#part-f">F · Leftovers</a>
+      <a href="#part-g">G · Close</a>
+    </nav>
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since last time</h3><span class="aside">no product talk yet</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Last time the RFC was due end of October and Dana was about to be away for three weeks. Where are you now?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Four weeks out, and Dana leaves on the 15th. I had my third session with her last Wednesday, so I have one more, next Thursday, and then I'm on my own until the RFC review. Finance sent me the two double-invoice incident write-ups, which helped. The glossary section of the RFC has six terms in it now. Last time it had zero. That's the progress.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>You had the link to the hosted app. Did you open it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Once, Saturday, on my phone. I read the notice, scrolled, saw a text box, and closed it. I didn't paste anything, because I didn't have the sanitized thread on my phone and I wasn't going to sanitize it with my thumbs. Then on Sunday I spent twenty minutes reading OpenRouter's privacy page on the laptop, which is more time than I spent on your app. <mark>So the first thing your hosted app made me do was research your vendor.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>What did you find on that page?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>If I read it right, OpenRouter doesn't keep prompts unless the account turns logging on, and then each model provider behind it has its own policy, and some keep things for a while for abuse checks. So the honest answer to “is my text stored?” is “it depends on settings the operator chose, which I can't see.” That's not a gotcha. It's just what I'd need you to tell me.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>The notice as shipped</h3></div>
+        <p class="stage">Shown the live page: the notice under the title, a one-line “Message” box, and a “Powered by Netlify” badge.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q4</span><span>That's the real wording now. Would you paste real work material?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No, and for the same reason as last time: OpenRouter isn't on our approved list, and no sentence fixes that. For sanitized text, it's slightly better than what you showed me in September, because of the last line. <mark>“Don't paste customer names or rates” is the first thing on this page that sounds like it's read a policy like mine.</mark> But “OpenRouter, an AI model provider” is wrong. OpenRouter is a router. It passes my text to somebody else's model. That's the part I asked you to name.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Last time you gave us a checklist. Let's go through it. First item: the company that processes the text.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Half there. You named OpenRouter, which is new. The September draft named a model slug. This one names nobody behind the router. Which model is it today?</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>Today it's an OpenAI model, <code>gpt-5.6-terra</code>, served through OpenRouter.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>OK, so not even Anthropic. That's fine for sanitized text, I honestly don't care which lab reads “Customer A.” But it proves my point. <mark>The notice was true in September with a Claude model, and it's still word-for-word true today with an OpenAI one, which means it tells me nothing about who processes my text.</mark> If you swap models, the notice should change.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>Second and third: retention at OpenRouter and the provider, and training use with a link.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Missing, both. “Nothing is stored on our server” is the only retention sentence, and it's about the one party I was least worried about. My guess is most people read it as “nothing is stored,” full stop. I did, for a second. There's no training line and no link anywhere on the page. You don't even need a new decision for the links. OpenRouter's privacy page exists today, and so does OpenAI's.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q8</span><span>Fourth and fifth: a page you can forward to security, and the operator named.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No page. No link at all, actually, apart from the Netlify bubble in the corner. And “our server”: still whose? There's no name, no About link, nothing on the page. The only company logo on the screen is Netlify's. <mark>If anyone at work asked me who runs it, my honest answer is “a guy who interviews me.”</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>So, overall: which items moved?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>One and a half out of five. OpenRouter is named, and there's a “don't paste” line I didn't have on the list but asked for. The placement is still right: visible, no dialog, doesn't block anything. Everything that would let me defend using it is still missing. I'd paste the sanitized thread with this notice. I'd have pasted the sanitized thread without it, too.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>The 8,000-character limit</h3></div>
+        <p class="stage">Shown the slice 2a demo at 1:01: a 9,000-character message gets “This message is too long for the coach. Shorten it and send it again.” There's no Retry, and the input is cleared.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q10</span><span>Your Slack export was about 18,000 characters. What's it at after sanitizing?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>About twelve thousand. Sanitizing removes names and rates, not messages. So even the cleaned-up version fails. And your box is one line. When I paste a Slack thread into a one-line input, the line breaks go and it's one long sentence. You lose who said what, and <mark>who said what is the entire point of that thread.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>Say you've pasted the twelve thousand and you get this message. What do you do at that moment?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>First I'd look for my text, and it's gone from the box. It's in the log above, all twelve thousand characters of it, so I'd be scrolling and selecting by hand on a laptop trackpad. Then I'd have to guess how much to cut, because the message doesn't say what the limit is. I'd delete the first forty messages, the “following” and “+1” and the original question, and keep the argument. That's maybe seven thousand. Another ten minutes, on top of the fifteen for sanitizing. And the part I'd cut first is where ops explains their definition in their own words, which is the part Dana would care about.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>When was the last time a tool rejected your input for length? What did you do?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>August, our company Claude. I'd attached the Rails model and the enum and a chunk of the callbacks, and after a few turns it said the conversation was too long and to start a new chat. I started a new chat, pasted the half I thought mattered, and lost the connection between the callbacks and the statuses. That's one of the forty chats called “Booking notes.” <mark>What I did was retry once, cut, and then stop trusting the answer, because I knew it hadn't seen everything.</mark> I'd do the same here. Cut once. If it rejects me twice, I close the tab.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>What would you want the message to say?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The number. “Your message is 12,040 characters; the limit is 8,000.” Then I know it's a 35% cut and not a 5% one. And leave my text in the box. Honestly, though, I'd rather it just took the thread. The thread is the input. Everything I type after that is a sentence or two.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q14</span><span>If you did get the thread in, a few turns later you'd hit the 24k conversation limit. One idea is to trim or summarize older turns automatically. How would that land?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Depends what “older” means. In my case the oldest turn is the thread, and everything after it is me asking about it. If you summarize my thread to make room for my chat, you've kept the wrong half. <mark>Keep the paste, squash the chat.</mark> And tell me you did it, in one line, beside the reply.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Your own key, and self-hosting</h3><span class="aside">decision #34</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q15</span><span>One option on the table: a field where you paste your own Anthropic API key, so your text goes to Anthropic under your company's terms. Is that acceptable?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>For me, it doesn't matter, because I can't get one. Our Claude Enterprise is the chat workspace. There's no API key in it for me to copy. API access is a separate account the platform team runs.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>How do you know that? Has anyone on your team tried?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Ravi, in July. He wanted to run a script that summarized Jira tickets. He filed a ticket with platform, had to name the service and an owner, and the key went into Vault. He's never seen the key itself. The script reads it at runtime. <mark>Nobody at my company holds a personal Anthropic key, and if they did, they wouldn't be allowed to paste it into a website.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q17</span><span>Say you had one. What would security say about pasting it into a third-party web app?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Our secrets policy is one line: credentials never go into third-party sites. A key is worse than the thread. If your page leaks it, anyone can spend on our bill, and anything sent with it goes out under our contract. Then they'd ask the question I'd ask: does the key go to your server? If it does, you're still a vendor, just one that's holding our key now. If it goes straight from my browser to Anthropic, that's better, but they'd still want to read the code, and the code is on your site, not in our repo.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>Would a key field break “no settings before the first reply” for you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>If it's optional and folded away, like “Use your own Anthropic key,” I'd ignore it, and it wouldn't bother me. If it's required, it's the account gate with a different name, and I'd bounce on the first visit. But the bigger point is: an optional field I can't fill in doesn't build anything for me. It's for somebody else. A consultant with a personal Anthropic account, maybe.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q19</span><span>What about self-hosting: the code as a repo you run locally or inside your company, pointed at your company's key?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That's the only version that could be legal for real material. If it runs on my laptop or in our infra and calls Anthropic with a key from Vault, it's an internal tool, not a vendor. Same path as Ravi's script: a platform ticket and a code review. That took him about two weeks. But I'm not doing that for a tool I haven't had one win with, and not four weeks before an RFC. <mark>Self-hosting is what I'd do after it's already saved me a week, not to find out whether it can.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>So if we had to pick one: key field, self-host, or say plainly “this is for sanitized text”?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>For this month, say it plainly. I'm already sanitizing. Tell me the tool is built for that, tell me what to strip, and fill in the rest of the notice. Self-host is a later conversation, and it only happens if the sanitized version wins first. The key field I'd skip. It costs you a setting and it doesn't unlock me.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>The look</h3><span class="aside">restyle #42 · not live, described in words</span></div>
+        <p class="stage">Described, not shown: a warm off-white paper background with a faint dot grid, a bold grotesque title, clean sans-serif body text, the notice in a light boxed panel, “YOU” and “COACH” labels, a blue Send button, a visible focus ring, and dark mode.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q21</span><span>Imagine the restyled screen. Would it look trustworthy enough to show Dana?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I'm not showing Dana the app. I said that in the first interview, and nothing's changed. I prep alone, and what Dana sees is the output: three questions in a Slack DM, or a table in Confluence. So the look matters for me, and a little for Marcus if I screenshot something. Times New Roman plus a Netlify bubble does read “someone's weekend project,” and your restyle would fix that. But a nicer-looking page from a name I don't know is still a stranger. The name and a link help me trust it more than the fonts do.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>When was the last time you showed Dana a tool? How did she react?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>April. The carrier team had built a booking-status timeline in Retool, and I shared my screen to ask if it matched what ops sees. Dana looked at it for about ten seconds and said, “CARRIER_ACK isn't a thing ops cares about. Why is that purple?” Then she asked if I could export it to Excel. She's never opened Retool since. <mark>She judged it on one wrong word in ten seconds, and the styling only made her ask about the colour.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q23</span><span>So what would make something trustworthy enough for Dana?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Her words, and her format. If the three questions use “rebook” and “TONU” and a real load number, she answers them. If they say “BookingReassigned” she's gone. And it has to arrive somewhere she already is, which is Slack or Excel. Whatever tool made it is irrelevant to her, as long as it doesn't pretend she said something she didn't.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Leftovers from last time</h3><span class="aside">from interview 02's “ask next time”</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q24</span><span>Last time you said to ask who approves a new AI vendor. Who does, and what happened the last time someone asked?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Security, which is three people, plus procurement if it costs money. The last one I know of was April. Design wanted an AI meeting-notes tool. Security sent a questionnaire: data processing agreement, SOC 2 report, subprocessor list, retention, training use, SSO. It took six weeks, and the answer was “use the one built into Zoom that we already pay for.” <mark>A side project with no company behind it doesn't get a questionnaire. It gets a no.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q25</span><span>Last time you said a page you could forward to security was “how anything gets approved here.” Does that still hold?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I overstated it. The page doesn't get you approved. You'd need a company and a DPA for that, and you don't have either. What the page does is cover me. If someone asks why I used it, I forward the page, and it shows I checked, I sanitized, and I read the retention terms. That's still worth something to me. It just isn't the door.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q26</span><span>Last time Dana corrected your notes, what did you do with the correction? Where does it live now?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Last Wednesday. I read my notes back to her on the rebook question, and she corrected one: a date change with the same carrier is AMENDED, but a lane change is always a new booking, even though the code sets REBOOKED. After the call I sent her a Slack DM with my three answers and “did I get this right?”, which is the thing I told you your tool should do. She replied with a thumbs-up and one fix. So now the correction lives in my text file, a comment on the Confluence table, and that DM. <mark>Three places, and none of them is the RFC yet.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q27</span><span>After your last paste into the RFC, what did you retype by hand?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The glossary, again. I pasted my Dana summary from the text file, and the table came through as pipes, so I rebuilt six rows with the table button. About twenty-five minutes. Same as last time. That hasn't changed, because nothing I use has changed.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="part-g">
+        <div class="part-head"><span class="tab">G</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q28</span><span>If you could only have one thing in the next month, what is it now?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Take my twelve-thousand-character sanitized thread in one go, and give me the words that don't match as a table I can paste into the glossary. Before the 30th. Last time I said “and it's still there when I come back,” and I still want that in general. But I have one Dana session left, so this month, <mark>the paste has to fit and the table has to paste. That's more urgent than persistence now.</mark> I know that's different from what I said before.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q29</span><span>Would you use it this week? For what?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Honestly, as it is today, no. The box is one line, it takes eight thousand characters, and it doesn't untangle anything. It's a chat. I might try it Saturday at home with the thread cut down to fit, to see one thing: does it find the REBOOKED versus AMENDED split without me pointing at it? Company Claude didn't. That's a twenty-minute test, not using it. If it finds the split, I'll tell you. <mark>If it tells me to make a Booking aggregate, I won't be back.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="decision-h">
+    <div class="section-head">
+      <h2 id="decision-h">Decision input · #34</h2>
+      <span class="label">Provider path · which option unlocks real material?</span>
+    </div>
+    <p class="dek" style="margin: 0 0 24px;"><mark>Accept “sanitized input only” for the hosted app now and say so on screen. Don't build a key field. Keep self-hosting with a company key as the one later path, gated on a solo win.</mark></p>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Now</span><div><h3>Say “built for sanitized text”</h3><div class="where">doesn't unlock real material · matches what she already does</div></div></header>
+        <dl>
+          <div><dt>Evidence</dt><dd>She already spends about 15 minutes sanitizing. The “don't paste” line was the only trust gain.</dd></div>
+          <div><dt>Her words</dt><dd>“Tell me the tool is built for that, tell me what to strip, and fill in the rest of the notice.”</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Later</span><div><h3>Self-host with a company key</h3><div class="where">the only work-legal path · after a solo win</div></div></header>
+        <dl>
+          <div><dt>Evidence</dt><dd>Internal-tool review like Ravi's script, about two weeks (secondhand). Keep the <code>Coach</code> port provider-agnostic so an Anthropic adapter stays cheap.</dd></div>
+          <div><dt>Her words</dt><dd>“What I'd do after it's already saved me a week, not to find out whether it can.”</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Skip</span><div><h3>Bring-your-own Anthropic key</h3><div class="where">doesn't unlock real material · a folded, optional field is tolerated</div></div></header>
+        <dl>
+          <div><dt>Evidence</dt><dd>Enterprise is chat only. API keys are per service, in Vault (Ravi, July). The secrets policy forbids pasting credentials into third-party sites. A key relayed by the server still makes the app a vendor.</dd></div>
+          <div><dt>Her words</dt><dd>“It costs you a setting and it doesn't unlock me.”</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Neutral</span><div><h3>Hosted Anthropic model, operator's key</h3><div class="where">still an unapproved vendor: the operator</div></div></header>
+        <dl>
+          <div><dt>Evidence</dt><dd>Which model runs doesn't change her decision for sanitized text. Reopen the key option only if a real practitioner holds a personal key and may use it in a browser.</dd></div>
+          <div><dt>Her words</dt><dd>“Not even Anthropic. That's fine for sanitized text.”</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The data-flow notice is done</h3><div class="ref">#2 (closed) · #34</div></div>
+        <p>1.5 of 5 checklist items are met. “An AI model provider” mislabels OpenRouter. The retention and training links don't need to wait for #34: the current vendors' policy pages exist today.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Pastes run 1–5k characters</h3><div class="ref">#4 · #7 · B40 (#35) · #50</div></div>
+        <p>Her thread is 18k raw and about 12k sanitized. The 8k cap rejects it, and the one-line input flattens it before it's even sent.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A 413 without Retry is enough recovery</h3><div class="ref">B41 (#36) · #51</div></div>
+        <p>No Retry is right. But the cleared draft and the missing limit number turn one rejection into a scroll-and-guess. Past behavior: “cut once,” then leave.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Trim or summarise older turns</h3><div class="ref">B38 (#7)</div></div>
+        <p>For a paste-first user, the oldest turn is the source. Pin the first paste and shorten the chat.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Bring-your-own key is a viable option</h3><div class="ref">#34</div></div>
+        <p>Not for this ICP. She has no key, and policy forbids pasting one into a site.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Local and private sources are blocked by the AI policy</h3><div class="ref">B10 · B19 · B20 (icebox #33)</div></div>
+        <p>They're blocked only while inference goes through OpenRouter. A self-hosted build with a company key is the one path she says could be work-legal.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The restyle makes it safe to show the expert</h3><div class="ref">#42 · #52</div></div>
+        <p>She never shows Dana the app. Dana judges terms and wants Excel or Slack. The restyle helps Priya's own read, the Netlify badge undercuts it, and a named operator matters more than either.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Persistence is her top ask</h3><div class="ref">#5 · B12 (icebox #33)</div></div>
+        <p>She still wants it. But with one Dana session left, paste capacity and a pasteable table rank higher this month. This is a self-contradiction, so confirm it with a real practitioner.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Export is Markdown into Confluence and Miro</h3><div class="ref">#6</div></div>
+        <p>That's the second hand-rebuilt glossary table (about 25 minutes). A rich-text table comes first, and Miro is gone.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Disclose</span><div><h3>Complete the notice with a linked data page</h3><div class="where">reopen #2 or a #34 follow-up</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The notice names the company behind the model (from server config), says “Built for sanitized text” and links “Data &amp; retention” to one static page. That page names the operator, OpenRouter and the provider, links each one's privacy and training policy, and states the OpenRouter logging setting.</dd></div>
+          <div><dt>Check</dt><dd>It fits at 400px and 1280px with no dialog, and the first reply isn't blocked. Changing the model changes the named company. Every retention or training claim links to that vendor's own policy, or it isn't shown. OpenRouter is no longer called “an AI model provider.” Each of her five checklist items maps to a line on the page.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Keep</span><div><h3>A 413 that keeps the draft and names the limit</h3><div class="where">extends #51</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Over 8,000 characters, the draft stays in the input and the message reads “Your message is N characters; the limit is 8,000.” There's still no Retry.</dd></div>
+          <div><dt>Check</dt><dd>Paste 12,040 characters and send. The input still holds all of it, both numbers show, and there are 0 buttons in the entry. The coach isn't called (413 in under 300 ms).</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Fit</span><div><h3>Multiline input plus a pinned first paste</h3><div class="where">#50 + a B38 (#7) variant · before #4</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>A textarea keeps line breaks. The per-message cap fits about 12k within the 24k budget. When the budget runs out, the first paste stays verbatim, the chat turns are shortened, and a one-line note under the reply says so.</dd></div>
+          <div><dt>Check</dt><dd>Paste a 12,000-character multi-line thread. The body keeps its <code>\n</code>s, and the response is 200. Keep chatting until the budget is hit. The next reply quotes a detail from the first paste, the note says what was shortened, and there's no 413.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 04 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>A real platform engineer: can an engineer at your company get a personal Anthropic API key? What may they paste it into?</li>
+      <li>A real security reviewer: here's a self-hosted repo that calls Anthropic with your company key. What's the review, and how long does it take?</li>
+      <li>Did you run the Saturday test? Did it find REBOOKED vs AMENDED? What did you cut to make it fit?</li>
+      <li>After Dana leaves on the 15th, what did you do with the questions only she can answer?</li>
+      <li>Where did Dana's Slack-DM correction end up in the RFC? Who else read it?</li>
+      <li>The PM (an Aisha): what did you prepare before your last finance meeting? What did you bring back?</li>
+      <li>If the notice said “Built for sanitized text,” would you sanitize differently? Show me the last thing you sanitized.</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. She was shown the live app at ddd-coach.netlify.app (nothing was sent) and the slice 2a demo. The #42 restyle wasn't deployed, so it was described in words. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>

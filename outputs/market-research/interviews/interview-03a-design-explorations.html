@@ -1,0 +1,695 @@
+<title>Priya Raman Interview 03a</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 03a · design explorations 01b + 02</div>
+      <h1>“Carry the board, not a paragraph about it.” <em>Priya</em> on the Untangle revision and Honest limits.</h1>
+      <p class="dek">We showed the tech lead the revised Untangle concept, rebuilt from her interview-02 feedback, then the Honest limits concept. The revision fixed almost everything she flagged, except the copy button she'd use first. The limits concept won trust by admitting its limits, then lost some of it by offering a summary.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 30 questions</span>
+        <span class="chip">Exploration 01b · concept, not built</span>
+        <span class="chip">Exploration 02 · concept, not built</span>
+        <span class="chip">Live app + own key → 03b</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC, due 30 October</dd></div>
+        <div><dt>Since 02</dt><dd>Dana, 29 Sep: case-based questions worked; her own note was wrong</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“For this RFC: <strong>the words-that-don't-match table, copied into Confluence as a real table.</strong> That's the glossary section, and finance is going to read it.”</blockquote>
+      <cite class="label">Priya, Q28. “Anything that ships after the 30th is for the next RFC.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>01b fixed nearly every flag except export.</b> The button still says “Copy prep sheet (Markdown).” It's the thing she'd use first.</span>
+        <div class="tags"><span>strong</span><span>#6 at P2</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">02</span>
+        <span><b>Name swapping skips the slow part of the scrub.</b> Customer names, rates, lanes and contract terms stay. The vendor block stays too.</span>
+        <div class="tags"><span>strong</span><span>#34 · #4</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">03</span>
+        <span><b>“Unconfirmed” earns its place.</b> Her own note was wrong for a week. Exports need “Ops, checked with Dana,” and a thumbs-up isn't confirmation.</span>
+        <div class="tags"><span>strong</span><span>B22 #19 · #4 · #6</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">04</span>
+        <span><b>A test she can run herself is facilitation.</b> The 48213 lookup took 15 minutes and settled TONU. Give one next step, and spare Dana's hour first.</span>
+        <div class="tags"><span>strong</span><span>B22 #19</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">05</span>
+        <span><b>Summaries lose things.</b> A Claude summary dropped TONU. She copies everything first. Carry the board, not counts.</span>
+        <div class="tags"><span>strong</span><span>B38 #7</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">06</span>
+        <span><b>A cut marker works only at the cut.</b> In s1 it sat below the scroll. Continue must append, never rewrite.</span>
+        <div class="tags"><span>strong</span><span>#44 · B35 #8</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">07</span>
+        <span><b>Browser storage doesn't change what she pastes.</b> Policy puts the board on her home laptop and the RFC on her work laptop. She'll copy it out anyway.</span>
+        <div class="tags"><span>strong</span><span>#5 needs #6</span></div>
+      </div>
+      <div class="sticky s-neutral weak">
+        <span class="n">08</span>
+        <span><b>Warn before the paste, don't show a battery.</b> One enum paste jumped the meter from 46% to 88%. She'd still check the bar.</span>
+        <div class="tags"><span>weak</span><span>B38 #7</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-01b">
+    <div class="section-head">
+      <h2 id="verdict-01b">Exploration 01b verdict</h2>
+      <span class="label">“Untangle a thread” v2 · stills 1–5</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">7 items</span></div>
+        <ul>
+          <li><b>Name-to-team swap, on by default</b><q>If I had to remember to tick it, I wouldn't.</q></li>
+          <li><b>Click a source label to see the line</b><q>I can click it and see finance's line.</q></li>
+          <li><b>Three questions, each on a real load</b><q>Dana answered the first two in about five minutes total, which never happens.</q></li>
+          <li><b>Pasted shorthand matched to questions</b><q>Matching my shorthand to the questions is the best thing in either concept.</q></li>
+          <li><b>“My notes from Dana · date · unconfirmed” in the tool</b><q>“Unconfirmed” turned out to be exactly right.</q></li>
+          <li><b>Test with an example before changing anything</b><q>That one question would have killed the “it's a bug” argument.</q></li>
+          <li><b>Welcome back as a banner</b><q>The welcome back is a banner.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">8 items</span></div>
+        <ul>
+          <li><b>Markdown copy → rich-text table</b><q>The button still says “Copy prep sheet (Markdown).”</q></li>
+          <li><b>Export label names the team, not Dana</b><q>Her name is still on it, right next to finance's definition.</q></li>
+          <li><b>“Ask Dana” gives yes/no lines to paste into Slack</b><q>Three paraphrased bullets get a thumbs-up.</q></li>
+          <li><b>One next step, the one that spares Dana's time first</b><q>The caption asks me about the truck, and the big button says “Ask Dana.” Which one?</q></li>
+          <li><b>TONU becomes its own term</b><q>It's a fee, so it's its own word.</q></li>
+          <li><b>Vary the cases across loads</b><q>Three questions on one load is really one case.</q></li>
+          <li><b>Show the outgoing text, and let her add swaps</b><q>If it's the model, the checkbox is theatre.</q></li>
+          <li><b>Show the whole note, with the matched part highlighted</b><q>I'll want to check it didn't invent the split.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">2 items</span></div>
+        <ul>
+          <li><b>“Dictate instead”</b><q>I said I'd dictate, tried it once, and went back to typing.</q></li>
+          <li><b>The board sticky that repeats question 1</b><q>I read it as a fourth question until I looked twice.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-02">
+    <div class="section-head">
+      <h2 id="verdict-02">Exploration 02 verdict</h2>
+      <span class="label">“Honest limits” · stills s1–s4</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>A visible “Cut short” marker</b><q>Saying “cut short” out loud is better than a reply that just stops.</q></li>
+          <li><b>“Copy everything first” when full</b><q>I paste the whole chat into my text file before I trust any summary.</q></li>
+          <li><b>An editable carried-over summary, as the second option</b><q>Keep both buttons. Just swap which one is blue.</q></li>
+          <li><b>The draft survives full and reload</b><q>It's small things like that that make me trust the rest.</q></li>
+          <li><b>“Don't paste customer names or rates”</b><q>Which I asked for.</q></li>
+          <li><b>Kept in the browser, not on the server</b><q>The right default for a stranger's app.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">7 items</span></div>
+        <ul>
+          <li><b>Marker at the cut, visible without scrolling</b><q>In s1 I didn't see the marker.</q></li>
+          <li><b>Continue appends, never rewrites</b><q>If question 1 changes when I press Continue, I trust neither version.</q></li>
+          <li><b>Warn before a paste fills the room, in pastes</b><q>Tell me before I send: “This paste fills most of what's left.”</q></li>
+          <li><b>“Copy everything first” becomes primary</b><q>It should be the blue button, not the grey one.</q></li>
+          <li><b>Carry meanings, statuses and labels, not counts</b><q>Carry the board, not a paragraph about it.</q></li>
+          <li><b>The old conversation stays readable after “Start fresh”</b><q>I didn't know that was the choice.</q></li>
+          <li><b>One notice across both concepts, with contract terms added</b><q>Your own demo breaks the rule your notice forgot.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">2 items</span></div>
+        <ul>
+          <li><b>The always-on percentage</b><q>I'd watch it like a phone battery.</q></li>
+          <li><b>The suggested answer inside question 3</b><q>It's my answer, not hers.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since last time</a>
+      <a href="#part-b">B · Exploration 01b</a>
+      <a href="#part-c">C · Exploration 02</a>
+      <a href="#part-d">D · Close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since last time</h3><span class="aside">no product talk yet</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Last time the RFC was due at the end of October and Dana was out from mid-October. What’s happened since?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Four weeks to go. I had one more hour with Dana last Tuesday, the 29th, and I get one more on the 13th before she’s out. The glossary section has real rows now. I typed Booking and Rebook in by hand on Friday: eight rows, about forty minutes including the fight with the table button. Finance asked to review the RFC, so the rebook definition will be read by the people who think it’s cancel plus new. Marcus hasn’t opened it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>Walk me through the session on the 29th. What did you bring, and what did you leave with?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I tried the thing I told you about: three questions, each on a real load. Two were on 48213, and one was on an August load where the pickup date moved. Dana answered the first two in about five minutes total, which never happens. Then she corrected me. My note from the 22nd said “RB = same bkg unless lane/date chg → AMEND.” It turns out a lane change is a new booking and only a date change is an amend. So my own shorthand was wrong for a week, and I’d already put it in the fourth column. <mark>Concrete questions worked. My notes didn’t.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>What did you do with the correction? Where does it live now?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I fixed the text file that night and the Confluence column on Friday. The Slack thread still has Maya’s version and my Claude chat still has the old one, so it’s right in two places and wrong in two. Then I DMed Dana three bullets asking “did I get this right?” She thumbs-upped it in under a minute. <mark>A thumbs-up in forty seconds isn’t a confirmation.</mark> It means she saw a message from me.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Did Dana’s 2019 sheet make it into the RFC?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I asked if I could attach it as an appendix. She said yes, but “put it in as ops, not as mine, half of it’s Maya’s anyway.” That’s the most she’s ever said about being named. She’s not worried about my notes quoting her. <mark>She’s worried about her name on a page the finance director reads.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Exploration 01b</h3><span class="aside">“Untangle a thread” v2 · a concept, not built</span></div>
+        <p class="stage">Shown stills 1–5 in order: the paste screen with “Replace people’s names with their team” ticked, the untangled board, the source popover on “Carrier confirmed, rate locked”, the welcome-back banner, and the notes matched to the questions. Told it’s a revision built from her interview-02 feedback.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q5</span><span>First pass. Did we fix what you flagged?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Mostly, yes. I’ll admit I went looking for what you missed. It uses teams instead of names, Rebook is on the board, and “Guess:” is at the front. The invoiceable card now says “From thread,” and I can click it and see finance’s line. There are three questions, each with a load, and the “which moment should booking mean” one is gone. The welcome back is a banner, and there’s no Talk toggle, no Miro and no Thursday button. What you missed is the one I’d use first: <mark>the button still says “Copy prep sheet (Markdown).”</mark> I told you Markdown tables arrive in Confluence as pipes. That cost me forty minutes on Friday.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>Anything new that’s wrong?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Two small things. TONU sits under “Rebook” like a third meaning of rebook. It isn’t. It’s a fee, so it’s its own word. And the pink sticky on the board, “Rebook: same booking or new?”, is question one again. I read it as a fourth question until I looked twice. Also, all three questions are on 48213. Three questions on one load is really one case. On Tuesday the August load did more work than my second 48213 question.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>Still 1. Replacing names with teams is on by default. Your policy covers the vendor, and also customer names, rates and contract terms. Does this move you from sanitized text to real material?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. On by default is right, because if I had to remember to tick it, I wouldn’t. But it swaps the part of the scrub I wasn’t doing. In August the fifteen minutes went on customer names, rates and lanes. I left colleague names in, as I admitted last time. This thread happens to have no customer in it, but the real ones do: “Acme wants the Laredo lane re-rated” is a normal line. <mark>And none of it touches the vendor, which is the actual no.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q8</span><span>So what does it save you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Maybe two minutes, and some guilt. Two things would make it worth more. First, let me add my own swaps, like “Acme” → “Customer A,” and keep the list, because it’s the same six customers every time. Second, show me the exact text before it leaves. The caption says “names swapped for teams before sending.” Swapped where? In my browser, or by your model after it has already read them? <mark>If it’s the model, the checkbox is theatre.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>The thread still says “load 48213.” Does your policy cover load numbers?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Honestly, I don’t know. A load ID isn’t a customer name, but anyone with admin access finds the customer in one click. Security would probably say yes, and I’d probably leave it in anyway. That tells you how the policy actually works for me. I scrub what I know is on the list and don’t think too hard about the rest.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>Still 5. Your answers are labeled “My notes from Dana · 22 Sep · unconfirmed.” Does that stop Dana worrying about being quoted?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>In the tool, yes. They’re my notes, it says so, and “unconfirmed” turned out to be exactly right, because my lane/date note was wrong for a week. But Dana’s worry isn’t this screen. It’s the RFC. <mark>If “my notes from Dana” is what lands in Confluence, her name is still on it, right next to finance’s definition.</mark> For the export I’d want the team: “Ops, checked with Dana 29 Sep” once she’s confirmed it, and “Ops, unconfirmed” before that. Her name stays in my copy.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>And the “Ask Dana: did I get this right?” button?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It depends on what it does. If it sends Dana anything, no. She doesn’t know your tool, and a message from a stranger’s app is worse than no message. If it gives me text to paste into Slack, yes, but make it yes/no lines, like “Lane change means new booking: yes or no?” She’ll answer that properly. Three paraphrased bullets get a thumbs-up.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>The coach says: “Before we change anything, let’s test it with 48213. Had the first carrier already sent a truck?” Facilitation or homework?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Facilitation, and I know because I did it. The Friday after we last talked, I looked 48213 up in the Rails console. The second invoice has a TONU charge line, so yes, the truck showed up and finance’s second invoice was legitimate. It took fifteen minutes because the invoice join is weird. That one question would have killed the “it’s a bug” argument that the old concept got wrong. <mark>It’s facilitation when I can answer it myself in fifteen minutes. It’s homework when only Dana can answer it and it doesn’t go on Dana’s list.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>Anything about how it’s asked?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>There are two next steps at once. The caption asks me about the truck, and the big button says “Ask Dana.” Which one? I’d do the truck first, because I can do it tonight, and if it answers the question I don’t spend Dana’s hour on it. So give me one next step, and the one that doesn’t cost Dana’s time comes first.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q14</span><span>Still 5 also shows your shorthand matched to the three questions. Does the matching look right?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It split my one note across two questions, correctly, and put “…” in front of the second half. Show me the whole line once, with the part it used highlighted, because I’ll want to check it didn’t invent the split. Still, <mark>matching my shorthand to the questions is the best thing in either concept.</mark> That hasn’t changed.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q15</span><span>“Dictate instead” for post-call notes. Last time you said you’d dictate right after a Dana call. Have you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Once. After the 29th I recorded a voice memo on my phone walking to the kitchen, about three minutes, because of what I told you. I never played it back, and the transcript said “Tony fee.” That evening I cleaned up the notes I’d typed during the call instead, because I type while Dana talks, and that’s already the record. <mark>So I said I’d dictate, tried it once, and went back to typing.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>Would you click it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Once, to see. Where does the audio go? If it’s OpenRouter again, that’s the same vendor review with a microphone on it. Keep the notes box. If Dictate costs you a week, I’d rather have the table.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Exploration 02</h3><span class="aside">“Honest limits” · a concept, not built</span></div>
+        <p class="stage">Shown stills in order: s1 a reply cut short, with the room meter at 22%; s1b after Continue; s2 nearly full at 88%; s3 “This conversation is full”; s3b a fresh conversation from a carried-over summary; s4 after a reload.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q17</span><span>s1 and s1b. The reply stops with “Cut short at the reply length limit” and a Continue button. Does that restore trust, or does any cut-off still taint the first two questions?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>First thing: in s1 I didn’t see the marker. I saw a reply ending in “When does a load get” and a progress bar. The marker was below the scroll, so on the screen that matters it looked exactly like what I complained about last time. Once I can see it, yes, a label right at the cut is the minimum. <mark>Saying “cut short” out loud is better than a reply that just stops.</mark> I don’t distrust the first two because it was cut. I’d distrust them if Continue changed them.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>What does Continue have to do for you to trust the first two?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Pick up exactly where it stopped and not touch anything above. In Claude I’ve typed “continue” on a long code answer and it restarted the block with different lines, so now I diff them by eye. If question 1 changes when I press Continue, I trust neither version. And honestly, three questions shouldn’t hit a limit. Make the answer fit, and keep the marker for when it doesn’t.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q19</span><span>Anything in the continued text?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Question 3 got finished as “for example a fee when the first carrier already sent a truck?” That’s the answer inside the question, and Dana will just say yes. Maybe the coach knows freight, but it’s leading her. <mark>It’s my answer, not hers.</mark> Ask it plainly: “Is the second one ever legitimate?”</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>s2, the room meter at 88% with “Nearly full.” Useful, or does it make you anxious?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Both. I’ve hit Claude’s “conversation is too long” wall twice in my Booking notes chat with no warning at all, so a warning beats a wall. But a percentage on screen all the time, I’d watch like a phone battery. <mark>The scary bit is the jump: one paste of the enum took it from 46 to 88, and nothing told me it would.</mark> Tell me before I send: “This paste fills most of what’s left.” Then I can trim it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q21</span><span>If you could have only one, the always-on bar or the warning before sending?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The warning. Although, to be honest, I’d check the bar before pasting Dana’s sheet, so I just argued against something I’d use. Hide it until it’s past half, and say it in pastes, not percent. “Room for about one more paste like the last one” I understand. 88% of what?</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>The notice at the top of 02 is different from the one in 01b. Anything?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Two concepts, two notices. 01b says “Not an approved vendor for you? Paste a sanitized copy,” which is the most honest line you’ve written. 02 says “Don’t paste customer names or rates,” which I asked for. You need both in one notice, and add contract terms. <mark>Look at the draft in s2: “the carrier contract says rejections within 2h are free.” Your own demo breaks the rule your notice forgot.</mark> The company name and retention I’ll save for next time.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q23</span><span>s3, “This conversation is full.” Would you trust the editable carried-over summary, or copy everything out first?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Copy first, every time. In September my Booking notes chat in Claude hit the limit, and I asked it to summarize everything for a new chat. The summary merged REBOOKED and AMENDED into “rebook/amend” and dropped TONU. I found out on the 29th, when Dana said TONU and my summary didn’t have it. <mark>Since then I paste the whole chat into my text file before I trust any summary.</mark> So “Copy everything first” should be the blue button, not the grey one.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q24</span><span>s3b. What would you check in the carried-over summary?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>What’s missing, and I can’t edit what’s missing. Then three things. The meanings, not the counts: “’Booking’ has 3 meanings” is a pointer, not a summary. Which 7 statuses are matched? “7 of 23” is useless when I’m checking against Dana’s sheet. And every open question still has its label, “unconfirmed” especially, because that’s the word summaries drop first. Actually, the thing that should carry over is the board from the other concept: terms, questions, events. <mark>Carry the board, not a paragraph about it.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q25</span><span>s3 says “Nothing here is deleted until you choose.” After the reload in s4, only the summary is there.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>So when I pressed “Start fresh,” that was me choosing? Then the old conversation is gone, and I didn’t know that was the choice. Keep it readable somewhere, even read-only. The draft surviving is good, though. I’ve lost a typed message to an error before, and it’s small things like that that make me trust the rest.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q26</span><span>The notice says the conversation is “kept in this browser.” Does that change what you’d paste? Where do you keep sensitive work notes today?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Plain text files in a folder on my work laptop. It syncs to the company OneDrive, because IT forces Documents to sync. Anything half-shareable goes in Confluence drafts, and nothing about work lives on my own laptop except the made-up version from August. “Kept in this browser” doesn’t change what I paste, because that’s decided by where it’s sent. It changes what I’d leave there overnight. <mark>And in March IT re-imaged my laptop and Chrome lost everything local. My text files survived because of OneDrive.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q27</span><span>So is browser storage good or bad for you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It’s the right default for a stranger’s app. I’d rather it sit in my browser than on your server. But there’s a catch nobody’s mentioned. If my policy means I use this at home with sanitized text, the board lives on my home laptop and the RFC lives on my work laptop. <mark>So I’ll copy it out anyway.</mark> That’s why the table export matters more to me than the storage.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q28</span><span>If you could have only one thing from either concept in the next month, what is it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Four weeks to the RFC, and Dana’s out after the 13th, so anything that ships after the 30th is for the next RFC, not this one. For this one, it’s the words-that-don’t-match table, copied into Confluence as a real table. That’s the glossary section, and finance is going to read it. Keeping my stuff is still the gate for using the tool at all, and I haven’t changed my mind on that. <mark>But if you ask what I’d use this month, it’s the table.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q29</span><span>What would you cut from either concept?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>From 01b, Dictate, and the pink sticky that repeats question one. From 02, the always-on percentage, and the answer tucked inside question 3. I’d also demote “Start fresh from a summary.” Actually no, keep both buttons. Just swap which one is blue.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q30</span><span>Anything we should have asked but didn’t?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Ask who answers when Dana’s out. It’s Maya, the ops lead, and Maya is “Ops” on your term map. Maya says a rebook is never a new booking, and Dana says it is when the lane changes. <mark>Team labels hid the one disagreement that’s inside a team.</mark> After the 13th, “Ops” will mean Maya’s version, and nobody reading the table will know. Ask me again after I’ve actually talked to her.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Rich-text export can follow paste and persistence</h3><div class="ref">#6 at P2 · #4 · #5 at P1</div></div>
+        <p>For the RFC due 30 October, the table is the one thing she'd use. It's the only interview-02 export ask that 01b still misses.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Summarising is the way past the conversation cap</h3><div class="ref">B38 #7</div></div>
+        <p>A Claude summary merged REBOOKED/AMENDED and dropped TONU. Carry the structured board, make copying out the default, and keep the old conversation readable.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Browser-only persistence answers “don't lose my stuff”</h3><div class="ref">#5</div></div>
+        <p>It covers a reload. It doesn't cover policy pushing her to a home machine while the RFC lives at work, or an IT re-image. #5 needs #6 as its backup.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Anonymising at paste time eases the policy problem</h3><div class="ref">#4 slice 3 · #34</div></div>
+        <p>It removes colleague names only. Customers, rates, lanes, contract terms and load IDs remain, and the vendor block is untouched. Only a provider path (#34) moves her to real material.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The data-flow notice is settled</h3><div class="ref">#2 (closed)</div></div>
+        <p>The two concepts show two notices. Neither lists contract terms, and the draft in 02's own demo pastes one. Revisit the wording in 03b against the live app.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Attributing disagreement by team is safe</h3><div class="ref">B05 #10</div></div>
+        <p>It's safe for exports, but it hides disagreement inside a team (Dana and Maya, both ops). Once Dana is away, “Ops” silently means Maya's version.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A cut marker is enough</h3><div class="ref">#44 · B35 #8</div></div>
+        <p>It has to sit at the cut and stay visible, and Continue has to append. The better fix is a reply shape that fits.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Voice has a debrief job</h3><div class="ref">slice 12 · #27</div></div>
+        <p>Her one real try was never played back. Dictation is unproven, and it would need its own vendor answer.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Copy</span><div><h3>Copy the term table as rich text</h3><div class="where">narrowest cut of #6</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>“Copy table” puts “Words that don't match” on the clipboard as an HTML table (Term, Team, Meaning), with a Markdown fallback as <code>text/plain</code>. No title, no coach lines, and TONU gets its own row.</dd></div>
+          <div><dt>Check</dt><dd>Paste into Confluence Cloud: a real 3-column table with 3 Booking rows, 2 Rebook rows and 1 TONU row. Paste into a plain-text editor: a valid Markdown table. Nothing needs deleting.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Preview</span><div><h3>Show what leaves, and let her add swaps</h3><div class="where">#4 · slice 3</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The name-to-team swap runs in the browser before sending. A swap list she can edit (e.g. <code>Acme → Customer A</code>) is kept in this browser. “Show what's sent” reveals the outgoing text with the swaps highlighted.</dd></div>
+          <div><dt>Check</dt><dd>With <code>Maya → Ops</code> and <code>Acme → Customer A</code>, the <code>/api/chat</code> body contains neither “Maya” nor “Acme.” The list survives a reload. The preview matches the request body byte for byte.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Carry</span><div><h3>When the conversation is full, copy first and carry the board</h3><div class="where">B38 #7</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>“Copy everything” is the primary action. “Start fresh” carries every term meaning, the open questions with their status labels verbatim, and the matched statuses by name. The old conversation stays readable, read-only.</dd></div>
+          <div><dt>Check</dt><dd>Fill a conversation with the 01b thread plus the shorthand notes, then start fresh. The carried text contains “TONU,” “unconfirmed,” all 3 questions and all 5 meanings, with no bare counts. The old log opens after a reload.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Mark</span><div><h3>Cut marker at the cut; Continue only appends</h3><div class="where">#44</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>On a capped reply, the log scrolls so that “Cut short · Continue” sits right after the last word. Continue appends to the same entry.</dd></div>
+          <div><dt>Check</dt><dd>Force a cap mid-question at 400px and 1280px. The marker is visible without scrolling. After Continue, the text before the cut is byte-identical, and the continuation carries no suggested answer.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 04 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>After the 13 October session (Dana's last before leave), what did you do with her answers in the first 24 hours?</li>
+      <li>When Maya covered for Dana, where did her answers differ from Dana's? How did you record it?</li>
+      <li>The last time a summary, from a person or an AI, dropped something important, how did you find out?</li>
+      <li>What did the RFC glossary look like on the 30th? What did you paste, and what did you retype?</li>
+      <li>What did finance challenge in the rebook definition during review?</li>
+      <li>A real domain expert (a Dana): here's “Ops, checked with Dana 29 Sep” in a doc. Comfortable? What label would you want?</li>
+      <li>A real security reviewer: is a load ID customer data under a policy like hers? Are contract terms?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Explorations 01b and 02 are design concepts, not shipped software. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>
