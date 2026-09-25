@@ -1,5 +1,5 @@
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
-import { parsePrompt } from "../src/domain/exchange.ts";
+import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
 import { field, stringField } from "../src/shared/json.ts";
 
 export type RejectionReason = "malformed" | "tooLong";
@@ -28,7 +28,7 @@ function charactersIn({ history, prompt }: Conversation): number {
 }
 
 function readConversation(body: unknown): Conversation | null {
-  const prompt = parsePrompt(stringField(body, "message") ?? "");
+  const prompt = promptField(body, "message");
   const history = readHistory(body);
   return prompt === null || history === null ? null : { history, prompt };
 }
@@ -41,7 +41,11 @@ function readHistory(body: unknown): Turn[] | null {
 }
 
 function readTurn(item: unknown): Turn | null {
-  const prompt = parsePrompt(stringField(item, "prompt") ?? "");
+  const prompt = promptField(item, "prompt");
   const reply = stringField(item, "reply");
   return prompt === null || !reply?.trim() ? null : { prompt, reply };
+}
+
+function promptField(body: unknown, key: string): Prompt | null {
+  return parsePrompt(stringField(body, key) ?? "");
 }
