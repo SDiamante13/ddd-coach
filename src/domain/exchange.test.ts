@@ -3,6 +3,7 @@ import {
   canRetry,
   fail,
   isBusy,
+  isRefused,
   messageLength,
   parsePrompt,
   reply,
@@ -17,6 +18,7 @@ import {
 const id = "exchange-1" as ExchangeId;
 const prompt = "Hello coach" as Prompt;
 const unavailable: Failure = { error: "Coach unavailable", retryable: true };
+const unverified: Failure = { error: "Coach couldn't verify the history", retryable: false };
 
 describe("Exchange", () => {
   it("fails a pending exchange with the error", () => {
@@ -110,6 +112,20 @@ describe("canRetry", () => {
 
   it("allows retrying only an exchange that failed", () => {
     expect(canRetry([reply(submit(id, prompt), "Hi there", "sig-1")], id)).toBe(false);
+  });
+});
+
+describe("isRefused", () => {
+  it("refuses an exchange that failed in a way not worth retrying", () => {
+    expect(isRefused(fail(submit(id, prompt), unverified))).toBe(true);
+  });
+
+  it("does not refuse an exchange that failed in a way worth retrying", () => {
+    expect(isRefused(fail(submit(id, prompt), unavailable))).toBe(false);
+  });
+
+  it("refuses an answer from the coach that is not worth retrying", () => {
+    expect(isRefused({ ok: false, ...unverified })).toBe(true);
   });
 });
 

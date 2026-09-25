@@ -50,3 +50,7 @@ export function parsePrompt(text: string): Prompt | null {
 export function messageLength(text: string): number {
   return text.trim().length;
 }
+
+export function isRefused(outcome: Exchange | AskResult): boolean {
+  return "retryable" in outcome && !outcome.retryable;
+}

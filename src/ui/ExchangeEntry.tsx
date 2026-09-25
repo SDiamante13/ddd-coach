@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Exchange } from "../domain/exchange.ts";
+import { isRefused, type Exchange } from "../domain/exchange.ts";
 import { PromptText } from "./PromptText.tsx";
 
 export function ExchangeEntry({ exchange, children }: { exchange: Exchange; children: ReactNode }) {
@@ -12,5 +12,5 @@ export function ExchangeEntry({ exchange, children }: { exchange: Exchange; chil
 }
 
 function shownStatus(exchange: Exchange): string {
-  return exchange.status === "failed" && !exchange.retryable ? "refused" : exchange.status;
+  return isRefused(exchange) ? "refused" : exchange.status;
 }

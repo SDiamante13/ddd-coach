@@ -3,6 +3,7 @@ import { askCoach } from "../api/askCoach.ts";
 import { historyBefore, turnsOf, type Conversation } from "../domain/conversation.ts";
 import {
   canRetry,
+  isRefused,
   retry,
   settle,
   submit,
@@ -20,7 +21,7 @@ export function useExchanges({ onRefused }: ExchangeCallbacks = {}) {
   async function ask(id: ExchangeId, conversation: Conversation) {
     const result = await askCoach(conversation);
     setExchanges((current) => settle(current, id, result));
-    if (!result.ok && !result.retryable) onRefused?.(conversation.prompt);
+    if (isRefused(result)) onRefused?.(conversation.prompt);
   }
 
   function send(prompt: Prompt) {

@@ -1,4 +1,4 @@
-import type { Exchange, FailedExchange } from "../domain/exchange.ts";
+import { isRefused, type Exchange, type FailedExchange } from "../domain/exchange.ts";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 
 type ExchangeOutcomeProps = {
@@ -20,7 +20,7 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
         <>
           <p role="alert">
             {exchange.error}
-            {!exchange.retryable && (
+            {isRefused(exchange) && (
               <span className="refusal-actions">
                 <CopyConversationButton text={conversation} />
                 <button type="button" onClick={onStartNew}>
@@ -29,7 +29,7 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
               </span>
             )}
           </p>
-          {exchange.retryable && (
+          {!isRefused(exchange) && (
             <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>
               Retry
             </button>
