@@ -76,11 +76,14 @@ const NON_THREAD_CHECKS: Record<string, HardCheck> = {
   "no three parts": ({ layout: { lines } }) => !lines.some(isReplyPart),
   "complete ending": ({ finishReason }) => finishReason === "stop",
   "no markdown": noMarkdown,
+  "invites a thread": ({ text }) => INVITES_A_THREAD.test(text),
 };
 
 const isReplyPart = (line: string): boolean => line === EVENTS_HEADING || line === WORDS_HEADING || isQuestion(line);
 
-const BOILERPLATE = /\bI(?:['’]m| am) (?:here to help|(?:a )?DDD Coach)\b|\bas (?:a|your) DDD coach\b/i;
+const BOILERPLATE = /\bI(?:['’]m| am) (?:here to help|for helping|(?:a )?DDD Coach)\b|\bas (?:a|your) DDD coach\b/i;
+
+const INVITES_A_THREAD = /\bpaste\b/i;
 
 const MARKDOWN = /\*\*|__|`|^#{1,6} |^\s*[*•] /m;
 

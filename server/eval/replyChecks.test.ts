@@ -299,6 +299,7 @@ describe("hard checks on a message that isn't a thread", () => {
     ["Hello! I am here to help you with Domain-Driven Design. Paste a thread to start."],
     ["Hi, I'm DDD Coach. I look at work threads for words that don't match. Paste one."],
     ["As a DDD coach, my job is to analyze business conversations. Paste a thread."],
+    ["I’m for helping you prepare from messy business threads, notes, status lists, or code; paste the material when you have it."],
   ])("fail no boilerplate for a canned role statement: %s", (reply) => {
     expect(failedHardChecks(reply, "stop", greeting)).toEqual(["no boilerplate"]);
   });
@@ -309,13 +310,19 @@ describe("hard checks on a message that isn't a thread", () => {
     ["an empty words part", "Words that don't match\nNone yet.\nPaste a thread to start."],
     ["a lone question line", "Hi!\nQuestion for the ops lead and the finance controller: which one counts?"],
   ])("fail no three parts for %s", (_case, reply) => {
-    expect(failedHardChecks(reply, "stop", greeting)).toEqual(["no three parts"]);
+    expect(failedHardChecks(reply, "stop", greeting)).toContain("no three parts");
   });
 
   it.each([
     ["no markdown", "**Domain-Driven Design** is a way to model software on the business.", "stop"],
     ["complete ending", "Domain-Driven Design is a way to model", "length"],
   ])("fail %s like any reply", (check, reply, finishReason) => {
-    expect(failedHardChecks(reply, finishReason, greeting)).toEqual([check]);
+    expect(failedHardChecks(reply, finishReason, greeting)).toContain(check);
+  });
+
+  it("fail invites a thread for an answer that never asks for the visitor's material", () => {
+    const reply = "DDD means Domain-Driven Design: a way to design software around the business's own words and rules.";
+
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual(["invites a thread"]);
   });
 });
