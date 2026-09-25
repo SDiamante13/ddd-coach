@@ -46,5 +46,9 @@ describe("Citations", () => {
     const footer = screen.getByRole("contentinfo");
     expect(footer).toHaveTextContent("The coach draws on Eric Evans, Domain-Driven Design Reference (2015), CC BY 4.0.");
     expect(within(footer).getByRole("link", { name: "CC BY 4.0" })).toHaveAttribute("href", "https://creativecommons.org/licenses/by/4.0/");
+    expect(within(footer).getByRole("link", { name: "Domain-Driven Design Reference" })).toHaveAttribute(
+      "href",
+      "https://www.domainlanguage.com/ddd/reference/",
+    );
   });
 });
