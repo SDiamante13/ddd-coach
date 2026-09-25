@@ -3,7 +3,7 @@ import type { ChatContentItems, ChatResult } from "@openrouter/sdk/models";
 import type { SendChatCompletionRequestRequest } from "@openrouter/sdk/models/operations";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
 import { describe, expect, it } from "vitest";
-import { conversationOf } from "../src/test/conversations.ts";
+import { verifiedConversationOf } from "./test/conversations.ts";
 import { createOpenRouterCoach } from "./openRouterCoach.ts";
 
 const config = { apiKey: "sk-or-test-key", model: "test/model" };
@@ -31,7 +31,7 @@ function fakeChat(content: string | ChatContentItems[] | null) {
 describe("OpenRouter coach", () => {
   it("sends the history as alternating turns before the prompt, capped and without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
-    const conversation = conversationOf("C", [
+    const conversation = verifiedConversationOf("C", [
       { prompt: "A", reply: "R1" },
       { prompt: "B", reply: "R2" },
     ]);
@@ -63,7 +63,7 @@ describe("OpenRouter coach", () => {
   it("asks for the configured reasoning effort", async () => {
     const { chat, requests } = fakeChat("Hi there");
 
-    await createOpenRouterCoach({ ...config, reasoningEffort: "low" }, chat).reply(conversationOf("A"));
+    await createOpenRouterCoach({ ...config, reasoningEffort: "low" }, chat).reply(verifiedConversationOf("A"));
 
     expect(requests[0]?.[0].chatRequest.reasoning).toEqual({ effort: "low" });
   });
@@ -75,12 +75,12 @@ describe("OpenRouter coach", () => {
       { type: "text", text: "there" },
     ]);
 
-    expect(await createOpenRouterCoach(config, chat).reply(conversationOf("Hello coach"))).toBe("Hi there");
+    expect(await createOpenRouterCoach(config, chat).reply(verifiedConversationOf("Hello coach"))).toBe("Hi there");
   });
 
   it("treats missing content as empty text", async () => {
     const { chat } = fakeChat(null);
 
-    expect(await createOpenRouterCoach(config, chat).reply(conversationOf("Hello coach"))).toBe("");
+    expect(await createOpenRouterCoach(config, chat).reply(verifiedConversationOf("Hello coach"))).toBe("");
   });
 });

@@ -1,5 +1,5 @@
-import type { Conversation } from "../src/domain/conversation.ts";
+import type { VerifiedConversation } from "./turnSignature.ts";
 
 export interface Coach {
-  reply(conversation: Conversation): Promise<string>;
+  reply(conversation: VerifiedConversation): Promise<string>;
 }

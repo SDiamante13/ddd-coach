@@ -1,9 +1,9 @@
-import type { Conversation } from "../src/domain/conversation.ts";
 import {
   COACH_MESSAGE_TOO_LONG,
   COACH_TIMED_OUT,
   COACH_TOO_LONG,
   COACH_UNAVAILABLE,
+  COACH_UNVERIFIED,
   type ChatResponseBody,
 } from "../src/shared/chatContract.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
@@ -11,7 +11,12 @@ import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
 import { MAX_BODY_BYTES, readJsonWithin } from "./requestBody.ts";
-import { createTurnSigner, type TurnSigner } from "./turnSignature.ts";
+import {
+  createTurnSigner,
+  verifyConversation,
+  type TurnSigner,
+  type VerifiedConversation,
+} from "./turnSignature.ts";
 
 export type CoachFailure = { name: string; statusCode: number | undefined };
 export type CoachFailureLog = (failure: CoachFailure) => void;
@@ -33,7 +38,9 @@ export function createChatHandler({ config, createCoach, signingKey, ...deps }: 
     if (!received.ok) return rejected("messageTooLong");
     const parsed = parseChatRequest(received.body);
     if (!parsed.ok) return rejected(parsed.reason);
-    return replyFrom(createCoach(config.config), parsed.conversation, replyDeps);
+    const conversation = verifyConversation(replyDeps.signer, parsed.conversation);
+    if (conversation === null) return rejected("unverified");
+    return replyFrom(createCoach(config.config), conversation, replyDeps);
   };
 }
 
@@ -45,20 +52,23 @@ function misconfigured(error: string): Response {
   return respond({ error }, { status: 500 });
 }
 
-const REJECTIONS: Record<RejectionReason, { error: string; status: number }> = {
+type Refusal = RejectionReason | "unverified";
+
+const REJECTIONS: Record<Refusal, { error: string; status: number }> = {
   malformed: { error: "Send a message.", status: 400 },
   tooLong: { error: COACH_TOO_LONG, status: 413 },
   messageTooLong: { error: COACH_MESSAGE_TOO_LONG, status: 413 },
+  unverified: { error: COACH_UNVERIFIED, status: 400 },
 };
 
-function rejected(reason: RejectionReason): Response {
+function rejected(reason: Refusal): Response {
   const { error, status } = REJECTIONS[reason];
   return respond({ error }, { status });
 }
 
 async function replyFrom(
   coach: Coach,
-  conversation: Conversation,
+  conversation: VerifiedConversation,
   { deadlineMs, log, signer }: ReplyDeps,
 ): Promise<Response> {
   try {
