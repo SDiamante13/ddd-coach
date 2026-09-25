@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { parseChatRequest } from "./chatRequest.ts";
+import { MAX_MESSAGE_CHARS, parseChatRequest } from "./chatRequest.ts";
 
 function turns(count: number) {
   return Array.from({ length: count }, () => ({ prompt: "A", reply: "R" }));
@@ -38,5 +38,9 @@ describe("parseChatRequest", () => {
     const history = [...turns(49), turnOfLength(24_000 - 49 * 2 - 1)];
 
     expect(parseChatRequest({ message: "B", history }).ok).toBe(true);
+  });
+
+  it("accepts a message at the per-message limit", () => {
+    expect(parseChatRequest({ message: "M".repeat(MAX_MESSAGE_CHARS), history: [] }).ok).toBe(true);
   });
 });

@@ -110,6 +110,18 @@ describe("Connection test", () => {
     expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
   });
 
+  it("shows a refusal of an overlong message inline, asking to shorten it", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "A very long message{Enter}");
+    server.reply(0, 413, { error: "This message is too long. Shorten it and try again." });
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent(
+      "This message is too long. Shorten it and try again.",
+    );
+  });
+
   it("retries the same message without duplicating it in the log", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();

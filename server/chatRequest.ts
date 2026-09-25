@@ -2,19 +2,22 @@ import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
 import { field, stringField } from "../src/shared/json.ts";
 
-export type RejectionReason = "malformed" | "tooLong";
+export type RejectionReason = "malformed" | "tooLong" | "messageTooLong";
 export type ChatRequestResult = { ok: true; conversation: Conversation } | { ok: false; reason: RejectionReason };
 
 export const MAX_HISTORY_TURNS = 50;
 export const MAX_CONVERSATION_CHARS = 24_000;
+export const MAX_MESSAGE_CHARS = 8_000;
 
 const MALFORMED: ChatRequestResult = { ok: false, reason: "malformed" };
 const TOO_LONG: ChatRequestResult = { ok: false, reason: "tooLong" };
+const MESSAGE_TOO_LONG: ChatRequestResult = { ok: false, reason: "messageTooLong" };
 
 export function parseChatRequest(body: unknown): ChatRequestResult {
   if (hasTooManyTurns(body)) return TOO_LONG;
   const conversation = readConversation(body);
   if (conversation === null) return MALFORMED;
+  if (conversation.prompt.length > MAX_MESSAGE_CHARS) return MESSAGE_TOO_LONG;
   return charactersIn(conversation) > MAX_CONVERSATION_CHARS ? TOO_LONG : { ok: true, conversation };
 }
 

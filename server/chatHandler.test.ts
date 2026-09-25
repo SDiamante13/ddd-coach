@@ -4,6 +4,7 @@ import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
+import { MAX_MESSAGE_CHARS } from "./chatRequest.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 
 const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key", model: "test/model" } };
@@ -161,6 +162,17 @@ describe("chat handler", () => {
     expect(await response.json()).toEqual({
       error: "This conversation is too long for the coach. Reload the page to start a new one.",
     });
+    expect(coach.reply).not.toHaveBeenCalled();
+  });
+
+  it("refuses a message too long on its own, asking to shorten it, without calling the coach", async () => {
+    const coach = echoCoach();
+    const handle = handler({ createCoach: () => coach });
+
+    const response = await handle(postMessage("M".repeat(MAX_MESSAGE_CHARS + 1)));
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({ error: "This message is too long. Shorten it and try again." });
     expect(coach.reply).not.toHaveBeenCalled();
   });
 
