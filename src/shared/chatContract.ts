@@ -1,5 +1,5 @@
 export type ChatTurn = { prompt: string; reply: string };
-export type ChatRequestBody = { message: string; history: ChatTurn[] };
+export type ChatRequestBody = { message: string; history: readonly ChatTurn[] };
 export type ChatResponseBody = { reply: string } | { error: string };
 
 export const COACH_UNAVAILABLE = "The coach is unavailable. Try again.";
