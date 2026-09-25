@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { isBusy } from "../domain/exchange.ts";
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
+import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
 import { AccessGate } from "./AccessGate.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
 import { conversationText } from "./conversationText.ts";
@@ -29,6 +31,10 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   });
   const busy = isBusy(exchanges);
   const conversation = () => conversationText(exchanges);
+  const tryExample = () => {
+    flushSync(() => setDraft(EXAMPLE_THREAD));
+    showFromTop(boxRef.current);
+  };
 
   return (
     <>
@@ -54,11 +60,20 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} boxRef={boxRef}>
         <ComposerActions
           started={exchanges.length > 0}
+          draftBlank={draft.trim() === ""}
           busy={busy}
           confirmation={confirmation}
           conversation={conversation}
+          onTryExample={tryExample}
         />
       </MessageForm>
     </>
   );
+}
+
+function showFromTop(box: HTMLTextAreaElement | null) {
+  if (!box) return;
+  box.focus();
+  box.setSelectionRange(0, 0);
+  box.scrollTop = 0;
 }
