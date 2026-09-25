@@ -24,7 +24,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const prompt = parsePrompt(draft);
-    if (busy || prompt === null) return;
+    if (busy || limit === "over" || prompt === null) return;
     onDraftChange("");
     onSend(prompt);
   }

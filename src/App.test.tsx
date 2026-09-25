@@ -141,6 +141,20 @@ describe("Connection test", () => {
     );
   });
 
+  it("sends nothing on Enter over the limit and keeps the draft", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+    const tooLong = "M".repeat(MAX_MESSAGE_CHARS + 1);
+    await user.click(input());
+    await user.paste(tooLong);
+
+    await user.keyboard("{Enter}");
+
+    expect(server.fetchMock).not.toHaveBeenCalled();
+    expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
+    expect(input()).toHaveValue(tooLong);
+  });
+
   it("starts with the message input focused and an empty log", () => {
     const { input, log } = renderApp();
 
