@@ -1,13 +1,14 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { ACCESS_BAD_REQUEST, ACCESS_WRONG_PASSWORD } from "../src/shared/accessContract.ts";
-import { createAccessPass } from "./accessPass.ts";
+import { ACCESS_MAX_AGE_S, createAccessPass } from "./accessPass.ts";
 import type { AccessPasswordResult, SigningKeyResult } from "./config.ts";
 import { TEST_SIGNING_KEY } from "./test/conversations.ts";
 import { createSessionHandler, createUnlockHandler } from "./unlockHandler.ts";
 
 const PASSWORD = "tidal-lantern-quartz";
 const NOW = new Date("2026-09-25T09:00:00Z");
+const JUST_EXPIRED_ISSUE = new Date(NOW.getTime() - ACCESS_MAX_AGE_S * 1000);
 const testPass = createAccessPass(TEST_SIGNING_KEY, PASSWORD);
 
 type AccessOverrides = { access?: AccessPasswordResult; signingKey?: SigningKeyResult };
@@ -46,12 +47,12 @@ function attributesOf(setCookie: string): string[] {
 }
 
 describe("unlock handler", () => {
-  it("sets a 7-day HttpOnly access cookie for the right password", async () => {
+  it("sets a 90-day HttpOnly access cookie for the right password", async () => {
     const response = await unlockHandler()(postPassword(PASSWORD));
 
     expect(response.status).toBe(204);
     const setCookie = response.headers.get("Set-Cookie") ?? "";
-    expect(attributesOf(setCookie)).toEqual(["Max-Age=604800", "Path=/api", "HttpOnly", "Secure", "SameSite=Lax"]);
+    expect(attributesOf(setCookie)).toEqual(["Max-Age=7776000", "Path=/api", "HttpOnly", "Secure", "SameSite=Lax"]);
     expect(testPass.admits(setCookie.split("; ")[0] ?? null, NOW)).toBe(true);
   });
 
@@ -121,7 +122,7 @@ describe("session handler", () => {
 
   it.each([
     ["no cookie", undefined],
-    ["an expired cookie", createAccessPass(TEST_SIGNING_KEY, PASSWORD).issue(new Date("2026-09-01T00:00:00Z")).split("; ")[0]],
+    ["an expired cookie", createAccessPass(TEST_SIGNING_KEY, PASSWORD).issue(JUST_EXPIRED_ISSUE).split("; ")[0]],
     ["a cookie for another password", createAccessPass(TEST_SIGNING_KEY, "old-pass").issue(NOW).split("; ")[0]],
     ["a forged cookie", `coach_access=9999999999.${"A".repeat(43)}`],
   ])("answers 401 to %s", async (_case, cookie) => {

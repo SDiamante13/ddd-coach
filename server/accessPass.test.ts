@@ -8,8 +8,8 @@ const OTHER_KEY = "other-signing-key-0123456789abcdefghijklmn";
 
 const PASSWORD = "tidal-lantern-quartz";
 const NOW = new Date("2026-09-25T09:00:00Z");
-const SEVEN_DAYS_S = 604_800;
-const EXP = Math.floor(NOW.getTime() / 1000) + SEVEN_DAYS_S;
+const NINETY_DAYS_S = 7_776_000;
+const EXP = Math.floor(NOW.getTime() / 1000) + NINETY_DAYS_S;
 const pass = createAccessPass(TEST_SIGNING_KEY, PASSWORD);
 const issued = cookieOf(pass.issue(NOW));
 
@@ -32,7 +32,7 @@ function cookieOf(setCookie: string): string {
 }
 
 describe("access pass", () => {
-  it("issues a cookie holding the expiry seven days out and a 43-character MAC", () => {
+  it("issues a cookie holding the expiry ninety days out and a 43-character MAC", () => {
     expect(cookieOf(pass.issue(NOW))).toMatch(new RegExp(`^coach_access=${EXP}\\.[A-Za-z0-9_-]{43}$`));
   });
 

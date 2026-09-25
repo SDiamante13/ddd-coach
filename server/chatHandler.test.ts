@@ -7,7 +7,7 @@ import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult 
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import { CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
-import { createAccessPass } from "./accessPass.ts";
+import { ACCESS_MAX_AGE_S, createAccessPass } from "./accessPass.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
 import { signedTurn, TEST_SIGNING_KEY } from "./test/conversations.ts";
@@ -16,6 +16,7 @@ const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key"
 const OTHER_SIGNING_KEY = "other-signing-key-0123456789abcdefghijklmn";
 const ACCESS_PASSWORD = "tidal-lantern-quartz";
 const NOW = new Date("2026-09-25T09:00:00Z");
+const JUST_EXPIRED_ISSUE = new Date(NOW.getTime() - ACCESS_MAX_AGE_S * 1000);
 const validAccessCookie = cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, ACCESS_PASSWORD), NOW);
 
 function cookieIssuedBy(pass: { issue(now: Date): string }, at: Date): string {
@@ -356,7 +357,7 @@ describe("chat handler", () => {
 
   it.each([
     ["no cookie", null],
-    ["an expired cookie", cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, ACCESS_PASSWORD), new Date("2026-09-01T00:00:00Z"))],
+    ["an expired cookie", cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, ACCESS_PASSWORD), JUST_EXPIRED_ISSUE)],
     ["a cookie with a tampered expiry", `coach_access=${Number(validExp) + 1}.${validMac}`],
     ["a cookie with a tampered MAC", `coach_access=${validExp}.${validMac.slice(0, -1)}${validMac.endsWith("A") ? "B" : "A"}`],
     ["a cookie for another password", cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, "old-password"), NOW)],
