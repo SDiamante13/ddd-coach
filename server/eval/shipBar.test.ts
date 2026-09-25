@@ -10,6 +10,9 @@ const ALL_SOFT: SoftScores = {
   noStaleMeaning: true,
   quotedWordsInThread: true,
   under400Words: true,
+  questionSpansThread: true,
+  jointRoles: true,
+  forum: true,
 };
 
 function run(fixture: string, overrides: Partial<ScoredRun> = {}): ScoredRun {
@@ -40,6 +43,7 @@ describe("shipBar", () => {
     ["one run misattributes", [run("carrier-status", { soft: { ...ALL_SOFT, attribution: false } })]],
     ["a fixture shows the split in only 1 of 3 runs", twoOf("booking-split", { split: false })],
     ["a fixture has a Code line in only 1 of 3 runs", twoOf("booking-split", { codeLine: false })],
+    ["a question spans the thread in only 1 of 3 runs", twoOf("booking-split", { questionSpansThread: false })],
   ])("does not ship when %s", (_case, changed) => {
     expect(shipBar([...passingRuns.slice(changed.length), ...changed]).ships).toBe(false);
   });

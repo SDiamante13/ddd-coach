@@ -1,6 +1,6 @@
 export const EVENTS_HEADING = "Events, in order";
 export const WORDS_HEADING = "Words that don't match";
-export const QUESTION = /^Question for [^:]+: .+\?$/;
+export const QUESTION = /^Question for ([^:]+): (.+\?)$/;
 
 const NUMBERED = /^\d+\. /;
 const MEANING = /^- /;
@@ -14,6 +14,13 @@ export type ReplyLayout = {
   eventClaims: string[];
   meaningClaims: string[];
   quotedWords: string[];
+  wordLines: string[];
+};
+
+export type CoachReply = {
+  events: string[];
+  words: { word: string; meanings: string[] }[];
+  question: { roles: string; text: string };
 };
 
 export function parseLayout(reply: string): ReplyLayout {
@@ -29,7 +36,25 @@ export function parseLayout(reply: string): ReplyLayout {
     eventClaims: eventLines.map((line) => line.replace(NUMBERED, "")),
     meaningClaims: wordLines.filter((line) => MEANING.test(line)).map((line) => line.replace(MEANING, "")),
     quotedWords: wordLines.flatMap((line) => QUOTED_WORD.exec(line)?.[1] ?? []),
+    wordLines,
   };
+}
+
+export function parseCoachReply(reply: string): CoachReply | null {
+  const layout = parseLayout(reply);
+  const question = layout.lines.map((line) => QUESTION.exec(line)).find((match) => match !== null);
+  if (!layout.inOrder || !question) return null;
+  return { events: layout.eventClaims, words: wordsOf(layout.wordLines), question: { roles: question[1]!, text: question[2]! } };
+}
+
+function wordsOf(wordLines: string[]): CoachReply["words"] {
+  const words: CoachReply["words"] = [];
+  for (const line of wordLines) {
+    const word = QUOTED_WORD.exec(line)?.[1];
+    if (word !== undefined) words.push({ word, meanings: [] });
+    else if (MEANING.test(line)) words.at(-1)?.meanings.push(line.replace(MEANING, ""));
+  }
+  return words;
 }
 
 export const isQuestion = (line: string): boolean => QUESTION.test(line);

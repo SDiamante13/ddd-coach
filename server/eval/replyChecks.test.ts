@@ -11,7 +11,14 @@ const fixture: Fixture = {
   key: {
     people: ["Dana", "Whitfield", "Tom", "Brennan", "Sam", "Kowalski"],
     attributions: [{ phrase: "invoiceable", teams: ["Finance"] }],
-    expect: { splitTeam: "Ops", splitTerms: ["REBOOKED", "AMENDED"], codeLine: true, stalePattern: "lane.*AMENDED" },
+    expect: {
+      splitTeam: "Ops",
+      splitTerms: ["REBOOKED", "AMENDED"],
+      codeLine: true,
+      stalePattern: "lane.*AMENDED",
+      forum: ["27 Oct"],
+      questionEvidence: [["submit"], ["invoiceable"], ["new row"]],
+    },
   },
 };
 
@@ -29,7 +36,7 @@ const GOOD_REPLY = [
   "- From thread: Ops (view A) means a date change with the same carrier is AMENDED.",
   "- From thread: Ops (view B) means every change is REBOOKED.",
   "",
-  "Question for the ops lead who handles rebooks: Is a date change with the same carrier still the same booking?",
+  "Question for the ops lead and the finance controller, at the 27 Oct review: If a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?",
 ].join("\n");
 
 const SIX_EVENTS = ["3.", "4.", "5.", "6."].map((n) => `${n} Guess: Ops calls the customer.`).join("\n") + "\n2. Guess:";
@@ -49,7 +56,7 @@ describe("hard checks", () => {
   });
 
   it.each([
-    ["layout", "the parts out of order", swap("Events, in order", "Words that don't match")],
+    ["parses", "the parts out of order", swap("Events, in order", "Words that don't match")],
     ["events", "six events", GOOD_REPLY.replace("2. Guess:", SIX_EVENTS)],
     ["labels", "a meaning line without a source label", GOOD_REPLY.replace("- Guess: Code", "- Code")],
     ["no names", "a person named in a meaning line", GOOD_REPLY.replace("Finance means", "Tom in Finance means")],
@@ -57,9 +64,18 @@ describe("hard checks", () => {
     ["no jargon", "avoided jargon", GOOD_REPLY.replace("Ops means", "Ops, a bounded context, means")],
     ["no jargon", "a made-up CamelCase name", GOOD_REPLY.replace("Ops rebooks", "BookingRebooked fires")],
     ["complete ending", "a truncated last line", GOOD_REPLY.slice(0, -12)],
+    ["no markdown", "bold emphasis", GOOD_REPLY.replace("Ops means", "**Ops** means")],
+    ["no offers", "an offer to do more", GOOD_REPLY.replace("on every rebook.", "on every rebook. Would you like me to draft a glossary.")],
     ["at most 4 words", "five quoted words", GOOD_REPLY.replace('"booking"', FIVE_WORDS)],
   ])("fail %s for %s", (check, _case, reply) => {
     expect(failedHardChecks(reply, "stop", fixture)).toContain(check);
+  });
+
+  it("fail code guess for a Code line stated as fact when no code was shown", () => {
+    const noCode = { ...fixture, key: { ...fixture.key, expect: { ...fixture.key.expect, codeShown: false } } };
+    const reply = GOOD_REPLY.replace("- Guess: Code", "- From thread: Code");
+
+    expect(failedHardChecks(reply, "stop", noCode)).toEqual(["code guess"]);
   });
 
   it("fail complete ending for a reply the model cut at the cap", () => {
@@ -76,6 +92,9 @@ describe("soft scores", () => {
       noStaleMeaning: true,
       quotedWordsInThread: true,
       under400Words: true,
+      questionSpansThread: true,
+      jointRoles: true,
+      forum: true,
     });
   });
 
@@ -87,6 +106,9 @@ describe("soft scores", () => {
     ["noStaleMeaning", "the corrected meaning carried", GOOD_REPLY.replace("a date change with", "a lane change with")],
     ["quotedWordsInThread", "a quoted word not in the thread", GOOD_REPLY.replace('"booking"', '"reservation"')],
     ["under400Words", "a reply of 400 words", GOOD_REPLY.replace("onward.", `onward.${" word".repeat(400)}.`)],
+    ["questionSpansThread", "a question from one part of the thread", GOOD_REPLY.replace(" but counts only once invoiceable,", ",")],
+    ["jointRoles", "a single role", GOOD_REPLY.replace("the ops lead and the finance controller", "the ops lead")],
+    ["forum", "no forum when the thread names one", GOOD_REPLY.replace(", at the 27 Oct review", "")],
   ])("miss %s for %s", (score, _case, reply) => {
     expect(softScores(reply, fixture)).toMatchObject({ [score]: false });
   });
