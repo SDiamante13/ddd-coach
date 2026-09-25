@@ -5,6 +5,7 @@ import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
 import { signedTurn, TEST_SIGNING_KEY } from "./test/conversations.ts";
@@ -48,6 +49,14 @@ function paddedBodyOf(bytes: number): string {
 
 function bodyPaddedWith(pad: string): string {
   return JSON.stringify({ message: "Hello coach", history: [], pad });
+}
+
+function longestConversationOf(character: string) {
+  const side = Math.floor(MAX_CONVERSATION_CHARS / (2 * MAX_HISTORY_TURNS + 1));
+  const text = character.repeat(side);
+  const history = Array.from({ length: MAX_HISTORY_TURNS }, () => signedTurn(text, text));
+  const message = character.repeat(MAX_CONVERSATION_CHARS - 2 * side * MAX_HISTORY_TURNS);
+  return { history, message };
 }
 
 describe("chat handler", () => {
@@ -266,9 +275,9 @@ describe("chat handler", () => {
 
   it("accepts the longest allowed conversation written in 3-byte characters", async () => {
     const handle = handler();
-    const history = Array.from({ length: 50 }, () => signedTurn("€".repeat(240), "€".repeat(239)));
+    const { history, message } = longestConversationOf("€");
 
-    const response = await handle(postMessage("€".repeat(50), history));
+    const response = await handle(postMessage(message, history));
 
     expect(response.status).toBe(200);
   });
