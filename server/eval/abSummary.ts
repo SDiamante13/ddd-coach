@@ -60,6 +60,7 @@ function reportedOnlyTable({ runs }: AbReport): string[] {
 }
 
 function budgetLine({ runs }: AbReport): string {
+  if (runs.length === 0) return "Budget: no calls finished.";
   const costOf = (arm: Arm) => dollars(runs.filter((run) => run.arm === arm));
   const ms = runs.map((run) => run.ms);
   const spend = `live ${costOf("live")}, candidate ${costOf("candidate")}, total ${dollars(runs)} over ${runs.length} calls`;

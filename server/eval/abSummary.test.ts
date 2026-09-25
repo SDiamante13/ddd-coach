@@ -88,6 +88,10 @@ describe("abSummary", () => {
     );
   });
 
+  it("says no calls finished instead of a budget when a run aborts on its first call", () => {
+    expect(abSummary(reportOf([], { aborted: "UnauthorizedResponseError 401" }))).toContain("Budget: no calls finished.");
+  });
+
   it("gives no verdict without a target", () => {
     expect(abSummary(reportOf(shipping, { target: null })).split("\n")[2]).toBe(
       "**No verdict:** name the targeted failure with `--target`.",

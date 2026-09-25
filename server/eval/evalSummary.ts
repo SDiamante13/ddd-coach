@@ -9,9 +9,9 @@ export function evalSummary(heading: string, runs: readonly SummaryRun[], bar: S
   return [
     `# ${heading}`,
     "",
-    `**Ships: ${bar.ships ? "yes" : "no"}.** Hard checks ${count(bar.hard)} (same meaning not split is reported only, #76), attribution ${count(bar.attribution)}.`,
+    `**Every run clean: ${bar.ships ? "yes" : "no"}.** Hard checks ${count(bar.hard)} (same meaning not split is reported only, #76), attribution ${count(bar.attribution)}.`,
     "",
-    "| Fixture | Split (3/3) | Code line (3/3) | Question spans the thread (3/3) | Same meaning named (reported only, #76) |",
+    "| Fixture | Split | Code line | Question spans the thread | Same meaning named (reported only, #76) |",
     "|---|---|---|---|---|",
     ...bar.perFixture.map(fixtureRow),
     "",
