@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { readConfig, readTimeoutMs } from "./config.ts";
+import { readConfig, readSigningKey, readTimeoutMs } from "./config.ts";
 
 const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
 
@@ -56,5 +56,32 @@ describe("readTimeoutMs", () => {
 
   it.each(["", "  ", "abc", "0", "-1", "2.5"])("falls back to 25 seconds for %j", (value) => {
     expect(readTimeoutMs({ COACH_TIMEOUT_MS: value })).toBe(25_000);
+  });
+});
+
+describe("readSigningKey", () => {
+  it("fails naming the variable when the key is not set", () => {
+    expect(readSigningKey({})).toEqual({ ok: false, error: "COACH_SIGNING_KEY is not set." });
+  });
+
+  it("treats a whitespace-only key as not set", () => {
+    expect(readSigningKey({ COACH_SIGNING_KEY: " \t\n " })).toEqual({ ok: false, error: "COACH_SIGNING_KEY is not set." });
+  });
+
+  it("accepts a key of exactly 32 characters", () => {
+    expect(readSigningKey({ COACH_SIGNING_KEY: "k".repeat(32) }).ok).toBe(true);
+  });
+
+  it("refuses a key shorter than 32 characters, naming the minimum", () => {
+    expect(readSigningKey({ COACH_SIGNING_KEY: "k".repeat(31) })).toEqual({
+      ok: false,
+      error: "COACH_SIGNING_KEY must be at least 32 characters.",
+    });
+  });
+
+  it("reads a key of 43 characters without surrounding whitespace", () => {
+    const key = "k".repeat(43);
+
+    expect(readSigningKey({ COACH_SIGNING_KEY: ` ${key}\n` })).toEqual({ ok: true, key });
   });
 });

@@ -2,8 +2,9 @@ import { ChatRequestEffort } from "@openrouter/sdk/models";
 
 export type ReasoningEffort = (typeof ChatRequestEffort)[keyof typeof ChatRequestEffort];
 export type CoachConfig = { apiKey: string; model: string; reasoningEffort?: ReasoningEffort };
-export type ConfigResult = { ok: true; config: CoachConfig } | { ok: false; error: string };
-export type SigningKeyResult = { ok: true; key: string } | { ok: false; error: string };
+type Misconfigured = { ok: false; error: string };
+export type ConfigResult = { ok: true; config: CoachConfig } | Misconfigured;
+export type SigningKeyResult = { ok: true; key: string } | Misconfigured;
 
 export type Env = Readonly<Record<string, string | undefined>>;
 
@@ -11,6 +12,8 @@ const API_KEY = "OPENROUTER_API_KEY";
 const MODEL = "OPENROUTER_MODEL";
 const REASONING_EFFORT = "OPENROUTER_REASONING_EFFORT";
 const TIMEOUT = "COACH_TIMEOUT_MS";
+const SIGNING_KEY = "COACH_SIGNING_KEY";
+export const MIN_SIGNING_KEY_CHARS = 32;
 const DEFAULT_TIMEOUT_MS = 25_000;
 const REASONING_EFFORTS: readonly string[] = Object.values(ChatRequestEffort);
 
@@ -41,11 +44,20 @@ function present(value: string | undefined): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
-function missing(name: string): ConfigResult {
+function missing(name: string): Misconfigured {
   return { ok: false, error: `${name} is not set.` };
 }
 
 export function readTimeoutMs(env: Env): number {
   const timeoutMs = Number(present(env[TIMEOUT]));
   return Number.isInteger(timeoutMs) && timeoutMs > 0 ? timeoutMs : DEFAULT_TIMEOUT_MS;
+}
+
+export function readSigningKey(env: Env): SigningKeyResult {
+  const key = present(env[SIGNING_KEY]);
+  if (key === undefined) return missing(SIGNING_KEY);
+  if (key.length < MIN_SIGNING_KEY_CHARS) {
+    return { ok: false, error: `${SIGNING_KEY} must be at least ${MIN_SIGNING_KEY_CHARS} characters.` };
+  }
+  return { ok: true, key };
 }
