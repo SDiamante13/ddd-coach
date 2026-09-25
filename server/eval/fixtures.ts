@@ -1,11 +1,14 @@
 import { readFileSync } from "node:fs";
+import { EXAMPLE_THREAD } from "../../src/shared/exampleThread.ts";
 import type { Fixture, FixtureKey } from "./replyChecks.ts";
 
-export const FIXTURE_NAMES = ["booking-split", "rebook-notes", "carrier-status"] as const;
+export const FIXTURE_NAMES = ["booking-split", "rebook-notes", "carrier-status", "example-thread"] as const;
 
 const FIXTURES = new URL("./fixtures/", import.meta.url);
+const SHARED_THREADS: Partial<Record<string, string>> = { "example-thread": EXAMPLE_THREAD };
 
 export function loadFixture(name: string): Fixture {
   const read = (file: string) => readFileSync(new URL(file, FIXTURES), "utf8");
-  return { thread: read(`${name}.txt`), key: JSON.parse(read(`${name}.key.json`)) as FixtureKey };
+  const thread = SHARED_THREADS[name] ?? read(`${name}.txt`);
+  return { thread, key: JSON.parse(read(`${name}.key.json`)) as FixtureKey };
 }
