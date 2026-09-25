@@ -22,8 +22,9 @@ Synthetic interviews generate hypotheses, not evidence. Promote an insight only 
 | 5 | concepts: Explorations 03b, 02b, 05 + #58 citation toggle | [md](interviews/interview-05-concepts-03b-02b-05.md) · [html](interviews/interview-05-concepts-03b-02b-05.html) | 03b fixed columns, not stale cells; Copy table drops the settle-by line and open questions; learning check passed when prompted (weak); drop the citation toggle: citations always in replies, never in copies |
 | 5c | concept: Exploration 03c, before #6 | [md](interviews/interview-05c-explore-03c.md) · [html](interviews/interview-05c-explore-03c.html) | 6 ok / 7 stale / 5 missing; retyping ~7 min (from 8), but now hunting wrong content; split row → two credited rows with loads; one check must update the cell, the question and Dana's line |
 | 6 | 03 (#4 paste → disagreements) + Explorations 06, 05b | [md](interviews/interview-06-after-slice-03.md) · [html](interviews/interview-06-after-slice-03.html) | Win condition partly met: run 1 asked a question she'd missed, run 2 proposed an answer; tie with Claude broken for the question only ('one tab, one job'); reused the move unprompted but can't name it; view A/B unstable; notice still 1.5/5; #68 not fixed |
+| 6b | 41 (conference password gate) | [md](interviews/interview-06b-after-slice-41.md) · [html](interviews/interview-06b-after-slice-41.html) | A slide password is 'a room key, not an account'; nobody has a thread at a meetup, so 'Try an example' (#63) is now a yes; rotating the password after the conference breaks the 90-day promise; hitting the spend limit shows a generic error |
 
-Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`, `slice-03.md`
+Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`, `slice-03.md`, `slice-41.md`
 
 ## Queued for interview 04
 

@@ -1,0 +1,573 @@
+<meta charset="utf-8">
+<title>Priya Raman Interview 06b</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 06b · after slice 41 (conference gate)</div>
+      <h1>“Nobody brings their thread to a meetup. <em>Bring one for them.</em>”</h1>
+      <p class="dek">The tech lead got through the conference password in about a minute and a half, reading it off a photo of the slide. Then she had nothing to paste: she'd deleted her sanitized copies, and she wouldn't paste company text next to strangers anyway. Three lines typed from memory came back as her own pre-read question. The gate passed. The five minutes didn't show her the question.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Short script · 12 questions</span>
+        <span class="chip">Slice 41 (#41) · shipped</span>
+        <span class="chip">Meetup · personal laptop · 5 min</span>
+        <span class="chip">#73 retest · kept for 07</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Where</dt><dd>Local DDD meetup, Thu 22 Oct, between two talks</dd></div>
+        <div><dt>Kit</dt><dd>Personal laptop, meetup Wi-Fi, phone photo of the slide</dd></div>
+        <div><dt>Since 06</dt><dd>Pre-read sent that morning; sanitized copies deleted at lunch; finance review Tue 27 Oct</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">The one thing the conference version needs</div>
+    <div>
+      <blockquote>“<strong>An example that finds the question.</strong> Long, messy and fictional. One click, not sent until I press Send, and the question shows me the two lines it joined.”</blockquote>
+      <cite class="label">Priya, Q12. “Everything else tonight was fine, including the password.”</cite>
+    </div>
+  </section>
+
+  <section class="one-thing" aria-labelledby="example-label">
+    <div class="label" id="example-label">“Try an example” verdict · GitHub #63</div>
+    <div>
+      <blockquote><strong>Flips to yes, for the conference.</strong> In 04a: “Me, no, I came with my own thread.” Tonight: “I'd have clicked it first.” It has to be long enough to hide a link and show the two lines the question came from.</blockquote>
+      <cite class="label">A three-line sample repeats her failed try. A canned reply is fine only if the screen says it's prepared: “A demo that's better than the product is the thing I'd tell people about, and not kindly.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-event">
+        <span class="n">01</span>
+        <span><b>At a meetup nobody has a thread, and the room stops the paste.</b> Sanitized copies deleted; the row behind reads her screen. The only input is memory or a built-in example.</span>
+        <div class="tags"><span>medium</span><span>#63</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>Short input can't show the win.</b> Three typed lines came back as her own pre-read question. The question she wouldn't have thought of needs a long thread with distant parts.</span>
+        <div class="tags"><span>medium</span><span>#63 · #4</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">03</span>
+        <span><b>The gate isn't an account.</b> “A room key.” The friction was a letter's case read off a photo, and an error that points at a slide that's gone. About 90 s of a 5-minute window.</span>
+        <div class="tags"><span>strong</span><span>#41</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">04</span>
+        <span><b>The 90-day memory is invisible, and #72's rotate step breaks it.</b> She returns on a work fight plus her own note, not an email. The gate at home again means she's gone.</span>
+        <div class="tags"><span>medium</span><span>#41 × #72</span></div>
+      </div>
+      <div class="sticky s-neutral weak">
+        <span class="n">05</span>
+        <span><b>The password spreads at once, and word of mouth stalls on it.</b> Read out to a neighbour in minutes. Telling Ravi means handing out a password and a personal laptop.</span>
+        <div class="tags"><span>weak</span><span>#41 · #72</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">06</span>
+        <span><b>A canned example backfires unless it's labelled.</b> With run variance, an unlabelled pre-recorded question makes the demo better than the product.</span>
+        <div class="tags"><span>medium</span><span>#63 · #73</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="context-h">
+    <div class="section-head">
+      <h2 id="context-h">Conference vs solo prep</h2>
+      <span class="label">Thu meetup, 5 min · Sunday at home, 04a–06 · what differs for the product</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Meetup</span><span class="count">Thu 22 Oct</span></div>
+        <ul>
+          <li><b>Input: none. Typed 3 lines from memory</b><q>Three lines from memory can't surprise me.</q></li>
+          <li><b>Time: ~5 min, ~1.5 min of it at the gate</b><q>About a minute and a half gone before I saw a message box.</q></li>
+          <li><b>Blocker: the room; HTTPS is fine</b><q>At a meetup the notice isn't what stops me. The room is.</q></li>
+          <li><b>Won't forgive: the gate eating the break; the coach down for 60 people</b><q>The other forty warn each other about.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Solo prep</span><span class="count">Sunday at home</span></div>
+        <ul>
+          <li><b>Input: a 12k sanitized thread in a file</b><q>First Sunday in three where I didn't choose which team to leave out.</q></li>
+          <li><b>Time: an evening; sanitizing is the cost</b><q>The paste is the expensive part.</q></li>
+          <li><b>Blocker: company policy and the notice, 1.5 / 5</b><q>For our security review it's still zero.</q></li>
+          <li><b>Won't forgive: a question that proposes, or a row with the wrong owner</b><q>If I have to run it twice and pick, I'm the coach.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">For the product</span><span class="count">what differs</span></div>
+        <ul>
+          <li><b>At a conference the product supplies the input: #63, long enough to hide a link</b><q>Bring one for them.</q></li>
+          <li><b>Every second before the first reply counts: gate copy, example length</b><q>I won't read fifty messages at a break.</q></li>
+          <li><b>#55 pays off at home, not at the meetup; the return visit needs the cookie alive</b><q>Tell me it remembers, and then don't break it.</q></li>
+          <li><b>The password leaks by design, so the budget is the bound, and a spent budget should say so (#72)</b><q>Cap the money, but don't lock out the people who were in the room.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Talks and tools</a>
+      <a href="#part-b">B · The gate</a>
+      <a href="#part-c">C · Nothing to paste</a>
+      <a href="#part-d">D · The notice</a>
+      <a href="#part-e">E · Coming back</a>
+      <a href="#part-f">F · Telling someone</a>
+      <a href="#part-g">G · Close</a>
+    </nav>
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Talks and tools</h3><span class="aside">a phone call on her walk home, 21:40</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>The last time you tried a tool live during a talk. What happened, and did you ever go back to it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Context Mapper, a meetup in spring last year. I installed the VS Code extension during the Q&amp;A, typed the speaker's example from the slide, and had a context map in about ten minutes. I went back once, that Saturday, with our booking model, and quit after an hour over the ceremony. So it worked on their example in the room and died on mine at home. <mark>What I try in a talk gets tried on the speaker's example. The real test is the return visit, and that only happens if I have my own mess that week.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>Walk me through tonight's five minutes.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>When the URL and password slide came up, I photographed it, like every slide with a link on it. At the break I typed the URL from the photo and got the password screen. My first try was wrong, because in the photo I couldn't tell if one letter was a capital. It said “Check the slide and try again”, and by then the slide showed the next speaker's title. I checked my photo instead, typed it the other way, and got in: about a minute and a half gone before I saw a message box.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>The gate</h3><span class="aside">slice 41 · “Conference password”</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q3</span><span>Did the password feel like an account?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. An account wants my email and a promise that I'll remember something. This is the Wi-Fi password: someone puts it on a slide, everyone types it, and nobody owns it. <mark>A password on a slide is a room key, not an account.</mark> The friction was reading it off a photo, not the gate. And the error told me to check a slide that wasn't there any more.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Nothing to paste</h3><span class="aside">no thread on this laptop · #63</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Once you were in, what did you paste?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Nothing, because I had nothing. The pre-read went out this morning, and at lunch I deleted every sanitized copy from the personal laptop. Two weeks of company Slack on a personal machine, names stripped or not, is something I'd have to explain if anyone asked. So I typed three lines from memory, made up to sound like us without being us: “Ops: a rebook is the same booking. Finance: a rebook means a second invoice. Carrier: it's a new tender.” It took about eight seconds and gave me my three lines back as events and words. Its question was about one rebooked load and whether finance raised a second invoice, and that's the pre-read question I sent this morning. <mark>It's only as surprising as what you give it, and three lines from memory can't surprise me.</mark></p></div></div>
+          </div>
+          <p class="stage">About 150 characters typed. The reply is synthetic, shaped like the slice 3 output: three events, one word (“rebook”) with three holders, and one question. Short input gives the coach no second part of a thread to join.</p>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Would a “Try an example” button have changed those five minutes?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Tonight, yes. I'd have clicked it first. In 04a I said no because I'd come with my own thread, but tonight nobody in that room had theirs, and nobody would paste it on meetup Wi-Fi next to strangers. A three-line example would do what mine did, though: show that it can sort what I said. It has to be long and messy, fifty messages with the “+1”s and a side-thread, with one link hidden between something early and something late, and it has to show me the two lines the question came from, because I won't read fifty messages at a break. <mark>The example has to prove the question, or it's an advert for the three things Claude also does.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>Suppose the example's reply were prepared in advance, so it's instant and always the good question.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Fine, if the screen says so. If it's canned and doesn't say, the first person who runs their own thread gets my run 2 from Sunday, the advice dressed as a question, and decides the demo was better than the product. <mark>A demo that's better than the product is the thing I'd tell people about, and not kindly.</mark> Run it live and I'll wait eight seconds.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>The notice, in a room</h3><span class="aside">#55 · #69 · on the gate screen</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q7</span><span>The notice was on the password screen. Was it enough for you to paste anything there?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I read it, because it was the only thing on the screen apart from the field. It's the same notice, still one and a half out of five. But tonight that didn't matter. The Wi-Fi isn't the problem, because the site is HTTPS. The problem is the man next to me with his elbow on my armrest: whatever I paste at a meetup, the row behind me reads too. <mark>At a meetup the notice isn't what stops me. The room is.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>Coming back</h3><span class="aside">90-day cookie · #72 rotation</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q8</span><span>The site remembers this browser for 90 days. Will you come back to it from home, with a real thread?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I didn't know it remembered. Nothing said so, and I assumed I'd need the password again, from a photo buried in two hundred slide photos. I'll be back if Tuesday's finance review leaves a fight, and it will. I'll find the URL through the note I send myself after every talk, “DDD coach, meetup 22 Oct”, not through an email from you: <mark>ask for my email and you've built the account with extra steps.</mark> But if the gate asks me for the password on Sunday, I won't dig through photos. I'll give up.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>The plan is to change the password after the conference. That signs out every browser.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Then the 90 days is a promise you break on Monday. <mark>Change it if someone abuses it, and cap the money, but don't lock out the people who were in the room.</mark> The people who come back a week later are the only ones who matter to you, and they're the ones who'd lose it.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Telling someone</h3><span class="aside">word of mouth</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q10</span><span>Would you tell a colleague? What would you say, in one line?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's already gone further than the slide. The man next to me missed it and asked me for the password, and I read it out. For Ravi, tomorrow: “Paste the whole thread, not your summary, go straight to the question at the bottom, and run it twice.” Then he'll ask for the password, and I'll have to decide whether it's mine to give, and he'd need his personal laptop, which he won't use on a Friday. <mark>So I'll tell him, and he'll try it in a month, if ever.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-g">
+        <div class="part-head"><span class="tab">G</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q11</span><span>What would have made tonight a waste of your five minutes?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Spending them on the password, which I nearly did. Two rows up, someone typed “what is an aggregate”, got something back, and turned the laptop to his friend with a face. I didn't see what it said, but it wasn't what he wanted. And the coach falling over because sixty people hit it in the same break: <mark>a tool that works for the first twenty people is a tool the other forty warn each other about.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>The one thing the conference version needs?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>An example that finds the question. Long, messy and fictional. One click, not sent until I press Send, and the question shows me the two lines it joined. Everything else tonight was fine, including the password. <mark>Nobody brings their thread to a meetup. Bring one for them.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Implications by issue</h2>
+      <span class="label">#41 · #63 · #55/#69 · #72 · #5</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A password field is all the gate needs to say</h3><div class="ref">#41</div></div>
+        <p>Keep it. The gate never says the browser stays unlocked, so she assumes she'll need the slide again. And “Check the slide” assumes the slide is still up. Her mistype was a capital, read off a photo.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>An example helps first-timers only once replies coach</h3><div class="ref">#63</div></div>
+        <p>That gate is met, and the verdict flips for the conference. The new spec: long and messy, one early/late link, the question shows its two lines, not auto-sent, live or labelled as prepared. Add it as an eval fixture, because variance hits the example too.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Conference use is progress on the notice</h3><div class="ref">#55 · #69</div></div>
+        <p>No change: still 1.5 of 5, read on the gate. At a meetup the room decides whether she pastes. The notice matters for the return visit from home.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The password bounds the cost, and rotation is harmless</h3><div class="ref">#72</div></div>
+        <p>The password spreads by word of mouth in minutes, so the hard limit is the real bound. A spent limit shows “The coach is unavailable. Try again.”, which invites a Retry storm. Rotating after the conference signs out every return visitor. Rotate on abuse, not by date. That's Steven's call.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Conference visitors need their conversation kept</h3><div class="ref">#5</div></div>
+        <p>She'd throw the three-line try away. #5 stays a solo-prep need (the Tue → Thu gap from 01). The only thing that must persist from the meetup to home is the unlock.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Example</span><div><h3>A conference example that proves the question</h3><div class="where">#63</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>“Try an example thread” in the empty state fills the box with a fictional, messy thread (30–50 messages, roles not names, a side-thread, “+1”s, ~4–6k chars) where one early and one late message imply a question. Not auto-sent. Hidden once the conversation starts. The same thread becomes an eval fixture.</dd></div>
+          <div><dt>Check</dt><dd>One click fills the box; 0 requests until Send. In 3/3 live runs on the production model, the question references both planted messages and passes <code>questionAsks</code>. The purpose line and notice stay visible.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Remember</span><div><h3>Say it remembers, and keep that promise</h3><div class="where">#41 copy · #72 checklist</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Under the field: “This browser stays unlocked for 90 days.” Wrong password: “That password isn't right. Check the capitals and try again.” In #72, “rotate after the conference” becomes “rotate if the usage alert shows abuse”.</dd></div>
+          <div><dt>Check</dt><dd>A fresh profile shows the line. Wrong password → new copy, field kept, <code>aria-invalid</code>. Unlock, quit and reopen the browser → no gate. The #72 body no longer schedules a rotation.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Budget</span><div><h3>A spent budget says so</h3><div class="where">#72 · code</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>An upstream 402 (credit limit) maps to “The coach has used up its budget for today. Try again tomorrow.”, with no Retry button, logged with <code>statusCode: 402</code>.</dd></div>
+          <div><dt>Check</dt><dd>A handler test where the coach throws <code>statusCode: 402</code> gets that copy and a non-502 status. The UI shows it without Retry and keeps the draft. Other failures still show <code>COACH_UNAVAILABLE</code> with Retry.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">For the next interview</h2>
+      <span class="label">07 keeps the #73 real-reply retest · #70 questions stay for a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>After #63 ships: click the example cold. How long until she finds the question and the two lines it joined?</li>
+      <li>Did she come back after the 27 Oct review? Did the gate appear? What did she paste, and how long did sanitizing take?</li>
+      <li>Did Ravi try it? On which laptop? Did he get the password from her?</li>
+      <li>If the example's reply is labelled “prepared”, does she still run it live to compare?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Slice 41 (#41) is live. Her meetup evening and the reply to her three typed lines are synthetic; the gate copy, 90-day cookie and failure copy are from the repo and the slice 41 demo. The password is not named anywhere on this page. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>
