@@ -29,7 +29,7 @@ export function NewConversation({ busy, onClear, conversation }: NewConversation
         <span id={`${questionId}-effect`}>The log and history go; your draft stays.</span>
       </span>
       <CopyConversationButton text={conversation} label="Copy first" />
-      <button type="button" disabled={busy} onClick={clear}>
+      <button type="button" className="clear" disabled={busy} onClick={clear}>
         Clear
       </button>
       <button type="button" autoFocus onClick={() => setStep("kept")}>

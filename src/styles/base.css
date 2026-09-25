@@ -204,6 +204,15 @@ form .row {
   color: var(--color-ink);
 }
 
+.formfoot .confirm .clear {
+  color: var(--color-alert);
+  border-color: var(--color-alert-line);
+}
+
+.formfoot .confirm .clear:hover:not(:disabled) {
+  border-color: var(--color-alert);
+}
+
 .count {
   margin-left: auto;
   font-family: var(--font-label);
