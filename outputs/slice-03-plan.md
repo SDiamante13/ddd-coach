@@ -35,8 +35,14 @@ Spec: the issue body of #4 (the source of truth). Also #44 (complete sentence), 
 - `server/openRouterCoach.smoke.test.ts` runs in `npm test` only when the OpenRouter vars are in the shell. It asks for "Reply with one word." and the code word PELICAN. **Under a coaching prompt, an off-topic code-word test is fragile.** Change it to a domain memory check (test 12).
 
 **Model (`GET https://openrouter.ai/api/v1/models`, 2026-09-25, no key):**
-- **Model switched to `openai/gpt-5.6-luna` by Steven (2026-09-25):** $0.20/M prompt, $1.20/M completion, about 10× cheaper than terra. Reasoning is optional and effort `none` is supported. Terra's figures follow for reference. Re-cost all estimates below at about 1/10.
-- `openai/gpt-5.6-terra` (previous):
+- **Slice 3 model: `openai/gpt-5.6-luna`** (Steven, 2026-09-25). The catalog check on the same day gave:
+  - prices: **$0.20/M prompt, $1.20/M completion**, $0.02/M cache read, $0.25/M cache write, 10× cheaper than terra;
+  - context: 1.05M tokens;
+  - reasoning: optional (`default_enabled: true`, `default_effort: "medium"`), and `none` is supported. Keep `OPENROUTER_REASONING_EFFORT=none`;
+  - the same `supported_parameters` as terra (`response_format`, `structured_outputs`, `seed`; no `temperature`).
+
+  Every estimate below is costed for luna.
+- `openai/gpt-5.6-terra` (production until this slice's deploy; used for comparison only):
   - prices: $2/M prompt, **$12/M completion**, $0.20/M cache read, $2.50/M cache write;
   - context: 1.05M tokens;
   - reasoning: `default_enabled: true`, `default_effort: "medium"`, and `none` is supported. Production sets `OPENROUTER_REASONING_EFFORT=none` (2a demo), so no reasoning tokens eat the cap;
@@ -180,7 +186,7 @@ About 700 words, so roughly 950 tokens. Notes:
 **1,000**, justified against the budget, the deadline and cost:
 - About 1.9× the budgeted reply. The prompt, not the cap, controls length. The cap is a safety net that the eval should see hit 0 times.
 - **Deadline:** worst case = time to first token (about 1–3 s with a 7k-token prompt) + 1,000 tokens at the output rate. At 100 tok/s that's about 13 s. At 50 tok/s, about 23 s, still under 25 s. **The latency spike measures the real rate.** If the p50 rate is under 50 tok/s, set the cap to `floor(22 s × rate)` and record why.
-- **Cost:** at most $0.012 per reply at $12/M. A typical reply of about 500 tokens is $0.006.
+- **Cost** (luna): at most $0.0012 per reply at $1.20/M. A typical reply of about 500 tokens is $0.0006.
 - The effort stays `none`. `.env.example` already warns that reasoning tokens count toward the cap. Update its "600" to "1,000".
 
 **Complete sentence, always:**
@@ -290,12 +296,14 @@ It runs from the dev machine against OpenRouter, the same upstream the function 
 
 **Repeats: 3 per fixture.** Ship bar: all hard checks 9/9. Soft: attribution 9/9 (it's the 03b trust killer; any miss goes to team-lead before the demo), REBOOKED/AMENDED split in at least 2 of 3 F1 runs, and Code line in at least 2 of 3.
 
-**Cost per run** (catalog prices, worst case at the cap):
-- input: (950 + 5,700) + 2 × (950 + 800) ≈ 10.2k tokens × 3 repeats ≈ 30.5k × $2/M ≈ **$0.06**;
-- output: 9 × ≤ 1,000 × $12/M ≤ **$0.11** (a typical 9 × 500 is $0.05).
-- **About $0.12–0.17 per eval run.**
-- The latency spike (5 + 2 streamed + 1 follow-up turn): about 8 × ($0.014 + $0.012) ≈ **$0.20**.
-- A full slice's spend, including 2–3 prompt iterations and the hosted demo, stays **under $1.50**.
+**Cost per run** (luna at catalog prices, worst case at the cap):
+- input: (950 + 5,700) + 2 × (950 + 800) ≈ 10.2k tokens × 3 repeats ≈ 30.5k × $0.20/M ≈ **$0.006**;
+- output: 9 × ≤ 1,000 × $1.20/M ≤ **$0.011**.
+- **About $0.01–0.02 per eval run.**
+- The latency spike (5 + 2 streamed + 1 follow-up turn): about 8 × ($0.0014 + $0.0012) ≈ **$0.02**.
+- A full slice's spend, including 2–3 prompt iterations and the hosted demo, stays **under $0.25**.
+
+**Model-size fallback.** Luna is the smaller model, so rule-following is what to watch: attribution, no names, and the prefixes. If luna still misses the ship bar after 3 prompt versions, run the same eval once on terra (about $0.15) and send both summaries to team-lead. Switching the model is Steven's call.
 
 ### 8. Purpose line, sharpened (`PURPOSE_LINE`)
 
@@ -307,11 +315,15 @@ It says exactly what the reply now does, in the order it does it. It keeps Priya
 
 | Turn | Input | Output | Cost |
 |---|---|---|---|
-| First turn, 20k paste | about 6.7k tokens, uncached (a $2.50/M cache write may apply) | about 500 | **about $0.02** |
-| A later turn, prefix cached | about 7–8k, of which about 6.7k is cached at $0.20/M | about 300 | **about $0.006** |
-| Worst turn (64k chars, cache miss, reply at the cap) | about 17k | 1,000 | about $0.046 |
+Luna, effort `none`:
 
-A 6-turn session costs about $0.05. Before #58 adds 25–30k tokens of knowledge base, a monthly budget cap on the OpenRouter key would be sensible.
+| Turn | Input | Output | Cost |
+|---|---|---|---|
+| First turn, 20k paste | about 6.7k tokens, uncached (a $0.25/M cache write may apply) | about 500 | **about $0.002** |
+| A later turn, prefix cached | about 7–8k, of which about 6.7k is cached at $0.02/M | about 300 | **about $0.0007** |
+| Worst turn (64k chars, cache miss, reply at the cap) | about 17k | 1,000 | about $0.005 |
+
+A 6-turn session costs about half a cent (about $0.05 on terra). #58's 25–30k knowledge-base tokens would add about $0.006 to each uncached luna turn. A monthly budget cap on the OpenRouter key is still sensible.
 
 ## Acceptance criteria
 
@@ -421,7 +433,7 @@ Each method stays ≤ 25 lines. `coachInstructions` is a `SECTIONS` array joined
 - A UI "cut short" marker or Continue button (#44 explore-02). The text note covers it for now.
 - JSON / structured output; board actions (slice 4a).
 - The provider decision (#34). The notice (#55).
-- "Try an example thread". Slice 50 moved it "to #4", but it isn't in #4's body. **PO: file it or drop it.**
+- "Try an example thread" (team-lead decision; the PO decides whether it gets its own issue).
 - `sessionId` / `promptCacheKey` (a follow-up only if the cache hit rate is poor).
 - Trimming or summarizing old turns (B38 #7). A conversation pre-check on the client.
 - Rotating the signing key or bumping the signature tag.
@@ -443,7 +455,7 @@ Each method stays ≤ 25 lines. `coachInstructions` is a `SECTIONS` array joined
 
 ## Demo script (verifier, hosted)
 
-After `bin/check.sh` is green, the eval summary is committed, and the deployer has deployed to production (`https://ddd-coach.netlify.app`, no new env vars). Use `agent-browser --session verifier`. Record `$PWD/outputs/demos/slice-03.webm` in a desktop context (1280×800), with a caption banner per step. Install the pass-through fetch spy with the **ms column** (agent-team.md). Put F1's text into the page from the verifier's scratchpad copy of `server/eval/fixtures/booking-split.txt`, using eval (`textarea` value + `input` event).
+After `bin/check.sh` is green, the eval summary is committed, and the deployer has deployed to production (`https://ddd-coach.netlify.app`, with `OPENROUTER_MODEL` switched to `openai/gpt-5.6-luna` in the same deploy). Use `agent-browser --session verifier`. Record `$PWD/outputs/demos/slice-03.webm` in a desktop context (1280×800), with a caption banner per step. Install the pass-through fetch spy with the **ms column** (agent-team.md). Put F1's text into the page from the verifier's scratchpad copy of `server/eval/fixtures/booking-split.txt`, using eval (`textarea` value + `input` event).
 
 1. Open the site. Caption: "Slice 3 (#4): paste a messy thread, see where people disagree." The first visit shows the new purpose line.
 2. Fill F1 (20,000 chars). The count reads "20,000 / 24,000 characters"; Send is enabled. Caption: "A 20k Slack thread, line breaks and all."
@@ -478,7 +490,7 @@ Off-video:
 
 Convert to `slice-03.mp4` + `.gif` as in agent-team.md.
 
-## Decisions for the user
+## Decisions put to the user (resolved: see Approved below; the figures there are terra's)
 
 1. **Output shape: free text in a fixed plain-text layout** (recommended), not JSON. #6 either parses the layout or makes its own structured call.
 2. **Reply cap 600 → 1,000 tokens**, lowered to fit if the measured output rate is under 50 tok/s. Worst case $0.012 per reply.
@@ -496,3 +508,5 @@ Convert to `slice-03.mp4` + `.gif` as in agent-team.md.
 - Eval spend is approved (a few dollars at most, far less on luna). The deployer runs the latency gate and the eval, reading `.env` in the redacted way.
 - (a) A free-text fixed layout. (b) `maxCompletionTokens` 1,000. (c) A body cap of about 391 KiB derived from the 64k conversation cap. (d) The text cut-short note partly satisfies #44, which stays open for a UI marker. (e) The prompt choices are accepted.
 - "Try an example thread" is out of this slice. The PO decides whether it gets its own issue.
+- Cost figures were re-costed for luna (Verified facts, decisions 4, 7 and 9). The terra fallback is described in decision 7.
+- Working tree: the uncommitted `src/acceptance/refusals.test.tsx`, `src/styles/base.css`, `src/ui/ConnectionTest.tsx` and `src/ui/ExchangeOutcome.tsx` are builder-6's #62 work in progress, not part of this slice.
