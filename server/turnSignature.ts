@@ -1,9 +1,10 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import type { Conversation, Turn } from "../src/domain/conversation.ts";
+import type { Conversation } from "../src/domain/conversation.ts";
 
 export type VerifiedConversation = Conversation & { readonly __brand: "VerifiedConversation" };
 export type SignableTurn = { prompt: string; reply: string };
-export type TurnSigner = { sign(turn: SignableTurn): string; verifies(turn: Turn): boolean };
+export type SignedTurn = SignableTurn & { signature: string };
+export type TurnSigner = { sign(turn: SignableTurn): string; verifies(turn: SignedTurn): boolean };
 
 const TURN_TAG = "ddd-coach/turn/v1";
 
