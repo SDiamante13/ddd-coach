@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ACCESS_REQUIRED } from "../shared/accessContract.ts";
 import { conversationOf } from "../test/conversations.ts";
 import { jsonResponse } from "../test/fetchStub.ts";
 import { askCoach } from "./askCoach.ts";
@@ -49,6 +50,12 @@ describe("askCoach", () => {
       error: "This conversation can't be verified.",
       retryable: false,
     });
+  });
+
+  it("marks a refusal for missing access as not worth retrying", async () => {
+    respondWith(jsonResponse(401, { error: ACCESS_REQUIRED }));
+
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: ACCESS_REQUIRED, retryable: false });
   });
 
   it("keeps a rate-limited request worth retrying", async () => {

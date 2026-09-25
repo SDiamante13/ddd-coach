@@ -9,6 +9,7 @@ import {
 import { readJson, stringField } from "../shared/json.ts";
 
 const BAD_REQUEST = 400;
+const UNAUTHORIZED = 401;
 const PAYLOAD_TOO_LARGE = 413;
 const GATEWAY_TIMEOUT = 504;
 
@@ -17,7 +18,7 @@ const UNEXPECTED: AskResult = { ok: false, error: "Unexpected response from the 
 const UNAVAILABLE: AskResult = { ok: false, error: COACH_UNAVAILABLE, retryable: true };
 const TIMED_OUT: AskResult = { ok: false, error: COACH_TIMED_OUT, retryable: true };
 const MESSAGE_TOO_LONG: AskResult = { ok: false, error: COACH_MESSAGE_TOO_LONG, retryable: false };
-const NOT_WORTH_RETRYING: readonly number[] = [BAD_REQUEST, PAYLOAD_TOO_LARGE];
+const NOT_WORTH_RETRYING: readonly number[] = [BAD_REQUEST, UNAUTHORIZED, PAYLOAD_TOO_LARGE];
 const FALLBACK_BY_STATUS: Partial<Record<number, AskResult>> = {
   [PAYLOAD_TOO_LARGE]: MESSAGE_TOO_LONG,
   [GATEWAY_TIMEOUT]: TIMED_OUT,

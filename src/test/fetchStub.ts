@@ -31,6 +31,9 @@ export function stubFetch({ session = NO_CONTENT }: StubOptions = {}) {
     bodyOf: (index: number) => callAt(calls, index).body,
     reply: (index: number, status: number, body: unknown) =>
       callAt(calls, index).resolve(jsonResponse(status, body)),
+    replyText: (index: number, status: number, text: string) =>
+      callAt(calls, index).resolve(new Response(text, { status })),
+    replyNoContent: (index: number) => callAt(calls, index).resolve(new Response(null, { status: NO_CONTENT })),
     fail: (index: number) => callAt(calls, index).reject(new TypeError("Failed to fetch")),
   };
 }

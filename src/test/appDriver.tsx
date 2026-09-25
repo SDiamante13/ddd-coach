@@ -48,3 +48,15 @@ export async function startConversation() {
     },
   };
 }
+
+export async function openGate() {
+  const server = stubFetch({ session: 401 });
+  const user = userEvent.setup();
+  render(<App />);
+  await screen.findByLabelText("Conference password");
+  return {
+    user,
+    server,
+    field: () => screen.getByLabelText("Conference password"),
+  };
+}
