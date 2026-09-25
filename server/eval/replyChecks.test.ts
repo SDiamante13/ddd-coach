@@ -90,6 +90,15 @@ describe("hard checks", () => {
     expect(failedHardChecks(GOOD_REPLY.replace("Finance means", meaning), "stop", withName)).toEqual(failures);
   });
 
+  it.each([
+    ["a straight closing quote", 'Ops calls it "same booking."', []],
+    ["a curly closing quote", "Ops calls it “same booking.”", []],
+    ["a curly apostrophe after a question mark", "Ops asks ‘same booking?’", []],
+    ["a bracket with no full stop", "Ops calls it same booking (per the sheet)", ["complete ending"]],
+  ])("check complete ending for a last line ending in %s", (_case, lastLine, failures) => {
+    expect(failedHardChecks(`${GOOD_REPLY}\n${lastLine}`, "stop", fixture)).toEqual(failures);
+  });
+
   it("fail complete ending for a reply the model cut at the cap", () => {
     expect(failedHardChecks(GOOD_REPLY, "length", fixture)).toEqual(["complete ending"]);
   });

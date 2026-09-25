@@ -18,6 +18,14 @@ describe("endOnCompleteLine", () => {
     );
   });
 
+  it("keeps a sentence that ends in a curly closing quote on the cut line", () => {
+    const cut = "Events, in order\n1. From thread: Dana’s desk says “same booking.” Then the carr";
+
+    expect(endOnCompleteLine(cut)).toBe(
+      `Events, in order\n1. From thread: Dana’s desk says “same booking.”\n\n${CUT_SHORT_NOTE}`,
+    );
+  });
+
   it("drops a numbered line cut short instead of keeping its number", () => {
     const cut = "Events, in order\n1. From thread: Customer submits on the portal.\n2. From thread: Ops rebo";
 

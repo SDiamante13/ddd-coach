@@ -1,6 +1,6 @@
 import { CUT_SHORT_NOTE } from "../src/shared/chatContract.ts";
 
-const SENTENCE_END = /(?<!^\d+)[.?!]["')\]]?(?=\s|$)/gm;
+const SENTENCE_END = /(?<!^\d+)[.?!]["'”’)\]]?(?=\s|$)/gm;
 
 export function endOnCompleteLine(text: string): string {
   const complete = completePart(text);
@@ -10,6 +10,10 @@ export function endOnCompleteLine(text: string): string {
 function completePart(text: string): string {
   const end = Math.max(text.lastIndexOf("\n"), lastSentenceEnd(text), 0);
   return text.slice(0, end).trim();
+}
+
+export function endsSentence(line: string): boolean {
+  return lastSentenceEnd(line) === line.length;
 }
 
 function lastSentenceEnd(text: string): number {

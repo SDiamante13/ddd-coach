@@ -1,3 +1,4 @@
+import { endsSentence } from "../replyEnding.ts";
 import {
   hasSourceLabel,
   isNumbered,
@@ -62,7 +63,7 @@ function codeClaims({ meaningClaims }: ReplyLayout): string[] {
 }
 
 function endsComplete(lines: string[]): boolean {
-  return /[.?!)]$/.test(lines.filter((line) => line !== "").at(-1) ?? "");
+  return endsSentence(lines.filter((line) => line !== "").at(-1) ?? "");
 }
 
 function hasOneQuestion(lines: string[]): boolean {
