@@ -28,6 +28,8 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 - Captions: inject an on-page banner per step via agent-browser (local ffmpeg lacks `drawtext`/`subtitles` filters).
 - Convert: `ffmpeg -i in.webm -c:v libx264 -pix_fmt yuv420p out.mp4`; GIF via `-vf "fps=10,scale=800:-1"`; optional soft CC track by muxing `.srt` as `mov_text`.
 - Output: `outputs/demos/slice-NN.{mp4,gif,md}`.
+- Never reload or open mid-recording: the recorder silently stops capturing. Split with `record stop`/`start` and join with ffmpeg concat.
+- Recording ignores `set viewport`, so take the 1280×800 PNG outside the recording. If `record stop` fails with "ffmpeg wait failed", retry it.
 
 ## Slice screenshot
 
@@ -35,4 +37,4 @@ The [mockups canvas](https://claude.ai/artifact/RjbLasj538CpC29jWrqzGf) pairs ea
 
 - Verifier: after the demo, set the viewport to 1280×800 and screenshot the state the slice's acceptance check describes → `outputs/demos/slice-NN.png`. Slice 5 has no UI: capture the terminal finding instead.
 - Navigator: upload the PNG as a canvas asset, replace the placeholder body of `ActualNN.dc.html` with `<img src="/_blob/<id>">` (1280×800, descriptive `alt`), and retitle the frame `Actual · NN (built)`.
-- Every agent-browser command uses a named session (`agent-browser --session <agent> …`); the default session is shared across sessions and mixes up captures. Reuse the running dev server on :8888 rather than starting another `netlify dev`. If a demo must restart it (e.g. `COACH_TIMEOUT_MS=1`), restore it afterwards in tmux session `ddd-coach` with `npm run dev`.
+- Every agent-browser command uses a named session (`agent-browser --session <agent> …`); the default session is shared across sessions and mixes up captures. Reuse the running dev server on :8888 rather than starting another `netlify dev`. If a demo must restart it (e.g. `COACH_TIMEOUT_MS=1`), restore it afterwards in tmux session `ddd-coach` with `npm run dev`. Inside swarm panes use `tmux -S /private/tmp/tmux-501/default`. Run the server as a plain command in an interactive shell (not `zsh -c`), so C-c doesn't kill the session.

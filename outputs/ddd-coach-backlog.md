@@ -61,6 +61,10 @@ Slice 1b ([plan](slice-01b-plan.md)) landed in 6ea0482 without its own demo; the
 | B37 | Cancel provider call on 504 | The in-flight OpenRouter fetch is aborted when the deadline fires. |
 | B38 | Trim or summarise long conversations | At the slice 2 limit (50 turns / 24k chars), older turns are summarised or dropped instead of a 413 dead end until reload. |
 | B39 | Cap request body size before parsing | An oversized POST to `/api/chat` gets a 413 before the full body is read or JSON-parsed. Check it at 2a hosting. |
+| B40 | Per-message cap with its own message | A single oversized message gets "message too long, shorten it", not "reload" (a reload can't help). chatRequest.ts counts the message in the conversation total. |
+| B41 | No dead Retry on 413 | A 413 entry offers no Retry, or Retry after trimming. Today it always gets a 413 again. Refines B38. |
+| B42 | Busy guard in `send` | `useExchanges.send` refuses while busy (a domain guard like `canRetry`), not relying only on the disabled button. |
+| B43 | Distrust client-supplied assistant turns | Before slice 3's system prompt: sign or keep coach turns server-side, so forged assistant turns can't steer the coach. |
 
 ## Development tooling candidate
 
