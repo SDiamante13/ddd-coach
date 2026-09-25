@@ -104,6 +104,8 @@ F3's "Customers see…" passes, because the key allows Customers (U1). The inter
 |---|---|---|---|---|---|---|---|---|---|
 | v4 (re-score) | no | 3/9 | 9/9 | F1 same meaning named 1/3, F2 split 2/3 | question asks ×5, split labels ×3, same meaning not split ×1 | 4/9 | 6,588 / 8,690 | 0 | see baseline above |
 | v5 | no | 4/9 | 8/9 | F1 same meaning named 0/3 | same meaning not split ×3 (F1), holders ×2 (F3) | 9/9 | 7,231 / 8,341 | 0.071 | [v5](2026-09-25-openai-gpt-5-6-terra-v5.md) |
+| v6 | no | 6/9 | 8/9 | F1 same meaning named 0/3 | same meaning not split ×2 (F1), code guess ×1 (F2) | 9/9 | 4,909 / 7,199 | 0.072 | [v6](2026-09-25-openai-gpt-5-6-terra-v6.md) |
+| v7 | no | 4/9 | 6/9 | F1 same meaning named 0/3, F2 split 2/3 | same meaning not split ×3 (F1), code guess ×1 (F2), split labels ×1 (F2) | 9/9 | 5,004 / 6,945 | 0.071 | [v7](2026-09-25-openai-gpt-5-6-terra-v7.md) |
 
 **v5, read by hand:**
 - **The question now asks in every run.** It's open ("which should count as the booking: the original ref, the new REBOOKED row, or only the delivered invoiceable shipment?") or a choice joined by "or". There are no proposals and no yes/no questions.
@@ -112,6 +114,14 @@ F3's "Customers see…" passes, because the key allows Customers (U1). The inter
 - **F3 r2–r3 use "Customer-facing portal means…"** as a holder, which is a screen, not a team. r3 also misattributes the 990 meaning to it (attribution miss). r2–r3 also write "Ops desk means"; see the key note below.
 - **F2 r1 splits "lane" into views that agree** ("Ops (view B) agrees that a lane change is a new booking"). No check catches this; it's the same slip as "hold".
 - **F2 r2 labels the night group view A** (it comes first in the notes), and the labels hold across all three of its words. r1 and r3 label the day group view A. The labels are stable within each reply, and that's what the check measures.
+
+**v6** said "view lines only when the groups mean different things; never view A and view B lines that say the same thing", and that a screen isn't a holder. **v7** added "don't give one group's word as view A and the other's as view B".
+- **"hold" in F1 didn't move.** Five of six runs still write "Ops (view A) means “waiting on customer.”" and "Ops (view B) means a booking waiting on the customer." v6 r2 wrote one plain line but named only "waiting on the customer", so the score is 0/3 in every version. The thread says 'day desk says "waiting on customer", not hold. night shift started saying hold', and terra turns that into one view per group every time.
+- **Screens stopped being holders** in v6 and v7. F3 now uses "Team unclear means the portal displays…", which passes.
+- **code guess (F2 r1 in v6 and v7):** "From thread: Code counts REBOOKED rows twice in “bookings today”." The notes say exactly that (line 23), so the line follows the prompt's own "someone in it says what the code does" rule. It fails only because F2's key says `codeShown: false`. This is the out-of-scope "Code when someone describes code" case.
+- **Attribution misses in v6 and v7 are Code or Ops lines that mention another team's phrase:** "Code has no status for Ops confirming the window" (F3, "window" belongs to Ops), and "Ops means every non-CANCELLED row…, including old REBOOKED rows and new rows" (F1, "new row" belongs to Code). The first is arguably a false miss.
+- **F2 r3 in v7 mixed a plain line and a view line** under "RB" and dropped view B, so it fails split labels and split.
+- **The question asks in 27 of 27 runs across v5–v7.**
 
 **Key note after v5:** F3 `teams` gains "Ops desk". Misread line: carrier-status r2/r3 "From thread: Ops desk means the customer agreed the pickup window." The thread names the team that way (line 10: "that's not what the ops desk means"), the same way F1–F3 allow "Carrier desk". With the fix, the v5 re-score still fails F3 r2–r3 on "Customer-facing portal".
 

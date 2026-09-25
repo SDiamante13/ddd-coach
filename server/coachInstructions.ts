@@ -1,4 +1,4 @@
-export const COACH_INSTRUCTIONS_VERSION = 5;
+export const COACH_INSTRUCTIONS_VERSION = 7;
 
 const lines = (...texts: string[]): string => texts.join("\n");
 const paragraphs = (...texts: string[]): string => texts.join("\n\n");
@@ -14,8 +14,8 @@ const REPLY_SHAPE = paragraphs(
     `Part 2. A line "Words that don't match", then up to 4 words that people use with different meanings. For each, put the word in double quotes on its own line, then one line per meaning starting with "- ". Each meaning line names who holds that meaning, then gives it in one sentence.`,
     `- Name teams, never people: Ops, Finance, Carriers, or whatever the thread calls them. Never write a person's name, even when the thread or notes give a view to someone by name. Work out someone's team only from what the thread says about them or their work. If you can't tell, write "Team unclear", even for someone the thread names often.`,
     `- When people on the same team disagree, give each view its own line, labelled exactly "Ops (view A)" and "Ops (view B)" with that team's name. Use these labels even when the thread names groups inside the team, such as a day desk and a night shift. They are views within one team, so don't add the group's name to the label. Decide once, before Part 2: view A is the group that appears first in the material and view B the other. Keep that for every word in the reply. Where the two groups agree on a word, write one plain line for the team. Under one word, never give a team both a plain line and a view line, or two plain lines.`,
-    `- When two groups use different words for the same meaning, such as "pending" and "unconfirmed", that isn't a split. Write one line for the team that names both words, such as: From thread: Front desk means a request nobody has confirmed yet, whether they say "pending" or "unconfirmed".`,
-    `- Start every meaning line with a team the thread names, "Code" or "Team unclear", then the view label if there is one. Never start it with a shift, desk or group inside a team, such as "Evening desk", "Night front desk" or "Day reception". That group's view goes under its team's view label.`,
+    `- Give a team view lines under a word only when its two groups mean different things by that word. Often one group just has its own word for the same thing, such as the evening desk saying "pending" for what the day desk calls "unconfirmed". That isn't a split, even when the thread says one group doesn't use the other's word. Write one plain line for the team that names both words, such as: From thread: Front desk means a request nobody has confirmed yet, whether they say "pending" or "unconfirmed". Don't write a view A line that gives one group's word and a view B line that gives the other's: those lines mean the same thing. Never write view A and view B lines that say the same thing.`,
+    `- Start every meaning line with a team the thread names, "Code" or "Team unclear", then the view label if there is one. Never start it with a shift, desk or group inside a team, such as "Evening desk", "Night front desk" or "Day reception". That group's view goes under its team's view label. A screen or system, such as the patient portal, isn't a holder either: put what it shows in the Code line.`,
     `- When the code or database behaves differently, add a line for "Code". Start it "From thread:" only when the material shows the code or someone in it says what the code does. Otherwise start it "Guess:".`,
     `If no word is used in different ways, say so in one line.`,
   ),
@@ -60,8 +60,8 @@ const CHECKLIST = lines(
   `- Every event line and every meaning line starts with "From thread:" or "Guess:", and a Code line is "Guess:" unless the material shows or describes the code.`,
   `- The question names at least two roles, adds the meeting when the thread names one, and draws on two distant parts of the thread.`,
   `- View A is the same group under every word, and so is view B; no team has a plain line and a view line under one word.`,
-  `- Every meaning line starts with a team, "Code" or "Team unclear", never a shift or desk.`,
-  `- Two words for one meaning are one line naming both, not two views.`,
+  `- Every meaning line starts with a team, "Code" or "Team unclear", never a shift, a desk inside a team, a screen or a system.`,
+  `- No word has view A and view B lines that mean the same thing. Two words for one meaning, one per group, are one plain line naming both words.`,
   `- The question asks: it is open or offers the thread's options joined by "or", and holds no answer or advice.`,
   `- The three parts appear once, in plain text, and nothing follows the question.`,
 );
