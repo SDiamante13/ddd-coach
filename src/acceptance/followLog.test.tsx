@@ -33,9 +33,14 @@ function scrollTo(entryBottom: number) {
   fireEvent.scroll(window);
 }
 
+function revealSettles() {
+  fireEvent(window, new Event("scrollend"));
+}
+
 async function replyArrivesWhileReadingUp() {
   const conversation = await startConversation();
   const index = await conversation.send("Hello coach");
+  revealSettles();
   scrollTo(READING_UP);
   scrollIntoView.mockClear();
   conversation.server.reply(index, 200, { reply: "Hi there", signature: "sig-1" });
@@ -134,5 +139,29 @@ describe("Following the log", () => {
 
     expect(lastRevealed()).toBe(within(log()).getByText("Hi there").closest(".reply"));
     expect(scrollIntoView.mock.lastCall?.[1]).toMatchObject({ block: "start" });
+  });
+
+  it("still brings an instant failure's Retry into view when the reveal's own glide fires a scroll", async () => {
+    const { send, server, log } = await startConversation();
+    const index = await send("Hello coach");
+
+    scrollTo(READING_UP);
+    server.reply(index, 502, { error: "The coach is unavailable." });
+
+    expect(await within(log()).findByRole("button", { name: "Retry" })).toBe(lastRevealed());
+    expect(screen.queryByRole("button", { name: "New reply ↓" })).not.toBeInTheDocument();
+  });
+
+  it("listens to the visitor's scroll again a second after a reveal, in browsers without scrollend", async () => {
+    const now = vi.spyOn(performance, "now");
+    const { send, server, log } = await startConversation();
+    const index = await send("Hello coach");
+
+    now.mockReturnValue(performance.now() + 1_001);
+    scrollTo(READING_UP);
+    server.reply(index, 200, { reply: "Hi there", signature: "sig-1" });
+    await within(log()).findByText("Hi there");
+
+    expect(screen.getByRole("button", { name: "New reply ↓" })).toBeInTheDocument();
   });
 });

@@ -1,24 +1,17 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import type { Exchange, ExchangeId } from "../domain/exchange.ts";
 import { fitsAbove, isFollowing, revealOptions } from "./logFollow.ts";
 import { prefersReducedMotion } from "./motion.ts";
 
 export function useLogFollow(newest: Exchange | undefined, composer: () => Element | null) {
   const logRef = useRef<HTMLOListElement>(null);
-  const following = useRef(true);
   const shownId = useRef<ExchangeId | undefined>(undefined);
   const [newReply, setNewReply] = useState(false);
-
-  useEffect(
-    () =>
-      onWindowScroll(() => {
-        following.current = followingNow(logRef.current, composer());
-        if (following.current) setNewReply(false);
-      }),
-    [composer],
-  );
+  const revealing = useRevealGuard();
+  const following = useFollowing(logRef, composer, revealing, () => setNewReply(false));
 
   const revealNewest = () => {
+    revealing.start();
     const outcome = newestOutcomeOf(logRef.current);
     const fits = fitsAboveComposer(outcome, composer());
     outcome?.scrollIntoView(revealOptions({ reducedMotion: prefersReducedMotion(), fits }));
@@ -34,6 +27,41 @@ export function useLogFollow(newest: Exchange | undefined, composer: () => Eleme
   }, [newest]);
 
   return { logRef, newReply, revealNewest };
+}
+
+type RevealGuard = ReturnType<typeof useRevealGuard>;
+
+function useFollowing(logRef: RefObject<HTMLOListElement | null>, composer: () => Element | null, revealing: RevealGuard, onBack: () => void) {
+  const following = useRef(true);
+  useEffect(
+    () =>
+      onWindowScroll(() => {
+        if (revealing.active()) return;
+        following.current = followingNow(logRef.current, composer());
+        if (following.current) onBack();
+      }),
+    [composer, revealing],
+  );
+  return following;
+}
+
+const REVEAL_SETTLE_MS = 1000;
+
+function useRevealGuard() {
+  const until = useRef(0);
+  const [guard] = useState(() => ({
+    start: () => {
+      until.current = performance.now() + REVEAL_SETTLE_MS;
+    },
+    active: () => performance.now() < until.current,
+  }));
+  useEffect(() => onWindowEvent("scrollend", () => (until.current = 0)), []);
+  return guard;
+}
+
+function onWindowEvent(name: string, listener: () => void): () => void {
+  window.addEventListener(name, listener);
+  return () => window.removeEventListener(name, listener);
 }
 
 function onWindowScroll(listener: () => void): () => void {
