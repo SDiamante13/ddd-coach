@@ -284,3 +284,38 @@ describe("soft scores", () => {
     expect(softScores(reply, bookingSplit)).toMatchObject({ sameMeaningNamed: true });
   });
 });
+
+describe("hard checks on a message that isn't a thread", () => {
+  const greeting: Fixture = { thread: "hi", key: { people: [], teams: [], attributions: [], expect: { nonThread: true } } };
+
+  it("pass a short natural answer that invites a thread in one line", () => {
+    const reply = "Hi! Good to have you here.\nPaste a chat thread, meeting notes or code from your work and I'll show where people mean different things.";
+
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual([]);
+  });
+
+  it.each([
+    ["I'm here to help analyze a business work thread. Paste one and I'll find the mismatched words."],
+    ["Hello! I am here to help you with Domain-Driven Design. Paste a thread to start."],
+    ["Hi, I'm DDD Coach. I look at work threads for words that don't match. Paste one."],
+    ["As a DDD coach, my job is to analyze business conversations. Paste a thread."],
+  ])("fail no boilerplate for a canned role statement: %s", (reply) => {
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual(["no boilerplate"]);
+  });
+
+  it.each([
+    ["the full layout", GOOD_REPLY],
+    ["an empty events part", "Events, in order\nNo events in your message.\nPaste a thread to start."],
+    ["an empty words part", "Words that don't match\nNone yet.\nPaste a thread to start."],
+    ["a lone question line", "Hi!\nQuestion for the ops lead and the finance controller: which one counts?"],
+  ])("fail no three parts for %s", (_case, reply) => {
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual(["no three parts"]);
+  });
+
+  it.each([
+    ["no markdown", "**Domain-Driven Design** is a way to model software on the business.", "stop"],
+    ["complete ending", "Domain-Driven Design is a way to model", "length"],
+  ])("fail %s like any reply", (check, reply, finishReason) => {
+    expect(failedHardChecks(reply, finishReason, greeting)).toEqual([check]);
+  });
+});

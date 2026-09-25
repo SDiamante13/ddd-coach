@@ -2,7 +2,15 @@ import { readFileSync } from "node:fs";
 import { EXAMPLE_THREAD } from "../../src/shared/exampleThread.ts";
 import type { Fixture, FixtureKey } from "./replyChecks.ts";
 
-export const FIXTURE_NAMES = ["booking-split", "rebook-notes", "carrier-status", "example-thread"] as const;
+export const FIXTURE_NAMES = [
+  "booking-split",
+  "rebook-notes",
+  "carrier-status",
+  "example-thread",
+  "greeting",
+  "ddd-question",
+  "one-line-note",
+] as const;
 
 const FIXTURES = new URL("./fixtures/", import.meta.url);
 const SHARED_THREADS: Partial<Record<string, string>> = { "example-thread": EXAMPLE_THREAD };

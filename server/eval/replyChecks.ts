@@ -8,12 +8,14 @@ import {
   namesSameMeaning,
 } from "./viewChecks.ts";
 import {
+  EVENTS_HEADING,
   hasSourceLabel,
   isNumbered,
   isQuestion,
   parseCoachReply,
   parseLayout,
   withoutSourceLabel,
+  WORDS_HEADING,
   type CoachReply,
   type ReplyLayout,
 } from "./replyLayout.ts";
@@ -36,12 +38,17 @@ export type FixtureKey = {
     stalePattern?: string;
     forum?: string[];
     questionEvidence?: string[][];
+    nonThread?: boolean;
   };
 };
 export type Fixture = { thread: string; key: FixtureKey };
 
 type Reply = { text: string; layout: ReplyLayout; words: CoachReply["words"]; finishReason: string | null; fixture: Fixture };
 type HardCheck = (reply: Reply) => boolean;
+
+function noMarkdown({ text }: Reply): boolean {
+  return !MARKDOWN.test(text);
+}
 
 const HARD_CHECKS: Record<string, HardCheck> = {
   parses: ({ text }) => parseCoachReply(text) !== null,
@@ -51,7 +58,7 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "one question": ({ layout }) => hasOneQuestion(layout.lines),
   "complete ending": ({ layout, finishReason }) => finishReason === "stop" && endsComplete(layout.lines),
   "at most 4 words": ({ layout }) => layout.quotedWords.length <= 4,
-  "no markdown": ({ text }) => !MARKDOWN.test(text),
+  "no markdown": noMarkdown,
   "no offers": ({ text }) => !OFFER.test(text),
   "code guess": ({ layout, fixture: { key } }) =>
     key.expect.codeShown !== false || codeClaims(layout).every((claim) => isGuess(claim) || cites(claim, key.expect.codeDescribed)),
@@ -63,6 +70,17 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
 };
+
+const NON_THREAD_CHECKS: Record<string, HardCheck> = {
+  "no boilerplate": ({ text }) => !BOILERPLATE.test(text),
+  "no three parts": ({ layout: { lines } }) => !lines.some(isReplyPart),
+  "complete ending": ({ finishReason }) => finishReason === "stop",
+  "no markdown": noMarkdown,
+};
+
+const isReplyPart = (line: string): boolean => line === EVENTS_HEADING || line === WORDS_HEADING || isQuestion(line);
+
+const BOILERPLATE = /\bI(?:['’]m| am) (?:here to help|(?:a )?DDD Coach)\b|\bas (?:a|your) DDD coach\b/i;
 
 const MARKDOWN = /\*\*|__|`|^#{1,6} |^\s*[*•] /m;
 
@@ -108,7 +126,7 @@ const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/
 export function failedHardChecks(reply: string, finishReason: string | null, fixture: Fixture): string[] {
   const words = parseCoachReply(reply)?.words ?? [];
   const checked: Reply = { text: reply, layout: parseLayout(reply), words, finishReason, fixture };
-  return Object.entries(HARD_CHECKS)
+  return Object.entries(fixture.key.expect.nonThread ? NON_THREAD_CHECKS : HARD_CHECKS)
     .filter(([, check]) => !check(checked))
     .map(([name]) => name);
 }
