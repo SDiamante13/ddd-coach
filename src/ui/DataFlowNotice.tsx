@@ -3,5 +3,5 @@ export const DATA_FLOW_NOTICE =
   "Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms.";
 
 export function DataFlowNotice() {
-  return <p>{DATA_FLOW_NOTICE}</p>;
+  return <p className="notice">{DATA_FLOW_NOTICE}</p>;
 }

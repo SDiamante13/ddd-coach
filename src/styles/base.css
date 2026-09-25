@@ -40,6 +40,9 @@ h1 {
 
 main > p {
   margin: 0;
+}
+
+main > p.notice {
   padding: var(--space-4) var(--space-5);
   border: 1px solid var(--color-line-strong);
   border-left: 4px solid var(--color-coach);
@@ -52,9 +55,6 @@ main > p {
 
 main > p.purpose {
   max-width: 60ch;
-  padding: 0;
-  border: 0;
-  background: none;
   color: var(--color-ink);
   font-size: var(--text-md);
 }
