@@ -21,22 +21,24 @@ const WITHOUT_RETRIES: RequestOptions = { retries: { strategy: "none" } };
 
 export function createOpenRouterCoach(
   config: CoachConfig,
+  instructions: string,
   chat: ChatClient = new OpenRouter({ apiKey: config.apiKey }).chat,
 ): Coach {
   return {
     reply: async (conversation: Conversation) =>
-      extractText(await chat.send(chatRequest(config, conversation), WITHOUT_RETRIES)),
+      extractText(await chat.send(chatRequest(config, instructions, conversation), WITHOUT_RETRIES)),
   };
 }
 
 function chatRequest(
   { model, reasoningEffort }: CoachConfig,
+  instructions: string,
   conversation: Conversation,
 ): SendChatCompletionRequestRequest {
   return {
     chatRequest: {
       model,
-      messages: messagesOf(conversation),
+      messages: [{ role: "system", content: instructions }, ...messagesOf(conversation)],
       stream: false,
       maxCompletionTokens: MAX_COMPLETION_TOKENS,
       ...(reasoningEffort && { reasoning: { effort: reasoningEffort } }),

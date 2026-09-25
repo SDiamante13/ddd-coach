@@ -1,5 +1,6 @@
 import type { Config } from "@netlify/functions";
 import { createChatHandler, type CoachFailure } from "../../server/chatHandler.ts";
+import { coachInstructions } from "../../server/coachInstructions.ts";
 import { readConfig, readSigningKey, readTimeoutMs } from "../../server/config.ts";
 import { createOpenRouterCoach } from "../../server/openRouterCoach.ts";
 
@@ -8,7 +9,7 @@ const logCoachFailure = (failure: CoachFailure): void => console.error("Coach fa
 export default (request: Request): Promise<Response> =>
   createChatHandler({
     config: readConfig(process.env),
-    createCoach: createOpenRouterCoach,
+    createCoach: (config) => createOpenRouterCoach(config, coachInstructions()),
     deadlineMs: readTimeoutMs(process.env),
     log: logCoachFailure,
     signingKey: readSigningKey(process.env),
