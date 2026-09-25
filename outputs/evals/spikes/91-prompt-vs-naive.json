@@ -1,0 +1,2313 @@
+{
+  "kind": "spike-91-prompt-vs-naive",
+  "date": "2026-09-25",
+  "model": "openai/gpt-5.6-terra",
+  "reasoningEffort": "none",
+  "runsPerFixturePerArm": 6,
+  "nonce": false,
+  "arms": {
+    "coach": {
+      "instructions": "server/__snapshots__/coach-instructions.v11.txt"
+    },
+    "naive": {
+      "systemMessage": "Here is a work thread. List where people use words differently, then ask one question for the domain expert."
+    }
+  },
+  "judge": {
+    "model": "anthropic/claude-sonnet-5",
+    "reasoningEffort": "none",
+    "seed": 91,
+    "criteria": {
+      "surprise": "Which question would a tech lead who read this thread NOT have thought of on their own, while still being answerable by the domain expert?",
+      "settles": "Which question better joins two separate, far-apart lines of the thread and, once answered, would settle the disagreement for the domain expert?"
+    }
+  },
+  "spend": {
+    "generation": 0.3339107,
+    "judge": 0.20767199999999994,
+    "failedJudgeCalls": 0.049,
+    "total": 0.6804702,
+    "realThreads": 0.08988750000000001
+  },
+  "calls": [
+    {
+      "arm": "coach",
+      "fixture": "booking-split",
+      "i": 1,
+      "ms": 4738,
+      "promptTokens": 7917,
+      "cachedTokens": 2320,
+      "completionTokens": 533,
+      "reasoningTokens": 0,
+      "cost": 0.020851,
+      "finishReason": "stop",
+      "label": "coach booking-split 1",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders to the carrier, then the carrier accepts the tender.\n3. From thread: A same-carrier date change can be AMENDED or REBOOKED because Amend does not reach the carrier portal.\n4. From thread: Rebook creates a new booking row and can cancel the original tender for the carrier.\n5. From thread: Night shift rebooked two same-carrier date changes for Customer B because Amend still does not reach the carrier portal.\n\nWords that don't match\n\"booking\"\n- From thread: Ops means the customer's portal submission that the desk starts working.\n- From thread: Finance means an invoiceable booking, which becomes invoiceable at delivery when proof of delivery closes it.\n- From thread: Carriers mean a load or a tender, not a booking.\n- From thread: Code means a booking row, so rebook creates a new booking row while the customer portal follows the original ref.\n\n\"rebook\"\n- From thread: Ops (day desk) means a new booking for a carrier change or lane change; a same-carrier date or window change is AMENDED.\n- From thread: Ops (night shift) means the action used for date changes, carrier drops, or lane changes when the carrier must receive the change.\n- From thread: Finance means a new booking with a separate invoice and a voided old booking.\n- From thread: Carriers mean cancel plus a new tender, which can trigger a TONU after dispatch.\n\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer\".\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account, where nothing ships.\n\n\"booking count\"\n- From thread: Ops means the dashboard count of rows not CANCELLED, including both rows of a rebooked shipment.\n- From thread: Finance means invoiceable bookings from the ledger export.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct RFC review: Which booking count applies to Customer B's two same-carrier date changes on Wednesday night: the old REBOOKED rows, the new rows, or only the rows invoiceable at delivery?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"Invoiceable at delivery, not pickup. Proof of delivery closes it.\"",
+      "hardFailures": [
+        "same meaning not split"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": false
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "booking-split",
+      "i": 1,
+      "ms": 8095,
+      "promptTokens": 5622,
+      "cachedTokens": 0,
+      "completionTokens": 690,
+      "reasoningTokens": 0,
+      "cost": 0.0223335,
+      "finishReason": "stop",
+      "label": "naive booking-split 1",
+      "reply": "## Words used differently\n\n| Term | Different meanings in the thread |\n|---|---|\n| **Booking** | **Ops/Dana:** customer request exists when submitted and work starts. **Finance/Tom:** exists for reporting only when invoiceable, at proof of delivery. **Database/Sam:** a booking is a row; rebooking creates a second row. **Customer portal:** treats an original and its rebook as one customer-facing booking/ref. |\n| **Booking count / bookings today** | **Dashboard/ops:** all non-cancelled rows, including both old `REBOOKED` and new rows. **Finance:** invoiceable bookings from the ledger. **Night dispatch:** operational count adjusted mentally to remove rebooks. |\n| **Rebook** | **Night dispatch/Maya:** operational action used for many changes, including date changes, because it is the reliable way to notify carriers. **Dana/day ops:** should be limited to carrier or lane changes; same-carrier date/window changes should be amendments. **Carrier/Luis:** cancellation of the old tender plus a new tender, potentially creating a TONU. **Finance/database:** a new booking/row, with its own invoice treatment; old row is `REBOOKED`. **Customer portal:** appears to remain the same booking because it displays the original reference. |\n| **Amend / AMENDED** | **Dana/ops:** same carrier and same lane, with date or pickup-window changes; same booking and same reference. **Database/Sam:** in-place update to one row and reference. **Night dispatch:** currently impractical because it does not sync the change to the carrier portal. **Carrier:** same tender with revised date, preferred over rebooking for date-only changes. |\n| **“Same booking”** | **Ops/customer view:** same shipment/request and usually same customer-facing reference. **Finance/database view:** not the same if `rebook!` creates a second row/invoiceable record. **Carrier view:** depends on tender semantics—an amendment is the same tender, a rebook is a new tender. |\n| **Hold** | **Night dispatch:** a booking waiting for customer input. **Finance/Tom:** a credit hold on the customer account, preventing shipment. **Day desk/Dana:** prefers “waiting on customer” rather than “hold.” |\n| **Carrier acceptance / CARRIER_ACK / assigned truck** | **Carrier/Luis and system status:** `CARRIER_ACK` means the carrier accepted the tender. **Ops/Dana:** does not use that status; operationally watches whether a truck is assigned. |\n| **Invoiceable** | **Tom/finance:** only at delivery, once proof of delivery is received—not at submission, tender, acceptance, or pickup. This is distinct from when ops begins treating a request as a booking. |\n| **Load / tender / booking** | **Carriers:** use “load” or “tender,” not “booking.” **Ops:** uses “booking” for the customer request. These terms may refer to overlapping but not identical entities. |\n\n## Question for the domain expert\n\nFor a **same-carrier, same-lane date or pickup-window change after carrier acceptance**, should the authoritative business action be **an amendment to the existing tender**, with a required carrier notification/sync, rather than a rebook—and are there any exceptions?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "booking-split",
+      "i": 2,
+      "ms": 10034,
+      "promptTokens": 5622,
+      "cachedTokens": 5619,
+      "completionTokens": 823,
+      "reasoningTokens": 0,
+      "cost": 0.0110058,
+      "finishReason": "stop",
+      "label": "naive booking-split 2",
+      "reply": "## Words used differently\n\n| Term | Different meanings / users |\n|---|---|\n| **Booking** | **Ops (Dana):** customer request exists when submitted and work begins. **Finance (Tom):** exists/counts only when invoiceable, at delivery with proof of delivery. **Database (Sam):** a row; a rebook creates a second booking row. **Customer portal:** treats original and rebooked rows as one customer-facing booking/ref. |\n| **Booking count / bookings today** | **Ops dashboard:** all non-`CANCELLED` rows, so original `REBOOKED` rows plus replacements are counted. **Finance:** invoiceable entries from the ledger export. **Night dispatch:** informally adjusts the dashboard by subtracting rebooks. |\n| **Rebook** | **Night dispatch (Maya):** operational action used for date changes, carrier drops, and other changes because it reliably notifies the carrier. **Ops desk (Dana):** should generally mean a carrier change; same-carrier date/window changes should be amendments. **Carrier desk (Luis):** cancel of the original tender plus a new tender; can create a TONU exposure. **Finance / database:** a new booking/row/ref and potentially separate invoice treatment. **Customer-facing portal:** still appears as the same booking because it displays the original ref. |\n| **Amend / AMENDED** | **Dana:** same carrier + same lane + date or pickup-window change; same booking and ref. **Maya:** desired action for same-carrier date changes, but currently unusable operationally because it does not sync to the carrier portal. **Carrier view (Luis):** same tender with updated date, distinct from cancellation/re-tender. **Code:** in-place row update with same ref, but no carrier sync. |\n| **“Same booking”** | **Ops/customer perspective:** same shipment/request, particularly for date-only changes. **Finance/database perspective:** a rebook is a separate booking because it is a new row and invoice entity. |\n| **Carrier drop** | **Night dispatch:** a type of rebook. **Database:** implemented as `rebook!`, creating a new row. **Finance:** only one booking if the first carrier never picked up the load, because the original was not invoiceable. **Carrier desk:** carrier-side cancellation, with no TONU owed by the customer/company. |\n| **Tender / load / booking** | **Carriers:** use “load” or “tender,” not “booking.” A rebook creates a new tender; an amendment retains the tender. **Internal teams:** often call the same operational object a booking. |\n| **Carrier acceptance / assignment** | **System/carrier desk:** `CARRIER_ACK` means carrier acceptance of the tender. **Ops:** tracks whether a truck is assigned instead and does not use `CARRIER_ACK` as its working indicator. |\n| **Hold** | **Night dispatch:** a booking waiting for customer action. **Finance:** a credit hold on the customer account, meaning nothing may ship. **Day desk:** prefers “waiting on customer,” avoiding “hold.” |\n| **Invoiceable** | **Tom / finance:** only after delivery and proof of delivery—not at submission, tender, carrier acceptance, or pickup. The term is also being used as finance’s boundary for what counts as a booking. |\n| **Reference / booking ref** | **Database:** rebook creates a new ref. **Customer portal:** displays the original ref for both the original and rebooked records. **Invoice process:** can use the new/ref-specific booking, causing portal-ref versus invoice-ref mismatch. |\n\n## Question for the domain expert\n\nFor the canonical workflow, should the business rule be: **same carrier and same lane + date/pickup-window change = amendment; carrier or lane change = replacement booking; carrier drop = a distinct replacement reason**—and, for each case, what should be the authoritative customer-facing reference and counting unit?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "booking-split",
+      "i": 2,
+      "ms": 5233,
+      "promptTokens": 7917,
+      "cachedTokens": 7914,
+      "completionTokens": 585,
+      "reasoningTokens": 0,
+      "cost": 0.0086088,
+      "finishReason": "stop",
+      "label": "coach booking-split 2",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders to the carrier, and the carrier accepts the tender.\n3. From thread: A same-carrier date change can be AMENDED or REBOOKED before or after dispatch.\n4. From thread: Rebook creates a new row and ref, while Amend updates the existing row and ref.\n5. From thread: Proof of delivery makes a load invoiceable.\n\nWords that don't match\n\"booking\"\n- From thread: Ops (day desk) means the customer's request, including a same-carrier date change that stays on the same ref.\n- From thread: Ops (night shift) means work started from submission, and a rebooked request gets a new ref.\n- From thread: Finance means an invoiceable load, after proof of delivery.\n- From thread: Carriers means a load or tender, not a booking.\n- From thread: Code creates a booking row on submit and creates another row on rebook.\n\"rebook\"\n- From thread: Ops (day desk) means a carrier or lane change that makes a new booking.\n- From thread: Ops (night shift) means using Rebook for date changes, carrier drops, and lane changes when Amend does not reach the carrier portal.\n- From thread: Finance means a new booking with its own invoice while the old one is voided.\n- From thread: Carriers means cancel + new tender, which can trigger a TONU after dispatch.\n- From thread: Code means the old row becomes REBOOKED and a new booking row with a new ref is inserted.\n\"booking count\"\n- From thread: Ops means the dashboard count of rows not CANCELLED, used for the shift plan.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code counts every row whose status is not CANCELLED, including the old REBOOKED row and the new row.\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer\".\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account that stops shipment.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct RFC review: For Customer B's second same-carrier date change at 11:55 PM, already rolling and rebooked because Amend does not reach the carrier portal, which booking count includes the old REBOOKED row, the new row, or neither?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"second one was already rolling, might be one TONU on that load.\"",
+      "hardFailures": [
+        "same meaning not split"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": false
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "booking-split",
+      "i": 3,
+      "ms": 4741,
+      "promptTokens": 7917,
+      "cachedTokens": 7914,
+      "completionTokens": 515,
+      "reasoningTokens": 0,
+      "cost": 0.0077688,
+      "finishReason": "stop",
+      "label": "coach booking-split 3",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders to the carrier and the carrier accepts the tender.\n3. From thread: A same-carrier date change can be AMENDED or REBOOKED.\n4. From thread: Rebooking sets the old row to REBOOKED and inserts a new booking row with a new ref.\n5. From thread: Proof of delivery makes a load invoiceable.\n\nWords that don't match\n\"booking\"\n- From thread: Ops (day desk) means the customer's request, including a same-carrier date change that stays on the same ref.\n- From thread: Ops (night shift) means a submitted request that may be REBOOKED when operationally necessary.\n- From thread: Finance means an invoiceable load, after proof of delivery.\n- From thread: Code means a row, so rebooking creates a new booking row while the portal follows the original ref.\n\"rebook\"\n- From thread: Ops (day desk) means a carrier change or lane change that creates a new booking.\n- From thread: Ops (night shift) means using Rebook for date changes when Amend does not reach the carrier portal.\n- From thread: Finance means a new booking with its own invoice while the old one is voided.\n- From thread: Carriers means cancelling the original load and sending a new tender.\n\"booking count\"\n- From thread: Ops means the dashboard count used for the shift plan.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code means every row whose status is not CANCELLED, including both rows of a rebook.\n\"hold\"\n- From thread: Ops (day desk) means “waiting on customer.”\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account that stops shipment.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct RFC review: Which booking count applies to Customer B's two same-carrier date changes overnight: the original rows, the new refs, or both?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"used Rebook because Amend still doesn't reach the carrier portal. flagging it so nobody is surprised by the new refs in the morning\"",
+      "hardFailures": [
+        "same meaning not split"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": false
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "booking-split",
+      "i": 3,
+      "ms": 8952,
+      "promptTokens": 5622,
+      "cachedTokens": 5619,
+      "completionTokens": 772,
+      "reasoningTokens": 0,
+      "cost": 0.0103938,
+      "finishReason": "stop",
+      "label": "naive booking-split 3",
+      "reply": "### Terms used differently\n\n| Term | Different meanings / users |\n|---|---|\n| **Booking** | **Ops/Dana:** the customer’s request exists at portal submission and is worked immediately. **Finance/Tom:** only a booking once it is invoiceable (at delivery/POD). **Database:** a persisted booking row; rebooking creates another row. **Customer portal:** treats original and rebooked rows as one customer-facing booking/ref. |\n| **Booking count / “bookings today”** | **Ops dashboard:** every non-`CANCELLED` row, including both old `REBOOKED` rows and their replacements. **Finance:** invoiceable bookings from the ledger export. **Night dispatch:** dashboard count adjusted mentally to remove rebooks. |\n| **Rebook** | **Maya/night dispatch:** used broadly for changes and disruptions, including date changes, carrier drops, and other urgent updates—partly because it syncs to carriers. **Dana/ops policy:** should mean a new booking, especially carrier or lane change; same-carrier date/window changes should be amendments. **Carrier desk/Luis:** cancel of the original tender plus a new tender, with possible TONU exposure. **Finance:** a distinct new billable booking/invoice line, with the old one voided. **Code:** old row becomes `REBOOKED`; a new row/ref is inserted. |\n| **Amend / AMENDED** | **Dana/day ops:** same carrier + same lane + a date or pickup-window change; same booking and ref. **Maya/night dispatch:** not operationally usable yet because it does not sync to the carrier portal. **Carrier desk:** same tender with changed date, preferred for date-only changes. **Code:** updates the existing row/ref in place but currently skips carrier sync. |\n| **“Same booking”** | **Customer portal / Dana:** a rebook can still appear as the same booking because the portal follows `rebooked_from_id` to the original ref. **Finance/database:** rebook is a new row/new booking. **Customer:** may view it as the same shipment despite new internal/invoice references. |\n| **Carrier drop** | **Night dispatch:** a kind of rebook. **Code:** handled through `rebook!`, creating a new row. **Finance:** if the first carrier never picked up, there is only one invoiceable booking. **Carrier desk:** carrier-side cancellation; no TONU for the company, but it affects carrier reliability scoring. |\n| **Tender / load** | **Carrier desk:** carriers use “load” or “tender,” not “booking.” A rebook means a new tender; an amendment modifies the existing tender. |\n| **Hold** | **Night dispatch:** a booking waiting for customer action. **Finance/Tom:** a credit hold on the customer account, meaning nothing ships. **Day desk/Dana:** prefers “waiting on customer” rather than “hold.” |\n| **Carrier acceptance / assignment** | **System/Luis:** `CARRIER_ACK` means carrier acceptance of a tender. **Ops/Dana:** operationally watches whether a truck is assigned, not `CARRIER_ACK`; these may not be treated as the same milestone. |\n| **Invoiceable** | **Tom:** invoiceable at delivery, when proof of delivery closes the shipment—not at submission, tender, carrier acceptance, or pickup. |\n\n### Question for the domain expert\n\nFor a **same-carrier, same-lane date or pickup-window change after the carrier has accepted the tender**, should the canonical business action be **Amend** in all cases, and should it be required to sync that amendment to the carrier portal (with an escalation path if the sync cannot complete in time)?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "booking-split",
+      "i": 4,
+      "ms": 8890,
+      "promptTokens": 5622,
+      "cachedTokens": 5619,
+      "completionTokens": 824,
+      "reasoningTokens": 0,
+      "cost": 0.0110178,
+      "finishReason": "stop",
+      "label": "naive booking-split 4",
+      "reply": "## Words used differently\n\n| Term | Different meanings in the thread | Who uses it this way |\n|---|---|---|\n| **Booking** | A customer request that exists as soon as it is submitted and can be worked by ops. | Dana / Ops |\n|  | A financial entity that exists only once it is invoiceable, after proof of delivery. | Tom / Finance |\n|  | A database row; a rebook creates a second row and reference. | Sam / Engineering |\n|  | A customer-facing record; rebooks still appear under the original reference. | Dana / Portal behavior |\n|  | A unit counted for shift planning; dashboard counts all non-cancelled rows, including both sides of a rebook. | Ops/dashboard |\n|  | A unit counted for CFO reporting; only invoiceable ledger items. | Finance |\n| **Rebook** | Operationally, a way to ensure a changed shipment reaches the carrier; night dispatch uses it for many changes because Amend does not sync. | Maya / Night dispatch |\n|  | A new booking for a carrier change, cancellation/re-tender, or lane change; date-only same-carrier changes should be amendments. | Dana / Day ops |\n|  | Cancel of the original tender plus a new tender, potentially causing a TONU. | Luis / Carrier desk |\n|  | A new billable booking with a new invoice; original is voided. | Tom / Finance |\n|  | A code operation: old row becomes `REBOOKED`, new row/ref is created, carrier assignment is cleared. | Sam / Engineering |\n| **Amend / AMENDED** | Same booking and same customer-facing reference; appropriate for same-carrier, same-lane date or pickup-window changes. | Dana / Ops |\n|  | Operationally unusable for urgent changes because it does not sync to the carrier portal. | Maya / Night dispatch |\n|  | Same tender with an updated date from the carrier’s perspective. | Luis / Carrier desk |\n|  | A database in-place update, same row/ref, without carrier sync. | Sam / Engineering |\n| **Booking count / “bookings today”** | All non-cancelled database rows; consequently, a rebook counts twice. | Dashboard / Ops |\n|  | Invoiceable bookings from the ledger export. | Finance |\n|  | Informally adjusted by subtracting rebooks mentally for night-shift planning. | Maya / Night dispatch |\n| **Hold** | A booking waiting for customer input. | Maya / Night shift |\n|  | A credit hold on the customer account, which prevents shipment. | Tom / Finance |\n|  | “Waiting on customer” rather than “hold.” | Dana / Day desk |\n| **Carrier acceptance / assignment** | `CARRIER_ACK`: carrier acceptance of a tender in the carrier portal. | Luis / Engineering |\n|  | Whether a truck is assigned; the operational signal the desk actually follows. | Dana / Ops |\n| **Same shipment / same booking** | Customer sees one shipment/booking even after a rebook, because the portal follows the original reference. | Ops / Portal |\n|  | Separate bookings/invoice lines if rebooked, even if physically the same shipment. | Finance / Database |\n| **Carrier drop** | A rebook case for night dispatch and the code path, producing a new booking row. | Maya / Sam |\n|  | A carrier-side cancellation, with no TONU owed by the shipper and a carrier reliability impact. | Luis |\n|  | Still only one booking financially if the first carrier never performed the shipment and it was never invoiceable. | Tom |\n\n## Question for the domain expert\n\nFor a **same-carrier, same-lane date or pickup-window change after the carrier has accepted the tender**, should the canonical business action be **Amend** (same booking/tender, carrier sync required), with **Rebook** reserved for carrier or lane changes—and are there any exceptions?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources",
+        "at most 600 words"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "booking-split",
+      "i": 4,
+      "ms": 4727,
+      "promptTokens": 7917,
+      "cachedTokens": 7914,
+      "completionTokens": 545,
+      "reasoningTokens": 0,
+      "cost": 0.0081288,
+      "finishReason": "stop",
+      "label": "coach booking-split 4",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders to the carrier, then the carrier accepts the tender.\n3. From thread: A same-carrier date change can be AMENDED or REBOOKED.\n4. From thread: Rebook creates a new booking row and the carrier sees the original load cancelled and a new tender.\n5. From thread: Proof of delivery makes a load invoiceable.\n\nWords that don't match\n\"booking\"\n- From thread: Ops (day desk) means the customer's request, including a same-carrier date change that stays on the same ref.\n- From thread: Ops (night shift) means something being worked from submission, and a changed date can be REBOOKED with a new ref.\n- From thread: Finance means an invoiceable load, after proof of delivery.\n- From thread: Carriers mean a load or tender, rather than a booking.\n- From thread: Code creates a booking row on submit, and rebook creates another row.\n\"rebook\"\n- From thread: Ops (day desk) means a carrier change or lane change that creates a new booking.\n- From thread: Ops (night shift) means using Rebook when a change must reach the carrier portal.\n- From thread: Finance means a new booking with its own invoice while the old one is voided.\n- From thread: Carriers mean cancel + new tender, which can trigger a TONU.\n- From thread: Code means REBOOKED on the old row and a new row with a new ref.\n\"booking count\"\n- From thread: Ops means every non-CANCELLED row on the dashboard, with rebooks mentally subtracted at night.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code counts every row where status is not CANCELLED.\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer\".\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct RFC review: Which booking count applies to the second Customer B date change on Wednesday night: the original REBOOKED row, the new row, or neither before proof of delivery?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"Invoiceable at delivery, not pickup. Proof of delivery closes it.\"",
+      "hardFailures": [
+        "same meaning not split"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": false
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "booking-split",
+      "i": 5,
+      "ms": 4601,
+      "promptTokens": 7917,
+      "cachedTokens": 7914,
+      "completionTokens": 535,
+      "reasoningTokens": 0,
+      "cost": 0.0080088,
+      "finishReason": "stop",
+      "label": "coach booking-split 5",
+      "reply": "Events, in order\n1. From thread: The customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders to the carrier, and the carrier accepts the tender.\n3. From thread: A same-carrier date change can be AMENDED, but Amend does not reach the carrier portal.\n4. From thread: Night dispatch uses Rebook, which marks the old row REBOOKED and creates a new row and ref.\n5. From thread: A carrier can charge a TONU when a rebook cancels an already dispatched load.\n\nWords that don't match\n\"booking\"\n- From thread: Ops (day desk) means the customer's request, including a same-carrier date change that stays on the same ref.\n- From thread: Ops (night shift) means a submitted request that can be rebooked when its date changes.\n- From thread: Finance means an invoiceable shipment, after proof of delivery.\n- From thread: Code creates a row on submit, creates another row on rebook, and treats the new row as separately billable.\n\"rebook\"\n- From thread: Ops (day desk) means a new booking for a carrier change or lane change, not a same-carrier date change.\n- From thread: Ops (night shift) means the action used for date changes because it reaches the carrier portal.\n- From thread: Finance means a new booking with a new invoice while the old booking is voided.\n- From thread: Carriers means cancel + new tender.\n\"booking count\"\n- From thread: Ops means the dashboard count used for the shift plan.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code counts every row whose status is not CANCELLED, including both rows of a rebooked shipment.\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer\".\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account that stops shipping.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct review: For Customer B's second same-carrier date change on Wednesday night, when the truck was already rolling, which count includes the old REBOOKED row, the new row, or neither?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"second one was already rolling, might be one TONU on that load.\"",
+      "hardFailures": [
+        "same meaning not split"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": false
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "booking-split",
+      "i": 5,
+      "ms": 8665,
+      "promptTokens": 5622,
+      "cachedTokens": 5619,
+      "completionTokens": 730,
+      "reasoningTokens": 0,
+      "cost": 0.0098898,
+      "finishReason": "stop",
+      "label": "naive booking-split 5",
+      "reply": "## Terms used differently\n\n| Term | Different meanings / users |\n|---|---|\n| **Booking** | **Ops/Dana:** the customer’s submitted request, worked immediately and searchable by booking reference. **Finance/Tom:** an invoiceable shipment, specifically after delivery/proof of delivery. **Database:** a row; rebooking creates a second row. **Customer portal:** effectively one customer-facing booking, because it displays the original reference across rebooks. |\n| **Booking count / bookings today** | **Dashboard/Ops:** every non-`CANCELLED` row, so a rebook can count twice. **Finance:** invoiceable bookings from the ledger export. **Night dispatch:** operational count adjusted manually by subtracting rebooks. |\n| **Rebook / REBOOKED** | **Maya/night dispatch:** commonly used for date changes, carrier drops, and other changes that need the carrier notified; driven by the working tool behavior. **Dana/day ops:** should mean a carrier or lane change; same-carrier date/window changes should be amendments. **Carrier desk/Luis:** cancel the original tender and issue a new tender, with possible TONU exposure. **Finance:** a new booking/invoice line, with the old one voided. **Code:** old row becomes `REBOOKED`; a new row/ref is created with `rebooked_from_id`. |\n| **Amend / AMENDED** | **Dana/day ops:** same carrier and lane, with a date or pickup-window change; same booking and same reference. **Maya/night dispatch:** desired action for those cases, but avoided because it does not sync to the carrier portal. **Code:** updates the existing row/ref in place, but currently does not trigger carrier sync. **Carrier desk:** same tender with updated date, rather than cancel + new tender. |\n| **Same booking** | **Ops/customer-facing view:** a changed shipment can remain the same booking if the customer sees the same reference. **Finance/database view:** a rebook is not the same booking because it creates a new billable row/reference. |\n| **Carrier drop** | **Night dispatch:** a type of rebook. **Code:** handled as `rebook!`, creating a new row. **Finance:** only one booking if the first carrier never picked up the load and it was never invoiceable. **Carrier desk:** a carrier-side cancellation, not a customer-caused change, with no TONU for the company. |\n| **Hold** | **Night dispatch:** a booking waiting for customer input. **Finance:** a credit hold on the customer account, meaning nothing may ship. **Day desk:** prefers “waiting on customer” rather than “hold.” |\n| **Carrier acceptance / assignment** | **System/carrier desk:** `CARRIER_ACK` means the carrier has accepted the tender. **Ops:** tends to track whether a truck is assigned instead, and does not use `CARRIER_ACK` directly. |\n| **Load / tender / booking** | **Carriers:** use “load” or “tender,” not booking. **Ops:** booking is the customer request/work item. **Finance:** booking is an invoiceable financial unit. |\n\n## Question for the domain expert\n\nFor the RFC, what is the authoritative business rule for a **same-carrier, same-lane date or pickup-window change after carrier acceptance**: should it remain one booking amended in place, with a carrier-sync notification, and under what exceptions—if any—must it instead become a cancel-and-new-tender rebook?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "booking-split",
+      "i": 6,
+      "ms": 10257,
+      "promptTokens": 5622,
+      "cachedTokens": 5619,
+      "completionTokens": 965,
+      "reasoningTokens": 0,
+      "cost": 0.0127098,
+      "finishReason": "stop",
+      "label": "naive booking-split 6",
+      "reply": "## Words used differently\n\n| Word / phrase | Different meanings in use | Who uses it that way |\n|---|---|---|\n| **Booking** | A customer request that exists as soon as it is submitted and can be worked by ops. | Dana / Ops |\n|  | A financial unit that exists only when it is invoiceable—at **delivery with proof of delivery**, not at submission or pickup. | Tom / Finance |\n|  | A database row; a rebook creates a second booking row. | Sam / Engineering |\n|  | What the customer sees as one continuous request, even if backend rows and invoice references change. | Customer portal / Ops framing |\n| **Booking count / bookings today** | All non-cancelled database rows; consequently counts both the old `REBOOKED` row and new row. | Dashboard / Ops operational view |\n|  | Invoiceable bookings from the ledger export. | Finance |\n|  | A practical shift-planning number, with rebooks mentally subtracted. | Night dispatch |\n| **Rebook** | A new booking: old database row becomes `REBOOKED`, a new row/ref is created, carrier assignment is cleared, and it can be separately billed. | Sam / Database; Tom / Finance |\n|  | The action night dispatch uses for date changes, carrier drops, and other changes because it is the reliable way to notify carriers today. | Maya / Night dispatch |\n|  | A cancel of the original tender plus a new tender; may cause a TONU if the truck was dispatched. | Luis / Carrier desk |\n|  | Not appropriate for a same-carrier date change; that should remain the same booking and be amended. | Dana / Day ops |\n| **Amend / AMENDED** | Update date/window in place, retaining the same database row and booking ref. | Sam / Engineering |\n|  | Correct action for same-carrier, same-lane date or pickup-window changes. | Dana / Ops |\n|  | Operationally unusable today because it does not sync the changed date to the carrier portal. | Maya / Night dispatch |\n|  | Same tender with updated date, distinct from a cancel-and-new-tender. | Luis / Carrier desk |\n| **New booking** | A new database row and reference, generated by `rebook!`. | Sam |\n|  | A different lane, different rate, or carrier change. | Dana |\n|  | A separate invoiceable unit, if the original became invoiceable. | Tom |\n|  | May still be “the same shipment” from the customer’s perspective. | Dana / Portal behavior |\n| **Carrier drop** | A reason to rebook: carrier change produces a new backend row. | Maya / Sam |\n|  | A carrier-side cancellation, not a customer-caused cancellation; should create a carrier reliability impact rather than a TONU for the company. | Luis |\n|  | Still one booking financially if the first carrier never picked up, because the original was never invoiceable. | Tom |\n| **Tender / load** | The carrier-facing object: rebook means cancelled load + new tender; amend means same tender with changed date. | Luis / Carriers |\n|  | A stage in the booking lifecycle after ops works the request. | Priya’s proposed sequence / Engineering statuses |\n|  | Carriers generally call the thing a “load” or “tender,” not a booking. | Luis |\n| **Carrier accepted / assigned** | `CARRIER_ACK` means the carrier accepted the tender in its portal. | Luis / System status |\n|  | Ops instead tracks whether a truck is assigned, rather than looking at `CARRIER_ACK`. | Dana |\n| **Hold** | A booking waiting for customer input. | Maya / Night dispatch |\n|  | A credit hold on an account, which prevents shipping. | Tom / Finance |\n|  | “Waiting on customer,” rather than “hold.” | Dana / Day desk |\n| **Reference / booking ref** | Backend rebooks receive a new reference. | Sam / Database |\n|  | The portal shows the original reference for both original and rebooked rows by following `rebooked_from_id`. | Sam / Customer portal |\n|  | Invoice references can differ from portal references, producing QA/test confusion. | Aisha / QA |\n\n## Question for the domain expert\n\nFor a **same-carrier, same-lane date or pickup-window change after carrier acceptance**, should the canonical business action be **Amend** (same booking and same tender), with carrier notification required—and are there any time/dispatch-stage exceptions where it must instead become a **Rebook**?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources",
+        "at most 600 words"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "booking-split",
+      "i": 6,
+      "ms": 4734,
+      "promptTokens": 7917,
+      "cachedTokens": 7914,
+      "completionTokens": 499,
+      "reasoningTokens": 0,
+      "cost": 0.0075768,
+      "finishReason": "stop",
+      "label": "coach booking-split 6",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders to a carrier, and the carrier accepts the tender.\n3. From thread: A same-carrier date change can be AMENDED or REBOOKED.\n4. From thread: Rebook creates a new booking row and can cancel the original load for the carrier.\n5. From thread: Proof of delivery makes a booking invoiceable.\n\nWords that don't match\n\"booking\"\n- From thread: Ops (day desk) means the customer's request, including a same-carrier date change that stays on the same ref.\n- From thread: Ops (night shift) means a submitted request they work immediately, and a rebook when operational changes require it.\n- From thread: Finance means an invoiceable booking, after proof of delivery.\n- From thread: Code creates a booking row on submit, and rebook creates another row.\n\"rebook\"\n- From thread: Ops (day desk) means a new booking for a carrier change or lane change.\n- From thread: Ops (night shift) means the action used for date changes because Amend does not reach the carrier portal.\n- From thread: Finance means a new booking with its own invoice and a voided old one.\n- From thread: Carriers means cancel plus new tender, which can cause a TONU.\n\"booking count\"\n- From thread: Ops means the dashboard total of rows not CANCELLED.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code counts every row where status is not CANCELLED, including REBOOKED rows and their replacements.\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer\".\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct RFC review: Which booking count applies to load 48213 after its same-carrier date move: the original REBOOKED row, the new row, or neither?\nFrom thread: \"date moved one day, same carrier, night shift rebooked it\"\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"",
+      "hardFailures": [
+        "same meaning not split"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": false
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "rebook-notes",
+      "i": 1,
+      "ms": 3711,
+      "promptTokens": 2907,
+      "cachedTokens": 2904,
+      "completionTokens": 421,
+      "reasoningTokens": 0,
+      "cost": 0.0056388,
+      "finishReason": "stop",
+      "label": "coach rebook-notes 1",
+      "reply": "Events, in order\n1. From thread: A customer request is submitted on portal.\n2. From thread: Load 48213's date moved +1 day with the same carrier and was rebooked at night.\n3. From thread: The carrier billed TONU on the orig load, then hauled the new one.\n4. From thread: Finance paid the TONU.\n5. From thread: Ops will update the glossary before the RFC review.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (night shift) means a date-only change is RB until amend! syncs to the carrier portal.\n- From thread: Ops (day desk) means lane chg or carrier chg is a new booking, while a same-carrier, same-lane date or window change is AMENDED.\n- From thread: Finance means a new invoice plus a void on the old one, but it needs one invoice per shipment that actually moves.\n\n\"AMENDED\"\n- From thread: Ops (night shift) means an option that does not push the date to carrier portal.\n- From thread: Ops (day desk) means a same-carrier, same-lane date or window change.\n\n\"booking\"\n- From thread: Ops (night shift) means a date-only change can be treated as RB for the carrier to get the date.\n- From thread: Ops (day desk) means a lane chg or carrier chg creates a new booking.\n- From thread: Finance means the shipment that actually moves and receives one invoice.\n\nQuestion for the finance chair and the ops sign-off role, at the RFC review, Tue 27 Oct: For Load 48213, where a date-only change was rebooked at night and the carrier billed TONU on the orig load before hauling the new one, which shipment gets the one invoice: the orig load, the new load, or neither?\nFrom thread: \"carrier billed TONU on orig load, then hauled the new one\"\nFrom thread: \"finance only needs one invoice per shipment that actually moves\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "rebook-notes",
+      "i": 1,
+      "ms": 7425,
+      "promptTokens": 612,
+      "cachedTokens": 0,
+      "completionTokens": 607,
+      "reasoningTokens": 0,
+      "cost": 0.008508,
+      "finishReason": "stop",
+      "label": "naive rebook-notes 1",
+      "reply": "### Where terms are being used differently\n\n- **“Rebook / RB”**\n  - **Dana (corrected definition):** A new booking when the **carrier changes** or the **shipment lane changes**. It should receive a **new reference**.\n  - **Maya / night shift:** Uses “RB” operationally for **any change that must reach the carrier portal**, including date-only changes, because Amend does not currently sync overnight.\n  - **Tom / Finance:** Treats RB primarily as an invoicing event: **new invoice plus voiding the old invoice**. The label matters less than preventing duplicate billing.\n  - **Open edge case:** When the carrier drops/cancels, nights call the replacement an RB, but it is not yet clear whether this is formally a new booking or a rebook.\n\n- **“Amend / AMENDED”**\n  - **Dana (corrected):** Only for a **date or pickup-window change** where the **carrier and shipment lane remain the same**; the booking keeps the same reference.\n  - **Maya / night shift:** Does not rely on Amend for date-only changes at night because it does not push the changed date to the carrier portal.\n  - **Carrier desk:** Supports the Amend-plus-phone-call approach for date changes; says it could have avoided the TONU on Load 48213.\n  - **Open edge case:** Whether a same-day pickup-window change is always an Amend still needs explicit confirmation, although Dana’s correction suggests it is when carrier and lane are unchanged.\n\n- **“Lane”**\n  - **Dana’s intended meaning on Tuesday:** The carrier’s lane assignment.\n  - **Priya’s notes / apparent interpretation:** The shipment lane.\n  - **Resolved definition:** A change to the **shipment lane** is always a **new booking**, even with the same carrier, because it changes rate and requires a new tender.\n\n- **“New booking” vs. “Rebook”**\n  - Dana’s corrected wording says lane or carrier changes create a **new booking**.\n  - The notes previously used **REBOOKED** for carrier changes, and nights use **RB** broadly.\n  - The glossary needs to state whether “rebook” is the formal name for every new booking created from an existing request, or whether it is distinct from “new booking.”\n\n- **“Bookings today”**\n  - The dashboard appears to treat **REBOOKED rows** as additional bookings, causing double counting.\n  - It is unclear whether the metric should count shipment requests, active bookings, or booking records/tenders.\n\n### Question for the domain expert\n\nFor glossary and reporting purposes, should **“REBOOKED” be the formal status for any replacement/new tender created from an existing booking** (including carrier cancellation, carrier change, and lane change), or should those cases be labelled simply **“new booking”** with “rebook” reserved for a narrower case?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "rebook-notes",
+      "i": 2,
+      "ms": 6459,
+      "promptTokens": 612,
+      "cachedTokens": 0,
+      "completionTokens": 526,
+      "reasoningTokens": 0,
+      "cost": 0.007536,
+      "finishReason": "stop",
+      "label": "naive rebook-notes 2",
+      "reply": "### Places where terms are being used differently\n\n- **“Rebooked / RB”**\n  - **Dana:** A new booking/reference when the **carrier changes**; after correction, also when the **shipment lane changes**.\n  - **Maya / night shift:** Operationally uses RB for **any change that must reach the carrier portal**, including date-only changes, because AMEND currently does not sync reliably overnight.\n  - **Tom / Finance:** Treats RB mainly as an invoicing event: **new invoice plus voiding the old invoice**. The label matters less than preventing duplicate billing.\n  - **Carrier desk:** Implies a date-only change should be an **amend plus phone call**, not a rebook; otherwise it may create cancellation/TONU exposure.\n\n- **“Amended / AMEND”**\n  - **Dana, corrected definition:** Only for a **date or pickup-window change** where both **carrier and shipment lane stay the same**; retain the same reference.\n  - **Maya:** Sees AMEND as unsafe for night operations until it pushes changes to the carrier portal.\n  - **Carrier desk:** Views AMEND as the correct process for the Load 48213-style date-only change, with a carrier call if needed.\n\n- **“Lane”**\n  - **Dana’s original wording / Priya’s notes:** “Lane change” was recorded as though it could be amended with the same carrier.\n  - **Dana’s correction:** She meant the carrier’s lane assignment, not the shipment lane. A **shipment-lane change always means a new booking**, because it changes rate/tender.\n  - This is the key glossary ambiguity that caused the initial conflict.\n\n- **“New booking” vs. “RB”**\n  - Dana’s corrected rule says lane or carrier changes create a **new booking**.\n  - Nights call carrier-drop cases and other replacements **RBs**.\n  - The glossary needs to state whether “rebook” is the formal name for every replacement/new booking, or only a specific subtype.\n\n- **“Bookings today”**\n  - The dashboard treats **REBOOKED rows as additional bookings**, causing double counting.\n  - This conflicts with Finance’s need to treat a rebook/replacement as one shipment movement for invoicing purposes.\n\n### Question for the domain expert\n\nFor a carrier cancellation or drop, should the replacement be formally classified as **REBOOKED** or as a **new booking**, and should it retain a link to the original booking/reference for invoicing and dashboard counting?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "rebook-notes",
+      "i": 2,
+      "ms": 4152,
+      "promptTokens": 2907,
+      "cachedTokens": 2904,
+      "completionTokens": 432,
+      "reasoningTokens": 0,
+      "cost": 0.0057708,
+      "finishReason": "stop",
+      "label": "coach rebook-notes 2",
+      "reply": "Events, in order\n1. From thread: Customer submits a bkg on the portal.\n2. From thread: Night shift rebooked Load 48213 after its date moved +1 day with the same carrier.\n3. From thread: The carrier billed TONU on the orig load, then hauled the new one.\n4. From thread: Only a date (or window) change with the same carrier and same lane is AMENDED.\n5. From thread: Finance needs one invoice per shipment that actually moves.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (day desk) means a new booking when the lane or carrier changes.\n- From thread: Ops (night shift) means a date-only change rebooked until amend! syncs to the carrier portal.\n- From thread: Finance means a new invoice plus a void on the old one.\n\"AMENDED\"\n- From thread: Ops (day desk) means a date or window change with the same carrier and same lane.\n- From thread: Ops (night shift) means a change that is not safe at 2am because it does not push the date to the carrier portal.\n- From thread: Carriers means a date change with a phone call that could avoid TONU.\n\"booking\"\n- From thread: Ops (day desk) means a customer request once submitted on portal, and a lane or carrier change creates a new booking.\n- From thread: Finance means one shipment that actually moves and receives one invoice.\n- From thread: Code counts REBOOKED rows twice in dashboard \"bookings today\".\n\nQuestion for the finance chair and ops sign-off role, at the Tue 27 Oct RFC review: For Load 48213, where the same-carrier date change was REBOOKED at night and the carrier charged TONU before hauling the new load, which booking and invoice count applies: the old row, the new row, or neither?\nFrom thread: \"dashboard \"bookings today\" counts REBOOKED rows twice. who owns the fix?\"\nFrom thread: \"finance only needs one invoice per shipment that actually moves\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "rebook-notes",
+      "i": 3,
+      "ms": 3589,
+      "promptTokens": 2907,
+      "cachedTokens": 2904,
+      "completionTokens": 390,
+      "reasoningTokens": 0,
+      "cost": 0.0052668,
+      "finishReason": "stop",
+      "label": "coach rebook-notes 3",
+      "reply": "Events, in order\n1. From thread: A customer request is submitted on portal.\n2. From thread: A date moved +1 day for Load 48213 with the same carrier, and night shift rebooked it.\n3. From thread: The carrier billed TONU on the orig load, then hauled the new one.\n4. From thread: A date or window change with the same carrier and same lane is AMENDED.\n5. From thread: Night shift RBs date-only changes until amend! syncs to the carrier portal.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (night shift) means a date-only change handled as REBOOKED so the carrier gets the date.\n- From thread: Ops (day desk) means a carrier change, while date or window changes on the same lane are AMENDED.\n- From thread: Finance means a new invoice plus a void on the old one.\n\"booking\"\n- From thread: Ops (night shift) means a date-only change can create a REBOOKED row.\n- From thread: Ops (day desk) means a lane change or carrier change is a new booking, while a same-lane date change is AMENDED.\n- From thread: Finance means one invoice per shipment that actually moves.\n\"bookings today\"\n- From thread: Code counts REBOOKED rows twice on the dashboard.\n- From thread: Team unclear means the dashboard fix has no identified owner.\n\nQuestion for the finance chair and the ops sign-off role, at the Tue 27 Oct RFC review: For Load 48213, where the original load received TONU and the new load moved, which booking and invoice count applies: the old row, the new row, or neither?\nFrom thread: \"carrier billed TONU on orig load, then hauled the new one\"\nFrom thread: \"finance only needs one invoice per shipment that actually moves\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "rebook-notes",
+      "i": 3,
+      "ms": 8172,
+      "promptTokens": 612,
+      "cachedTokens": 0,
+      "completionTokens": 576,
+      "reasoningTokens": 0,
+      "cost": 0.008136,
+      "finishReason": "stop",
+      "label": "naive rebook-notes 3",
+      "reply": "### Where terms are used differently\n\n- **“Rebook / RB”**\n  - **Dana (corrected definition):** A new booking when the **carrier changes** or the **shipment lane changes**. New tender / new booking; likely a new reference.\n  - **Maya / night shift:** Uses **RB** operationally for any change that must reach the carrier portal, including **date-only changes**, because Amend does not currently sync overnight.\n  - **Tom / Finance:** Treats RB mainly as an invoicing event: **new invoice plus voiding the old invoice**. The label matters less than preventing duplicate invoices.\n  - **Carrier desk:** Implies a date-only change should be an **amend plus phone call**, not a rebook; otherwise it can trigger TONU / duplicate operational handling.\n\n- **“Amend / AMENDED”**\n  - **Dana (final):** Only for a **date or pickup-window change** where both **carrier and shipment lane stay the same**; same reference.\n  - **Maya:** Accepts this as the intended definition, but does not use it at night until the amendment reliably syncs to the carrier portal.\n  - **Carrier desk:** Treats amendment, combined with direct notification, as the proper handling for date-only changes.\n  - **Earlier notes:** Dana’s original wording was ambiguous because “lane” meant the carrier’s lane assignment, while the notes recorded it as the shipment lane.\n\n- **“Lane change”**\n  - **Initial notes:** Suggested lane/date changes could be amendments.\n  - **Dana’s correction and Maya’s agreement:** A **shipment lane change is always a new booking**, even with the same carrier, because it changes the rate and requires a new tender.\n  - The disagreement was primarily between the recorded notes and Dana’s intended meaning, rather than a remaining policy disagreement.\n\n- **“Booking / new booking”**\n  - **Dana:** A new tender caused by carrier or lane change.\n  - **Night operations:** May create what is effectively a new booking for a date-only change as a workaround for portal-sync limitations.\n  - **Finance:** Focuses on whether the shipment that moves has exactly one invoice, regardless of whether operations calls the record a booking or rebooking.\n\n- **“Bookings today”**\n  - Dashboard currently treats **REBOOKED rows as additional bookings**, producing double counts.\n  - Ownership of correcting that metric is not assigned.\n\n### Question for the domain expert\n\nFor a **date-only change made overnight** before Amend-to-carrier portal sync is available, should operations create a temporary rebook/new reference, or retain the existing booking and use a defined escalation method (for example, carrier phone/email notification) so that finance and dashboard reporting do not treat it as a second booking?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": false,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "rebook-notes",
+      "i": 4,
+      "ms": 6217,
+      "promptTokens": 612,
+      "cachedTokens": 0,
+      "completionTokens": 510,
+      "reasoningTokens": 0,
+      "cost": 0.007344,
+      "finishReason": "stop",
+      "label": "naive rebook-notes 4",
+      "reply": "### Where terms are being used differently\n\n- **“Rebooked / RB”**\n  - **Dana / glossary intent:** A new booking when the **carrier changes** or the **shipment lane changes**. It gets a new reference.\n  - **Maya / night shift practice:** Used for **any change**, including date-only changes, because rebooking is the reliable way to push the update to the carrier portal overnight.\n  - **Tom / finance lens:** Effectively means a transaction that creates a **new invoice and voids the old one**; terminology matters less than avoiding duplicate billing.\n  - **Dashboard:** Treats REBOOKED as an additional booking row, causing “bookings today” to count it twice.\n\n- **“Amended / AMEND”**\n  - **Dana, corrected definition:** Only a **date or pickup-window change** where the **same carrier and same shipment lane** remain in place. Same reference.\n  - **Maya:** Operationally insufficient at night because it does not reliably update the carrier portal.\n  - **Carrier desk:** Agrees amendment plus a phone call could have avoided the TONU on Load 48213.\n\n- **“Lane”**\n  - **Dana’s original wording / Priya’s notes:** “Lane change” was recorded as potentially amendable with the same carrier.\n  - **Dana’s correction:** She meant the carrier’s lane assignment, not the shipment lane. A **shipment-lane change is always a new booking** because it changes rate and tender.\n\n- **“Booking” / “new booking”**\n  - **Dana:** A customer request submitted through the portal is a booking; lane or carrier changes produce a new booking.\n  - **Night operations:** A date-only operational update may be made as a new/rebooked booking for portal-delivery reliability.\n  - **Finance:** Should correspond to one invoice for the shipment that actually moves, regardless of whether operations created multiple booking records.\n\n- **Carrier cancellation (“carrier drop”)**\n  - **Night shift:** Calls the replacement action an RB.\n  - **Open glossary question:** Whether it should instead be classified as a new booking.\n\n### Question for the domain expert\n\nWhen a carrier cancels and the shipment is retendered—whether to the same carrier later or to a different carrier—should the glossary classify the replacement as **REBOOKED** or simply a **new booking**, and what reference/invoice relationship should it have to the cancelled original?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "rebook-notes",
+      "i": 4,
+      "ms": 5467,
+      "promptTokens": 2907,
+      "cachedTokens": 2904,
+      "completionTokens": 405,
+      "reasoningTokens": 0,
+      "cost": 0.0054468,
+      "finishReason": "stop",
+      "label": "coach rebook-notes 4",
+      "reply": "Events, in order\n1. From thread: A customer request is submitted on portal as a bkg.\n2. From thread: Load 48213's date moved +1 day with the same carrier and was rebooked at night.\n3. From thread: The carrier billed TONU on orig load, then hauled the new one.\n4. From thread: Only a date (or window) change with the same carrier and same lane is AMENDED.\n5. From thread: Night shift RBs date-only changes until amend! syncs to the carrier portal.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (night shift) means date-only changes are RB until amend! syncs the date to the carrier portal.\n- From thread: Ops (day desk) means a carrier change is a new booking, while a same-carrier, same-lane date or window change is AMENDED.\n- From thread: Finance means a new invoice plus a void on the old one, but only one invoice per shipment that actually moves.\n\n\"new booking\"\n- From thread: Ops (night shift) means a carrier drop is RB.\n- From thread: Ops (day desk) means a lane change or carrier change is a new booking because it is a new tender.\n- From thread: Finance means the shipment must have only one invoice if it actually moves.\n\n\"bookings today\"\n- From thread: Code counts REBOOKED rows twice.\n\nQuestion for the ops lead and the finance controller, at the RFC review, Tue 27 Oct: How does Load 48213 count in \"bookings today\" and invoicing when the night shift creates a REBOOKED row for a same-carrier, same-lane date change: as the old row, the new row, or neither?\nFrom thread: \"dashboard \"bookings today\" counts REBOOKED rows twice. who owns the fix?\"\nFrom thread: \"finance only needs one invoice per shipment that actually moves\"",
+      "hardFailures": [
+        "code guess"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "rebook-notes",
+      "i": 5,
+      "ms": 3840,
+      "promptTokens": 2907,
+      "cachedTokens": 2904,
+      "completionTokens": 381,
+      "reasoningTokens": 0,
+      "cost": 0.0051588,
+      "finishReason": "stop",
+      "label": "coach rebook-notes 5",
+      "reply": "Events, in order\n1. From thread: A customer request is submitted on portal as a bkg.\n2. From thread: Load 48213's date moved +1 day with the same carrier and was rebooked at night.\n3. From thread: The carrier billed TONU on orig load, then hauled the new one.\n4. From thread: Only a date (or window) change with the same carrier and same lane is AMENDED.\n5. From thread: Night shift still RBs date-only changes until amend! syncs to the carrier portal.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (day desk) means a new booking when the lane or carrier changes.\n- From thread: Ops (night shift) means the safe way to send a date-only change to the carrier portal until amend! syncs.\n- From thread: Finance means a change that results in a new invoice and a void on the old one.\n\"AMENDED\"\n- From thread: Ops (day desk) means a date or window change with the same carrier and same lane.\n- From thread: Ops (night shift) means a change that does not push the date to the carrier portal.\n\"booking\"\n- From thread: Ops (day desk) means a customer request once submitted on portal, and a new booking for a lane or carrier change.\n- From thread: Finance means one shipment that actually moves and receives one invoice.\n\nQuestion for the ops lead and the finance controller, at the Tue 27 Oct RFC review: For Load 48213's same-carrier date move, which record is the booking for invoicing: the orig load, the new one, or both?\nFrom thread: \"carrier billed TONU on orig load, then hauled the new one\"\nFrom thread: \"finance only needs one invoice per shipment that actually moves\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "rebook-notes",
+      "i": 5,
+      "ms": 7306,
+      "promptTokens": 612,
+      "cachedTokens": 0,
+      "completionTokens": 554,
+      "reasoningTokens": 0,
+      "cost": 0.007872,
+      "finishReason": "stop",
+      "label": "naive rebook-notes 5",
+      "reply": "### Where terms are being used differently\n\n- **“Rebook / RB”**\n  - **Dana (corrected definition):** A new booking when the **carrier changes** or the **shipment lane changes**; it should receive a **new reference**.\n  - **Maya / night shift:** Uses RB operationally for **date-only changes** as well, because rebooking is the reliable way to push the new date to the carrier portal overnight.\n  - **Tom / Finance:** Treats RB primarily as an invoicing event: a **new invoice plus a void on the old invoice**. The label matters less than preventing duplicate payment.\n  - **Original Tuesday notes:** Incorrectly stated that same-carrier lane changes were amendments. Dana later clarified this was a misunderstanding of “lane.”\n\n- **“Amend / AMENDED”**\n  - **Dana (corrected):** Only for a **date or pickup-window change** where the **carrier and shipment lane are unchanged**; same booking reference.\n  - **Maya / night shift:** Does not treat amendment as operationally sufficient at night because it currently does not synchronize the changed date to the carrier portal.\n  - **Carrier desk:** Also sees amendment plus a phone call as the preferred handling for a date-only change, since it could avoid a cancellation/TONU and duplicate movement.\n\n- **“Booking / bkg”**\n  - **Dana:** A customer request once submitted through the portal.\n  - **Dana’s corrected rule:** A lane or carrier change creates a **new booking**, not merely an amended version of the existing one.\n  - **Open ambiguity:** It is not yet explicit whether a **carrier cancellation/drop** requires a new booking or is classified as a rebook of the prior booking.\n\n- **“Lane”**\n  - **Tuesday notes:** Recorded “lane” as the shipment lane.\n  - **Dana’s intended meaning on Tuesday:** The carrier’s lane assignment.\n  - **Corrected operational interpretation:** Any actual shipment-lane change is a new booking because it changes the rate and requires a new tender.\n\n- **“Bookings today”**\n  - The dashboard appears to use “booking” as a row-counting concept, causing rebooked rows to be counted twice.\n  - Finance’s stated need is instead one invoice per shipment that actually moves, which may not align with counting booking records.\n\n### Question for the domain expert\n\nFor a **date-only change made overnight before the amend-to-carrier-portal sync is available**, should the glossary classify the action as **AMENDED** (with a separate operational escalation/notification process), or as **REBOOKED** because a new carrier-facing tender is actually created?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "rebook-notes",
+      "i": 6,
+      "ms": 7788,
+      "promptTokens": 612,
+      "cachedTokens": 0,
+      "completionTokens": 488,
+      "reasoningTokens": 0,
+      "cost": 0.00708,
+      "finishReason": "stop",
+      "label": "naive rebook-notes 6",
+      "reply": "### Terms used differently\n\n| Term / concept | Dana / glossary meaning | Maya / night-shift usage | Tom / finance usage | Impact |\n|---|---|---|---|---|\n| **Rebook / RB** | A **new booking** when carrier changes or shipment lane changes; should receive a new reference. | Operational fallback for **any change**, including date-only changes, because the amend flow does not update the carrier portal overnight. | A transaction that creates a new invoice and requires the old invoice to be voided. | Date-only changes are being labelled/processed as rebooks at night, creating duplicate booking/dashboard counts and potential duplicate invoicing. |\n| **Amend / AMENDED** | Same carrier, same shipment lane, with only a date or pickup-window change; keeps the same reference. | Not reliable overnight because it does not currently push the revised date to the carrier portal. | Not specifically defined; acceptable if finance still receives only one invoice for the shipment that moves. | Ops definition and system capability differ; Load 48213 incurred a TONU after a date-only night rebook. |\n| **Lane** | Corrected definition: a shipment lane change always means a new booking because it changes rate/tender. | Agrees with the corrected definition. | Not discussed. | Initial notes confused “carrier lane assignment” with the shipment lane, leading to an incorrect prior rule. |\n| **Booking / bkg** | Customer request once submitted through the portal. A changed lane or carrier creates a new booking. | “RB” is used as a practical action rather than necessarily as a new-business object. | Primarily relevant as the source of invoice/void events. | Need to distinguish the business object (“new booking”) from the operational action used to notify a carrier. |\n| **Success criterion** | Correct classification and reference handling. | Carrier receives the changed date. | One invoice per shipment actually moved. | The glossary needs wording that covers both classification and required carrier notification/invoice behavior. |\n\n### Question for the domain expert\n\nFor a **date- or pickup-window-only change** on the same carrier and shipment lane during the night shift, should the glossary classify it as **AMENDED** even if operations must use a temporary “rebook” workflow to notify the carrier, and how should that workflow prevent a new booking reference and second invoice?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "rebook-notes",
+      "i": 6,
+      "ms": 3463,
+      "promptTokens": 2907,
+      "cachedTokens": 2904,
+      "completionTokens": 356,
+      "reasoningTokens": 0,
+      "cost": 0.0048588,
+      "finishReason": "stop",
+      "label": "coach rebook-notes 6",
+      "reply": "Events, in order\n1. From thread: A customer request is submitted on the portal as a bkg.\n2. From thread: Load 48213's date moved +1 day with the same carrier and was rebooked at night.\n3. From thread: The carrier billed TONU on the orig load, then hauled the new one.\n4. From thread: A date or window change with the same carrier and same lane is AMENDED.\n5. From thread: Night shift RBs date-only changes until amend! syncs to the carrier portal.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (day desk) means a carrier change, while a same-carrier same-lane date or window change is AMENDED.\n- From thread: Ops (night shift) means a date-only change handled at night until amend! syncs to the carrier portal.\n- From thread: Finance means a new invoice plus a void on the old one.\n\"booking\"\n- From thread: Ops means a customer request once submitted on portal, and a lane or carrier change is a new booking.\n- From thread: Finance means a shipment that actually moves and needs one invoice.\n- From thread: Code counts REBOOKED rows twice in dashboard \"bookings today\".\n\nQuestion for the ops lead and the finance controller, at the Tue 27 Oct RFC review: Which booking and invoice treatment applies to Load 48213's same-carrier, same-lane date change: AMENDED, REBOOKED, or a new booking?\nFrom thread: \"only a date (or window) change with the same carrier and same lane is AMENDED\"\nFrom thread: \"carrier billed TONU on orig load, then hauled the new one\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "carrier-status",
+      "i": 1,
+      "ms": 3344,
+      "promptTokens": 2904,
+      "cachedTokens": 2320,
+      "completionTokens": 270,
+      "reasoningTokens": 0,
+      "cost": 0.0051625,
+      "finishReason": "stop",
+      "label": "coach carrier-status 1",
+      "reply": "Events, in order\n1. From thread: Customer D submits a load on the portal.\n2. From thread: Carrier desk sends the tender to a carrier.\n3. From thread: The carrier accepts the tender by sending the 990.\n4. From thread: The booking service sets CONFIRMED when the 990 acceptance arrives over EDI.\n5. From thread: Ops agrees the pickup window with the customer in the notes field.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and sent back the 990.\n- From thread: Ops means the customer agreed the pickup window after Ops called them.\n- From thread: Code means CONFIRMED is set when the carrier's 990 acceptance arrives over EDI.\n- From thread: Team unclear means the portal displays Confirmed as soon as the carrier accepts.\n\nQuestion for the carrier desk lead and the ops lead: What does Confirmed mean for Customer D's load when Ops has told the customer the pickup window is agreed but the carrier has not yet returned the 990: carrier acceptance, customer window agreement, or neither?\nFrom thread: \"for ops, confirmed is when we've called the customer and they've agreed the pickup window.\"\nFrom thread: \"the portal means the carrier one. it's literally the 990\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "carrier-status",
+      "i": 1,
+      "ms": 3477,
+      "promptTokens": 609,
+      "cachedTokens": 0,
+      "completionTokens": 218,
+      "reasoningTokens": 0,
+      "cost": 0.003834,
+      "finishReason": "stop",
+      "label": "naive carrier-status 1",
+      "reply": "People use **“confirmed”** differently:\n\n- **Carrier desk / system / portal (Rosa, Sam, Luis):**  \n  “Confirmed” means the carrier accepted the tender, indicated by an EDI 990 acceptance. This is the meaning of the `CONFIRMED` booking status shown in the portal.\n\n- **Operations (Dana):**  \n  “Confirmed” means ops and the customer have agreed on the pickup window. This is communicated to customers verbally and recorded only in notes, not as a booking status.\n\n- **Customer-facing interpretation (Luis):**  \n  Customers may reasonably hear “confirmed” as a commitment that the pickup plan/window is settled, while the portal uses it only for carrier tender acceptance.\n\n- **Commercial/legal implication (Rosa):**  \n  Carrier confirmation also implies a contractual commitment; cancelling after acceptance may create TONU exposure.\n\n**Question for the domain expert:**  \nShould “Confirmed” remain the customer-visible portal status for carrier tender acceptance, or should the portal distinguish it from a separate customer pickup-window confirmation status?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "carrier-status",
+      "i": 2,
+      "ms": 4696,
+      "promptTokens": 609,
+      "cachedTokens": 0,
+      "completionTokens": 239,
+      "reasoningTokens": 0,
+      "cost": 0.004086,
+      "finishReason": "stop",
+      "label": "naive carrier-status 2",
+      "reply": "People use **“confirmed”** differently:\n\n- **Carrier desk / system / portal (Rosa, Sam, Luis):** “Confirmed” means the carrier accepted the tender via an EDI 990. This is the meaning of the `CONFIRMED` booking status and what customers currently see in the portal.\n- **Ops desk (Dana):** “Confirmed” means ops and the customer have agreed on the pickup window. This is recorded only in notes, not as a status.\n- **Customer-facing usage:** Customers may hear “confirmed” from ops before—or separately from—the portal status changing, creating the impression that both events mean the same thing.\n- **Commercial/contractual nuance (Rosa):** Carrier confirmation also implies a commitment with cancellation/TONU implications, especially once a truck is rolling.\n- **Data/reporting usage (Dana):** The ops meaning is not represented as structured status data, so it cannot be reliably reported on.\n\n**Question for the domain expert:**  \nShould “Confirmed” be reserved for carrier tender acceptance, with a separate named and tracked status for customer pickup-window agreement (for example, “Pickup Window Agreed”)?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "carrier-status",
+      "i": 2,
+      "ms": 2669,
+      "promptTokens": 2904,
+      "cachedTokens": 2901,
+      "completionTokens": 284,
+      "reasoningTokens": 0,
+      "cost": 0.0039942,
+      "finishReason": "stop",
+      "label": "coach carrier-status 2",
+      "reply": "Events, in order\n1. From thread: Customer D submitted the load on the portal.\n2. From thread: Carrier desk sent the tender to a carrier.\n3. From thread: The carrier accepted the tender by sending the 990.\n4. From thread: The booking service set CONFIRMED when the 990 acceptance arrived over EDI.\n5. From thread: Ops agreed the pickup window with the customer in the notes field.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and sent the 990.\n- From thread: Ops means the customer agreed the pickup window.\n- From thread: Code means CONFIRMED is set when the carrier's 990 acceptance arrives over EDI.\n\"confirmed\"\n- From thread: Carrier desk means a contractual acceptance that can lead to a TONU if cancelled while the truck is rolling.\n- From thread: Ops means a promise to the customer once the pickup window is agreed.\n\nQuestion for the carrier desk lead and the ops lead: What does Confirmed on Customer D's portal load mean when the carrier's 990 arrives before Ops has agreed the pickup window: carrier acceptance, customer-window agreement, or both?\nFrom thread: \"and the carrier can accept a tender before ops has even called the customer\"\nFrom thread: \"the portal means the carrier one. it's literally the 990\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "carrier-status",
+      "i": 3,
+      "ms": 2495,
+      "promptTokens": 2904,
+      "cachedTokens": 2901,
+      "completionTokens": 252,
+      "reasoningTokens": 0,
+      "cost": 0.0036102,
+      "finishReason": "stop",
+      "label": "coach carrier-status 3",
+      "reply": "Events, in order\n1. From thread: Customer D submitted the load on the portal.\n2. From thread: Carrier desk sent the tender to the carrier.\n3. From thread: Ops called the customer and agreed the pickup window.\n4. From thread: The carrier accepted the tender with a 990.\n5. From thread: The portal showed Confirmed to Customer D.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and sent back a 990.\n- From thread: Ops desk means the customer agreed the pickup window.\n- From thread: Code sets CONFIRMED when the carrier's 990 acceptance arrives over EDI.\n- From thread: Team unclear means a contractual commitment where cancelling can cost a TONU if the truck is rolling.\n\nQuestion for the ops lead and the carrier desk lead: What does Confirmed mean for Customer D's load when ops agreed the pickup window on Monday but the portal changed to Confirmed on Tuesday: customer window agreement or carrier 990 acceptance?\nFrom thread: \"for ops, confirmed is when we've called the customer and they've agreed the pickup window.\"\nFrom thread: \"the portal means the carrier one. it's literally the 990\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "carrier-status",
+      "i": 3,
+      "ms": 3341,
+      "promptTokens": 609,
+      "cachedTokens": 0,
+      "completionTokens": 216,
+      "reasoningTokens": 0,
+      "cost": 0.00381,
+      "finishReason": "stop",
+      "label": "naive carrier-status 3",
+      "reply": "People use **“confirmed”** differently:\n\n- **Carrier desk / system / portal (Rosa, Sam, Luis):** “Confirmed” means the carrier accepted the tender, typically via an EDI 990.\n- **Operations (Dana):** “Confirmed” means ops and the customer agreed on the pickup window; it is a customer-facing commitment.\n- **Customer interpretation (Luis):** Customers may reasonably read “Confirmed” as the shipment is fully arranged, including a truck/pickup plan, which neither internal definition necessarily guarantees.\n- **Commercial/legal framing (Rosa):** Carrier confirmation creates a contractual commitment and potential TONU exposure if cancelled.\n- **Data-model framing (Sam):** The formal booking status enum defines `CONFIRMED` only as carrier EDI acceptance; customer-window confirmation exists only in notes and is not reportable.\n\n**Question for the domain expert:**  \nShould carrier tender acceptance and customer pickup-window agreement be modeled and displayed as two separate, explicitly named statuses—and if so, what should each status be called?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "carrier-status",
+      "i": 4,
+      "ms": 3572,
+      "promptTokens": 609,
+      "cachedTokens": 0,
+      "completionTokens": 216,
+      "reasoningTokens": 0,
+      "cost": 0.00381,
+      "finishReason": "stop",
+      "label": "naive carrier-status 4",
+      "reply": "People use **“Confirmed”** differently:\n\n- **Carrier desk / system:** “Confirmed” means the carrier accepted the tender via an EDI 990. This is the booking-service enum and what the portal displays.\n- **Operations:** “Confirmed” means ops and the customer agreed to the pickup window; it is a customer-facing promise.\n- **Customer-facing interpretation:** Customers may reasonably read “Confirmed” as the shipment/pickup arrangement being finalized, which aligns more with ops’ meaning than the carrier-acceptance event.\n- **Contractual interpretation:** Rosa treats carrier confirmation as a commitment with cancellation/TONU implications, especially once a truck is moving.\n- **Data-model/reporting interpretation:** Sam notes only carrier acceptance is modeled as a status; ops’ customer-window confirmation exists only in notes, so it cannot be consistently reported.\n\n**Question for the domain expert:** Should carrier tender acceptance and customer pickup-window agreement be modeled as two separate named statuses/events, and if so, what customer-facing label should replace the current portal label “Confirmed”?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "carrier-status",
+      "i": 4,
+      "ms": 3341,
+      "promptTokens": 2904,
+      "cachedTokens": 2901,
+      "completionTokens": 314,
+      "reasoningTokens": 0,
+      "cost": 0.0043542,
+      "finishReason": "stop",
+      "label": "coach carrier-status 4",
+      "reply": "Events, in order\n1. From thread: Customer D submits the booking on the portal.\n2. From thread: Carrier desk sends the booking to a carrier as TENDERED.\n3. From thread: The carrier accepts the tender by sending a 990.\n4. From thread: Booking service sets CONFIRMED when the 990 acceptance arrives over EDI.\n5. From thread: Ops agrees the pickup window with the customer in the notes field.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and sent the 990 back.\n- From thread: Ops desk means the customer has agreed the pickup window.\n- From thread: Code means CONFIRMED is set when the carrier's 990 acceptance arrives over EDI.\n- From thread: Team unclear means the portal shows Confirmed when the enum is CONFIRMED.\n\n\"confirmation\"\n- From thread: Carrier desk means a contractual carrier acceptance that can lead to a TONU if cancelled while the truck is rolling.\n- From thread: Ops desk means a promise to the customer that depends on an agreed pickup window.\n\nQuestion for the carrier desk lead and the ops desk lead: What does Customer D's portal status Confirmed represent when the carrier has sent a 990 but the pickup window has not been agreed: carrier acceptance or customer window agreement?\nFrom thread: \"for ops, confirmed is when we've called the customer and they've agreed the pickup window.\"\nFrom thread: \"the portal means the carrier one. it's literally the 990\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "carrier-status",
+      "i": 5,
+      "ms": 3237,
+      "promptTokens": 2904,
+      "cachedTokens": 2901,
+      "completionTokens": 301,
+      "reasoningTokens": 0,
+      "cost": 0.0041982,
+      "finishReason": "stop",
+      "label": "coach carrier-status 5",
+      "reply": "Events, in order\n1. From thread: Customer D submitted the load on the portal.\n2. From thread: Carrier desk sent the tender to the carrier.\n3. From thread: Ops called the customer and agreed the pickup window on Monday.\n4. From thread: The carrier's 990 acceptance arrived on Tuesday.\n5. From thread: The portal showed Confirmed when the booking service set CONFIRMED.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender by sending the 990.\n- From thread: Ops means the customer agreed the pickup window.\n- From thread: Code means CONFIRMED is set when the carrier's 990 acceptance arrives over EDI.\n\"confirmation\"\n- From thread: Carrier desk means a contractual carrier acceptance that can lead to a TONU if cancelled while the truck is rolling.\n- From thread: Ops means a promise to the customer that the pickup window is agreed.\n- From thread: Code means the portal displays the enum name Confirmed after the 990 arrives.\n\nQuestion for the ops lead and the carrier desk lead: What does Confirmed mean for Customer D's load when ops agreed the pickup window on Monday but the portal changed to Confirmed only after the carrier's 990 on Tuesday?\nFrom thread: \"for ops, confirmed is when we've called the customer and they've agreed the pickup window.\"\nFrom thread: \"the portal means the carrier one. it's literally the 990\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "carrier-status",
+      "i": 5,
+      "ms": 3438,
+      "promptTokens": 609,
+      "cachedTokens": 0,
+      "completionTokens": 207,
+      "reasoningTokens": 0,
+      "cost": 0.003702,
+      "finishReason": "stop",
+      "label": "naive carrier-status 5",
+      "reply": "People use **“Confirmed” / “confirmation”** differently:\n\n- **Carrier desk / Rosa:** “Confirmed” means the carrier accepted the tender, evidenced by an EDI 990. It has contractual and financial implications (for example, possible TONU exposure after acceptance).\n- **Booking service / Sam / portal:** `CONFIRMED` is the system status set specifically when the carrier’s 990 acceptance arrives. The portal displays this enum value.\n- **Operations / Dana:** “Confirmed” means ops has agreed the pickup window with the customer—a customer-facing promise. This is currently recorded only in notes, not as a reportable status.\n- **Luis / customer perspective:** Customers may interpret “Confirmed” as the operations/customer-window meaning, even though the portal uses the carrier-acceptance meaning.\n\n**Question for the domain expert:**  \nShould carrier tender acceptance and customer pickup-window agreement be modeled as two separate, explicitly named business states—and if so, what should each be called in customer-facing language?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "carrier-status",
+      "i": 6,
+      "ms": 4057,
+      "promptTokens": 609,
+      "cachedTokens": 0,
+      "completionTokens": 274,
+      "reasoningTokens": 0,
+      "cost": 0.004506,
+      "finishReason": "stop",
+      "label": "naive carrier-status 6",
+      "reply": "People use **“Confirmed” / “confirmation”** differently:\n\n- **Carrier desk / system meaning (Rosa, Sam, Luis):**  \n  “Confirmed” means the carrier accepted the tender, evidenced by an EDI **990**. This is the booking-service `CONFIRMED` status and what the portal displays.\n\n- **Ops meaning (Dana):**  \n  “Confirmed” means Ops has contacted the customer and agreed the pickup window—a customer-facing commitment. This is currently recorded only in notes, not as a system status.\n\n- **Customer-facing interpretation (Luis):**  \n  Customers may understand “Confirmed” as both carrier acceptance and an agreed pickup appointment, creating confusion when the carrier has accepted but the customer window is not yet agreed.\n\n- **Contractual/risk nuance (Rosa):**  \n  Carrier confirmation implies a contractual commitment and potential TONU exposure if cancelled, especially once a truck is moving.\n\n- **Technical/modeling usage (Kev):**  \n  “Confirmation rules” is used as a domain-modeling concept, without specifying whether it refers to carrier acceptance, customer-window agreement, or both.\n\n**Question for the domain expert:**  \nShould carrier tender acceptance and customer pickup-window agreement be modeled and displayed as two separate statuses/events, and if so, what should each be called in customer-facing language?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "no names",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "carrier-status",
+      "i": 6,
+      "ms": 2614,
+      "promptTokens": 2904,
+      "cachedTokens": 2901,
+      "completionTokens": 282,
+      "reasoningTokens": 0,
+      "cost": 0.0039702,
+      "finishReason": "stop",
+      "label": "coach carrier-status 6",
+      "reply": "Events, in order\n1. From thread: Ops calls the customer and agrees the pickup window.\n2. From thread: The booking is sent to the carrier.\n3. From thread: The carrier accepts the tender by sending a 990.\n4. From thread: The booking service sets CONFIRMED when the 990 acceptance arrives over EDI.\n5. From thread: The portal shows Confirmed to Customer D.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and sent the 990 back.\n- From thread: Ops desk means the customer agreed the pickup window.\n- From thread: Code sets CONFIRMED when the carrier's 990 acceptance arrives over EDI.\n\"confirmation\"\n- From thread: Carrier desk means a contractual carrier acceptance that can lead to a TONU if cancelled while the truck is rolling.\n- From thread: Ops desk means a promise to the customer once the pickup window is agreed.\n\nQuestion for the carrier desk lead and the ops desk lead: What does Confirmed mean for Customer D's portal booking when the carrier's 990 arrives before Ops agrees the pickup window: carrier acceptance, customer window agreement, or both?\nFrom thread: \"and the carrier can accept a tender before ops has even called the customer\"\nFrom thread: \"the portal means the carrier one. it's literally the 990\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "example-thread",
+      "i": 1,
+      "ms": 4032,
+      "promptTokens": 3345,
+      "cachedTokens": 3342,
+      "completionTokens": 443,
+      "reasoningTokens": 0,
+      "cost": 0.0059904,
+      "finishReason": "stop",
+      "label": "coach example-thread 1",
+      "reply": "Events, in order\n1. From thread: Account team says a load is late when the delivery appointment the customer booked is missed.\n2. From thread: Ops day desk marks a load late when the truck misses the pickup window.\n3. From thread: Ops night desk marks a load late when the ETA passes the delivery appointment, even before pickup.\n4. From thread: Code makes the weekly late report late when actual pickup is after pickup_window_end.\n5. From thread: Billing issues Customer D a service credit for load 7731 from the weekly late report, although it delivered before its appointment.\n\nWords that don't match\n\"late\"\n- From thread: Account team means a missed customer-booked delivery appointment.\n- From thread: Ops (day desk) means a truck arriving after the pickup window.\n- From thread: Ops (night desk) means an ETA passing the delivery appointment, including before pickup.\n- From thread: Carrier desk means a missed pickup for which the carrier pays a late fee.\n- From thread: Billing means a load included as late in the weekly report.\n- From thread: Code means actual_pickup_at is after pickup_window_end.\n\n\"on time\"\n- From thread: Account team means delivery by the customer-booked appointment.\n- From thread: Billing means not shown as late by the weekly late report.\n- From thread: Code means a pickup that is not after pickup_window_end.\n\n\"late report\"\n- From thread: Billing means the weekly report used for service credits and Customer D's Q3 on-time %.\n- From thread: Code means the late_loads query based on actual pickup, without delivery_appointment.\n\nQuestion for the account lead and the billing lead, at Friday's service review: Which result counts for Customer D's load 7731 in the Q3 on-time % and service credit: its missed pickup window, its delivery before the appointment, or neither?\nFrom thread: \"in the contract a load is late when we miss the delivery appointment the customer booked. Service credits are based on that and nothing else.\"\nFrom thread: \"7731 delivered 40 min before the appointment. driver made it up on the road\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "example-thread",
+      "i": 1,
+      "ms": 5124,
+      "promptTokens": 1050,
+      "cachedTokens": 0,
+      "completionTokens": 409,
+      "reasoningTokens": 0,
+      "cost": 0.0075315,
+      "finishReason": "stop",
+      "label": "naive example-thread 1",
+      "reply": "### Terms used differently\n\n- **“Late”**\n  - **Account team / contract:** Late means missing the customer’s booked **delivery appointment**.\n  - **Ops day desk:** Late means arriving for **pickup after the pickup window ends**.\n  - **Ops night desk:** Late can mean a **predicted delivery miss** once ETA passes the delivery appointment, even before pickup.\n  - **Carrier desk:** Late is primarily a **missed pickup**, because that is what triggers carrier late fees.\n  - **Dev / weekly report:** Late means **actual pickup after pickup_window_end**.\n\n- **“On time” / “on-time %”**\n  - **Account team / Customer D expectation:** Presumably tied to delivery appointment performance.\n  - **Weekly report / Dev / Billing:** Tied to pickup-window performance.\n  - This makes Customer D’s board-pack metric potentially inconsistent with the contract definition.\n\n- **“Late report”**\n  - **Billing:** Treats it as the operational basis for customer credits.\n  - **Dev:** Defines it as a pickup-lateness query.\n  - **Account team:** Intends to use it for a customer delivery-service metric.\n\n- **“Service credit”**\n  - **Account team / contract:** Should be based on missed delivery appointments.\n  - **Billing:** Issued one for load 7731 because it appeared on the pickup-based late report, despite delivery occurring 40 minutes before the appointment.\n\n- **“Marked late”**\n  - **Ops day desk:** A confirmed pickup-window failure.\n  - **Ops night desk:** A proactive risk/forecast status based on ETA, before the failure has occurred.\n  - The same status is therefore being used for both an actual breach and a predicted breach.\n\n### Question for the domain expert\n\nFor customer-facing reporting and service credits, should the authoritative definition of **late** be a missed delivery appointment, while pickup-window misses and predicted delivery risks are reported as separate metrics/statuses?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "example-thread",
+      "i": 2,
+      "ms": 5049,
+      "promptTokens": 1050,
+      "cachedTokens": 1047,
+      "completionTokens": 432,
+      "reasoningTokens": 0,
+      "cost": 0.0053994,
+      "finishReason": "stop",
+      "label": "naive example-thread 2",
+      "reply": "### Where “late” / “on-time” are used differently\n\n- **Account team / contract definition**\n  - A load is **late only if it misses the customer’s booked delivery appointment**.\n  - This is the stated basis for **service credits** and customer-facing performance.\n\n- **Ops day desk**\n  - A load is **late if the truck misses the pickup window**.\n  - This is an operational/carrier-management definition.\n  - They distinguish a predicted delivery miss from an actual late load: “that’s a forecast, not late.”\n\n- **Carrier desk**\n  - Uses **late** for a **missed pickup**, because that triggers the carrier’s late-pickup fee.\n  - Does not treat delivery-appointment performance as something they track for carrier purposes.\n\n- **Ops night desk**\n  - Uses **late** prospectively: a load becomes late when its **ETA passes the delivery appointment**, even if pickup has not happened.\n  - This is effectively a customer-notification / risk-status definition, not necessarily an actual performance result.\n\n- **Dev / weekly `late_loads` report**\n  - Defines **late** as `actual_pickup_at > pickup_window_end`.\n  - The report excludes delivery appointments, so its “late” metric is pickup-based.\n\n- **Billing**\n  - Treats the weekly late report as the basis for customer credits.\n  - That makes Billing operationally use the **pickup-based report definition**, despite the contract’s delivery-appointment definition.\n\n- **Customer D / 7731 illustrates the conflict**\n  - 7731 was late by pickup timing and appeared late in the report.\n  - It was delivered **40 minutes before** its appointment, so it was on time under the contract/customer definition.\n  - Billing nevertheless issued a service credit because the report labeled it late.\n\n### Question for the domain expert\n\nFor customer-facing on-time reporting and service credits, should a missed pickup window count as “late” when the load is still delivered by the booked delivery appointment—or should pickup lateness be tracked as a separate operational/carrier metric?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "example-thread",
+      "i": 2,
+      "ms": 4142,
+      "promptTokens": 3345,
+      "cachedTokens": 3342,
+      "completionTokens": 392,
+      "reasoningTokens": 0,
+      "cost": 0.0053784,
+      "finishReason": "stop",
+      "label": "coach example-thread 2",
+      "reply": "Events, in order\n1. From thread: The contract calls a load late when it misses the customer’s delivery appointment.\n2. From thread: Ops day desk marks a load late when it misses the pickup window.\n3. From thread: Ops night desk marks a load late when its ETA passes the delivery appointment.\n4. From thread: The late_loads query marks late from actual pickup after pickup_window_end.\n5. From thread: Billing issued Customer D a service credit for load 7731 from the weekly late report.\n\nWords that don't match\n\"late\"\n- From thread: Account team means a missed delivery appointment booked by the customer.\n- From thread: Ops (day desk) means the truck arrived after the pickup window.\n- From thread: Ops (night desk) means the ETA has passed the delivery appointment, even before pickup.\n- From thread: Carrier desk means a missed pickup that can incur a carrier late fee.\n- From thread: Billing means a load included as late in the weekly report.\n- From thread: Code means actual_pickup_at is after pickup_window_end.\n\n\"on time\"\n- From thread: Account team means delivery by the customer’s appointment.\n- From thread: Billing means not included as late in the weekly report.\n\n\"late report\"\n- From thread: Billing means the weekly report used for service credits and Customer D’s Q3 on-time percentage.\n- From thread: Code means the late_loads query based on a missed pickup window.\n\nQuestion for the account lead and the billing lead, at Friday's service review: Which measure applies to Customer D's load 7731 for both the service credit and Q3 on-time %: missed pickup window or delivery appointment?\nFrom thread: \"in the contract a load is late when we miss the delivery appointment the customer booked\"\nFrom thread: \"7731 delivered 40 min before the appointment. driver made it up on the road\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "example-thread",
+      "i": 3,
+      "ms": 3844,
+      "promptTokens": 3345,
+      "cachedTokens": 3342,
+      "completionTokens": 423,
+      "reasoningTokens": 0,
+      "cost": 0.0057504,
+      "finishReason": "stop",
+      "label": "coach example-thread 3",
+      "reply": "Events, in order\n1. From thread: Account team says a load is late when the delivery appointment the customer booked is missed.\n2. From thread: Ops day desk says a truck arriving after the pickup window is late.\n3. From thread: Ops night desk marks a load late when its ETA slips past the delivery appointment.\n4. From thread: Code puts loads with actual pickup after pickup_window_end on the weekly late report.\n5. From thread: Billing issues Customer D a service credit for load 7731 because it is on the late report.\n\nWords that don't match\n\"late\"\n- From thread: Account team means missing the delivery appointment the customer booked.\n- From thread: Ops (day desk) means arriving at pickup after the pickup window ends.\n- From thread: Ops (night desk) means an ETA past the delivery appointment, even before pickup.\n- From thread: Carrier desk means a missed pickup for a carrier late fee.\n- From thread: Billing means a load included on the weekly late report.\n- From thread: Code means actual_pickup_at is after pickup_window_end.\n\n\"on time\"\n- From thread: Account team means meeting the customer's delivery appointment.\n- From thread: Billing means not being on the weekly late report.\n- From thread: Code means actual_pickup_at is not after pickup_window_end.\n\n\"late report\"\n- From thread: Billing means the weekly report used for service credits and Customer D's Q3 on-time %.\n- From thread: Code means the late_loads query based on pickup timing, not delivery_appointment.\n\nQuestion for the account team lead and the billing lead, at Friday's service review: Which result applies to Customer D load 7731 for the service credit and Q3 on-time %: late because pickup missed the window, on time because delivery was before the appointment, or neither?\nFrom thread: \"in the contract a load is late when we miss the delivery appointment the customer booked.\"\nFrom thread: \"7731 delivered 40 min before the appointment. driver made it up on the road\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "example-thread",
+      "i": 3,
+      "ms": 7326,
+      "promptTokens": 1050,
+      "cachedTokens": 1047,
+      "completionTokens": 499,
+      "reasoningTokens": 0,
+      "cost": 0.0062034,
+      "finishReason": "stop",
+      "label": "naive example-thread 3",
+      "reply": "### Where “late” is used differently\n\n| Group | Meaning of “late” | Evidence / impact |\n|---|---|---|\n| **Account team / customer contract** | **Actual missed delivery appointment** booked by the customer | Contract and service credits are based only on this. Under this meaning, load **7731 was on time** because it delivered 40 minutes early. |\n| **Ops day desk** | **Actual missed pickup window**: truck has not arrived by the end of the pickup window | Used operationally to chase carriers. They marked **7731 late** because pickup was 3 hours after the window. |\n| **Carrier desk** | **Missed pickup window**, specifically for carrier late-fee purposes | Carrier 3 was charged a late-pickup fee for 7731. They do not treat delivery appointments as part of that carrier-fee definition. |\n| **Ops night desk** | **Predicted delivery miss**: ETA has passed the delivery appointment, even if pickup has not happened | They mark a load late proactively to manage customer communication, e.g., **7802**. Day ops calls this a forecast rather than lateness. |\n| **Dev / weekly `late_loads` report** | **Actual pickup after pickup-window end** | The report defines `late = actual_pickup_at > pickup_window_end`; delivery appointment is not used. |\n| **Billing** | Treats the weekly report’s pickup-based definition as the basis for customer reporting and credits | Billing credited Customer D for 7731 because it appeared on the report, conflicting with the contract definition. |\n| **Account team’s planned Q3 on-time %** | Ambiguous in practice: intended customer/contract delivery performance, but they planned to use the pickup-based weekly report | This could understate Customer D’s contractual on-time performance. |\n\nOther term ambiguity:\n- **“On time”** appears to mean delivery-appointment performance for the account team/customer, but the weekly report operationalizes it as pickup-window performance.\n- **“Will be late”** for night ops means a forecasted risk/expected miss, while others reserve “late” for an actual event.\n\n### Question for the domain expert\n\nFor customer-facing service credits and Customer D’s Q3 on-time percentage, should the authoritative definition be **actual delivery against the booked delivery appointment**, with pickup lateness and forecasted delivery risk reported separately?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "example-thread",
+      "i": 4,
+      "ms": 4938,
+      "promptTokens": 1050,
+      "cachedTokens": 1047,
+      "completionTokens": 362,
+      "reasoningTokens": 0,
+      "cost": 0.0045594,
+      "finishReason": "stop",
+      "label": "naive example-thread 4",
+      "reply": "### Where people use “late” differently\n\n- **Account team / customer contract:**  \n  “Late” means **missing the customer’s booked delivery appointment**. This is the stated basis for service credits and customer-facing performance.\n\n- **Ops day desk:**  \n  “Late” means **the truck arrives at pickup after the pickup window ends**. This is the operational exception they pursue with carriers.\n\n- **Carrier desk:**  \n  Uses “late” primarily as **a missed pickup**, because that is what triggers a carrier late fee. They do not treat delivery appointment performance as their tracked metric.\n\n- **Ops night desk:**  \n  Uses “late” as a **predicted delivery miss**: once ETA passes the delivery appointment, they mark it late—even before pickup—to manage customer expectations.\n\n- **Dev / weekly `late_loads` report:**  \n  “Late” is defined technically as **`actual_pickup_at > pickup_window_end`**. Delivery appointments are excluded from the query.\n\n- **Billing:**  \n  Treats the weekly report’s definition—therefore **late pickup**—as the basis for customer credits, despite the contract defining lateness by delivery appointment.\n\n### Concrete conflict: load 7731\n\n- It was **late for pickup** by three hours.\n- It was **on time for delivery**, arriving 40 minutes before the appointment.\n- The carrier was appropriately charged under the pickup-fee rule.\n- But Customer D received a service credit based on the pickup-based report, conflicting with the contract/customer definition.\n\n### Question for the domain expert\n\nFor customer reporting and service credits, should the authoritative “late” status be **actual delivery after the booked delivery appointment**, while pickup lateness and predicted ETA risk remain separate operational metrics?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "example-thread",
+      "i": 4,
+      "ms": 4493,
+      "promptTokens": 3345,
+      "cachedTokens": 3342,
+      "completionTokens": 425,
+      "reasoningTokens": 0,
+      "cost": 0.0057744,
+      "finishReason": "stop",
+      "label": "coach example-thread 4",
+      "reply": "Events, in order\n1. From thread: Account team says a load is late when the delivery appointment the customer booked is missed.\n2. From thread: Ops day desk marks a truck late when it misses the pickup window.\n3. From thread: Ops night desk marks a load late when its ETA slips past the delivery appointment.\n4. From thread: Code makes the weekly late report late when actual pickup is after pickup_window_end.\n5. From thread: Billing issues Customer D a service credit for load 7731 from the weekly late report.\n\nWords that don't match\n\"late\"\n- From thread: Account team means a missed customer delivery appointment.\n- From thread: Ops (day desk) means a truck not at pickup by the end of the pickup window.\n- From thread: Ops (night desk) means an ETA past the delivery appointment, including before pickup.\n- From thread: Carrier desk means a missed pickup for which the carrier pays a late fee.\n- From thread: Billing means a load on the weekly late report.\n- From thread: Code means actual_pickup_at is after pickup_window_end.\n\n\"on time\"\n- From thread: Account team means delivery by the customer’s booked appointment.\n- From thread: Billing means not appearing as late on the weekly late report.\n- From thread: Code means pickup is not after pickup_window_end.\n\n\"late report\"\n- From thread: Billing means the basis for Customer D service credits and Q3 on-time numbers.\n- From thread: Code means the late_loads query based on actual pickup after the pickup window.\n\nQuestion for the account lead and the billing lead, at Friday's service review: For Customer D load 7731, which count goes into the Q3 on-time % and service credit: the missed pickup window, the delivery appointment, or both?\nFrom thread: \"in the contract a load is late when we miss the delivery appointment the customer booked. Service credits are based on that and nothing else.\"\nFrom thread: \"7731 delivered 40 min before the appointment. driver made it up on the road\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "example-thread",
+      "i": 5,
+      "ms": 4205,
+      "promptTokens": 3345,
+      "cachedTokens": 3342,
+      "completionTokens": 412,
+      "reasoningTokens": 0,
+      "cost": 0.0056184,
+      "finishReason": "stop",
+      "label": "coach example-thread 5",
+      "reply": "Events, in order\n1. From thread: Account team says a load is late when the delivery appointment the customer booked is missed.\n2. From thread: Ops day desk marks a load late when the truck misses the pickup window.\n3. From thread: Ops night desk marks a load late when the ETA slips past the delivery appointment, even before pickup.\n4. From thread: Code puts loads in the weekly late report when actual pickup is after pickup_window_end.\n5. From thread: Billing issues Customer D a service credit for load 7731 because it is on the late report.\n\nWords that don't match\n\"late\"\n- From thread: Account team means a missed customer delivery appointment.\n- From thread: Ops (day desk) means a truck not at pickup by the end of the pickup window.\n- From thread: Ops (night desk) means an ETA past the delivery appointment, including before pickup.\n- From thread: Carrier desk means a missed pickup for which the carrier pays a late fee.\n- From thread: Billing means a load included in the weekly late report.\n- From thread: Code means actual_pickup_at is after pickup_window_end.\n\n\"on time\"\n- From thread: Account team means delivery by the customer’s appointment.\n- From thread: Billing means not late according to the weekly late report.\n\n\"late report\"\n- From thread: Billing means the weekly report used for service credits and Customer D’s Q3 on-time %.\n- From thread: Code means the late_loads query based on pickup timing, not delivery_appointment.\n\nQuestion for the account team lead and the billing lead, at Friday's service review: Which definition determines whether Customer D's load 7731 counts as late in its Q3 on-time %: the missed pickup window or the delivery appointment it met?\nFrom thread: \"in the contract a load is late when we miss the delivery appointment the customer booked\"\nFrom thread: \"7731 delivered 40 min before the appointment. driver made it up on the road\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "example-thread",
+      "i": 5,
+      "ms": 4201,
+      "promptTokens": 1050,
+      "cachedTokens": 1047,
+      "completionTokens": 327,
+      "reasoningTokens": 0,
+      "cost": 0.0041394,
+      "finishReason": "stop",
+      "label": "naive example-thread 5",
+      "reply": "People use **“late”** (and related measures) differently:\n\n- **Account team / contract:** Late means **missing the customer’s booked delivery appointment**. This is the basis for service credits and customer-facing performance.\n- **Ops day desk:** Late means **the truck arrives at pickup after the pickup window ends**. This is the operational carrier-management definition.\n- **Carrier desk:** Uses late for **missed pickup** because that triggers carrier late fees; they do not treat delivery appointments as their tracked metric.\n- **Ops night desk:** Uses late as a **predicted delivery miss** once ETA passes the delivery appointment, even before pickup, to manage customer communication. Day ops calls this a forecast rather than actual lateness.\n- **Dev / weekly `late_loads` report:** Late means **`actual_pickup_at > pickup_window_end`**. Delivery appointments are excluded because they are nullable.\n- **Billing:** Treats the weekly report’s pickup-late result as sufficient to issue a **customer service credit**, despite the contract defining customer lateness by delivery appointment.\n- **Customer D / account reporting need:** Their Q3 “on-time %” appears intended to mean **delivery-appointment performance**, but the proposed source is a **pickup-lateness** report.\n\n**Question for the domain expert:**  \nFor customer reporting and service credits, should a load such as 7731—late to pickup but delivered before its appointment—be counted as late, and should the weekly report be split into separate pickup-late, predicted-delivery-risk, and actual delivery-late measures?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "naive",
+      "fixture": "example-thread",
+      "i": 6,
+      "ms": 5875,
+      "promptTokens": 1050,
+      "cachedTokens": 1047,
+      "completionTokens": 466,
+      "reasoningTokens": 0,
+      "cost": 0.0058074,
+      "finishReason": "stop",
+      "label": "naive example-thread 6",
+      "reply": "### Where “late” is used differently\n\n| Group / artifact | Meaning of “late” | Evidence |\n|---|---|---|\n| Account team / customer contract | **Actual missed delivery appointment** booked by the customer | Mon 08:11: service credits are based on missing the delivery appointment “and nothing else.” |\n| Ops day desk | **Actual missed pickup window** | Mon 09:40: truck not at pickup by end of window = late. |\n| Carrier desk | **Missed pickup window for carrier enforcement/fees** | Mon 09:44 and Wed 08:10: carrier late fee is for missed pickup; they do not track delivery appointment. |\n| Ops night desk | **Predicted missed delivery appointment**, based on ETA, even before pickup | Mon 10:02 and Thu 09:45: mark late once ETA slips past appointment. |\n| Dev’s `late_loads` query / weekly report | **Actual pickup after pickup-window end** | Mon 11:20: `actual_pickup_at > pickup_window_end`; delivery appointment excluded. |\n| Billing | Uses the **weekly report’s pickup-late definition** for credits, despite the contractual definition being delivery-late | Thu 09:30–09:41: credited Customer D for 7731 because it was in the pickup-based report. |\n| Account team’s Q3 metric | Intends to report the customer/contractual **delivery-appointment on-time rate**, but plans to use the pickup-based weekly report | Tue 09:05, Thu 11:00. |\n\n### Consequence illustrated by load 7731\n7731 was **pickup-late** by three hours, but **delivered 40 minutes before the appointment**. It is therefore late under the carrier, day-ops, and report definitions, but on time under Customer D’s contract definition. The service credit and any Customer D on-time metric based on the weekly report are inconsistent with the contract.\n\n### Question for the domain expert\nFor customer reporting and service credits, should the authoritative “late” measure be **actual delivery after the customer’s delivery appointment**, with pickup lateness and predicted delivery risk reported as separate fields rather than included in the same late-load metric?",
+      "hardFailures": [
+        "parses",
+        "events",
+        "one question",
+        "no markdown",
+        "question asks",
+        "question names a case",
+        "question sources"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": false,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": false,
+        "jointRoles": false,
+        "forum": false,
+        "sameMeaningNamed": true
+      }
+    },
+    {
+      "arm": "coach",
+      "fixture": "example-thread",
+      "i": 6,
+      "ms": 4210,
+      "promptTokens": 3345,
+      "cachedTokens": 3342,
+      "completionTokens": 428,
+      "reasoningTokens": 0,
+      "cost": 0.0058104,
+      "finishReason": "stop",
+      "label": "coach example-thread 6",
+      "reply": "Events, in order\n1. From thread: Account team says a load is late when the delivery appointment the customer booked is missed.\n2. From thread: Ops day desk marks a load late when the truck misses the pickup window.\n3. From thread: Ops night desk marks a load late when the ETA passes the delivery appointment, even before pickup.\n4. From thread: Code puts loads with actual pickup after pickup_window_end on the weekly late report.\n5. From thread: Billing issues Customer D a service credit for load 7731 from the weekly late report.\n\nWords that don't match\n\"late\"\n- From thread: Account team means a missed delivery appointment booked by the customer.\n- From thread: Ops (day desk) means the truck was not at pickup by the end of the pickup window.\n- From thread: Ops (night desk) means the ETA has slipped past the delivery appointment, including before pickup.\n- From thread: Carrier desk means a missed pickup for which a carrier can pay a late fee.\n- From thread: Billing means a load appearing on the weekly late report.\n- From thread: Code means actual_pickup_at is after pickup_window_end.\n\n\"on time\"\n- From thread: Account team means delivery by the customer's appointment.\n- From thread: Billing means not being on the pickup-based weekly late report.\n\n\"weekly late report\"\n- From thread: Billing means the basis for Customer D's service credits and Q3 on-time %.\n- From thread: Code means the late_loads query based on actual pickup after pickup_window_end.\n\nQuestion for the account team lead and the billing lead, at Friday's service review: Which result applies to Customer D's load 7731, whose pickup was 3h after the window but delivery was 40 min before the appointment: late for the service credit and Q3 on-time %, on time, or neither?\nFrom thread: \"in the contract a load is late when we miss the delivery appointment the customer booked.\"\nFrom thread: \"7731 delivered 40 min before the appointment. driver made it up on the road\"",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": true,
+        "forum": true,
+        "sameMeaningNamed": true
+      }
+    }
+  ],
+  "judged": [
+    {
+      "fixture": "booking-split",
+      "i": 1,
+      "coachFirst": false,
+      "questions": {
+        "coach": "Which booking count applies to Customer B's two same-carrier date changes on Wednesday night: the old REBOOKED rows, the new rows, or only the rows invoiceable at delivery?",
+        "naive": "For a same-carrier, same-lane date or pickup-window change after carrier acceptance, should the authoritative business action be an amendment to the existing tender, with a required carrier notification/sync, rather than a rebook—and are there any exceptions?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "A",
+        "reason": "B is a narrow, oddly specific application-of-the-rule question that isn't obviously derivable ahead of time, while A directly synthesizes Dana's, Maya's, Luis's, and Tom's separate positions into the core rule (with exceptions) that would resolve the rebook/amend disagreement."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.02166
+    },
+    {
+      "fixture": "booking-split",
+      "i": 2,
+      "coachFirst": true,
+      "questions": {
+        "coach": "For Customer B's second same-carrier date change at 11:55 PM, already rolling and rebooked because Amend does not reach the carrier portal, which booking count includes the old REBOOKED row, the new row, or neither?",
+        "naive": "For the canonical workflow, should the business rule be: same carrier and same lane + date/pickup-window change = amendment; carrier or lane change = replacement booking; carrier drop = a distinct replacement reason—and, for each case, what should be the authoritative customer-facing reference and counting unit?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "Question A asks a narrow, oddly-specific factual lookup a tech lead might not think to isolate, while Question B synthesizes the whole rebook/amend/carrier-drop debate spread across the thread into one canonical rule that would resolve the disagreement."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.021574
+    },
+    {
+      "fixture": "booking-split",
+      "i": 3,
+      "coachFirst": false,
+      "questions": {
+        "coach": "Which booking count applies to Customer B's two same-carrier date changes overnight: the original rows, the new refs, or both?",
+        "naive": "For a same-carrier, same-lane date or pickup-window change after the carrier has accepted the tender, should the canonical business action be Amend in all cases, and should it be required to sync that amendment to the carrier portal (with an escalation path if the sync cannot complete in time)?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "A",
+        "reason": "Question A synthesizes the scattered amend/rebook/TONU/carrier-sync threads into one crisp rule-plus-escalation proposal that a tech lead likely wouldn't formulate unassisted but the domain expert (Dana) can answer and thereby resolve the recurring dispute, whereas Question B is just a narrow follow-up on the already-explained triple-counting issue."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.021916
+    },
+    {
+      "fixture": "booking-split",
+      "i": 4,
+      "coachFirst": true,
+      "questions": {
+        "coach": "Which booking count applies to the second Customer B date change on Wednesday night: the original REBOOKED row, the new row, or neither before proof of delivery?",
+        "naive": "For a same-carrier, same-lane date or pickup-window change after the carrier has accepted the tender, should the canonical business action be Amend (same booking/tender, carrier sync required), with Rebook reserved for carrier or lane changes—and are there any exceptions?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "Question A applies Tom's invoiceable-at-delivery rule to a specific just-mentioned event in a way a tech lead likely wouldn't preemptively derive, while Question B synthesizes Dana's, Maya's, Luis's, and Sam's scattered rebook-vs-amend positions into a single canonical rule that would resolve the whole disagreement."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.021852
+    },
+    {
+      "fixture": "booking-split",
+      "i": 5,
+      "coachFirst": true,
+      "questions": {
+        "coach": "For Customer B's second same-carrier date change on Wednesday night, when the truck was already rolling, which count includes the old REBOOKED row, the new row, or neither?",
+        "naive": "For the RFC, what is the authoritative business rule for a same-carrier, same-lane date or pickup-window change after carrier acceptance: should it remain one booking amended in place, with a carrier-sync notification, and under what exceptions—if any—must it instead become a cancel-and-new-tender rebook?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A asks a narrow mechanical detail about which dashboard/ledger counts a specific rebooked row (something already implied by Sam's dashboard explanation and not obviously novel to a tech lead), while B synthesizes the ops/finance/carrier threads into the single decision the RFC must nail down to resolve the whole rebook-vs-amend disagreement."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.021868
+    },
+    {
+      "fixture": "booking-split",
+      "i": 6,
+      "coachFirst": false,
+      "questions": {
+        "coach": "Which booking count applies to load 48213 after its same-carrier date move: the original REBOOKED row, the new row, or neither?",
+        "naive": "For a same-carrier, same-lane date or pickup-window change after carrier acceptance, should the canonical business action be Amend (same booking and same tender), with carrier notification required—and are there any time/dispatch-stage exceptions where it must instead become a Rebook?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "A",
+        "reason": "Question B is a specific, oddly concrete recombination (load 48213 + count semantics) a tech lead likely wouldn't pose, while Question A directly synthesizes Dana/Maya/Luis's scattered amend-vs-rebook rules into one decidable policy that would resolve the recurring disagreement."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.021666
+    },
+    {
+      "fixture": "rebook-notes",
+      "i": 1,
+      "coachFirst": true,
+      "questions": {
+        "coach": "For Load 48213, where a date-only change was rebooked at night and the carrier billed TONU on the orig load before hauling the new one, which shipment gets the one invoice: the orig load, the new load, or neither?",
+        "naive": "For glossary and reporting purposes, should “REBOOKED” be the formal status for any replacement/new tender created from an existing booking (including carrier cancellation, carrier change, and lane change), or should those cases be labelled simply “new booking” with “rebook” reserved for a narrower case?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A asks a specific edge-case invoicing question a tech lead might not derive from the general rules, while B ties together the definitional debate (lines 8-18, 32-38) and directly resolves the naming disagreement for the glossary."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.003708
+    },
+    {
+      "fixture": "rebook-notes",
+      "i": 2,
+      "coachFirst": true,
+      "questions": {
+        "coach": "For Load 48213, where the same-carrier date change was REBOOKED at night and the carrier charged TONU before hauling the new load, which booking and invoice count applies: the old row, the new row, or neither?",
+        "naive": "For a carrier cancellation or drop, should the replacement be formally classified as REBOOKED or as a new booking, and should it retain a link to the original booking/reference for invoicing and dashboard counting?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "A",
+        "reason": "Question B raises the unresolved carrier-drop edge case (line 21) that wasn't fully worked through and requires domain judgment beyond the thread's discussion, while Question A ties together the definition debate (lines 8-13, 32-40) with the concrete Load 48213 example (lines 15-18) to resolve the double-invoice/dashboard-count disagreement."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.004116
+    },
+    {
+      "fixture": "rebook-notes",
+      "i": 3,
+      "coachFirst": true,
+      "questions": {
+        "coach": "For Load 48213, where the original load received TONU and the new load moved, which booking and invoice count applies: the old row, the new row, or neither?",
+        "naive": "For a date-only change made overnight before Amend-to-carrier portal sync is available, should operations create a temporary rebook/new reference, or retain the existing booking and use a defined escalation method (for example, carrier phone/email notification) so that finance and dashboard reporting do not treat it as a second booking?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "Question A asks about a specific concrete edge case (the TONU double-payment on load 48213) that requires knowing the messy real-world outcome rather than the stated rules, while Question B directly connects Dana's definition rules, Maya's night-shift workaround, and the dashboard/finance double-count issue, and resolving it settles the ongoing rebook-vs-amend disagreement."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.004178
+    },
+    {
+      "fixture": "rebook-notes",
+      "i": 4,
+      "coachFirst": true,
+      "questions": {
+        "coach": "How does Load 48213 count in \"bookings today\" and invoicing when the night shift creates a REBOOKED row for a same-carrier, same-lane date change: as the old row, the new row, or neither?",
+        "naive": "When a carrier cancels and the shipment is retendered—whether to the same carrier later or to a different carrier—should the glossary classify the replacement as REBOOKED or simply a new booking, and what reference/invoice relationship should it have to the cancelled original?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A ties the dashboard double-count issue to the specific 48213 case in a non-obvious way, while B directly resolves the still-open 'carrier drop' question (line 21) using Dana's corrected lane/carrier rule, settling the classification and invoice reference logic once and for all."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.003858
+    },
+    {
+      "fixture": "rebook-notes",
+      "i": 5,
+      "coachFirst": false,
+      "questions": {
+        "coach": "For Load 48213's same-carrier date move, which record is the booking for invoicing: the orig load, the new one, or both?",
+        "naive": "For a date-only change made overnight before the amend-to-carrier-portal sync is available, should the glossary classify the action as AMENDED (with a separate operational escalation/notification process), or as REBOOKED because a new carrier-facing tender is actually created?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "Question B forces resolution of the load 48213 invoicing outcome (lines 16-18) against Dana's amend/rebook definition (lines 8-11, 33-36), directly settling the double-invoice disagreement, while Question A raises a subtler process-vs-technical-reality tension a tech lead wouldn't naturally surface unprompted."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.004026
+    },
+    {
+      "fixture": "rebook-notes",
+      "i": 6,
+      "coachFirst": true,
+      "questions": {
+        "coach": "Which booking and invoice treatment applies to Load 48213's same-carrier, same-lane date change: AMENDED, REBOOKED, or a new booking?",
+        "naive": "For a date- or pickup-window-only change on the same carrier and shipment lane during the night shift, should the glossary classify it as AMENDED even if operations must use a temporary “rebook” workflow to notify the carrier, and how should that workflow prevent a new booking reference and second invoice?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "B",
+        "reason": "Question A merely restates the already-corrected definition (Dana's Thu correction directly answers it), while Question B ties together Dana's terminology fix, Maya's night-shift workaround, and Tom's invoicing concern into a non-obvious operational question that, once answered, resolves the terminology-vs-practice conflict."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.003984
+    },
+    {
+      "fixture": "carrier-status",
+      "i": 1,
+      "coachFirst": true,
+      "questions": {
+        "coach": "What does Confirmed mean for Customer D's load when Ops has told the customer the pickup window is agreed but the carrier has not yet returned the 990: carrier acceptance, customer window agreement, or neither?",
+        "naive": "Should “Confirmed” remain the customer-visible portal status for carrier tender acceptance, or should the portal distinguish it from a separate customer pickup-window confirmation status?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A probes a specific edge case a tech lead likely wouldn't isolate on their own, while B directly joins Rosa's carrier-acceptance definition (line 7) with Dana's window-agreement definition (line 10) into the actionable naming/design decision that resolves the dispute."
+      },
+      "surprise": "coach",
+      "settles": "naive",
+      "cost": 0.003946
+    },
+    {
+      "fixture": "carrier-status",
+      "i": 2,
+      "coachFirst": true,
+      "questions": {
+        "coach": "What does Confirmed on Customer D's portal load mean when the carrier's 990 arrives before Ops has agreed the pickup window: carrier acceptance, customer-window agreement, or both?",
+        "naive": "Should “Confirmed” be reserved for carrier tender acceptance, with a separate named and tracked status for customer pickup-window agreement (for example, “Pickup Window Agreed”)?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "A",
+        "reason": "A directly resolves the immediate cross-team confusion (Rosa vs Dana's definitions vs Sam's enum answer) that Luis needs answered for Customer D, while B proposes a naming/process fix a tech lead would likely already suggest themselves."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.003876
+    },
+    {
+      "fixture": "carrier-status",
+      "i": 3,
+      "coachFirst": false,
+      "questions": {
+        "coach": "What does Confirmed mean for Customer D's load when ops agreed the pickup window on Monday but the portal changed to Confirmed on Tuesday: customer window agreement or carrier 990 acceptance?",
+        "naive": "Should carrier tender acceptance and customer pickup-window agreement be modeled and displayed as two separate, explicitly named statuses—and if so, what should each status be called?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A proposes a structural naming solution a tech lead might not independently formulate, while B directly ties Luis's original customer question to Sam's clarifying answer and resolves the ambiguity."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.00363
+    },
+    {
+      "fixture": "carrier-status",
+      "i": 4,
+      "coachFirst": false,
+      "questions": {
+        "coach": "What does Customer D's portal status Confirmed represent when the carrier has sent a 990 but the pickup window has not been agreed: carrier acceptance or customer window agreement?",
+        "naive": "Should carrier tender acceptance and customer pickup-window agreement be modeled as two separate named statuses/events, and if so, what customer-facing label should replace the current portal label “Confirmed”?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "B directly resolves the immediate ambiguity Sam already answered in-thread by tying the customer's confusion to the carrier-vs-ops distinction, while A raises a broader redesign question about labels and modeling that a tech lead would more naturally propose themselves."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.003876
+    },
+    {
+      "fixture": "carrier-status",
+      "i": 5,
+      "coachFirst": true,
+      "questions": {
+        "coach": "What does Confirmed mean for Customer D's load when ops agreed the pickup window on Monday but the portal changed to Confirmed only after the carrier's 990 on Tuesday?",
+        "naive": "Should carrier tender acceptance and customer pickup-window agreement be modeled as two separate, explicitly named business states—and if so, what should each be called in customer-facing language?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "B",
+        "reason": "A merely restates the timeline already spelled out in the thread, while B synthesizes the carrier/ops distinction (lines 7,10,52,55) into the naming decision that would actually resolve the underlying ambiguity."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.003726
+    },
+    {
+      "fixture": "carrier-status",
+      "i": 6,
+      "coachFirst": true,
+      "questions": {
+        "coach": "What does Confirmed mean for Customer D's portal booking when the carrier's 990 arrives before Ops agrees the pickup window: carrier acceptance, customer window agreement, or both?",
+        "naive": "Should carrier tender acceptance and customer pickup-window agreement be modeled and displayed as two separate statuses/events, and if so, what should each be called in customer-facing language?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "B",
+        "reason": "A is already answered in the thread (Sam confirms it's the carrier's 990), while B synthesizes the ops-vs-carrier definitions and the missing-status/reporting problem into a forward-looking design decision the tech lead would need the domain expert to resolve."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.003872
+    },
+    {
+      "fixture": "example-thread",
+      "i": 1,
+      "coachFirst": false,
+      "questions": {
+        "coach": "Which result counts for Customer D's load 7731 in the Q3 on-time % and service credit: its missed pickup window, its delivery before the appointment, or neither?",
+        "naive": "For customer-facing reporting and service credits, should the authoritative definition of late be a missed delivery appointment, while pickup-window misses and predicted delivery risks are reported as separate metrics/statuses?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A proposes a non-obvious structural fix (separate metrics) a tech lead might not devise unprompted, while B directly ties the contract definition (line 5) to the 7731 pickup-vs-delivery facts (lines 34-38) and the credit dispute (lines 42-49), resolving the concrete disagreement."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.005182
+    },
+    {
+      "fixture": "example-thread",
+      "i": 2,
+      "coachFirst": false,
+      "questions": {
+        "coach": "Which measure applies to Customer D's load 7731 for both the service credit and Q3 on-time %: missed pickup window or delivery appointment?",
+        "naive": "For customer-facing on-time reporting and service credits, should a missed pickup window count as “late” when the load is still delivered by the booked delivery appointment—or should pickup lateness be tracked as a separate operational/carrier metric?"
+      },
+      "verdict": {
+        "surprise": "A",
+        "settles": "B",
+        "reason": "A reframes the issue as a broader design question a tech lead likely wouldn't formulate on their own, while B directly ties the contract definition (line 5) to the mistaken 7731 credit (lines 34-44) and resolves the concrete dispute."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.004946
+    },
+    {
+      "fixture": "example-thread",
+      "i": 3,
+      "coachFirst": true,
+      "questions": {
+        "coach": "Which result applies to Customer D load 7731 for the service credit and Q3 on-time %: late because pickup missed the window, on time because delivery was before the appointment, or neither?",
+        "naive": "For customer-facing service credits and Customer D’s Q3 on-time percentage, should the authoritative definition be actual delivery against the booked delivery appointment, with pickup lateness and forecasted delivery risk reported separately?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "B",
+        "reason": "B reframes the whole thread's tension into a single policy proposal linking the contract definition (msg 5) with the pickup-based report (msg 20-24) and the 7731 dispute (msg 43-45), and answering it resolves both the credit question and the reporting mismatch going forward, whereas A only resolves the single 7731 instance."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.005246
+    },
+    {
+      "fixture": "example-thread",
+      "i": 4,
+      "coachFirst": true,
+      "questions": {
+        "coach": "For Customer D load 7731, which count goes into the Q3 on-time % and service credit: the missed pickup window, the delivery appointment, or both?",
+        "naive": "For customer reporting and service credits, should the authoritative “late” status be actual delivery after the booked delivery appointment, while pickup lateness and predicted ETA risk remain separate operational metrics?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "B",
+        "reason": "B explicitly proposes a structural resolution tying the contract definition (line 5) to the pickup-based report (lines 20-24) and the night desk's ETA-based flagging (lines 15-17, 46), whereas A only asks about a single load already implied by the contract clause."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.005008
+    },
+    {
+      "fixture": "example-thread",
+      "i": 5,
+      "coachFirst": true,
+      "questions": {
+        "coach": "Which definition determines whether Customer D's load 7731 counts as late in its Q3 on-time %: the missed pickup window or the delivery appointment it met?",
+        "naive": "For customer reporting and service credits, should a load such as 7731—late to pickup but delivered before its appointment—be counted as late, and should the weekly report be split into separate pickup-late, predicted-delivery-risk, and actual delivery-late measures?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "B",
+        "reason": "Question B connects the contract definition, the pickup-based query design, and the delivery-time evidence into a concrete redesign proposal that a tech lead wouldn't independently propose but that, once answered, resolves the whole thread's disagreement."
+      },
+      "surprise": "naive",
+      "settles": "naive",
+      "cost": 0.004938
+    },
+    {
+      "fixture": "example-thread",
+      "i": 6,
+      "coachFirst": true,
+      "questions": {
+        "coach": "Which result applies to Customer D's load 7731, whose pickup was 3h after the window but delivery was 40 min before the appointment: late for the service credit and Q3 on-time %, on time, or neither?",
+        "naive": "For customer reporting and service credits, should the authoritative “late” measure be actual delivery after the customer’s delivery appointment, with pickup lateness and predicted delivery risk reported as separate fields rather than included in the same late-load metric?"
+      },
+      "verdict": {
+        "surprise": "B",
+        "settles": "A",
+        "reason": "A directly ties the contract definition (line 5) to the specific 7731 dispute (lines 42-49), resolving the concrete disagreement, while B proposes a structural reporting fix a tech lead wouldn't independently formulate without domain input on policy design."
+      },
+      "surprise": "naive",
+      "settles": "coach",
+      "cost": 0.00502
+    }
+  ],
+  "realThreads": {
+    "note": "#92 real public threads, fetched at eval time and not committed; links only. n=2 per arm (budget). Keys are ad hoc: people = participant logins, teams = Code/Team unclear, so holder-based checks do not apply. Participant logins redacted to [participant] in replies and judge reasons.",
+    "threads": {
+      "erpnext-34467": "https://github.com/frappe/erpnext/issues/34467",
+      "odoo-93552": "https://github.com/odoo/odoo/issues/93552"
+    },
+    "judgeSeed": 92,
+    "spend": {
+      "generation": 0.05731750000000001,
+      "judge": 0.03257
+    },
+    "calls": [
+      {
+        "arm": "coach",
+        "fixture": "erpnext-34467",
+        "i": 1,
+        "ms": 6445,
+        "promptTokens": 4905,
+        "cachedTokens": 4902,
+        "completionTokens": 455,
+        "reasoningTokens": 0,
+        "cost": 0.0064464,
+        "finishReason": "stop",
+        "label": "coach erpnext-34467 1",
+        "replySha256": "5de163800482b528c13c0f5119e4756b8588fe510ad68e2cc63f1297496b20ed",
+        "hardFailures": [
+          "split labels",
+          "question names a case"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": true,
+          "questionSpansThread": true,
+          "jointRoles": true,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "naive",
+        "fixture": "erpnext-34467",
+        "i": 1,
+        "ms": 9822,
+        "promptTokens": 2610,
+        "cachedTokens": 0,
+        "completionTokens": 651,
+        "reasoningTokens": 0,
+        "cost": 0.0143355,
+        "finishReason": "stop",
+        "label": "naive erpnext-34467 1",
+        "replySha256": "4338a89e79e6e0d1305b3c9d215d4f1fa3f4a29b93a748e58253112217803880",
+        "hardFailures": [
+          "parses",
+          "events",
+          "no names",
+          "one question",
+          "no markdown",
+          "question asks",
+          "question names a case",
+          "question sources"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": false,
+          "questionSpansThread": true,
+          "jointRoles": false,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "naive",
+        "fixture": "erpnext-34467",
+        "i": 2,
+        "ms": 10218,
+        "promptTokens": 2610,
+        "cachedTokens": 2607,
+        "completionTokens": 745,
+        "reasoningTokens": 0,
+        "cost": 0.0094674,
+        "finishReason": "stop",
+        "label": "naive erpnext-34467 2",
+        "replySha256": "06f96b1a7eac309cb0fed25e775a819fc67f5e7b0487c98f468d53457700ed0f",
+        "hardFailures": [
+          "parses",
+          "events",
+          "no names",
+          "one question",
+          "no markdown",
+          "question asks",
+          "question names a case",
+          "question sources"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": false,
+          "questionSpansThread": true,
+          "jointRoles": false,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "coach",
+        "fixture": "erpnext-34467",
+        "i": 2,
+        "ms": 5354,
+        "promptTokens": 4905,
+        "cachedTokens": 4902,
+        "completionTokens": 398,
+        "reasoningTokens": 0,
+        "cost": 0.0057624,
+        "finishReason": "stop",
+        "label": "coach erpnext-34467 2",
+        "replySha256": "74f851ec6094aa5f29559e3c9f016fcea56273b6aa1b389e8c6d555053ad10d3",
+        "hardFailures": [
+          "split labels",
+          "question names a case"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": true,
+          "questionSpansThread": true,
+          "jointRoles": true,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "coach",
+        "fixture": "odoo-93552",
+        "i": 1,
+        "ms": 4321,
+        "promptTokens": 3436,
+        "cachedTokens": 3433,
+        "completionTokens": 350,
+        "reasoningTokens": 0,
+        "cost": 0.0048926,
+        "finishReason": "stop",
+        "label": "coach odoo-93552 1",
+        "replySha256": "63b24237c82280a828ab047bec7cfff81b33b3f41fb40a5675ed670e3348664f",
+        "hardFailures": [
+          "no markdown",
+          "split labels",
+          "question sources"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": true,
+          "questionSpansThread": true,
+          "jointRoles": true,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "naive",
+        "fixture": "odoo-93552",
+        "i": 1,
+        "ms": 4984,
+        "promptTokens": 1141,
+        "cachedTokens": 0,
+        "completionTokens": 299,
+        "reasoningTokens": 0,
+        "cost": 0.006439,
+        "finishReason": "stop",
+        "label": "naive odoo-93552 1",
+        "replySha256": "7ad647d08f02c196ef60e9c7f30e567f27a9eec600baa21336217b2aed2602c0",
+        "hardFailures": [
+          "parses",
+          "events",
+          "one question",
+          "no markdown",
+          "question asks",
+          "question names a case",
+          "question sources"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": true,
+          "questionSpansThread": true,
+          "jointRoles": false,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "naive",
+        "fixture": "odoo-93552",
+        "i": 2,
+        "ms": 6304,
+        "promptTokens": 1141,
+        "cachedTokens": 1138,
+        "completionTokens": 383,
+        "reasoningTokens": 0,
+        "cost": 0.0048296,
+        "finishReason": "stop",
+        "label": "naive odoo-93552 2",
+        "replySha256": "5611c492007bd66610a99f2f8b1587b64053087bced5f3d7f3bf38c504840be4",
+        "hardFailures": [
+          "parses",
+          "events",
+          "one question",
+          "no markdown",
+          "question asks",
+          "question names a case",
+          "question sources"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": true,
+          "questionSpansThread": true,
+          "jointRoles": false,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      },
+      {
+        "arm": "coach",
+        "fixture": "odoo-93552",
+        "i": 2,
+        "ms": 4908,
+        "promptTokens": 3436,
+        "cachedTokens": 3433,
+        "completionTokens": 371,
+        "reasoningTokens": 0,
+        "cost": 0.0051446,
+        "finishReason": "stop",
+        "label": "coach odoo-93552 2",
+        "replySha256": "39a434db9930a4b2e4c593a27311f55ff8a061ae7ec1e59f9fc8ab2b9488675a",
+        "hardFailures": [
+          "no markdown",
+          "split labels"
+        ],
+        "soft": {
+          "attribution": true,
+          "split": true,
+          "codeLine": true,
+          "noStaleMeaning": true,
+          "quotedWordsInThread": true,
+          "under400Words": true,
+          "questionSpansThread": true,
+          "jointRoles": true,
+          "forum": true,
+          "sameMeaningNamed": true
+        }
+      }
+    ],
+    "judged": [
+      {
+        "fixture": "erpnext-34467",
+        "i": 1,
+        "coachFirst": true,
+        "questions": {
+          "coach": "For an advance under the proposed Sales Order → Invoice on Account → Payment Entry flow, which document records the advance tax exactly once when the final Sales Invoice deducts it: the Payment Entry, the Sales Invoice, or both?",
+          "naive": "Should ERPNext model two explicitly separate flows—(1) a non-posting Advance Invoice/request whose tax liability is triggered by Payment Entry, and (2) a posting milestone/on-account Sales Invoice with tax due on invoice—and make the applicable tax point configurable by jurisdiction?"
+        },
+        "verdict": {
+          "surprise": "A",
+          "settles": "B",
+          "reason": "Question A pinpoints the specific double-taxation bug (a concrete, non-obvious technical detail) while Question B directly synthesizes the Germany-vs-India terminology dispute ([participant]/[participant]) into a single actionable design decision that would settle it."
+        },
+        "surprise": "coach",
+        "settles": "naive",
+        "cost": 0.010524
+      },
+      {
+        "fixture": "odoo-93552",
+        "i": 1,
+        "coachFirst": false,
+        "questions": {
+          "coach": "For the new Contacts record shown in issue #93552, which meaning does \"Company\" need to carry: the Individual/Company radio choice, the multi-company field, or the Partners grouping and filtering choice?",
+          "naive": "Which distinction should be primary in the UI: should “Company” be reserved exclusively for Odoo’s internal multi-company entity, with contact/business entities consistently called “Organization”?"
+        },
+        "verdict": {
+          "surprise": "B",
+          "settles": "A",
+          "reason": "Question B's forced three-way exclusive framing is an odd, non-obvious way to slice the issue that a tech lead likely wouldn't invent, whereas Question A directly captures the core naming-policy disagreement ([participant]/[participant] vs [participant]/[participant]/[participant]) that spans the whole thread and would resolve it if answered."
+        },
+        "surprise": "coach",
+        "settles": "naive",
+        "cost": 0.005812
+      },
+      {
+        "fixture": "erpnext-34467",
+        "i": 2,
+        "coachFirst": false,
+        "questions": {
+          "coach": "How must an advance on the Sales Order be represented when payment is received: as an Advance Invoice with no posting until Payment Entry, or as an Invoice on Account with tax and accounting at issue?",
+          "naive": "Should ERPNext model these as two separately named workflows—(1) a non-posting Advance Payment Request/Advance Invoice where tax is recognized on receipt, and (2) a posting On-Account/Milestone Sales Invoice where tax is recognized on invoice—or should one configurable Sales Invoice workflow cover both while preserving jurisdiction-specific tax timing and advance-tax reconciliation?"
+        },
+        "verdict": {
+          "surprise": "A",
+          "settles": "A",
+          "reason": "Question A explicitly synthesizes the [participant]/[participant] terminology split (two distinct workflows) with [participant]'s configurable-settings alternative, posing a design-choice framing a tech lead likely wouldn't independently formulate, whereas B merely restates the original issue's binary already visible early in the thread."
+        },
+        "surprise": "naive",
+        "settles": "naive",
+        "cost": 0.01072
+      },
+      {
+        "fixture": "odoo-93552",
+        "i": 2,
+        "coachFirst": false,
+        "questions": {
+          "coach": "Which meaning does \"Company\" have for the new Contacts record shown in issue #93552: the contact type opposite \"individual\", the `company_id` multi-company value, or both?",
+          "naive": "What distinct business concepts should Odoo officially name and define for (a) the operating multi-company entity, (b) a partner’s person-vs-organization type, and (c) the commercial parent/grouping of contacts, so that labels and field names can be made consistently unambiguous?"
+        },
+        "verdict": {
+          "surprise": "A",
+          "settles": "A",
+          "reason": "Question A synthesizes the naming/scope disagreement scattered across [participant]'s proposed renames and multiple contributors' suggestions into a structured decision that, once answered, would resolve the terminology dispute, whereas Question B is trivially answerable from the issue text itself."
+        },
+        "surprise": "naive",
+        "settles": "naive",
+        "cost": 0.005514
+      }
+    ]
+  }
+}
