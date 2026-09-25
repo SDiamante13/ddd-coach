@@ -1,25 +1,12 @@
 import { cleanup, screen, within } from "@testing-library/react";
-import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_MESSAGE_TOO_LONG, MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
-import { composerOf, formatCount, startConversation } from "../test/appDriver.tsx";
+import { addSwap, composerOf, formatCount, openSwaps, startConversation } from "../test/appDriver.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
 const fullText = (text: string) => (_: string, element: Element | null) =>
   element?.tagName === "P" && element.textContent === text;
-
-async function openSwaps(user: UserEvent) {
-  const summary = screen.getByText(/^Your swaps/);
-  if (!summary.closest("details")?.open) await user.click(summary);
-}
-
-async function addSwap(user: UserEvent, from: string, to: string) {
-  await openSwaps(user);
-  await user.type(screen.getByRole("textbox", { name: "Replace" }), from);
-  await user.type(screen.getByRole("textbox", { name: "With" }), to);
-  await user.click(screen.getByRole("button", { name: "Add swap" }));
-}
 
 describe("Swapping sensitive words", () => {
   it("sends the placeholder instead of a swapped word", async () => {

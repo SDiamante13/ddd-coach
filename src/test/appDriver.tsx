@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { vi } from "vitest";
 import { App } from "../App.tsx";
 import { stubFetch } from "./fetchStub.ts";
@@ -59,4 +59,16 @@ export async function openGate() {
     server,
     field: () => screen.getByLabelText("Conference password"),
   };
+}
+
+export async function openSwaps(user: UserEvent) {
+  const summary = screen.getByText(/^Your swaps/);
+  if (!summary.closest("details")?.open) await user.click(summary);
+}
+
+export async function addSwap(user: UserEvent, from: string, to: string) {
+  await openSwaps(user);
+  await user.type(screen.getByRole("textbox", { name: "Replace" }), from);
+  await user.type(screen.getByRole("textbox", { name: "With" }), to);
+  await user.click(screen.getByRole("button", { name: "Add swap" }));
 }
