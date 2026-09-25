@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
@@ -135,6 +135,16 @@ describe("Connection test", () => {
     await user.type(input(), "Hello coach{Control>}{Enter}{/Control}");
 
     expect(server.bodyOf(0)).toEqual({ message: "Hello coach", history: [] });
+  });
+
+  it("sends nothing on Enter while an input method is composing", async () => {
+    const server = stubFetch();
+    const { user, input } = renderApp();
+    await user.type(input(), "Hello coach");
+
+    fireEvent.keyDown(input(), { key: "Enter", isComposing: true });
+
+    expect(server.fetchMock).not.toHaveBeenCalled();
   });
 
   it.each([
