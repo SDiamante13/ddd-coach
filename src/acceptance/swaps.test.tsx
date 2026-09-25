@@ -223,4 +223,63 @@ describe("Swapping sensitive words", () => {
     );
     expect(sendButton()).toBeDisabled();
   });
+
+  it("warns while typing a placeholder that reads as a team or role name, and still adds it", async () => {
+    const { user } = await startConversation();
+    await openSwaps(user);
+
+    await user.type(screen.getByRole("textbox", { name: "Replace" }), "Maya");
+    await user.type(screen.getByRole("textbox", { name: "With" }), "Ops");
+
+    expect(screen.getByRole("textbox", { name: "With" })).toHaveAccessibleDescription(
+      '"Ops" reads as a team or role name, so the coach may mix the two up. ' +
+        'Try a made-up placeholder like "Customer A" or "Person 1".',
+    );
+    await user.click(screen.getByRole("button", { name: "Add swap" }));
+    expect(screen.getByText("Maya → Ops")).toBeVisible();
+  });
+
+  it("warns while typing a placeholder the message already uses", async () => {
+    const { user, input } = await startConversation();
+    await user.type(input(), "Maya asked dana to rebook");
+    await openSwaps(user);
+
+    await user.type(screen.getByRole("textbox", { name: "Replace" }), "Maya");
+    await user.type(screen.getByRole("textbox", { name: "With" }), "Dana");
+
+    expect(screen.getByRole("textbox", { name: "With" })).toHaveAccessibleDescription(
+      '"Dana" is already in your message, so the coach can\'t tell the two apart. ' +
+        'Try a made-up placeholder like "Customer A" or "Person 1".',
+    );
+  });
+
+  it("warns in 'What's sent' when a listed placeholder is already in the message", async () => {
+    const { user, input } = await startConversation();
+    await addSwap(user, "Maya", "Dana");
+    await user.type(input(), "Maya asked Dana to rebook");
+
+    await user.click(screen.getByRole("button", { name: "Show what's sent" }));
+
+    const preview = screen.getByRole("region", { name: "What's sent" });
+    expect(
+      within(preview).getByText(
+        '"Dana" is already in your message, so the coach can\'t tell the two apart. ' +
+          'Try a made-up placeholder like "Customer A" or "Person 1".',
+      ),
+    ).toBeVisible();
+  });
+
+  it("clears every swap from this browser", async () => {
+    const first = await startConversation();
+    await addSwap(first.user, "Acme Foods", "Customer A");
+    await addSwap(first.user, "Laredo", "Lane 1");
+
+    await first.user.click(screen.getByRole("button", { name: "Clear swaps" }));
+
+    expect(screen.getByText("Your swaps (0)")).toBeInTheDocument();
+    expect(JSON.stringify({ ...localStorage })).not.toMatch(/Acme|Laredo/);
+    cleanup();
+    await startConversation();
+    expect(screen.getByText("Your swaps (0)")).toBeInTheDocument();
+  });
 });

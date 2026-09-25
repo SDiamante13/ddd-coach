@@ -1,8 +1,10 @@
 import { useId, useState, type ReactNode } from "react";
-import type { SwappedText } from "../domain/swaps.ts";
+import { applySwaps, placeholderClash, type SwapList, type SwappedText } from "../domain/swaps.ts";
+import { clashWarning } from "./clashWarning.ts";
 
-export function SentPreview({ swapped }: { swapped: SwappedText }) {
+export function SentPreview({ swaps, draft }: { swaps: SwapList; draft: string }) {
   const id = useId();
+  const swapped = applySwaps(swaps, draft);
   const [open, setOpen] = useState(false);
 
   return (
@@ -13,6 +15,11 @@ export function SentPreview({ swapped }: { swapped: SwappedText }) {
       <section id={id} aria-label="What's sent" className="sent" hidden={!open}>
         <p>{marked(swapped)}</p>
         <p>{appliedLine(swapped.spans.length)}</p>
+        {placeholdersIn(swaps, draft).map((placeholder) => (
+          <p key={placeholder} className="warning">
+            {clashWarning(placeholder, "in-thread")}
+          </p>
+        ))}
       </section>
     </>
   );
@@ -31,4 +38,9 @@ function marked({ text, spans }: SwappedText): ReactNode[] {
 function appliedLine(count: number): string {
   if (count === 0) return "No swaps applied";
   return `${count} ${count === 1 ? "swap" : "swaps"} applied`;
+}
+
+function placeholdersIn(swaps: SwapList, draft: string): string[] {
+  const placeholders = new Set(swaps.map((swap) => swap.to));
+  return [...placeholders].filter((placeholder) => placeholderClash(placeholder, draft) === "in-thread");
 }

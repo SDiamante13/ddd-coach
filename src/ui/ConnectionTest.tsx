@@ -82,8 +82,8 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
           conversation={conversation}
           onTryExample={tryExample}
         />
-        <SwapPanel {...swaps} />
-        {!draftBlank && <SentPreview swapped={applySwaps(swaps.swaps, draft)} />}
+        <SwapPanel {...swaps} thread={draft} />
+        {!draftBlank && <SentPreview swaps={swaps.swaps} draft={draft} />}
       </MessageForm>
     </>
   );

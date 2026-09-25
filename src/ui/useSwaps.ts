@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { addSwap, removeSwap, type SwapList, type SwapResult } from "../domain/swaps.ts";
-import { keepSwaps, keptSwaps } from "./swapStore.ts";
+import { forgetSwaps, keepSwaps, keptSwaps } from "./swapStore.ts";
 
 export type Swaps = {
   swaps: SwapList;
   add: (from: string, to: string) => SwapResult;
   remove: (from: string) => void;
+  clear: () => void;
 };
 
 export function useSwaps(): Swaps {
@@ -23,5 +24,9 @@ export function useSwaps(): Swaps {
       return result;
     },
     remove: (from) => change(removeSwap(swaps, from)),
+    clear: () => {
+      setSwaps([]);
+      forgetSwaps();
+    },
   };
 }

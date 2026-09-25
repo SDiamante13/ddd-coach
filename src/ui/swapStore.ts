@@ -11,6 +11,14 @@ export function keepSwaps(list: SwapList): void {
   }
 }
 
+export function forgetSwaps(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    return;
+  }
+}
+
 export function keptSwaps(): SwapList {
   try {
     const kept: unknown = JSON.parse(localStorage.getItem(KEY) ?? "[]");

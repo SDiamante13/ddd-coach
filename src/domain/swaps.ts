@@ -73,3 +73,19 @@ export function swapListOf(candidates: readonly Swap[]): SwapList {
 export function removeSwap(list: SwapList, from: string): SwapList {
   return list.filter((swap) => !sameWord(swap.from, from));
 }
+
+export type PlaceholderClash = "in-thread" | "role-name";
+
+const TEAM_AND_ROLE_NAMES = [
+  "Ops", "Operations", "Finance", "Billing", "Accounting", "Dispatch", "Dispatcher", "Sales", "Tracking",
+  "Claims", "Pricing", "Procurement", "Compliance", "Customer Service", "Support", "Warehouse", "Legal",
+  "Day desk", "Night desk", "Day shift", "Night shift", "Account manager", "Carrier relations", "Driver",
+  "Broker", "Shipper", "Manager", "Team lead",
+];
+
+export function placeholderClash(to: string, thread: string): PlaceholderClash | null {
+  const placeholder = to.trim();
+  if (placeholder === "") return null;
+  if (anyOf([placeholder]).test(thread)) return "in-thread";
+  return TEAM_AND_ROLE_NAMES.some((name) => sameWord(name, placeholder)) ? "role-name" : null;
+}

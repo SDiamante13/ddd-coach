@@ -5,7 +5,7 @@ export const SWAPS_NOTE =
   "Swaps run in this browser before anything is sent. They hide only the words you list: rates, " +
   "load IDs and contract terms you haven't listed still go. They don't make an unapproved vendor approved.";
 
-export function SwapPanel({ swaps, add, remove }: Swaps) {
+export function SwapPanel({ swaps, add, remove, clear, thread }: Swaps & { thread: string }) {
   return (
     <details className="swaps">
       <summary>Your swaps ({swaps.length})</summary>
@@ -22,7 +22,12 @@ export function SwapPanel({ swaps, add, remove }: Swaps) {
           </li>
         ))}
       </ul>
-      <AddSwapRow add={add} />
+      <AddSwapRow add={add} thread={thread} />
+      {swaps.length > 0 && (
+        <button type="button" className="clearswaps" onClick={clear}>
+          Clear swaps
+        </button>
+      )}
     </details>
   );
 }

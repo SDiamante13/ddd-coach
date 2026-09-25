@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addSwap, applySwaps, removeSwap, type SwapList } from "./swaps.ts";
+import { addSwap, applySwaps, placeholderClash, removeSwap, type SwapList } from "./swaps.ts";
 
 const swaps = (...pairs: [string, string][]): SwapList => pairs.map(([from, to]) => ({ from, to }));
 
@@ -121,5 +121,23 @@ describe("addSwap", () => {
       reason: "You can keep up to 50 swaps. Remove one to add another.",
     });
     expect(addSwap(full, "Name 0", "Person X").ok).toBe(true);
+  });
+});
+
+describe("placeholderClash", () => {
+  it("flags a placeholder the thread already uses", () => {
+    expect(placeholderClash("Ops", "Maya asked ops to rebook")).toBe("in-thread");
+  });
+
+  it("accepts a made-up placeholder the thread doesn't use, even inside a longer word", () => {
+    expect(placeholderClash("Person 1", "Maya asked Person 12 to rebook")).toBeNull();
+  });
+
+  it.each(["Ops", "finance", "Night desk", "Dispatch", "Sales"])("flags %j as a team or role name", (to) => {
+    expect(placeholderClash(to, "")).toBe("role-name");
+  });
+
+  it("says nothing about a blank placeholder", () => {
+    expect(placeholderClash("", "Maya asked ops, then Finance.")).toBeNull();
   });
 });

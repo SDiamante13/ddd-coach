@@ -1,8 +1,13 @@
 import { useId, useState, type KeyboardEvent } from "react";
-import type { SwapField, SwapRefusal } from "../domain/swaps.ts";
+import { placeholderClash, type SwapField, type SwapRefusal } from "../domain/swaps.ts";
+import { clashWarning } from "./clashWarning.ts";
 import type { Swaps } from "./useSwaps.ts";
 
-export function AddSwapRow({ add }: Pick<Swaps, "add">) {
+type FieldNote = { text: string; kind: "refusal" | "warning" };
+
+type AddSwapRowProps = Pick<Swaps, "add"> & { thread: string };
+
+export function AddSwapRow({ add, thread }: AddSwapRowProps) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [refusal, setRefusal] = useState<SwapRefusal | null>(null);
@@ -19,12 +24,19 @@ export function AddSwapRow({ add }: Pick<Swaps, "add">) {
     event.preventDefault();
     submit();
   };
-  const refusalFor = (field: SwapField) => (refusal?.field === field ? refusal.reason : undefined);
+  const noteFor = (field: SwapField): FieldNote | undefined =>
+    refusal?.field === field ? { text: refusal.reason, kind: "refusal" } : undefined;
 
   return (
     <div className="addswap">
-      <SwapInput label="Replace" value={from} onChange={setFrom} onKeyDown={addOnEnter} refusal={refusalFor("from")} />
-      <SwapInput label="With" value={to} onChange={setTo} onKeyDown={addOnEnter} refusal={refusalFor("to")} />
+      <SwapInput label="Replace" value={from} onChange={setFrom} onKeyDown={addOnEnter} note={noteFor("from")} />
+      <SwapInput
+        label="With"
+        value={to}
+        onChange={setTo}
+        onKeyDown={addOnEnter}
+        note={noteFor("to") ?? clashNote(to, thread)}
+      />
       <button type="button" onClick={submit}>
         Add swap
       </button>
@@ -32,15 +44,24 @@ export function AddSwapRow({ add }: Pick<Swaps, "add">) {
   );
 }
 
+function clashNote(to: string, thread: string): FieldNote | undefined {
+  const clash = placeholderClash(to, thread);
+  if (clash === null) return undefined;
+  return {
+    kind: "warning",
+    text: clashWarning(to.trim(), clash),
+  };
+}
+
 type SwapInputProps = {
   label: string;
   value: string;
   onChange: (value: string) => void;
   onKeyDown: (event: KeyboardEvent) => void;
-  refusal: string | undefined;
+  note: FieldNote | undefined;
 };
 
-function SwapInput({ label, value, onChange, onKeyDown, refusal }: SwapInputProps) {
+function SwapInput({ label, value, onChange, onKeyDown, note }: SwapInputProps) {
   const id = useId();
   return (
     <span className="swapfield">
@@ -48,14 +69,14 @@ function SwapInput({ label, value, onChange, onKeyDown, refusal }: SwapInputProp
       <input
         id={id}
         value={value}
-        aria-invalid={refusal !== undefined || undefined}
-        aria-describedby={refusal === undefined ? undefined : `${id}-refusal`}
+        aria-invalid={note?.kind === "refusal" || undefined}
+        aria-describedby={note && `${id}-note`}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
       />
-      {refusal !== undefined && (
-        <span id={`${id}-refusal`} className="refusal">
-          {refusal}
+      {note && (
+        <span id={`${id}-note`} className={note.kind}>
+          {note.text}
         </span>
       )}
     </span>
