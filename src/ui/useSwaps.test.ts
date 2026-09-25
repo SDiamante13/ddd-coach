@@ -66,4 +66,18 @@ describe("useSwaps", () => {
 
     expect(result.current.swaps).toEqual([]);
   });
+
+  it("drops kept swaps that would be refused on add", () => {
+    const kept = [
+      { from: "", to: "Customer A" },
+      { from: "A", to: "Customer A" },
+      { from: " Acme ", to: "Customer A" },
+      { from: "acme", to: "Customer B" },
+    ];
+    localStorage.setItem(KEY, JSON.stringify(kept));
+
+    const { result } = renderHook(() => useSwaps());
+
+    expect(result.current.swaps).toEqual([{ from: "acme", to: "Customer B" }]);
+  });
 });

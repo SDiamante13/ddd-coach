@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applySwaps, removeSwap, type SwapList } from "./swaps.ts";
+import { addSwap, applySwaps, removeSwap, type SwapList } from "./swaps.ts";
 
 const swaps = (...pairs: [string, string][]): SwapList => pairs.map(([from, to]) => ({ from, to }));
 
@@ -72,5 +72,54 @@ describe("removeSwap", () => {
   it("drops the swap for a listed word and keeps the rest", () => {
     const list = swaps(["Acme", "Customer A"], ["Laredo", "Lane 1"]);
     expect(removeSwap(list, "Acme")).toEqual(swaps(["Laredo", "Lane 1"]));
+  });
+});
+
+describe("addSwap", () => {
+  it("adds a swap without surrounding spaces", () => {
+    expect(addSwap([], "  Acme Foods ", " Customer A  ")).toEqual({ ok: true, list: swaps(["Acme Foods", "Customer A"]) });
+  });
+
+  it("refuses a blank word to replace", () => {
+    expect(addSwap([], "  ", "Customer A")).toEqual({ ok: false, field: "from", reason: "Enter a word to replace." });
+  });
+
+  it("refuses a blank placeholder", () => {
+    expect(addSwap([], "Acme", " ")).toEqual({ ok: false, field: "to", reason: "Enter a placeholder." });
+  });
+
+  it("refuses a word to replace shorter than 2 characters", () => {
+    expect(addSwap([], " A ", "Customer A")).toEqual({
+      ok: false,
+      field: "from",
+      reason: "Use at least 2 characters, so common letters aren't swapped.",
+    });
+  });
+
+  it("refuses a placeholder that is the word itself in any case", () => {
+    expect(addSwap([], "Acme", "ACME")).toEqual({
+      ok: false,
+      field: "to",
+      reason: "Pick a placeholder that differs from the word.",
+    });
+  });
+
+  it("replaces the placeholder of a word already listed in any case", () => {
+    const list = swaps(["Acme", "Customer A"], ["Laredo", "Lane 1"]);
+    expect(addSwap(list, "ACME", "Customer B")).toEqual({
+      ok: true,
+      list: swaps(["Laredo", "Lane 1"], ["ACME", "Customer B"]),
+    });
+  });
+
+  it("refuses a 51st swap but still updates a listed one", () => {
+    const full = swaps(...Array.from({ length: 50 }, (_, i): [string, string] => [`Name ${i}`, `Person ${i}`]));
+
+    expect(addSwap(full, "Acme", "Customer A")).toEqual({
+      ok: false,
+      field: "from",
+      reason: "You can keep up to 50 swaps. Remove one to add another.",
+    });
+    expect(addSwap(full, "Name 0", "Person X").ok).toBe(true);
   });
 });

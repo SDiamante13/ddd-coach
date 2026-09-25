@@ -139,4 +139,40 @@ describe("Swapping sensitive words", () => {
     expect(screen.queryByText("Acme Foods → Customer A")).not.toBeInTheDocument();
     expect(screen.getByText("Laredo → Lane 1")).toBeVisible();
   });
+
+  it("says in 'Your swaps' what swaps don't cover", async () => {
+    const { user } = await startConversation();
+
+    await openSwaps(user);
+
+    expect(
+      screen.getByText(
+        "Swaps run in this browser before anything is sent. They hide only the words you list: rates, " +
+          "load IDs and contract terms you haven't listed still go. They don't make an unapproved vendor approved.",
+      ),
+    ).toBeVisible();
+  });
+
+  it("refuses a one-letter word inline and keeps what was typed", async () => {
+    const { user } = await startConversation();
+
+    await addSwap(user, "A", "Customer A");
+
+    const replace = screen.getByRole("textbox", { name: "Replace" });
+    expect(replace).toHaveAccessibleDescription("Use at least 2 characters, so common letters aren't swapped.");
+    expect(replace).toHaveAttribute("aria-invalid", "true");
+    expect(replace).toHaveValue("A");
+    expect(screen.getByRole("textbox", { name: "With" })).toHaveValue("Customer A");
+    expect(screen.getByText("Your swaps (0)")).toBeInTheDocument();
+  });
+
+  it("updates the placeholder when a listed word is added again in another case", async () => {
+    const { user } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+
+    await addSwap(user, "ACME", "Customer B");
+
+    expect(screen.getByText("Your swaps (1)")).toBeInTheDocument();
+    expect(screen.getByText("ACME → Customer B")).toBeVisible();
+  });
 });

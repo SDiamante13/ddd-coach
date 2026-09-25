@@ -3,6 +3,7 @@ export type SwapList = readonly Swap[];
 export type Span = { readonly start: number; readonly end: number };
 export type SwappedText = { readonly text: string; readonly spans: readonly Span[] };
 
+export const MAX_SWAPS = 50;
 const WORD_CHAR = "[\\p{L}\\p{N}_]";
 
 export function applySwaps(list: SwapList, text: string): SwappedText {
@@ -39,12 +40,36 @@ function longestFirst(list: SwapList): SwapList {
   return [...list].sort((a, b) => b.from.length - a.from.length);
 }
 
-export type SwapResult = { readonly ok: true; readonly list: SwapList } | { readonly ok: false; readonly reason: string };
+export type SwapField = "from" | "to";
+export type SwapRefusal = { readonly ok: false; readonly field: SwapField; readonly reason: string };
+export type SwapResult = { readonly ok: true; readonly list: SwapList } | SwapRefusal;
 
 export function addSwap(list: SwapList, from: string, to: string): SwapResult {
-  return { ok: true, list: [...list, { from, to }] };
+  const swap = { from: from.trim(), to: to.trim() };
+  const others = removeSwap(list, swap.from);
+  return refusalOf(others, swap) ?? { ok: true, list: [...others, swap] };
+}
+
+function refusalOf(others: SwapList, { from, to }: Swap): SwapRefusal | null {
+  if (from === "") return refuse("from", "Enter a word to replace.");
+  if (to === "") return refuse("to", "Enter a placeholder.");
+  if (from.length < 2) return refuse("from", "Use at least 2 characters, so common letters aren't swapped.");
+  if (sameWord(from, to)) return refuse("to", "Pick a placeholder that differs from the word.");
+  if (others.length >= MAX_SWAPS) return refuse("from", `You can keep up to ${MAX_SWAPS} swaps. Remove one to add another.`);
+  return null;
+}
+
+const sameWord = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: "accent" }) === 0;
+
+const refuse = (field: SwapField, reason: string): SwapRefusal => ({ ok: false, field, reason });
+
+export function swapListOf(candidates: readonly Swap[]): SwapList {
+  return candidates.reduce<SwapList>((list, { from, to }) => {
+    const result = addSwap(list, from, to);
+    return result.ok ? result.list : list;
+  }, []);
 }
 
 export function removeSwap(list: SwapList, from: string): SwapList {
-  return list.filter((swap) => swap.from !== from);
+  return list.filter((swap) => !sameWord(swap.from, from));
 }

@@ -1,4 +1,4 @@
-import type { Swap, SwapList } from "../domain/swaps.ts";
+import { swapListOf, type Swap, type SwapList } from "../domain/swaps.ts";
 import { stringField } from "../shared/json.ts";
 
 const KEY = "ddd-coach.swaps.v1";
@@ -14,7 +14,7 @@ export function keepSwaps(list: SwapList): void {
 export function keptSwaps(): SwapList {
   try {
     const kept: unknown = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    return Array.isArray(kept) && kept.every(isSwap) ? kept : [];
+    return Array.isArray(kept) && kept.every(isSwap) ? swapListOf(kept) : [];
   } catch {
     return [];
   }

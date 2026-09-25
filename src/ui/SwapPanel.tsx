@@ -1,10 +1,15 @@
-import { useId, useState, type KeyboardEvent } from "react";
+import { AddSwapRow } from "./AddSwapRow.tsx";
 import type { Swaps } from "./useSwaps.ts";
+
+export const SWAPS_NOTE =
+  "Swaps run in this browser before anything is sent. They hide only the words you list: rates, " +
+  "load IDs and contract terms you haven't listed still go. They don't make an unapproved vendor approved.";
 
 export function SwapPanel({ swaps, add, remove }: Swaps) {
   return (
     <details className="swaps">
       <summary>Your swaps ({swaps.length})</summary>
+      <p className="swapsnote">{SWAPS_NOTE}</p>
       <ul>
         {swaps.map(({ from, to }) => (
           <li key={from}>
@@ -19,34 +24,5 @@ export function SwapPanel({ swaps, add, remove }: Swaps) {
       </ul>
       <AddSwapRow add={add} />
     </details>
-  );
-}
-
-function AddSwapRow({ add }: Pick<Swaps, "add">) {
-  const id = useId();
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-
-  function submit() {
-    if (!add(from, to).ok) return;
-    setFrom("");
-    setTo("");
-  }
-  const addOnEnter = (event: KeyboardEvent) => {
-    if (event.key !== "Enter") return;
-    event.preventDefault();
-    submit();
-  };
-
-  return (
-    <div className="addswap">
-      <label htmlFor={`${id}-from`}>Replace</label>
-      <input id={`${id}-from`} value={from} onChange={(e) => setFrom(e.target.value)} onKeyDown={addOnEnter} />
-      <label htmlFor={`${id}-to`}>With</label>
-      <input id={`${id}-to`} value={to} onChange={(e) => setTo(e.target.value)} onKeyDown={addOnEnter} />
-      <button type="button" onClick={submit}>
-        Add swap
-      </button>
-    </div>
   );
 }
