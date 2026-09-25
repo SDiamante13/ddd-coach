@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import { parsePrompt, type Prompt } from "../domain/exchange.ts";
+import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
 type MessageFormProps = {
   busy: boolean;
@@ -21,7 +22,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
     <form onSubmit={handleSubmit}>
       <label>
         Message
-        <input type="text" autoFocus value={draft} onChange={(e) => onDraftChange(e.target.value)} />
+        <input type="text" autoFocus placeholder={PASTE_EXAMPLE} value={draft} onChange={(e) => onDraftChange(e.target.value)} />
       </label>
       <button type="submit" disabled={busy}>
         Send

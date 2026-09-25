@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
 import { stubFetch } from "./test/fetchStub.ts";
-import { PURPOSE_LINE } from "./ui/PurposeLine.tsx";
+import { PASTE_EXAMPLE, PURPOSE_LINE } from "./ui/PurposeLine.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -58,6 +58,12 @@ describe("Connection test", () => {
     renderApp();
 
     expect(screen.getByText(PURPOSE_LINE)).toBeVisible();
+  });
+
+  it("shows an example of what to paste in the empty message box", () => {
+    const { input } = renderApp();
+
+    expect(input()).toHaveAttribute("placeholder", PASTE_EXAMPLE);
   });
 
   it("starts with the message input focused and an empty log", () => {
