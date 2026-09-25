@@ -12,13 +12,15 @@ const MALFORMED: ChatRequestResult = { ok: false, reason: "malformed" };
 const TOO_LONG: ChatRequestResult = { ok: false, reason: "tooLong" };
 
 export function parseChatRequest(body: unknown): ChatRequestResult {
+  if (hasTooManyTurns(body)) return TOO_LONG;
   const conversation = readConversation(body);
   if (conversation === null) return MALFORMED;
-  return isTooLong(conversation) ? TOO_LONG : { ok: true, conversation };
+  return charactersIn(conversation) > MAX_CONVERSATION_CHARS ? TOO_LONG : { ok: true, conversation };
 }
 
-function isTooLong(conversation: Conversation): boolean {
-  return conversation.history.length > MAX_HISTORY_TURNS || charactersIn(conversation) > MAX_CONVERSATION_CHARS;
+function hasTooManyTurns(body: unknown): boolean {
+  const history = field(body, "history");
+  return Array.isArray(history) && history.length > MAX_HISTORY_TURNS;
 }
 
 function charactersIn({ history, prompt }: Conversation): number {

@@ -9,7 +9,7 @@ export function turnsOf(exchanges: readonly Exchange[]): Turn[] {
 
 export function historyBefore(exchanges: readonly Exchange[], id: ExchangeId): Turn[] {
   const position = exchanges.findIndex((exchange) => exchange.id === id);
-  return turnsOf(exchanges.slice(0, position));
+  return turnsOf(position === -1 ? exchanges : exchanges.slice(0, position));
 }
 
 function isReplied(exchange: Exchange): exchange is RepliedExchange {

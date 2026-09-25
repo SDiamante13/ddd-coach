@@ -28,4 +28,11 @@ describe("historyBefore", () => {
   it("keeps only the replied turns positioned before the exchange", () => {
     expect(historyBefore([repliedA, failedB, repliedC], exchangeId(2))).toEqual([{ prompt: "A", reply: "R1" }]);
   });
+
+  it("keeps every replied turn for an exchange that is not in the log", () => {
+    expect(historyBefore([repliedA, failedB, repliedC], exchangeId(99))).toEqual([
+      { prompt: "A", reply: "R1" },
+      { prompt: "C", reply: "R3" },
+    ]);
+  });
 });

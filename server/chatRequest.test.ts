@@ -22,6 +22,12 @@ describe("parseChatRequest", () => {
     expect(parseChatRequest({ message: "B", history: turns(51) })).toEqual({ ok: false, reason: "tooLong" });
   });
 
+  it("refuses an oversized history as too long before checking its turns", () => {
+    const history = Array.from({ length: 51 }, () => "not a turn");
+
+    expect(parseChatRequest({ message: "B", history })).toEqual({ ok: false, reason: "tooLong" });
+  });
+
   it("refuses more than 24,000 characters across the history and message as too long", () => {
     const history = [turnOfLength(23_999)];
 
