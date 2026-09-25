@@ -1,6 +1,6 @@
 import { CUT_SHORT_NOTE } from "../src/shared/chatContract.ts";
 
-const SENTENCE_END = /(?<!^\d+)[.?!]["'”’)\]]?(?=\s|$)/gm;
+const SENTENCE_END = /(?<!^\d+)(?<!\b(?:e\.g|i\.e|vs))[.?!]["'”’)\]]?(?=\s|$)/gim;
 
 export function endOnCompleteLine(text: string): string {
   const complete = completePart(text);

@@ -26,6 +26,20 @@ describe("endOnCompleteLine", () => {
     );
   });
 
+  it.each(["e.g.", "i.e.", "vs.", "E.g."])("does not take the full stop in %s as the end of a sentence", (abbreviation) => {
+    const cut = `- From thread: Ops means one thing.\n- From thread: Finance means a change, ${abbreviation} a da`;
+
+    expect(endOnCompleteLine(cut)).toBe(`- From thread: Ops means one thing.\n\n${CUT_SHORT_NOTE}`);
+  });
+
+  it("takes the full stop in etc. as the end of a sentence", () => {
+    const cut = "- From thread: Ops means one thing.\n- From thread: Finance means a date, a lane, etc. Then a";
+
+    expect(endOnCompleteLine(cut)).toBe(
+      `- From thread: Ops means one thing.\n- From thread: Finance means a date, a lane, etc.\n\n${CUT_SHORT_NOTE}`,
+    );
+  });
+
   it("drops a numbered line cut short instead of keeping its number", () => {
     const cut = "Events, in order\n1. From thread: Customer submits on the portal.\n2. From thread: Ops rebo";
 
