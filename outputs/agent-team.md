@@ -33,7 +33,7 @@ Template: `outputs/demos/chores-30af2d6-deploy.md`.
 - Build from a pinned git worktree outside the repo (`npm ci` + `bin/check.sh`), deploy with `netlify deploy --prod`, then remove the worktree.
 - Use the repo's `npx netlify` (27.x); the homebrew `netlify` on PATH is older and lacks flags such as `env:list --site`.
 - Check env as booleans only (model, effort, keys and password set). Never print values or change them.
-- Confirm the live index JS hash equals the build.
+- Confirm the live index JS hash equals the build. Match response header names case-insensitively (`grep -i`).
 - Hosted checks: headers; chat GET 405 / POST 401; session 401 no-store; unlock GET 405; source paths 404; 0 `sk-or`/`OPENROUTER` in the HTML, JS, CSS and function zips; no `.map`.
 - Fonts: every CSS font URL is same-origin, every woff2 returns 200, and there are 0 googleapis/gstatic references.
 - No unlock and no paid calls; the verifier owns the demo.
