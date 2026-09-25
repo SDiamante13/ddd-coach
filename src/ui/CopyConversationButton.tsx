@@ -2,23 +2,35 @@ import { useEffect, useState } from "react";
 
 const COPIED_MS = 2000;
 
+type CopyState = "ready" | "copied" | "failed";
+
+const LABELS: Record<CopyState, string> = {
+  ready: "Copy the conversation",
+  copied: "Copied",
+  failed: "Couldn't copy. Select the text in the log instead.",
+};
+
 export function CopyConversationButton({ text }: { text: () => string }) {
-  const [copied, setCopied] = useState(false);
+  const [state, setState] = useState<CopyState>("ready");
 
   useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), COPIED_MS);
+    if (state !== "copied") return;
+    const timer = setTimeout(() => setState("ready"), COPIED_MS);
     return () => clearTimeout(timer);
-  }, [copied]);
+  }, [state]);
 
   async function copy() {
-    await navigator.clipboard.writeText(text());
-    setCopied(true);
+    try {
+      await navigator.clipboard.writeText(text());
+      setState("copied");
+    } catch {
+      setState("failed");
+    }
   }
 
   return (
     <button type="button" className="copy" onClick={() => void copy()}>
-      {copied ? "Copied" : "Copy the conversation"}
+      {LABELS[state]}
     </button>
   );
 }

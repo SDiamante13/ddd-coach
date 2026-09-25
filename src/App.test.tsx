@@ -372,6 +372,18 @@ describe("Connection test", () => {
     expect(within(log()).getByRole("button", { name: "Copied" })).toBeInTheDocument();
   });
 
+  it("says when the conversation couldn't be copied", async () => {
+    const { server, user, log, send } = startConversation();
+    vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(new DOMException("Denied", "NotAllowedError"));
+    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
+
+    await user.click(await within(log()).findByRole("button", { name: "Copy the conversation" }));
+
+    expect(
+      await within(log()).findByRole("button", { name: "Couldn't copy. Select the text in the log instead." }),
+    ).toBeInTheDocument();
+  });
+
   it("retries the same message without duplicating it in the log", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();
