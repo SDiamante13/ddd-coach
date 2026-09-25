@@ -1,3 +1,4 @@
+import { coachInstructions } from "../coachInstructions.ts";
 import type { CoachConfig } from "../config.ts";
 import type { ChatClient } from "../openRouterCoach.ts";
 import { verifiedConversationOf } from "../test/conversations.ts";
@@ -8,17 +9,19 @@ import { shipBar, type ScoredRun } from "./shipBar.ts";
 
 export type EvalRun = Measured & ScoredRun;
 
-export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: number) {
+export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: number, instructions = coachInstructions()) {
   const runs: EvalRun[] = [];
   for (const name of FIXTURE_NAMES) {
     const fixture = loadFixture(name);
-    runs.push(...(await repeat(repeats, (i) => scoredRun(config, chat, name, fixture, i))));
+    runs.push(...(await repeat(repeats, (i) => scoredRun(config, chat, { name, fixture, instructions }, i))));
   }
   return { runs, bar: shipBar(runs) };
 }
 
-async function scoredRun(config: CoachConfig, chat: ChatClient, name: string, fixture: Fixture, index: number): Promise<EvalRun> {
+type EvalCase = { name: string; fixture: Fixture; instructions: string };
+
+async function scoredRun(config: CoachConfig, chat: ChatClient, { name, fixture, instructions }: EvalCase, index: number): Promise<EvalRun> {
   const asPasted = verifiedConversationOf(fixture.thread.trim());
-  const measured = await measure(config, chat, `${name} ${index}`, asPasted);
+  const measured = await measure(config, chat, `${name} ${index}`, asPasted, {}, instructions);
   return { ...measured, fixture: name, ...scoreReply(measured.reply, measured.finishReason, fixture) };
 }

@@ -13,9 +13,10 @@ export async function measure(
   label: string,
   conversation: VerifiedConversation,
   overrides?: Overrides,
+  instructions: string = coachInstructions(),
 ): Promise<Measured> {
   const recorder = recordingChat(chat, overrides);
-  const reply = await createOpenRouterCoach(config, coachInstructions(), recorder.chat).reply(conversation);
+  const reply = await createOpenRouterCoach(config, instructions, recorder.chat).reply(conversation);
   const record = recorder.records[0]!;
   console.log(`${label}: ${record.ms} ms, ${record.completionTokens} out, cached ${record.cachedTokens}, ${record.finishReason}`);
   return { ...record, label, prompt: conversation.prompt, reply };
