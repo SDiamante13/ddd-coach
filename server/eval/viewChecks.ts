@@ -1,6 +1,6 @@
 import type { FixtureKey, SameMeaning, ViewGroup } from "./replyChecks.ts";
-import type { CoachReply } from "./replyLayout.ts";
-import { withoutSourceLabel } from "./replyLayout.ts";
+import type { CoachReply } from "../../src/shared/replyLayout.ts";
+import { withoutSourceLabel } from "../../src/shared/replyLayout.ts";
 
 const ALWAYS_HELD_BY = ["Code", "Team unclear"];
 const AFTER_HOLDER = /^(?: \((?:view ([AB])|(\p{Ll}+(?: \p{Ll}+){0,3}))\))? (\p{Ll}+)/u;

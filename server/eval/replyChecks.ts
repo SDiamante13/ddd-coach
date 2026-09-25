@@ -19,7 +19,7 @@ import {
   WORDS_HEADING,
   type CoachReply,
   type ReplyLayout,
-} from "./replyLayout.ts";
+} from "../../src/shared/replyLayout.ts";
 
 export type Attribution = { phrase: string; teams: string[] };
 export type ViewGroup = { name: string; markers: string[] };
