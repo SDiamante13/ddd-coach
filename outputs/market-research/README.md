@@ -64,3 +64,5 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
 - The model changes to gpt-6-luna at this deploy. Note it, but judge the reply, not the model.
 - The "questions for interview 05" sections in 04a and 05.
 - **The learning metric (#26): "reuses a move unprompted".** Watch the transcript for her using a coaching move on her own, without being asked. Record yes or no with the quote.
+- **Design Exploration 06, "Structured reply"** (`outputs/design/explore-06/structured.html`, stills s1–s3; #64): slice 3's fixed reply layout shown as real lists and a table. A quick look alongside the #4 demo.
+- **Design Exploration 05b, "Why this question?" v2** (`outputs/design/explore-05b/why-v2.html` ?state=1..3, stills v1–v3, `explore-05b-steps.mp4`): each move shown once in a visible line, an always-visible source line on the coach's DDD claim, technique names only inside "why", no toggle, the hotspot paraphrase corrected. **Learning retest (delayed recall):** open by asking, without showing the line, whether she can name or apply "ask about one real case" from interview 05. Then check the corrected source line against her spot-check.
