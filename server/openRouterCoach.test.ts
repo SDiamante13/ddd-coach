@@ -60,6 +60,14 @@ describe("OpenRouter coach", () => {
     ]);
   });
 
+  it("asks for the configured reasoning effort", async () => {
+    const { chat, requests } = fakeChat("Hi there");
+
+    await createOpenRouterCoach({ ...config, reasoningEffort: "low" }, chat).reply(conversationOf("A"));
+
+    expect(requests[0]?.[0].chatRequest.reasoning).toEqual({ effort: "low" });
+  });
+
   it("joins the text parts of structured content", async () => {
     const { chat } = fakeChat([
       { type: "text", text: "Hi " },

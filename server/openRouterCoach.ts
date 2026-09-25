@@ -25,17 +25,21 @@ export function createOpenRouterCoach(
 ): Coach {
   return {
     reply: async (conversation: Conversation) =>
-      extractText(await chat.send(chatRequest(config.model, conversation), WITHOUT_RETRIES)),
+      extractText(await chat.send(chatRequest(config, conversation), WITHOUT_RETRIES)),
   };
 }
 
-function chatRequest(model: string, conversation: Conversation): SendChatCompletionRequestRequest {
+function chatRequest(
+  { model, reasoningEffort }: CoachConfig,
+  conversation: Conversation,
+): SendChatCompletionRequestRequest {
   return {
     chatRequest: {
       model,
       messages: messagesOf(conversation),
       stream: false,
       maxCompletionTokens: MAX_COMPLETION_TOKENS,
+      ...(reasoningEffort && { reasoning: { effort: reasoningEffort } }),
     },
   };
 }

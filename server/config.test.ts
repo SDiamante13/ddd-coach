@@ -12,6 +12,32 @@ describe("readConfig", () => {
     });
   });
 
+  it("reads an optional reasoning effort", () => {
+    const env = {
+      OPENROUTER_API_KEY: "sk-or-test-key",
+      OPENROUTER_MODEL: "test/model",
+      OPENROUTER_REASONING_EFFORT: "low",
+    };
+
+    expect(readConfig(env)).toEqual({
+      ok: true,
+      config: { apiKey: "sk-or-test-key", model: "test/model", reasoningEffort: "low" },
+    });
+  });
+
+  it("refuses an unknown reasoning effort, naming the allowed ones", () => {
+    const env = {
+      OPENROUTER_API_KEY: "sk-or-test-key",
+      OPENROUTER_MODEL: "test/model",
+      OPENROUTER_REASONING_EFFORT: "turbo",
+    };
+
+    expect(readConfig(env)).toEqual({
+      ok: false,
+      error: "OPENROUTER_REASONING_EFFORT must be one of: max, xhigh, high, medium, low, minimal, none.",
+    });
+  });
+
   it("names a missing key", () => {
     expect(readConfig({ OPENROUTER_MODEL: "test/model" })).toEqual({
       ok: false,
