@@ -110,7 +110,7 @@ describe("Connection test", () => {
     expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
   });
 
-  it("shows a refusal of an overlong message inline, asking to shorten it", async () => {
+  it("shows a refusal of an overlong message inline, asking to shorten it, without Retry", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();
 
@@ -120,6 +120,7 @@ describe("Connection test", () => {
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
       "This message is too long for the coach. Shorten it and send it again.",
     );
+    expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
   });
 
   it("retries the same message without duplicating it in the log", async () => {

@@ -16,9 +16,11 @@ export function ExchangeOutcome({ exchange, busy, onRetry }: ExchangeProps) {
       return (
         <>
           <p role="alert">{exchange.error}</p>
-          <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>
-            Retry
-          </button>
+          {exchange.retryable && (
+            <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>
+              Retry
+            </button>
+          )}
         </>
       );
   }

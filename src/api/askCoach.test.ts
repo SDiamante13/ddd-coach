@@ -31,6 +31,16 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({ ok: false, error: "The coach is unavailable.", retryable: true });
   });
 
+  it("marks a refusal as too long as not worth retrying", async () => {
+    respondWith(jsonResponse(413, { error: "This message is too long for the coach." }));
+
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: "This message is too long for the coach.",
+      retryable: false,
+    });
+  });
+
   it("reports an unreachable coach when the request throws", async () => {
     respondWith(Promise.reject(new TypeError("Failed to fetch")));
 

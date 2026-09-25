@@ -34,6 +34,6 @@ async function readResult(response: Response): Promise<AskResult> {
 
 function errorFrom(body: unknown, status: number): AskResult {
   const error = stringField(body, "error");
-  if (error !== undefined) return { ok: false, error, retryable: true };
+  if (error !== undefined) return { ok: false, error, retryable: status !== 413 };
   return status === 504 ? TIMED_OUT : UNAVAILABLE;
 }

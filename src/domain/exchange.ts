@@ -39,7 +39,7 @@ export function isBusy(exchanges: readonly Exchange[]): boolean {
 
 export function canRetry(exchanges: readonly Exchange[], id: ExchangeId): boolean {
   const target = exchanges.find((exchange) => exchange.id === id);
-  return target?.status === "failed" && !isBusy(exchanges);
+  return target?.status === "failed" && target.retryable && !isBusy(exchanges);
 }
 
 export function parsePrompt(text: string): Prompt | null {

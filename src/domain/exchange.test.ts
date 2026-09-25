@@ -100,6 +100,12 @@ describe("canRetry", () => {
     expect(canRetry([failed, submit(otherId, prompt)], id)).toBe(false);
   });
 
+  it("blocks retrying a failure that is not worth retrying", () => {
+    const refused = fail(submit(id, prompt), { error: "Too long", retryable: false });
+
+    expect(canRetry([refused], id)).toBe(false);
+  });
+
   it("allows retrying only an exchange that failed", () => {
     expect(canRetry([reply(submit(id, prompt), "Hi there")], id)).toBe(false);
   });
