@@ -1,11 +1,11 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+import { entityId } from "./entityId.ts";
 import type { ExchangeId } from "./exchange.ts";
 import {
   applyAction,
   type Board,
   type BoardAction,
-  cardIdOf,
   changeOf,
   emptyBoard,
   type Provenance,
@@ -14,21 +14,11 @@ import {
 
 const addEvent = (text: string, provenance: Provenance, by: string): BoardAction => ({
   type: "addEvent",
-  id: cardIdOf("event", text),
+  id: entityId("event", text),
   text,
   provenance,
   by: by as ExchangeId,
 });
-
-const word = fc.stringMatching(/^[a-z0-9']{1,8}$/);
-const gap = fc.constantFrom(" ", "  ", "\t", " \n ");
-const casedWord = fc.tuple(word, fc.boolean()).map(([w, upper]) => (upper ? w.toUpperCase() : w));
-const restatedEvent = fc
-  .tuple(fc.array(casedWord, { minLength: 1, maxLength: 6 }), gap, gap, fc.constantFrom("", ".", "!", "?"))
-  .map(([words, inner, edge, ending]) => ({
-    plain: words.join(" ").toLowerCase(),
-    restated: `${edge}${words.join(inner)}${ending}${edge}`,
-  }));
 
 const eventText = fc.constantFrom(
   "Customer submits a bkg.",
@@ -43,24 +33,6 @@ const boardAction = fc
 const boardActions = fc.array(boardAction, { maxLength: 12 });
 const boardOfActions = (actions: readonly BoardAction[]) => actions.reduce(applyAction, emptyBoard);
 const idsInFirstAppearanceOrder = (actions: readonly BoardAction[]) => [...new Set(actions.map((action) => action.id))];
-
-describe("cardIdOf", () => {
-  it("keys a card by its kind and lower-cased text without the final full stop", () => {
-    expect(cardIdOf("event", "Customer submits a bkg on the portal.")).toBe("event:customer submits a bkg on the portal");
-  });
-
-  it("collapses runs of whitespace and drops any final ., ! or ?", () => {
-    expect(cardIdOf("event", "  The  carrier rejects\tthe booking!? ")).toBe("event:the carrier rejects the booking");
-  });
-
-  it("gives the same id however the event is cased, spaced or ended", () => {
-    fc.assert(
-      fc.property(restatedEvent, ({ plain, restated }) => {
-        expect(cardIdOf("event", restated)).toBe(cardIdOf("event", plain));
-      }),
-    );
-  });
-});
 
 describe("applyAction", () => {
   it("places a new event as a card placed and changed by its reply", () => {

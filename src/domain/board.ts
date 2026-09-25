@@ -1,10 +1,9 @@
+import type { EntityId } from "./entityId.ts";
 import type { ExchangeId } from "./exchange.ts";
 
-export type CardKind = "event";
-export type CardId = string & { readonly __brand: "CardId" };
 export type Provenance = "thread" | "guess";
 export type EventCard = {
-  readonly id: CardId;
+  readonly id: EntityId;
   readonly kind: "event";
   readonly text: string;
   readonly provenance: Provenance;
@@ -12,22 +11,17 @@ export type EventCard = {
   readonly changedBy: ExchangeId;
 };
 export type Board = { readonly cards: readonly EventCard[]; readonly latest: ExchangeId | null };
-export type BoardAction = { type: "addEvent"; id: CardId; text: string; provenance: Provenance; by: ExchangeId };
+export type BoardAction = { type: "addEvent"; id: EntityId; text: string; provenance: Provenance; by: ExchangeId };
 export type CardChange = "added" | "updated" | null;
 
-export type RenameCard = { type: "renameCard"; id: CardId; text: string }; // #95
-export type ConnectCards = { type: "connectCards"; from: CardId; to: CardId }; // #96
-export type AddQuestion = { type: "addQuestion"; id: string; text: string; about?: CardId }; // #97
+export type RenameCard = { type: "renameCard"; id: EntityId; text: string }; // #95
+export type ConnectCards = { type: "connectCards"; from: EntityId; to: EntityId }; // #96
+export type AddQuestion = { type: "addQuestion"; id: string; text: string; about?: EntityId }; // #97
 export type LaterBoardAction = RenameCard | ConnectCards | AddQuestion;
 
 export const PROVENANCE_LABEL: Record<Provenance, "FROM THREAD" | "GUESS"> = { thread: "FROM THREAD", guess: "GUESS" };
 
 export const emptyBoard: Board = { cards: [], latest: null };
-
-export function cardIdOf(kind: CardKind, text: string): CardId {
-  const normalised = text.toLowerCase().replace(/\s+/g, " ").trim().replace(/[.!?]+$/, "");
-  return `${kind}:${normalised}` as CardId;
-}
 
 export function applyAction(board: Board, action: BoardAction): Board {
   return { cards: cardsAfter(board.cards, action), latest: action.by };
