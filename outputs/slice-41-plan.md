@@ -143,7 +143,7 @@ Post-conference rotation is the same steps with a new value, then a redeploy. Se
 
 **Credit limit (flag, before the conference):**
 - Set a credit limit on the OpenRouter key Netlify uses: about $0.023 per first turn on terra, and 100 people × 20 turns ≈ **$25–50**. Suggest a limit of about $50, ideally on a dedicated hosting key (swap it in with 2a Step B).
-- The gate stops strangers, but not the password leaking to social media; rotate right after the conference.
+- The gate stops strangers, but not the password leaking to social media; rotate if it leaks and gets abused (the credit limit bounds the cost).
 
 ### UI
 
@@ -349,7 +349,7 @@ Part B, locally, fail closed: `ACCESS_PASSWORD= npm run dev` gives unlock 500 an
 ## Risks
 
 - **Shared NAT at the venue.** Per-IP limits act per room. That's the reason for 30/min on unlock and the proposed 300/min on chat. If the venue still trips them, the fallback is to raise the numbers (config and a redeploy, ~2 min).
-- **A weak passphrase.** A single dictionary or DDD word is guessable despite the limiter, which is approximate and soft. Use three random words, and rotate after the conference.
+- **A weak passphrase.** A single dictionary or DDD word is guessable despite the limiter, which is approximate and soft. Use three random words, and rotate only on abuse (see the rotation note below).
 - **The password leaks** (photo of the slide, social post). Spend is bounded only by the OpenRouter credit limit. Rotate in the Netlify UI and redeploy.
 - **Cookie across `netlify dev` vs production.** `Secure` on `http://localhost` works in Chromium and Firefox, but may not in Safari. The builder's local curl check and the agent-browser run confirm it. Production is https with HSTS.
 - **The first load gets one extra request** (the session check; a cold start can take a few hundred ms). The "Checking access…" status covers it.
@@ -367,7 +367,7 @@ Part B, locally, fail closed: `ACCESS_PASSWORD= npm run dev` gives unlock 500 an
 4. **Reuse `COACH_SIGNING_KEY`** with the `ddd-coach/access/v1` tag. Rotating it logs everyone out.
 5. **Dev:** the deployer appends `ACCESS_PASSWORD=local-coach-dev` to `.env` (append only; no read).
 6. **For Steven:**
-   - **Passphrase:** three random lowercase words joined by hyphens, not a DDD term, and nowhere in the repo, so a future remote build doesn't fail secrets scanning. Rotate after the conference.
+   - **Passphrase:** three random lowercase words joined by hyphens, not a DDD term, and nowhere in the repo, so a future remote build doesn't fail secrets scanning. Rotate only on abuse.
    - **Before the conference, set an OpenRouter credit limit:** about $50, ideally on a dedicated hosting key. The estimate is $25–50 for 100 people × 20 turns.
 
 **Rotation (90-day pass):** rotate `ACCESS_PASSWORD` only on abuse. Rotating right after the conference would break the "unlocked for 90 days" promise to attendees (PO, #72). To rotate: change it in the Netlify UI, then redeploy. The password is part of the cookie MAC, so every existing pass stops working at once.
