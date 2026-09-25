@@ -4,6 +4,8 @@ After each completed slice, the loop runs one synthetic interview with the [ICP 
 
 Each interview ships as a transcript `.md` plus a styled `.html` page (EventStorming sticky palette; reuse interview-01 as the template).
 
+**Rule (2026-09-25, agreed with PO, #70):** synthetic interviews test only new concepts or deployed slices, never repeat rounds on the same concept. The table design (#6) is frozen until one real-practitioner session after #4 and #6 ship.
+
 Synthetic interviews generate hypotheses, not evidence. Promote an insight only after a real practitioner confirms it.
 
 ## Log
@@ -18,6 +20,7 @@ Synthetic interviews generate hypotheses, not evidence. Promote an insight only 
 | 4b | 37 + Explorations 03, 02b, #58, Marcus claims | [md](interviews/interview-04b-after-slice-37.md) · [html](interviews/interview-04b-after-slice-37.html) | Table cuts fix-up time from ~25 to ~10 min; rename Status → Source; a stale correction resurfaces; carried board dropped TONU again; 'Reload to start a new one' error would make her throw away her work; no books in the export |
 | 4a | 50 (paste box, #50/#51/#57/#61/#62) | [md](interviews/interview-04a-after-slice-50.md) · [html](interviews/interview-04a-after-slice-50.html) | Sunday replay: 5 fixed / 3 partly / 2 broken, all waiting on #4; nothing lost but the 8k cap picks which team the coach hears; reply 'a waiter, not a facilitator'; Clear kept the follow-up, not the thread; notice still 1.5/5 |
 | 5 | concepts: Explorations 03b, 02b, 05 + #58 citation toggle | [md](interviews/interview-05-concepts-03b-02b-05.md) · [html](interviews/interview-05-concepts-03b-02b-05.html) | 03b fixed columns, not stale cells; Copy table drops the settle-by line and open questions; learning check passed when prompted (weak); drop the citation toggle: citations always in replies, never in copies |
+| 5c | concept: Exploration 03c, before #6 | [md](interviews/interview-05c-explore-03c.md) · [html](interviews/interview-05c-explore-03c.html) | 6 ok / 7 stale / 5 missing; retyping ~7 min (from 8), but now hunting wrong content; split row → two credited rows with loads; one check must update the cell, the question and Dana's line |
 
 Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`
 

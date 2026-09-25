@@ -1,0 +1,590 @@
+<meta charset="utf-8">
+<title>Priya Raman Interview 05c</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+<main class="page">
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 05c · Exploration 03c before #6</div>
+      <h1>“The dates are the right shape now, <em>but three of them are wrong.</em>”</h1>
+      <p class="dek">The day after interview 05, and Dana's last day, we showed the tech lead the third version of the table before #6 (copy the table) is built. The structure passes now, and the paste carries the whole section. But dates the input never had, a check that updates one cell out of three, and a split with no names on it still cost her about seven minutes of reading every cell.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Short script · 11 questions</span>
+        <span class="chip">Exploration 03c · concept, not built</span>
+        <span class="chip">table-v3.html · pasted into Confluence and plain text</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC: finance review 27 Oct, due 30 Oct</dd></div>
+        <div><dt>Since 05</dt><dd>Maya answered in one line; Dana's last day; RFC unchanged</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">The one change that gets it pasted untouched</div>
+    <div>
+      <blockquote>“<strong>Let it write only what I gave it.</strong> Then the seven minutes go on filling blanks it shows me, instead of hunting for mistakes it hides.”</blockquote>
+      <cite class="label">Priya, Q11. A date not in the paste becomes “date?”, and a filled blank changes everywhere: cell, question, and the line for Dana.</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>The date format is fixed, but not where the dates come from.</b> Three sources say “22 Sep 2026”, but the input has no date. The check stamps a hard-coded “25 Sep”. Retyping drops from 8 to about 7 minutes, and it's all content now.</span>
+        <div class="tags"><span>strong</span><span>#6 · #4</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>A check lands in one place.</b> “I checked” rewrote the TONU cell, but left open question 3 and Dana's TONU line. The cell still says “by you · Dana to confirm”, and there's still no “no” button.</span>
+        <div class="tags"><span>strong</span><span>#6 · #4</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">03</span>
+        <span><b>A split is safe for finance only with an owner, a date and named sides.</b> After the May P2 write-up, finance added a manual check that ops still runs. From today Dana's side has nobody in the room, so the row must name her sheet.</span>
+        <div class="tags"><span>medium</span><span>#6 · B05</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">04</span>
+        <span><b>“Guess” is honest on her screen and sloppy in finance's doc.</b> It made her stop and compare. Marcus trusts a “not sure” column, but finance would read it as engineering not knowing its own code.</span>
+        <div class="tags"><span>medium</span><span>#6 · #58</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">05</span>
+        <span><b>For someone leaving, ask for sources, not opinions.</b> Dana answered TONU on Monday, and “rebook or amendment?” leaves out her real answer. The useful question is which contract clause she relies on.</span>
+        <div class="tags"><span>medium</span><span>#4 · B22</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">06</span>
+        <span><b>The plain-text copy is only a header row.</b> “Plain-text editors get Markdown”, but her text file got <code>| Term | Team | Meaning | Status |</code>, with the old column name.</span>
+        <div class="tags"><span>strong</span><span>#6</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="scorecard">
+    <div class="section-head">
+      <h2 id="scorecard">Nothing missing, nothing stale</h2>
+      <span class="label">d3–d5, cell by cell · as of Thu 15 Oct · 6 ok · 7 stale · 5 missing</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">OK</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>Settle-by line on the clipboard</b><q>The date line and the open questions came with the paste, and that was yesterday's biggest miss.</q></li>
+          <li><b>Open questions on the clipboard; Q1 with a joint role plus the forum</b><q>I'd still keep the pair, because the controller is in it and it happens in a room, not a DM.</q></li>
+          <li><b>The split as its own row with a forum, not a bracket</b><q>It's safer than that, and much safer than yesterday's bracket.</q></li>
+          <li><b>Code row labelled Guess, in the tool</b><q>On my screen “Guess” did its job: I stopped and compared instead of nodding.</q></li>
+          <li><b>Absolute date format, no relative days</b><q>The dates are the right shape now.</q></li>
+          <li><b>Events last, with the guess marked</b><q>Last is right, since that's the part I cut and move.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Stale</span><span class="count">7 items</span></div>
+        <ul>
+          <li><b>“Slack #booking-split, 22 Sep 2026” ×3, with no date in the input</b><q>I can't see a wrong date in the right format.</q></li>
+          <li><b>Rebook ops: “Confirmed by Dana, 29 Sep”</b><q>I re-checked with her on 8 Oct, and Maya's “(since the 2024 portal change)” isn't there.</q></li>
+          <li><b>TONU after the check: “checked by you 25 Sep 2026 · Dana to confirm”</b><q>That's “you” again, Dana's name on a job she won't be here to do after today, and a date I didn't check it on.</q></li>
+          <li><b>Open Q3 on TONU after the check, settled by “ops lead” alone</b><q>One click, three places it should land, and it landed in one.</q></li>
+          <li><b>Split wording: “one view says rebook, another says amend”</b><q>“Amend” was my 22 Sep note, the one Dana corrected.</q></li>
+          <li><b>Dana lines: TONU (answered 12 Oct) and “rebook or amendment?”</b><q>It gives her two answers and hers is neither.</q></li>
+          <li><b>Notice: gpt-5.6-terra, “Kept in this browser only”</b><q>The notice didn't notice, again.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Missing</span><span class="count">5 items</span></div>
+        <ul>
+          <li><b>Two split rows, credited to a practice and a document, one load each</b><q>After today the only thing that speaks for Dana's side is the document, so the row has to name it.</q></li>
+          <li><b>Plain-text clipboard contents</b><q>They get a header, with the column name I got rid of last week.</q></li>
+          <li><b>An “as of” date on the paste</b><q>“Settle by” tells finance when it's due, not when it was true.</q></li>
+          <li><b>A line asking Dana for the contract clause before she leaves</b><q>For someone who's leaving, ask for sources, not opinions.</q></li>
+          <li><b>A “no” path on “I checked”</b><q>And there's still only a yes button.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-03c">
+    <div class="section-head">
+      <h2 id="verdict-03c">Exploration 03c verdict</h2>
+      <span class="label">“Leave with a table” v3 · d1–d5 + table-v3.html</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>Copy carries settle-by, the table, questions and events, in that order</b><q>The order the section reads on the 27th.</q></li>
+          <li><b>A joint role plus the forum on the lane-change question</b><q>The controller is in it and it happens in a room.</q></li>
+          <li><b>The split as its own row, with a date and a forum</b><q>Much safer than yesterday's bracket.</q></li>
+          <li><b>The Guess label in the tool</b><q>I stopped and compared instead of nodding.</q></li>
+          <li><b>Absolute dates, and “I checked” replacing the cell</b><q>The dates are the right shape now.</q></li>
+          <li><b>Only open items go to the expert</b><q>For someone who's leaving, ask for sources, not opinions.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">8 items</span></div>
+        <ul>
+          <li><b>Show a date only if it's in the input or she typed it; otherwise “date?”</b><q>I can't see a wrong date in the right format.</q></li>
+          <li><b>A check updates the cell, removes its open question and drops its expert line</b><q>It landed in one.</q></li>
+          <li><b>A split becomes two rows credited to a practice and a document, each with a load</b><q>“Split, to settle at the 27 Oct review” is a status, not a source.</q></li>
+          <li><b>Guess rows get “I checked: &lt;what&gt;, &lt;date&gt;”, and Copy counts the guesses left</b><q>If I copy with a guess still in, tell me how many are left.</q></li>
+          <li><b>The plain-text copy matches the HTML, with “Source” and an “As of” line</b><q>They get a header.</q></li>
+          <li><b>Every open question gets a joint role or a forum</b><q>“Ops lead”, which means Maya alone again.</q></li>
+          <li><b>A departing expert is asked for sources, and “FOR DANA” follows who's actually available</b><q>The one thing nobody can give me tomorrow.</q></li>
+          <li><b>“I checked” gets a no path, and the notice takes the model from config</b><q>The notice didn't notice, again.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">5 items</span></div>
+        <ul>
+          <li><b>“Dana to confirm” and “by you” in any cell</b><q>A name on a job she won't be here to do after today.</q></li>
+          <li><b>“One view … another” wording, and “amend” as a lane-change option</b><q>Neither view has a name on it.</q></li>
+          <li><b>An expert line for anything already answered or checked</b><q>She answered the TONU question on Monday.</q></li>
+          <li><b>“Guess:” in both Meaning and Source on the same row</b></li>
+          <li><b>Unresolved “Guess” in the pasted doc, unless she chooses to keep it</b><q>Honest on my screen and sloppy in their doc.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since yesterday</a>
+      <a href="#part-b">B · Missing, stale</a>
+      <a href="#part-c">C · The split row</a>
+      <a href="#part-d">D · The Guess label</a>
+      <a href="#part-e">E · Lines for Dana</a>
+      <a href="#part-f">F · Close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since yesterday</h3><span class="aside">Thursday 15 October · Dana's last day</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>It's been a day. What's happened?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Last night I found a third load, 47356, where the lane actually changed, and sent Maya the question with all three. She answered in one line: “REBOOKED if the carrier changes, lane or not.” That's what ops does, and it still isn't what Dana's sheet says the contract means, so the split stands. Today is Dana's last day, and her leaving coffee is at three. The RFC hasn't moved since yesterday: nine rows, and Marcus still hasn't opened it.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Nothing missing, nothing stale</h3><span class="aside">Exploration 03c · concept, not built</span></div>
+        <p class="stage">Shown d1 swaps → d2 what's sent → d3 table → d4 next step and lines for Dana → d5 pasted into the RFC. She clicked through table-v3.html, pressed Copy table, and pasted into a scratch Confluence page and into her plain-text notes file.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q2</span><span>Run your test on d3 and d5, cell by cell. Start with what's missing.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Not much is missing now. The date line and the open questions came with the paste, and that was yesterday's biggest miss. The missing piece is the second ops row: the split is one row that says “one view says rebook, another says amend”, so neither view has a name on it. I also pasted into my text file, and got one line: “| Term | Team | Meaning | Status |”. <mark>It says “Plain-text editors get Markdown.” They get a header, with the column name I got rid of last week.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>And stale?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The dates are the right shape now, but three of them are wrong. “Slack #booking-split, 22 Sep 2026” appears three times. The five lines you sent have no date, the thread is from July, and 22 Sep is the day of my Dana notes. <mark>I could see that “Tue” was wrong, but I can't see a wrong date in the right format.</mark> The Rebook ops row says “Confirmed by Dana, 29 Sep”, but I re-checked with her on 8 Oct, and Maya's “(since the 2024 portal change)” isn't there. And the header still says gpt-5.6-terra and “Kept in this browser only”, so the notice didn't notice, again.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q4</span><span>After you clicked “I checked” on d4, what changed?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The cell, and only the cell. It now says “Load 48213, checked by you 25 Sep 2026 · Dana to confirm”. That's “you” again, Dana's name on a job she won't be here to do after today, and a date I didn't check it on, since I checked on 2 Oct. Open question three still asks whether 48213 was a TONU fee, settled by “ops lead”, which means Maya alone again, and Dana's list still has the TONU line. <mark>One click, three places it should land, and it landed in one.</mark> And there's still only a yes button.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>What would you still retype before the 27 Oct review, and how long would it take?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The three 22 Sep sources take two minutes, because it's Slack search for July. Splitting the row into two credited rows with a load each takes two more, since I have the loads from Maya's question. The Rebook date and Maya's wording, the TONU source, the Code row's source and deleting question three come to about two minutes together, and cutting the events takes thirty seconds. That's about seven minutes, against eight yesterday and ten before that. <mark>Yesterday's eight were formatting I'd spot anyway. Today's seven are content, and I only find those by reading every cell against my notes.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>Look at d5, the paste. Is that how you'd put it in the RFC? What order, and what's missing?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Settle-by, then the table, then the open questions is the order the section reads on the 27th: the deadline, what we've written down, and what we need from the room. The events don't belong in the glossary, because my RFC has them in section 3. So last is right, since that's the part I cut and move. What's missing is an “as of” date. <mark>“Settle by” tells finance when it's due, not when it was true, and they'll read it twelve days after I paste it.</mark> And “Guess: The tender goes to another carrier” can't go into section 3 as it is.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>The split row</h3><span class="aside">safe to show finance?</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q7</span><span>“Ops is split on lane changes… to settle at the 27 Oct review.” Is that row safe to show finance? When did finance last see an internal disagreement in a doc, and what happened?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The last time was the May write-up of our second double-invoice P2. It had one line, “Ops and engineering disagree on whether a rebook keeps the invoice”, and the finance controller's only comment was “Who decides, and by when?” Nobody answered for three weeks, so finance added a manual check on every rebooked load's invoice, and Maya's team still does about forty a week. <mark>Finance doesn't mind a disagreement. It minds one with no owner, and it fixes that with a control.</mark> This row has the when and the where, which the P2 line didn't, so it's safer than that, and much safer than yesterday's bracket.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q8</span><span>Does Maya's new role change that?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Yes: from today, Dana's side has nobody in the room on the 27th, and Maya is both one view and half the pair that settles it. I'd still keep the pair, because the controller is in it and it happens in a room, not a DM. “One view says rebook, another says amend” is also wrong: Dana's sheet says a lane change is a new booking, and “amend” was my 22 Sep note, the one Dana corrected. <mark>After today the only thing that speaks for Dana's side is the document, so the row has to name it.</mark> I'd make it two rows, each with one load: “Ops, current practice (since the 2024 portal change)” and “Dana's 2019 sheet, carrier contract reading”. And “Split, to settle at the 27 Oct review” is a status, not a source, because nothing in your five lines mentions a lane.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>The Guess label</h3><span class="aside">the Code row</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q9</span><span>The Code row says “Guess”. Will you check it? Does “Guess” read as honest or as sloppy to finance, or to Marcus?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I already have. I read <code>rebook!</code> on 6 Oct, and the guess is right, so on my screen “Guess” did its job: I stopped and compared instead of nodding. Marcus would be fine with it, since earlier this year his only questions on my ticket spreadsheet were about the two rows in the “not sure” column. Finance is different: “Guess” on the one row about the code behind the double invoices reads as “engineering doesn't know its own code”, which is the P2 again. <mark>“Guess” is honest on my screen and sloppy in their doc.</mark> Give me the TONU button on it, “I checked: <code>rebook!</code>, 6 Oct”, and if I copy with a guess still in, tell me how many are left.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>The lines for Dana</h3><span class="aside">her last day</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q10</span><span>Dana gets a neutral “rebook or amendment?” and the TONU check. Are those the right two? Would she answer them by Slack DM?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Neither. She answered the TONU question on Monday, and it's in Slack: “yes, truck was there, that's TONU.” “Rebook or amendment?” isn't neutral: it gives her two answers and hers is neither, and after today it's a question for the 27th, not for her. What I need from Dana today is the one thing nobody can give me tomorrow: which clause of the carrier contract makes a lane change a new booking. She'd answer that by DM before lunch, because she's answered my short lines for four years and it's her side of the split. <mark>For someone who's leaving, ask for sources, not opinions.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q11</span><span>What's the one change that would make you paste this without touching it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Let it write only what I gave it. A date that isn't in my paste becomes “date?”, a meaning from code I didn't send says Guess, and when I fill a blank, it changes everywhere: the cell, the question and the line for Dana. <mark>Then the seven minutes go on filling blanks it shows me, instead of hunting for mistakes it hides.</mark> I'd still ask for the split rows and the plain-text copy, but that's the change that stops me reading every cell.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">#6 implications</h2>
+      <span class="label">Result · acceptance check · checked against table-v3.html</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Copy</span><div><h3>The clipboard carries the whole section in both formats</h3><div class="where">#6</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Copy table writes the same section as HTML and as plain text.</dd></div>
+          <div><dt>Check</dt><dd>Each payload contains, in order, “Settle by 27 Oct 2026”, “As of &lt;today&gt;”, the table, all open questions and the events. The <code>text/html</code> payload has exactly 1 <code>&lt;table&gt;</code>. The <code>text/plain</code> header contains “Source” (0 × “Status”), plus one row per on-screen row.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Dates</span><div><h3>No made-up dates in Source</h3><div class="where">#6 · depends on #4</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>A date appears only if it was in the input or she typed it. Otherwise the cell says “date?”.</dd></div>
+          <div><dt>Check</dt><dd>Given the five-line demo thread, 0 Source cells contain a date she didn't type. After she types “2 Oct 2026” on the TONU row, that date appears exactly once, in that cell.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Check</span><div><h3>A check updates everything that depends on it</h3><div class="where">#6 · #4</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>“I checked” changes the cell, removes the matching open question and drops the matching expert line. It has a no path.</dd></div>
+          <div><dt>Check</dt><dd>After a check on load 48213 dated 2 Oct 2026, the Source reads “Load 48213, checked 2 Oct 2026” with 0 × “you” and 0 × “to confirm”. 0 open questions and 0 expert lines mention 48213. “No” records “no truck sent” and adds 1 open question.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Split</span><div><h3>A split exports as credited rows</h3><div class="where">#6 · B05</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Each side of an open split is its own row, credited to a practice or a document, with a load.</dd></div>
+          <div><dt>Check</dt><dd>At least 2 rows under the term, each with a named Team value and a load ID. 0 cells contain “one view” or “another”. The matching open question names at least 2 roles and a forum.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Guess</span><div><h3>Guesses are counted before they leave</h3><div class="where">#6 · #58</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Copy warns about any rows that are still guesses. Checking a row replaces the guess.</dd></div>
+          <div><dt>Check</dt><dd>With at least 1 Guess row, Copy shows “N rows are still guesses” before writing. After the Code row is checked, the payload contains 0 × “Guess”.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Owner</span><div><h3>No single-holder owners</h3><div class="where">#6</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Every open question is settled by a joint role, or a role plus a forum.</dd></div>
+          <div><dt>Check</dt><dd>Each question's “who settles” names at least 2 roles, or 1 role plus a forum. “ops lead, before 27 Oct” fails.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 06 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>Did Dana send the contract clause before she left? Did it make it into her row?</li>
+      <li>On 27 Oct, what did finance do with the two ops rows: settle it, ask for an owner, or add a control?</li>
+      <li>Did anyone read the “as of” date or a Source date, or ask where a date came from?</li>
+      <li>Did Marcus open the Code row? What did he ask?</li>
+      <li>Tonight's small run on Maya's comments: what did the coach ask, and did you use it?</li>
+      <li>A real finance controller: when an RFC shows two definitions with a review date, what do you do before the meeting?</li>
+      <li>A real practitioner: when a tool fills in a date for you, do you check it?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Exploration 03c is a design concept, not shipped software, and its rows come from a five-line demo thread. Findings about dates, the check and the plain-text payload were checked against <code>table-v3.html</code>. Every point here is a hypothesis until a real practitioner confirms it.
+  </footer>
+
+</main>
