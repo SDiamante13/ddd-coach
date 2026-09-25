@@ -47,7 +47,17 @@ function ReplyPart({ block }: { block: ReplyBlock }) {
           {CUT_SHORT_NOTE}
         </p>
       );
+    case "citation":
+      return <Citation title={block.title} />;
     case "text":
       return <p>{block.text}</p>;
   }
+}
+
+function Citation({ title }: { title: string }) {
+  return (
+    <p className="citation">
+      <span className="citation-label">Source</span> <cite>Evans, Domain-Driven Design Reference (2015), "{title}"</cite>
+    </p>
+  );
 }

@@ -1,4 +1,5 @@
 import type { Exchange } from "../domain/exchange.ts";
+import { CITATION } from "../shared/replyLayout.ts";
 
 type Shown = (text: string) => string;
 
@@ -10,5 +11,11 @@ export function conversationText(exchanges: readonly Exchange[], shown: Shown = 
 
 function turnText(exchange: Exchange, shown: Shown): string {
   const you = `You: ${shown(exchange.prompt)}`;
-  return exchange.status === "replied" ? `${you}\nCoach: ${shown(exchange.reply)}` : you;
+  return exchange.status === "replied" ? `${you}\nCoach: ${shown(withoutCitations(exchange.reply))}` : you;
 }
+
+const withoutCitations = (reply: string): string =>
+  reply
+    .split("\n")
+    .filter((line) => !CITATION.test(line.trim()))
+    .join("\n");

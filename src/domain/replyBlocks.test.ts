@@ -56,6 +56,12 @@ describe("parseReply", () => {
     ]);
   });
 
+  it("reads a Source line as a citation of the Reference section it names (#58)", () => {
+    expect(parseReply('Source: Evans, Domain-Driven Design Reference (2015), "Bounded Context".')).toEqual([
+      { kind: "citation", title: "Bounded Context" },
+    ]);
+  });
+
   it("keeps a line outside the layout as text", () => {
     expect(parseReply("Hi! Paste a thread when you have one.")).toEqual([{ kind: "text", text: "Hi! Paste a thread when you have one." }]);
   });
@@ -111,6 +117,7 @@ describe("parseReply", () => {
       "Question for the ops lead: For load 48213, which count includes it?",
       'From thread: "carrier billed TONU on orig load"',
       CUT_SHORT_NOTE,
+      'Source: Evans, Domain-Driven Design Reference (2015), "Context Map".',
       "",
     ];
     const freeLine = fc.string({ minLength: 1 }).map((text) => `note ${text.replace(/[\r\n]/g, " ")}`.trim());

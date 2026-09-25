@@ -1,5 +1,5 @@
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
-import { EVENTS_HEADING, QUESTION, SOURCE_QUOTE, WORDS_HEADING } from "../shared/replyLayout.ts";
+import { CITATION, EVENTS_HEADING, QUESTION, SOURCE_QUOTE, WORDS_HEADING } from "../shared/replyLayout.ts";
 
 export type Source = "From thread" | "Guess";
 export type Claim = { source: Source; text: string };
@@ -10,6 +10,7 @@ export type ReplyBlock =
   | { kind: "words"; rows: WordRow[] }
   | { kind: "question"; roles: string; text: string; sources: string[] }
   | { kind: "cut" }
+  | { kind: "citation"; title: string }
   | { kind: "text"; text: string };
 
 const QUOTED_WORD = /^["“](.+)["”]$/;
@@ -42,6 +43,8 @@ function openedBy(line: string): ReplyBlock | null {
   if (line === EVENTS_HEADING) return { kind: "events", items: [] };
   if (line === WORDS_HEADING) return { kind: "words", rows: [] };
   if (line === CUT_SHORT_NOTE) return { kind: "cut" };
+  const citation = CITATION.exec(line)?.[1];
+  if (citation !== undefined) return { kind: "citation", title: citation };
   return null;
 }
 

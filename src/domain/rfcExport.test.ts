@@ -107,6 +107,14 @@ describe("toMarkdown escaping", () => {
   });
 });
 
+describe("rfcDocument", () => {
+  it("never carries a book citation into the RFC copy, even when the reply has one (#58)", () => {
+    const cited = `${WORDS}\nSource: Evans, Domain-Driven Design Reference (2015), "Bounded Context".`;
+
+    expect(markdownOf(cited)).not.toContain("Domain-Driven Design Reference");
+  });
+});
+
 describe("copiedMessage", () => {
   it.each([
     [0, "Copied for your RFC."],
