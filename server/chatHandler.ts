@@ -24,6 +24,8 @@ import {
 export type CoachFailure = { name: string; statusCode: number | undefined };
 export type CoachFailureLog = (failure: CoachFailure) => void;
 
+const MISSED_DEADLINE: CoachFailure = { name: "Timeout", statusCode: undefined };
+
 type CoachCallDeps = { deadlineMs: number; log: CoachFailureLog };
 type ReplyDeps = CoachCallDeps & { signer: TurnSigner };
 
@@ -86,7 +88,9 @@ async function replyFrom(
   { deadlineMs, log, signer }: ReplyDeps,
 ): Promise<Response> {
   try {
-    return replied(await withDeadline(coach.reply(conversation), deadlineMs), conversation.prompt, signer);
+    const reply = await withDeadline(coach.reply(conversation), deadlineMs);
+    if (reply === TIMED_OUT) log(MISSED_DEADLINE);
+    return replied(reply, conversation.prompt, signer);
   } catch (error) {
     log(failureOf(error));
     return error instanceof CoachOutOfCredit ? coachOutOfCredit() : coachUnavailable();

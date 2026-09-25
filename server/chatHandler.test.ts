@@ -247,6 +247,16 @@ describe("chat handler", () => {
     expect(await response.json()).toEqual({ error: "The coach took too long. Try a shorter question or Retry." });
   });
 
+  it("logs a missed deadline as a Timeout", async () => {
+    const silentCoach = (): Coach => ({ reply: () => new Promise<string>(() => {}) });
+    const log = vi.fn<CoachFailureLog>();
+    const handle = handler({ createCoach: silentCoach, deadlineMs: 10, log });
+
+    await handle(postMessage("Hello coach"));
+
+    expect(log).toHaveBeenCalledWith({ name: "Timeout", statusCode: undefined });
+  });
+
   it("fails with a 502 when the coach's reply is blank", async () => {
     const blankCoach = (): Coach => ({ reply: async () => "  " });
     const handle = handler({ createCoach: blankCoach });
