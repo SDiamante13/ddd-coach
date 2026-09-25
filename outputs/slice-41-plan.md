@@ -135,7 +135,7 @@ Steven sets it himself, so the value never enters chat, the transcript, or a com
 2. Tick **"Contains secret values"**, choose different values per deploy context, and fill **Production only**. Leave deploy previews and branch deploys empty; drafts already fail at `OPENROUTER_API_KEY` (2a).
 3. Tell navigator "set". The deployer redeploys, because env changes need a redeploy, and runs the slice 2a Step C filter with `ACCESS_PASSWORD` added to the key list. It prints `set`/`absent` only.
 
-Post-conference rotation is the same steps with a new value, then a redeploy. Secret values can't be read back in the UI, so Steven keeps the passphrase where he keeps the slide.
+Rotation (only on abuse) is the same steps with a new value, then a redeploy. Secret values can't be read back in the UI, so Steven keeps the passphrase where he keeps the slide.
 
 **Passphrase advice (for Steven):**
 - Use three unrelated lowercase words joined by hyphens, easy to put on a slide, that appear nowhere in the app or repo text. For example "tidal-lantern-quartz", but not that one.
