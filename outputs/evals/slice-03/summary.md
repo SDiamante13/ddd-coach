@@ -218,6 +218,29 @@ It's **below #78's n ≥ 6 per fixture per arm** (n=3 per arm), accepted because
 - 7231d43 briefly made a nonce line the quality default, citing "as hosted first turns do". That was wrong: the hosted app never adds one. The next commit reverted it.
 - **#77 must be re-judged without nonces.** Its hosted 0/2 F2 runs had a nonce line that the deployer prepended to the paste. That model-visible extra line may itself have caused the split-label drift.
 
+## Ship rule (#78)
+
+A prompt version ships only through the paired A/B:
+
+```
+OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none \
+  npm run eval -- --ab <candidate> [--live <N>] [--runs <n>] --target <fixture[:check]>,…
+```
+
+- **Arms.** The candidate is `coach-instructions.v<candidate>.txt`; live is `--live`, defaulting to `LIVE_INSTRUCTIONS_VERSION` in `server/eval/promptVersions.ts` (bump it in the commit that records a ship). Each snapshot is sent as the system message exactly as `chat.mts` sends it, and each fixture as a visitor pastes it, with no nonce. A stale current snapshot stops the run: run `npm test` first.
+- **Conditions.** All 7 fixtures, n ≥ 6 runs per fixture per arm (`--runs` below 6 is refused), interleaved: live then candidate on odd runs, candidate then live on even runs. Model and effort come from the command's env and are recorded in the result. A failed call is retried once; a second failure aborts the run with no verdict, and missing runs are never scored.
+- **Ships when both hold:**
+  1. the named target gains at least 2 runs, candidate against live (`fixture` alone counts runs with no gating hard failure; `fixture:check` counts that check);
+  2. no gating (fixture, check) drops by more than one run. Gating: every hard check except "same meaning not split", plus attribution, split, Code line and question spans the thread.
+- **Reported only, never gating:** "same meaning not split", sameMeaningNamed, jointRoles, forum and the other soft scores. The summary also prints the total drop across fixtures; it doesn't gate.
+- **No `--target`, no verdict.** Counts are always x/n. The single-arm `npm run eval` is a diagnostic ("Every run clean"), not a ship verdict.
+- **Budget.** About $0.34 per 7-fixture A/B at n=6 on terra (≈ $0.51 uncached); stop if a run passes $1.20. Every result's `.md` ends with its budget line.
+- **Answer-key guard.** Each A/B JSON records every fixture's key sha256. `node server/eval/rescore.ts <ab.json>` re-scores both arms at $0 with the current checks and keys, recomputes the verdict and prints "Keys changed since this run: …". A key change that turns a fail into a pass gets its own commit with its reason, and the latest A/B's `rescore` output goes into this file.
+
+## Re-score after #78's check fixes (2026-09-25, $0)
+
+#78 fixes two false negatives from #63: `invites a thread` counts a non-negated "paste" alone, and share, drop, send or bring followed by "here", "below" or "in the box"; `mentionsNonce` also catches the nonce's clock time or date in the reply's own format, unless the thread contains it. `node server/eval/rescore.ts outputs/evals/slice-03/2026-09-25-openai-gpt-5-6-terra-v8.json` gives output identical to before the fixes: non-thread 9/9, thread failures unchanged (F1 r2 split labels, F2 r2 code guess, F3 r1 holders).
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.
