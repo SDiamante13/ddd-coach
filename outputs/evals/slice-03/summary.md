@@ -213,7 +213,10 @@ It's **below #78's n ≥ 6 per fixture per arm** (n=3 per arm), accepted because
 
 **Conditions (#77):**
 - Prompt assembly matches production. Both `measure` and `netlify/functions/chat.mts` build the coach with `createOpenRouterCoach(config, coachInstructions())`, with no reference block.
-- These runs were **not** nonce'd: the fixture text went in as is, while hosted first turns carried a nonce line. From the next commit, nonce'd first turns are the eval default for thread fixtures. There's been no paid run under it yet.
+- These runs sent each fixture exactly as a visitor would paste it. That's the right condition for quality: real visitors never send a nonce, and OpenRouter's prompt caching changes only latency and cost, never the output.
+- A nonce belongs only in the latency spike, which needs uncached first turns.
+- 7231d43 briefly made a nonce line the quality default, citing "as hosted first turns do". That was wrong: the hosted app never adds one. The next commit reverted it.
+- **#77 must be re-judged without nonces.** Its hosted 0/2 F2 runs had a nonce line that the deployer prepended to the paste. That model-visible extra line may itself have caused the split-label drift.
 
 ## Limits
 

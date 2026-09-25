@@ -1,8 +1,7 @@
-import { randomUUID } from "node:crypto";
 import type { CoachConfig } from "../config.ts";
 import type { ChatClient } from "../openRouterCoach.ts";
 import { verifiedConversationOf } from "../test/conversations.ts";
-import { FIXTURE_NAMES, firstTurnOf, loadFixture } from "./fixtures.ts";
+import { FIXTURE_NAMES, loadFixture } from "./fixtures.ts";
 import { measure, repeat, type Measured } from "./measure.ts";
 import { scoreReply, type Fixture } from "./replyChecks.ts";
 import { shipBar, type ScoredRun } from "./shipBar.ts";
@@ -19,7 +18,7 @@ export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: n
 }
 
 async function scoredRun(config: CoachConfig, chat: ChatClient, name: string, fixture: Fixture, index: number): Promise<EvalRun> {
-  const firstTurn = verifiedConversationOf(firstTurnOf(fixture, randomUUID().slice(0, 8)));
-  const measured = await measure(config, chat, `${name} ${index}`, firstTurn);
+  const asPasted = verifiedConversationOf(fixture.thread.trim());
+  const measured = await measure(config, chat, `${name} ${index}`, asPasted);
   return { ...measured, fixture: name, ...scoreReply(measured.reply, measured.finishReason, fixture) };
 }
