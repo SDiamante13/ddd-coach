@@ -35,14 +35,16 @@ Spec: the issue body of #4 (the source of truth). Also #44 (complete sentence), 
 - `server/openRouterCoach.smoke.test.ts` runs in `npm test` only when the OpenRouter vars are in the shell. It asks for "Reply with one word." and the code word PELICAN. **Under a coaching prompt, an off-topic code-word test is fragile.** Change it to a domain memory check (test 12).
 
 **Model (`GET https://openrouter.ai/api/v1/models`, 2026-09-25, no key):**
-- **Slice 3 model: `openai/gpt-6-luna` at effort `none`** (Steven, 2026-09-25, after the latency gate): $0.10/M prompt, $0.50/M completion, reasoning optional. The gate and the eval run on it. `gpt-5.6-luna`, below, was the first choice. The catalog check that day gave:
+- **Production model: `openai/gpt-5.6-terra` at effort `none` with prompt v4** (Steven, 2026-09-25, after the eval). It's the only model that meets the ship bar (`outputs/evals/slice-03/summary.md`).
+- **Local dev model: `openai/gpt-6-luna` at effort `none`**: $0.10/M prompt, $0.50/M completion, reasoning optional. It's cheap and passes the latency gate, but misses the ship bar on names and split teams.
+- History: the first choice was `openai/gpt-5.6-luna`. The catalog check that day gave:
   - prices: **$0.20/M prompt, $1.20/M completion**, $0.02/M cache read, $0.25/M cache write, 10× cheaper than terra;
   - context: 1.05M tokens;
   - reasoning: optional (`default_enabled: true`, `default_effort: "medium"`), and `none` is supported. Keep `OPENROUTER_REASONING_EFFORT=none`;
   - the same `supported_parameters` as terra (`response_format`, `structured_outputs`, `seed`; no `temperature`).
 
   Every estimate below is costed for luna.
-- `openai/gpt-5.6-terra` (production until this slice's deploy; used for comparison only):
+- `openai/gpt-5.6-terra` (production before and after this slice; see the production model above):
   - prices: $2/M prompt, **$12/M completion**, $0.20/M cache read, $2.50/M cache write;
   - context: 1.05M tokens;
   - reasoning: `default_enabled: true`, `default_effort: "medium"`, and `none` is supported. Production sets `OPENROUTER_REASONING_EFFORT=none` (2a demo), so no reasoning tokens eat the cap;
@@ -234,7 +236,7 @@ This meets both halves of #44's acceptance in text form: a visible marker plus a
 
 **Measure before building the rest (test step 7 is a gate).** The builder, or the deployer, since the run reads `.env`, runs `npm run eval -- --latency`:
 - fixture F1 (the 20k-char thread) as a first turn;
-- with the current prompt, against `openai/gpt-6-luna` at effort `none` with the 1,000 cap (first run on `gpt-5.6-luna`; both are in `outputs/evals/slice-03/latency.md`);
+- with the current prompt, at effort `none` with the 1,000 cap, on production's `openai/gpt-5.6-terra` and dev's `openai/gpt-6-luna` (the first run was on `gpt-5.6-luna`; all three are in `outputs/evals/slice-03/latency.md`);
 - **5 runs**, one after another.
 
 It records per run:
@@ -455,7 +457,7 @@ Each method stays ≤ 25 lines. `coachInstructions` is a `SECTIONS` array joined
 
 ## Demo script (verifier, hosted)
 
-After `bin/check.sh` is green, the eval summary is committed, and the deployer has deployed to production (`https://ddd-coach.netlify.app`, with `OPENROUTER_MODEL=openai/gpt-6-luna` and `OPENROUTER_REASONING_EFFORT=none`). Use `agent-browser --session verifier`. Record `$PWD/outputs/demos/slice-03.webm` in a desktop context (1280×800), with a caption banner per step. Install the pass-through fetch spy with the **ms column** (agent-team.md). Put F1's text into the page from the verifier's scratchpad copy of `server/eval/fixtures/booking-split.txt`, using eval (`textarea` value + `input` event).
+After `bin/check.sh` is green, the eval summary is committed, and the deployer has deployed to production (`https://ddd-coach.netlify.app`, with `OPENROUTER_MODEL=openai/gpt-5.6-terra` and `OPENROUTER_REASONING_EFFORT=none`). Use `agent-browser --session verifier`. Record `$PWD/outputs/demos/slice-03.webm` in a desktop context (1280×800), with a caption banner per step. Install the pass-through fetch spy with the **ms column** (agent-team.md). Put F1's text into the page from the verifier's scratchpad copy of `server/eval/fixtures/booking-split.txt`, using eval (`textarea` value + `input` event).
 
 1. Open the site. Caption: "Slice 3 (#4): paste a messy thread, see where people disagree." The first visit shows the new purpose line.
 2. Fill F1 (20,000 chars). The count reads "20,000 / 24,000 characters"; Send is enabled. Caption: "A 20k Slack thread, line breaks and all."
@@ -504,7 +506,7 @@ Convert to `slice-03.mp4` + `.gif` as in agent-team.md.
 
 ## Approved (2026-09-25, Steven + team-lead)
 
-- The model is `openai/gpt-5.6-luna` at effort `none`, locally and in production (the deployer sets the production env at the next deploy). **Superseded the same day: `openai/gpt-6-luna` at effort `none`** (Steven, after the gate).
+- The model is `openai/gpt-5.6-luna` at effort `none`, locally and in production (the deployer sets the production env at the next deploy). **Superseded the same day:** `openai/gpt-6-luna` at effort `none` for local dev, and **`openai/gpt-5.6-terra` at effort `none` with prompt v4 for production** (Steven, after the eval).
 - Eval spend is approved (a few dollars at most, far less on luna). The deployer runs the latency gate and the eval, reading `.env` in the redacted way.
 - (a) A free-text fixed layout. (b) `maxCompletionTokens` 1,000. (c) A body cap of about 391 KiB derived from the 64k conversation cap. (d) The text cut-short note partly satisfies #44, which stays open for a UI marker. (e) The prompt choices are accepted.
 - "Try an example thread" is out of this slice. The PO decides whether it gets its own issue.
