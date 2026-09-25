@@ -2,7 +2,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
-import { V10_GREETING_REPLY, V10_THREAD_REPLIES } from "../test/v10Replies.ts";
+import { V10_GREETING_REPLY, V10_THREAD_REPLIES, V11_REPLY_WITH_SOURCES } from "../test/v10Replies.ts";
 import { parseReply, type ReplyBlock } from "./replyBlocks.ts";
 
 describe("parseReply", () => {
@@ -35,7 +35,24 @@ describe("parseReply", () => {
     const reply = "Question for the ops lead and the finance controller, at the 27 Oct review: For load 48213, which count includes the new row?";
 
     expect(parseReply(reply)).toEqual([
-      { kind: "question", roles: "the ops lead and the finance controller, at the 27 Oct review", text: "For load 48213, which count includes the new row?" },
+      { kind: "question", roles: "the ops lead and the finance controller, at the 27 Oct review", text: "For load 48213, which count includes the new row?", sources: [] },
+    ]);
+  });
+
+  it("reads the lines under the question as the question's sources (#85)", () => {
+    const reply = [
+      "Question for the ops lead: For load 48213, which count includes the new row?",
+      'From thread: "carrier billed TONU on orig load, then hauled the new one"',
+      'From thread: "finance only needs one invoice per shipment that actually moves"',
+    ].join("\n");
+
+    expect(parseReply(reply)).toEqual([
+      {
+        kind: "question",
+        roles: "the ops lead",
+        text: "For load 48213, which count includes the new row?",
+        sources: ["carrier billed TONU on orig load, then hauled the new one", "finance only needs one invoice per shipment that actually moves"],
+      },
     ]);
   });
 
@@ -92,6 +109,7 @@ describe("parseReply", () => {
       "- From thread: Ops (night shift) means every change.",
       "- Guess: Code counts both rows.",
       "Question for the ops lead: For load 48213, which count includes it?",
+      'From thread: "carrier billed TONU on orig load"',
       CUT_SHORT_NOTE,
       "",
     ];
@@ -106,6 +124,8 @@ describe("parseReply", () => {
           return 1 + block.rows.reduce((sum, row) => sum + 1 + row.meanings.length, 0);
         case "text":
           return block.text.split("\n").length;
+        case "question":
+          return 1 + block.sources.length;
         default:
           return 1;
       }
@@ -117,6 +137,7 @@ describe("parseReply", () => {
           const blocks = parseReply(lines.join("\n"));
           expect(blocks.reduce((sum, block) => sum + linesIn(block), 0)).toBe(lines.filter((line) => line !== "").length);
         }),
+        { numRuns: 500 },
       );
     });
 
@@ -126,6 +147,7 @@ describe("parseReply", () => {
           const texts = parseReply(lines.join("\n")).flatMap((block) => (block.kind === "text" ? block.text.split("\n") : []));
           expect(texts.filter((line) => line.startsWith("note"))).toEqual(lines.filter((line) => line.startsWith("note")));
         }),
+        { numRuns: 500 },
       );
     });
   });
@@ -133,6 +155,12 @@ describe("parseReply", () => {
   describe("real v10 replies", () => {
     it.each(Object.entries(V10_THREAD_REPLIES))("parse %s into events, words and the question with nothing left over", (_fixture, reply) => {
       expect(parseReply(reply).map((block) => block.kind)).toEqual(["events", "words", "question"]);
+    });
+
+    it("parse a v11 reply's two source lines into its question (#85)", () => {
+      const question = parseReply(V11_REPLY_WITH_SOURCES).at(-1);
+
+      expect(question?.kind === "question" ? question.sources : []).toHaveLength(2);
     });
 
     it("parse a greeting as text only", () => {

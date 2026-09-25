@@ -1,5 +1,5 @@
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
-import { EVENTS_HEADING, QUESTION, WORDS_HEADING } from "../shared/replyLayout.ts";
+import { EVENTS_HEADING, QUESTION, SOURCE_QUOTE, WORDS_HEADING } from "../shared/replyLayout.ts";
 
 export type Source = "From thread" | "Guess";
 export type Claim = { source: Source; text: string };
@@ -8,7 +8,7 @@ export type WordRow = { word: string; meanings: Meaning[] };
 export type ReplyBlock =
   | { kind: "events"; items: Claim[] }
   | { kind: "words"; rows: WordRow[] }
-  | { kind: "question"; roles: string; text: string }
+  | { kind: "question"; roles: string; text: string; sources: string[] }
   | { kind: "cut" }
   | { kind: "text"; text: string };
 
@@ -38,7 +38,7 @@ function withLine(blocks: ReplyBlock[], line: string, previous: string): ReplyBl
 
 function openedBy(line: string): ReplyBlock | null {
   const question = QUESTION.exec(line);
-  if (question) return { kind: "question", roles: question[1]!, text: question[2]! };
+  if (question) return { kind: "question", roles: question[1]!, text: question[2]!, sources: [] };
   if (line === EVENTS_HEADING) return { kind: "events", items: [] };
   if (line === WORDS_HEADING) return { kind: "words", rows: [] };
   if (line === CUT_SHORT_NOTE) return { kind: "cut" };
@@ -48,7 +48,13 @@ function openedBy(line: string): ReplyBlock | null {
 function joinedTo(block: ReplyBlock, line: string): ReplyBlock | null {
   if (block.kind === "events") return withEvent(block.items, line);
   if (block.kind === "words") return withWordLine(block.rows, line);
+  if (block.kind === "question") return withSource(block, line);
   return null;
+}
+
+function withSource(question: Extract<ReplyBlock, { kind: "question" }>, line: string): ReplyBlock | null {
+  const source = SOURCE_QUOTE.exec(line)?.[1];
+  return source === undefined ? null : { ...question, sources: [...question.sources, source] };
 }
 
 function withEvent(items: Claim[], line: string): ReplyBlock | null {
