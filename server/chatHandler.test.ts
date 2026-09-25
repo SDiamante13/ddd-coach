@@ -7,8 +7,8 @@ import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { MAX_MESSAGE_CHARS } from "./chatRequest.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
+import { signedTurn, TEST_SIGNING_KEY } from "./test/conversations.ts";
 
-const TEST_SIGNING_KEY = "test-signing-key-0123456789abcdefghijklmnop";
 const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key", model: "test/model" } };
 
 type HandlerOverrides = {
@@ -32,10 +32,6 @@ function handler(overrides: HandlerOverrides = {}) {
 
 function echoCoach(): Coach {
   return { reply: vi.fn(async ({ prompt }: Conversation) => `Echo: ${prompt}`) };
-}
-
-function signedTurn(prompt: string, reply: string) {
-  return { prompt, reply, signature: createTurnSigner(TEST_SIGNING_KEY).sign({ prompt, reply }) };
 }
 
 function post(body: string): Request {

@@ -2,13 +2,10 @@
 import { describe, expect, it } from "vitest";
 import { conversationOf } from "../src/test/conversations.ts";
 import { createTurnSigner, verifyConversation } from "./turnSignature.ts";
+import { signedTurn, TEST_SIGNING_KEY } from "./test/conversations.ts";
 
-const signer = createTurnSigner("test-signing-key-0123456789abcdefghijklmnop");
+const signer = createTurnSigner(TEST_SIGNING_KEY);
 const BASE64URL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-
-function signedTurn(prompt: string, reply: string) {
-  return { prompt, reply, signature: signer.sign({ prompt, reply }) };
-}
 
 function withSignature(signature: string) {
   return { ...signedTurn("A", "R1"), signature };
