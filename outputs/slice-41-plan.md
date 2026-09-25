@@ -369,3 +369,5 @@ Part B, locally, fail closed: `ACCESS_PASSWORD= npm run dev` gives unlock 500 an
 6. **For Steven:**
    - **Passphrase:** three random lowercase words joined by hyphens, not a DDD term, and nowhere in the repo, so a future remote build doesn't fail secrets scanning. Rotate after the conference.
    - **Before the conference, set an OpenRouter credit limit:** about $50, ideally on a dedicated hosting key. The estimate is $25–50 for 100 people × 20 turns.
+
+**Rotation (90-day pass):** change `ACCESS_PASSWORD` in the Netlify UI after the conference, then redeploy. The password is part of the cookie MAC, so every existing pass stops working at once.

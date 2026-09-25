@@ -37,6 +37,7 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 - Injected overlays (captions, spy panels) need `pointer-events:none` and body padding so they don't hide results or catch clicks.
 - Mid-script, use CSS selectors or `form.requestSubmit()` instead of `@eN` refs, which go stale. Avoid `wait --fn` (it hangs past the tool timeout).
 - Always give `screenshot` an absolute path: a relative path lands in the repo root.
+- `network route` needs the full URL (`http://localhost:8888/api/session`); a `**/path` glob silently matches nothing. Run `tmux -S /tmp/tmux-$(id -u)/default …` directly, not through a shell variable, because zsh doesn't word-split it.
 - If screenshots hang, run `agent-browser --session <agent> close` first. Wrap each command in `timeout 60` so a hang can't stall the take.
 - `click` doesn't check what's covering the target. A button under the sticky composer (e.g. a new entry's refusal actions) gets its click on the composer instead. Use `focus <selector>` + `press Enter`, which also exercises the scroll padding, or scroll first.
 - Run a rate-limit burst truly last. Afterwards every POST returns 429 for about 60 s, even oversized ones.
