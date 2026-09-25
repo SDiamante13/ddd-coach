@@ -170,6 +170,15 @@ form .row {
   font-size: var(--text-xs);
 }
 
+.count {
+  margin-left: auto;
+  font-family: var(--font-label);
+}
+
+.count.near {
+  color: var(--color-warn);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

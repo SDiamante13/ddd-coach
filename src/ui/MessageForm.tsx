@@ -49,7 +49,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
           Send
         </button>
       </div>
-      <DraftFoot keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
+      <DraftFoot length={draft.length} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
     </form>
   );
 }

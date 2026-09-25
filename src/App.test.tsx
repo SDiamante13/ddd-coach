@@ -90,6 +90,27 @@ describe("Connection test", () => {
     expect(screen.queryByText(/Enter sends/)).not.toBeInTheDocument();
   });
 
+  it("shows no character count below 80% of the limit", async () => {
+    const { user, input } = renderApp();
+
+    await user.click(input());
+    await user.paste("M".repeat(MAX_MESSAGE_CHARS * 0.8 - 1));
+
+    expect(screen.queryByText(/characters$/)).not.toBeInTheDocument();
+  });
+
+  it("shows the character count once a draft reaches 80% of the limit", async () => {
+    const { user, input } = renderApp();
+    const nearLimit = MAX_MESSAGE_CHARS * 0.8;
+
+    await user.click(input());
+    await user.paste("M".repeat(nearLimit));
+
+    expect(
+      screen.getByText(`${formatCount(nearLimit)} / ${formatCount(MAX_MESSAGE_CHARS)} characters`),
+    ).toBeVisible();
+  });
+
   it("starts with the message input focused and an empty log", () => {
     const { input, log } = renderApp();
 
