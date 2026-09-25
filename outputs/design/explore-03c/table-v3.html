@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glossary table v3</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;width:1280px;height:800px;overflow:hidden;position:relative;font:var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper)}
+button{font:inherit;cursor:pointer}
+header{height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:var(--color-surface);border-bottom:1px solid var(--color-line)}
+.brand{font:700 19px/1 var(--font-display);letter-spacing:-.02em}
+.notice{font-size:12px;color:var(--color-ink-muted);max-width:640px;line-height:1.35;text-align:right}
+.wrap{display:grid;grid-template-columns:800px 480px;height:744px}
+.left{padding:24px 28px;display:flex;flex-direction:column;gap:14px;background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1.2px,transparent 1.4px);background-size:24px 24px;overflow:hidden}
+.right{padding:22px 24px;background:var(--color-surface);border-left:1px solid var(--color-line);display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.lab{font:500 var(--text-sm)/1 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-ink-muted)}
+h2{margin:0;font:700 22px/1.1 var(--font-display);letter-spacing:-.02em}
+.btn{min-height:44px;padding:0 18px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);background:var(--color-surface);color:var(--color-ink);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.primary{background:var(--color-coach);border-color:var(--color-coach);color:var(--color-on-coach)}
+textarea,input[type=text]{width:100%;border:1px solid var(--color-line-strong);border-radius:var(--radius-md);background:#fff;font:400 13px/1.55 var(--font-label);color:var(--color-ink);padding:12px 14px;resize:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:14px;background:var(--color-surface-sunken);border:1px solid var(--color-line);font:500 12px/1 var(--font-label)}
+.chip.new{border-color:var(--color-coach);background:var(--color-coach-tint)}
+mark{background:#FDE6C4;color:inherit;border-radius:3px;padding:0 2px}
+.pre{white-space:pre-wrap;font:400 12.5px/1.6 var(--font-label);padding:12px 14px;border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-line);max-height:300px;overflow:hidden}
+table.terms{width:100%;border-collapse:separate;border-spacing:0;background:var(--color-surface);border:1px solid var(--color-line);border-radius:var(--radius-md);overflow:hidden;font-size:14px}
+.terms th{text-align:left;font:500 var(--text-sm)/1 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-ink-muted);padding:10px 12px;border-bottom:1px solid var(--color-line);background:var(--color-surface-sunken)}
+.terms td{padding:9px 12px;border-bottom:1px solid var(--color-line);vertical-align:top}
+.terms tr:last-child td{border-bottom:0}
+.terms td.term{font:700 16px/1.2 var(--font-display)}
+.status{font:500 12px/1.3 var(--font-label);color:var(--color-ink-muted)}
+.status.ok{color:var(--color-ok)}
+.status.unc{color:#8a5a10}
+.split{display:inline-block;margin-top:4px;font:500 11px/1 var(--font-label);color:#8a2a45;background:#FBEFF2;border:1px solid #EFC6D1;padding:3px 6px;border-radius:6px}
+.row-in{animation:rowin .4s var(--ease-out)}
+@keyframes rowin{from{opacity:0;transform:translateY(4px)}}
+.next{padding:14px 16px;border-radius:var(--radius-md);background:var(--color-coach-tint);border:1px solid #C5D0EC;display:flex;flex-direction:column;gap:10px}
+.lines{display:flex;flex-direction:column;gap:8px}
+.yn{padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--color-line);background:#fff;font-size:14px}
+.yn b{font-family:var(--font-label);font-weight:500;color:var(--color-coach);margin-right:6px}
+.doc{position:absolute;left:28px;top:70px;width:744px;height:710px;background:#fff;border:1px solid var(--color-line-strong);border-radius:12px;box-shadow:var(--shadow-float);padding:20px 24px;display:none;flex-direction:column;gap:10px}
+.doc.show{display:flex}
+.doc h3{margin:0;font:600 20px/1.2 var(--font-body)}
+.doc table{border-collapse:collapse;width:100%;font-size:14px}
+.doc th,.doc td{border:1px solid #c9c9c9;padding:6px 10px;text-align:left}
+.doc th{background:#f4f5f7}
+.toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);padding:10px 18px;border-radius:22px;background:var(--color-ink);color:var(--color-surface);font-size:14px;opacity:0;transition:opacity .3s;z-index:9}
+.toast.show{opacity:1}
+.hide{display:none!important}
+.steps{position:absolute;left:16px;bottom:12px;display:flex;gap:6px;z-index:8}
+.steps span{font:500 11px/1 var(--font-label);letter-spacing:.06em;padding:7px 10px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink-muted)}
+.steps span.on{background:var(--color-coach);border-color:var(--color-coach);color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:16px"><div class="brand">DDD Coach</div><div style="width:1px;height:22px;background:var(--color-line)"></div><div style="font-size:14px">Eazy Freight · what is a booking?</div></div>
+  <div class="notice">Where your text goes: OpenRouter routes it to OpenAI (openai/gpt-5.6-terra). Kept in this browser only. Don't paste customer names, rates, lanes or contract terms. Your swaps run in this browser before anything is sent.</div>
+</header>
+<div class="wrap">
+  <section class="left" id="left">
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><div class="lab">GLOSSARY · WORDS THAT DON'T MATCH</div><div style="font-size:14px;font-weight:600;color:var(--color-warn)">Settle by 27 Oct 2026 (finance review)</div></div>
+    <table class="terms" id="terms">
+      <thead><tr><th style="width:120px">Term</th><th style="width:120px">Team</th><th>Meaning</th><th style="width:200px">Source</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="openq" class="hide" style="display:flex;flex-direction:column;gap:6px"><div class="lab">OPEN QUESTIONS · WHO SETTLES IT</div><ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.5"><li>On a lane change, is it a rebook or an amendment? · ops lead and finance controller, at the 27 Oct review</li><li>Should the database keep the booking id on a rebook? · engineering, with the finance controller</li><li>Was load 48213's second invoice a TONU fee? · ops lead, before 27 Oct</li></ul></div>
+    <div id="leftActions" class="hide" style="display:flex;gap:10px;align-items:center"><button class="btn primary" id="copyTable">Copy table</button><span style="font-size:13px;color:var(--color-ink-muted)">Pastes as a real table. Plain-text editors get Markdown.</span></div>
+    <div class="doc" id="doc"><div class="lab">YOUR RFC · GLOSSARY SECTION (ANY RICH-TEXT EDITOR)</div><h3>4. Glossary</h3><div id="docBody" contenteditable="true" style="outline:none;overflow:auto;font-size:13px"></div></div>
+  </section>
+  <aside class="right" id="right">
+    <div id="p1">
+      <div class="lab" style="color:var(--color-coach)">BEFORE ANYTHING IS SENT</div>
+      <h2 style="margin:6px 0 12px">Your swaps</h2>
+      <div class="chips" id="chips"><span class="chip">Maya → Ops</span><span class="chip">Tom → Finance</span><span class="chip">Ravi → Carriers</span></div>
+      <div style="display:flex;gap:8px;margin-top:10px"><label class="lab" for="swap" style="align-self:center;white-space:nowrap">ADD</label><input type="text" id="swap" placeholder="Acme Foods → Customer A"><button class="btn" id="add">Add</button></div>
+      <div style="margin-top:10px;font-size:12.5px;line-height:1.45;color:var(--color-ink-muted)">Swaps hide the words you list. They don't make an unapproved vendor approved, and they won't catch rates, lanes or load IDs you haven't listed.</div>
+      <div style="display:flex;gap:10px;margin-top:12px"><button class="btn" id="preview">Show what's sent</button><button class="btn primary" id="send">Send</button></div>
+      <div class="pre hide" id="out" style="margin-top:12px"></div>
+    </div>
+    <div id="p2" class="hide" style="display:flex;flex-direction:column;gap:14px">
+      <div class="lab" style="color:var(--color-coach)">ONE NEXT STEP</div>
+      <div class="next" id="next"><div style="font-weight:600">Look up load 48213 in your own system: had the first carrier already sent a truck?</div><div style="font-size:13px;color:var(--color-ink-muted)">This settles TONU without spending Dana's time.</div><div style="display:flex;gap:8px"><button class="btn primary" id="done">I checked: yes, a truck was sent</button></div></div>
+      <button class="btn" id="draft" disabled style="opacity:.5">Draft yes/no lines for Dana</button>
+      <div id="p3" class="hide" style="display:flex;flex-direction:column;gap:10px">
+        <div class="lab">FOR DANA · SHORT ANSWERS · YOU SEND IT</div>
+        <div class="lines">
+          <div class="yn"><b>ONE WORD</b>On a lane change: rebook or amendment?</div>
+                    <div class="yn"><b>Y/N</b>Load 48213's second invoice was a TONU fee, because the first carrier had already sent a truck.</div>
+        </div>
+        <button class="btn primary" id="copyYN" style="align-self:flex-start">Copy for Slack</button>
+      </div>
+    </div>
+  </aside>
+</div>
+<div class="toast" id="toast"></div>
+<div class="steps" aria-hidden="true"><span id="s1" class="on">1 What leaves</span><span id="s2">2 Table</span><span id="s3">3 Next step</span><span id="s4">4 Into the RFC</span></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const step = (n) => [1, 2, 3, 4].forEach((i) => $("s" + i).classList.toggle("on", i === n));
+const toast = async (t) => { $("toast").textContent = t; $("toast").classList.add("show"); await wait(1600); $("toast").classList.remove("show"); };
+const THREAD = `Maya (ops): a booking exists the moment Acme Foods hits submit in the portal
+Tom (finance): not for us. it's a booking once it's invoiceable, so carrier confirmed and rate locked
+Ravi (carriers): the EDI mapping calls the tender a "booking"
+Maya (ops): load 48213 got rejected tue, we rebooked with another carrier. not a new booking
+Tom (finance): finance sees a rebook as cancel + new booking. Acme Foods got two invoices`;
+const swaps = [["Maya", "Ops"], ["Tom", "Finance"], ["Ravi", "Carriers"]];
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function outgoing() {
+  let html = esc(THREAD);
+  for (const [from, to] of swaps) html = html.split(from).join(`<mark>${to}</mark>`);
+  return html;
+}
+$("add").onclick = () => {
+  const v = $("swap").value.split("→").map((s) => s.trim());
+  if (v.length !== 2 || !v[0]) return;
+  swaps.push(v); $("chips").insertAdjacentHTML("beforeend", `<span class="chip new">${esc(v[0])} → ${esc(v[1])}</span>`); $("swap").value = "";
+  if (!$("out").classList.contains("hide")) $("out").innerHTML = outgoing();
+};
+$("preview").onclick = () => { $("out").innerHTML = outgoing(); $("out").classList.remove("hide"); };
+const ROWS = [
+  ["Booking", "Ops", "The customer submitted a request", "Slack #booking-split, 22 Sep 2026"],
+  ["", "Finance", "Carrier confirmed and rate locked", "Slack #booking-split, 22 Sep 2026"],
+  ["", "Carriers", "The tender sent to a carrier", "EDI mapping, as carriers described it"],
+  ["Rebook", "Ops", "Same booking, new carrier", "Confirmed by Dana, 29 Sep 2026", "ok"],
+  ["", "Ops", "Open: on a lane change, one view says rebook, another says amend", "Split, to settle at the 27 Oct review", "unc"],
+  ["", "Finance", "Cancel plus a new booking", "Slack #booking-split, 22 Sep 2026"],
+  ["", "Code", "Guess: the screen keeps the booking; the database writes a new one", "Guess (no code was sent)", "unc"],
+  ["TONU", "Ops", "A fee when the first carrier already sent a truck", "My notes from Dana, 22 Sep 2026 (unconfirmed)", "unc"],
+];
+const QUESTIONS = [
+  "On a lane change, is it a rebook or an amendment? · ops lead and finance controller, at the 27 Oct review",
+  "Should the database keep the booking id on a rebook? · engineering, with the finance controller",
+  "Was load 48213's second invoice a TONU fee? · ops lead, before 27 Oct",
+];
+const EVENTS = [
+  ["From thread", "A customer submits a booking in the portal"],
+  ["From thread", "The tender goes to a carrier"],
+  ["From thread", "The carrier rejects load 48213"],
+  ["Guess", "The tender goes to another carrier"],
+  ["From thread", "The carrier confirms and the rate is locked"],
+];
+function rowHtml([term, team, meaning, status, cls]) {
+  return `<tr class="row-in"><td class="term">${term}</td><td>${team}</td><td>${meaning}</td><td class="status ${cls || ""}">${status}</td></tr>`;
+}
+$("send").onclick = async () => {
+  step(2); $("p1").classList.add("hide");
+  for (const r of ROWS) { $("tbody").insertAdjacentHTML("beforeend", rowHtml(r)); await wait(260); }
+  $("openq").classList.remove("hide"); $("leftActions").classList.remove("hide"); $("p2").classList.remove("hide"); step(3);
+};
+$("done").onclick = async () => {
+  const cell = [...$("tbody").querySelectorAll("tr")][7].lastElementChild;
+  ROWS[7][3] = "Load 48213, checked by you 25 Sep 2026 · Dana to confirm"; ROWS[7][4] = "ok";
+  cell.textContent = ROWS[7][3]; cell.className = "status ok";
+  $("next").innerHTML = `<div style="font-weight:600">Checked: load 48213 had a truck dispatched.</div><div style="font-size:13px;color:var(--color-ink-muted)">TONU now rests on a real case. Dana only needs a yes or no.</div>`;
+  $("draft").disabled = false; $("draft").style.opacity = 1;
+};
+$("draft").onclick = () => { $("p3").classList.remove("hide"); $("draft").classList.add("hide"); };
+$("copyYN").onclick = () => toast("Copied 2 yes/no lines, only for what's still open. Paste them to Dana yourself.");
+function tableHtml() {
+  const rows = ROWS.map(([t, team, m, src]) => `<tr><td>${t}</td><td>${team}</td><td>${m}</td><td>${src}</td></tr>`).join("");
+  const qs = QUESTIONS.map((q) => `<li>${q}</li>`).join("");
+  const ev = EVENTS.map(([src, e]) => `<li>${src === "Guess" ? "Guess: " : ""}${e}</li>`).join("");
+  return `<p><strong>Settle by 27 Oct 2026 (finance review).</strong></p><table><thead><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table><p><strong>Open questions</strong></p><ul>${qs}</ul><p><strong>Events, in order</strong></p><ol>${ev}</ol>`;
+}
+$("copyTable").onclick = async () => {
+  step(4);
+  const html = tableHtml();
+  try { await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob(["| Term | Team | Meaning | Status |"], { type: "text/plain" }) })]); } catch (e) {}
+  await toast("Copied the settle-by date, table, open questions and events.");
+  $("doc").classList.add("show"); await wait(700);
+  $("docBody").innerHTML = html;
+};
+
+window.runTo = async (n) => {
+  const click = (id) => document.getElementById(id).click();
+  if (n >= 2) { click("preview"); $("swap").value = "Acme Foods → Customer A"; click("add"); }
+  if (n >= 3) { await $("send").onclick(); }
+  if (n >= 4) { click("done"); click("draft"); }
+  if (n >= 5) { await $("copyTable").onclick(); }
+};
+const demoState = +new URLSearchParams(location.search).get("state") || 0;
+if (demoState) runTo(demoState);
+</script>
+</body>
+</html>
