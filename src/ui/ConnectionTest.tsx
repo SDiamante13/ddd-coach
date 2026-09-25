@@ -28,7 +28,7 @@ export function ConnectionTest() {
         ))}
       </ol>
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send}>
-        {exchanges.length > 0 && <NewConversation onClear={clear} />}
+        {exchanges.length > 0 && <NewConversation busy={busy} onClear={clear} />}
       </MessageForm>
     </>
   );

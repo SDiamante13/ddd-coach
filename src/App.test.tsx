@@ -530,6 +530,19 @@ describe("Connection test", () => {
     expect(screen.getByRole("button", { name: "New conversation" })).toHaveFocus();
   });
 
+  it("lets the conversation be cleared only once no reply is pending", async () => {
+    const { server, user, send, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+
+    const pending = await send("B");
+
+    expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled();
+    server.reply(pending, 200, { reply: "R2", signature: "sig-B" });
+    await within(screen.getByRole("log")).findByText("R2");
+    expect(screen.getByRole("button", { name: "Clear" })).toBeEnabled();
+  });
+
   it("shows HTML in a reply as literal text", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();

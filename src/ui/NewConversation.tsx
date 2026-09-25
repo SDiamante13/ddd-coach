@@ -2,7 +2,7 @@ import { useState, type MouseEvent } from "react";
 
 type Step = "offered" | "confirming" | "kept";
 
-export function NewConversation({ onClear }: { onClear: () => void }) {
+export function NewConversation({ busy, onClear }: { busy: boolean; onClear: () => void }) {
   const [step, setStep] = useState<Step>("offered");
 
   function clear(event: MouseEvent<HTMLButtonElement>) {
@@ -21,7 +21,7 @@ export function NewConversation({ onClear }: { onClear: () => void }) {
   return (
     <span className="confirm">
       Clear this conversation?
-      <button type="button" onClick={clear}>
+      <button type="button" disabled={busy} onClick={clear}>
         Clear
       </button>
       <button type="button" autoFocus onClick={() => setStep("kept")}>
