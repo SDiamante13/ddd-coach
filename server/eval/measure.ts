@@ -3,9 +3,8 @@ import { coachInstructions } from "../coachInstructions.ts";
 import type { CoachConfig } from "../config.ts";
 import { createOpenRouterCoach, type ChatClient } from "../openRouterCoach.ts";
 import type { VerifiedConversation } from "../turnSignature.ts";
-import { recordingChat, type CallRecord } from "./recordingChat.ts";
+import { recordingChat, type CallRecord, type Overrides } from "./recordingChat.ts";
 
-type Overrides = Parameters<typeof recordingChat>[1];
 export type Measured = CallRecord & { label: string; prompt: Prompt; reply: string };
 
 export async function measure(

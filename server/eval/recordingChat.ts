@@ -13,7 +13,7 @@ export type CallRecord = {
   finishReason: string | null;
 };
 
-type Overrides = Partial<Pick<ChatRequest, "maxCompletionTokens" | "stream">>;
+export type Overrides = Partial<Pick<ChatRequest, "maxCompletionTokens" | "stream">>;
 
 export function recordingChat(chat: ChatClient, overrides: Overrides = {}) {
   const records: CallRecord[] = [];
@@ -33,11 +33,12 @@ function streamable(request: ChatRequest): ChatRequest {
 }
 
 type Collected = ChatResult & { firstTokenMs?: number };
+type FinishReason = ChatResult["choices"][number]["finishReason"];
 
 async function collect(stream: EventStream<ChatStreamChunk>, startedAt: number): Promise<Collected> {
   let text = "";
   let firstTokenMs: number | undefined;
-  let finishReason: ChatResult["choices"][number]["finishReason"] = null;
+  let finishReason: FinishReason = null;
   let usage: ChatUsage | undefined;
   for await (const chunk of stream) {
     const choice = chunk.choices[0];
@@ -49,7 +50,7 @@ async function collect(stream: EventStream<ChatStreamChunk>, startedAt: number):
   return { ...emptyResult(text, finishReason), usage, firstTokenMs };
 }
 
-function emptyResult(content: string, finishReason: ChatResult["choices"][number]["finishReason"]): ChatResult {
+function emptyResult(content: string, finishReason: FinishReason): ChatResult {
   const message = { role: "assistant" as const, content };
   return { id: "", created: 0, model: "", object: "chat.completion", systemFingerprint: null, choices: [{ index: 0, finishReason, message }] };
 }
