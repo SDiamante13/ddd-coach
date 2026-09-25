@@ -15,3 +15,14 @@ export function median(values: readonly number[]): number {
   const middle = sorted.length % 2 === 0 ? sorted.slice(upper - 1, upper + 1) : sorted.slice(upper, upper + 1);
   return middle.length === 0 ? 0 : middle.reduce((sum, value) => sum + value, 0) / middle.length;
 }
+
+const NONCE_WORDING = "Pasted at";
+
+export function nonceLine(pastedAt: Date): string {
+  return `(${NONCE_WORDING} ${pastedAt.toISOString()}.)`;
+}
+
+export function mentionsNonce(reply: string, pastedAt: Date): boolean {
+  const text = reply.toLowerCase();
+  return text.includes(pastedAt.toISOString().toLowerCase()) || text.includes(NONCE_WORDING.toLowerCase());
+}

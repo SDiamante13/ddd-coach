@@ -30,7 +30,7 @@ function describeRun({ model, reasoningEffort }: CoachConfig) {
 
 async function runLatency(config: CoachConfig, chat: OpenRouter["chat"]): Promise<void> {
   const spike = await latencySpike(config, chat, loadFixture("booking-split").thread);
-  console.log(JSON.stringify(spike.verdict));
+  console.log(JSON.stringify({ ...spike.verdict, nonceMentions: spike.nonceMentions }));
   const record = { ...describeRun(config), ...spike, calls: spike.calls.map(recordable) };
   writeResult(`latency-${today()}-${slugOf(config)}.json`, asJson(record));
 }
