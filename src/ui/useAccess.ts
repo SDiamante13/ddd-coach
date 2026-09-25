@@ -6,13 +6,12 @@ export type Unlock = (password: string) => Promise<UnlockResult>;
 
 export function useAccess() {
   const [access, setAccess] = useState<AccessState>("checking");
+  const refresh = () => void checkAccess().then(setAccess);
   const recheck = () => {
     setAccess("checking");
-    void checkAccess().then(setAccess);
+    refresh();
   };
-  useEffect(() => {
-    void checkAccess().then(setAccess);
-  }, []);
+  useEffect(refresh, []);
   const tryUnlock: Unlock = async (password) => {
     const result = await unlock(password);
     if (result.ok) setAccess("open");
