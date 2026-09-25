@@ -1,11 +1,12 @@
 import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
-import { formatCount, type DraftLimit } from "./draftLimit.ts";
+import { draftLimit, formatCount, type DraftLimit } from "./draftLimit.ts";
 
 const KEY_HINT = "Enter sends · Shift+Enter adds a line";
 
-type DraftFootProps = { length: number; limit: DraftLimit; keyHint: boolean; hintId: string; limitId: string };
+type DraftFootProps = { length: number; keyHint: boolean; hintId: string; limitId: string };
 
-export function DraftFoot({ length, limit, keyHint, hintId, limitId }: DraftFootProps) {
+export function DraftFoot({ length, keyHint, hintId, limitId }: DraftFootProps) {
+  const limit = draftLimit(length, MAX_MESSAGE_CHARS);
   return (
     <>
       {limit === "over" && <OverLimitAlert length={length} />}
