@@ -1,5 +1,7 @@
 # Slice 08 (#8, P1): stream replies into the entry
 
+**Status: parked (re-ranked below #56, #64, #6 and #58).** The plan is complete as written; no section is unfinished. Re-check the verified facts against main before building, since #58 and #6 will have moved the code and latency.
+
 The spec is issue #8's body, rewritten after spike #79. This plan adds the verified facts, the wire format, the decisions, the test order and the demo.
 
 In one line: the coach's reply appears word by word within about 2 s instead of after a 9–21 s blank. A reply that would pass the 25 s budget arrives as a signed partial marked cut short, not a 504.
