@@ -62,11 +62,14 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   4. After using it, can she name or reuse one move herself? This is a light check that learning actually happened, not just a preference.
 - Tooling: `agent-browser` and headed Chrome screenshots hang on this machine. Use `npx -y playwright@1.63.0 screenshot --channel chrome …` (headless) over `python3 -m http.server`.
 
-## Queued for interview 08 (trigger: the next slice demo, likely #77)
+## Queued for interview 08 (trigger: the #85 / prompt v11 slice demo)
 
 - **#77 group-named views (U2), from real replies.** Does the plain "Ops" ambiguity go away? Are the group names in her words?
 - **#85:** the question shows its two source lines. Does that make it checkable, and does it change what she copies?
 - The new hard checks: does every real run's question name a concrete case? Does any "should X or Y" ruling slip through?
 - Build order after #77 (from the PO): #56 sanitizing → #64 structured reply → #6 export → #58 knowledge base → #8 streaming. Test each deployed slice with the solo ICP.
+- **The PO's option-B probe:** in a real reply where Ops is split on some words, a plain "Ops" line appears where the groups genuinely agree (e.g. booking = the portal submission). Does she read it correctly as all of Ops, or does it confuse her next to the named groups? This decides prompt option B (always name the groups once a team is split). Use a real reply if one exists; otherwise note that it was constructed.
+- **#56 swaps (live):** does the swap list cut her ~15 minutes of sanitizing? Is it built from past behavior on her real thread?
+- **#66 scroll fix (live):** after sending, a reply or a failed-send alert with Retry comes into view.
 - **Length check:** on a 400+ word v8 reply, ask "Where did you stop reading?" and "Where's the question?" Interview 06 says length is fine without advice, but it was never probed directly.
 - #70 (a real practitioner with a real thread) remains the top research ask. Don't spend its questions on the persona.
