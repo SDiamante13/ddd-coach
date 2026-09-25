@@ -32,6 +32,25 @@ Raw data: `latency-2026-09-25-openai-gpt-5-6-terra.json`.
 - **Cache:** v4's system prompt (about 1,430 tokens) is cached across first turns. The follow-up read 7,048 of 7,524 prompt tokens from cache (94%).
 - **Cost:** a 20k first turn costs about $0.020, and a cached follow-up about $0.004. The spike cost $0.19, most of it in the three uncached-paste probes.
 
+## `openai/gpt-5.6-terra`, effort `low` (#73 trial; prompt v6)
+
+Raw data: `latency-2026-09-25-openai-gpt-5-6-terra-effort-low.json`. Nonce'd 20k first turns, as above.
+
+| Call | Wall ms | Completion | Reasoning | finishReason |
+|---|---|---|---|---|
+| run 1 | 17,987 | 925 | 461 | stop |
+| run 2 | 21,186 | **1,000** | 681 | **length** |
+| run 3 | 8,981 | 504 | 0 | stop |
+| run 4 | 7,607 | 479 | 0 | stop |
+| run 5 | 7,695 | 475 | 0 | stop |
+| stream 1 | 8,231 | 491 | 0 | stop |
+| stream 2 | 19,936 | **1,000** | 578 | **length** |
+| follow-up | 3,649 | 115 | 0 | stop |
+
+- **First turn:** median 8,981 ms, max 21,186 ms. The gate's verdict doesn't fire (15 s median, 22 s any run), but the max is 0.8 s under the run limit and 3.8 s under the 25 s deadline.
+- **The cap:** reasoning tokens count toward the 1,000 cap. When terra reasons (3 of 7 full first turns), it spends 461–681 tokens thinking. 2 of 7 replies were cut at the cap (`length`), so a visitor would see a reply cut short.
+- **Cost:** $0.208 for the spike.
+
 ## `openai/gpt-6-luna`, effort `none` (local dev model; prompt v3)
 
 Raw data: `latency-2026-09-25-openai-gpt-6-luna.json`.

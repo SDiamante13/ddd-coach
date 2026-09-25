@@ -139,6 +139,28 @@ F3's "Customers see…" passes, because the key allows Customers (U1). The inter
 
 v7's remaining attribution miss is F1 r1, "Ops means every non-CANCELLED row in the dashboard, including old REBOOKED rows and new rows". The line never names Code, so it still counts as a miss. It's a judgment call: Ops's count really does include the rows the code creates.
 
+## Effort `low` on terra (Steven's call after v7)
+
+| Run | Hard | Attribution | Below 3/3 | Hard failures | finishReason | Median / max ms | Cost $ | Summary |
+|---|---|---|---|---|---|---|---|---|
+| v6, low | 5/9 | 9/9 | F1 same meaning named 1/3 | same meaning not split ×3 (F1), holders ×1 (F3) | 9 stop | 9,556 / 18,574 | 0.090 | [low v6](2026-09-25-openai-gpt-5-6-terra-effort-low-v6.md) |
+| v7, low | 6/9 | 9/9 | F1 split 0/3, Code line 2/3, question spans 0/3 | F1 ×3 cut at the cap: parses, one question, complete ending, question asks | F1 3× **length** (761–799 reasoning), others stop | 18,461 / 21,595 | 0.106 | [low v7](2026-09-25-openai-gpt-5-6-terra-effort-low-v7.md) |
+
+The rows are re-scored with the key fixes below.
+- **Low doesn't fix "hold".** Low v6 still splits it in 3/3 runs, e.g. "Ops (view A) means “waiting on customer,” rather than hold." / "Ops (view B) means a booking waiting on the customer."
+- **Low spends the cap on reasoning.**
+  - F2 used 466–516 reasoning tokens (up to 936 of 1,000) and took about 18 s.
+  - v7's F1 replies spent 761–799 on reasoning and were all cut at 1,000.
+  - In the latency spike (`latency.md`), 2 of 7 20k first turns were cut, with a max of 21.2 s.
+  - More `maxCompletionTokens` headroom is an option, but the cap is unchanged.
+- **Low v7 F2 and F3 are clean in every run**, including the F2 split.
+
+**Key fixes from the low runs (cited):**
+- F2 `codeDescribed` += "dashboard". Low v6 F2 r2 wrote "From thread: Code counts REBOOKED rows twice on the dashboard.", which is notes line 23.
+- F3 `teams` += "Customer". Low v6 F3 r2 wrote "From thread: Customer sees Confirmed on the portal…", the customers' view that U1 allows. "Customer-facing portal shows…" still fails holders.
+
+With these, the none rows re-score the same, apart from v5 F3 (holders ×2 stays).
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.
