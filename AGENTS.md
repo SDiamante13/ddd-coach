@@ -1,0 +1,51 @@
+# AGENTS.md — repo map
+
+A map of where things live. Rules and guidelines live in the files it points to.
+
+## Product & planning
+- `outputs/SESSION-HANDOFF.md` — orientation and latest decisions (its workspace path is stale; the repo root is the workspace)
+- `outputs/ddd-coach-plan.html` — interactive roadmap; stable slice IDs `1, 2, 2a, 3 … 13`
+- `outputs/generative-coach-direction.md` — shared modeling board and voice direction
+- `outputs/ddd-coach-backlog.md` — B-numbered candidates and the promotion rule
+- `outputs/slice-01-plan.md`, `slice-01b-plan.md`, `slice-02-plan.md` — per-slice plans (acceptance criteria, test order, demo script)
+
+## Decisions
+- No ADR directory yet.
+- Decisions live in the slice plans: "Stack decision" (slice 01), "Design notes" (slice 01b), "Decisions" (slice 02).
+
+## Team & workflow
+- `outputs/agent-team.md` — archetypes, slice loop, demo recording, screenshot rules
+- User-level skills used by the loop (in `~/.claude/skills`): `tdd`, `sweep`, `commit`, `agent-browser`, `story-planner`
+
+## Domain / DDD references
+- `outputs/ddd-research.md` — DDD research
+- `outputs/ddd-domain-analysis.md` — domain analysis
+- `outputs/ddd-analysis-sensor.md` — dev-only DDD analysis sensor
+- `outputs/ddd-analysis-review.md` — review of the analysis (stale)
+
+## Demos
+- `outputs/demos/` — `slice-NN.mp4`, `.gif`, `.md` report, `.png` screenshots
+
+## Code
+- `src/domain/` — exchange and conversation types and pure rules
+- `src/api/` — `askCoach` browser client for `/api/chat`
+- `src/shared/` — chat contract and JSON helpers shared by client and server
+- `src/ui/` — React components and the `useExchanges` hook
+- `src/test/` — Vitest setup and fetch stub
+- `src/App.tsx`, `src/main.tsx` — app shell and entry
+- `server/` — chat handler, config, deadline, `Coach` port and OpenRouter adapter
+- `netlify/functions/chat.mts` — Netlify Function wiring config and coach into the handler
+- `bin/check.sh` — runs test, typecheck and build; prints output only on failure
+- `work/` — one-off plan-editing scripts
+
+## Commands
+- `npm run dev` — `netlify dev` on :8888, proxying Vite on :5180
+- `npm test` — Vitest (smoke test runs only when OpenRouter vars are in the environment)
+- `npm run typecheck` — `tsc --noEmit`
+- `npm run build` — Vite build to `dist/`
+- `bin/check.sh` — full pre-commit gate
+
+## Hard constraints (details in the docs above)
+- Never read or print `.env`; `.env.example` lists the variable names.
+- Secrets stay server-side (`server/`, `netlify/functions/`), never in `src/`.
+- Commits go through the committer agent.
