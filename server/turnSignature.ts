@@ -1,5 +1,6 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac } from "node:crypto";
 import type { Conversation } from "../src/domain/conversation.ts";
+import { sameText } from "./constantTime.ts";
 
 export type VerifiedConversation = Conversation & { readonly __brand: "VerifiedConversation" };
 export type SignableTurn = { prompt: string; reply: string };
@@ -17,10 +18,4 @@ export function createTurnSigner(key: string): TurnSigner {
 export function verifyConversation(signer: TurnSigner, conversation: Conversation): VerifiedConversation | null {
   const trusted = conversation.history.every((turn) => signer.verifies(turn));
   return trusted ? (conversation as VerifiedConversation) : null;
-}
-
-function sameText(actual: string, expected: string): boolean {
-  const actualBytes = Buffer.from(actual);
-  const expectedBytes = Buffer.from(expected);
-  return actualBytes.length === expectedBytes.length && timingSafeEqual(actualBytes, expectedBytes);
 }
