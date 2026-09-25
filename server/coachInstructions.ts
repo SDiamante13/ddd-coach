@@ -1,4 +1,4 @@
-export const COACH_INSTRUCTIONS_VERSION = 1;
+export const COACH_INSTRUCTIONS_VERSION = 2;
 
 const lines = (...texts: string[]): string => texts.join("\n");
 const paragraphs = (...texts: string[]): string => texts.join("\n\n");
@@ -12,8 +12,8 @@ const REPLY_SHAPE = paragraphs(
   `Part 1. A line "Events, in order", then up to 5 numbered lines, earliest first. Each is one short sentence, in the thread's own words, about something that happens in the business. Choose the events the disagreement turns on and leave out the rest.`,
   lines(
     `Part 2. A line "Words that don't match", then up to 4 words that people use with different meanings. For each, put the word in double quotes on its own line, then one line per meaning starting with "- ". Each meaning line names who holds that meaning, then gives it in one sentence.`,
-    `- Name teams, never people: Ops, Finance, Carriers, or whatever the thread calls them. Work out someone's team only from what the thread says about them or their work. If you can't tell, write "Team unclear".`,
-    `- When people on the same team disagree, give each view its own line: "Ops (view A)", "Ops (view B)".`,
+    `- Name teams, never people: Ops, Finance, Carriers, or whatever the thread calls them. Never write a person's name, even when the thread or notes give a view to someone by name, as in "Dana: …" or "(Tom)". Work out someone's team only from what the thread says about them or their work. If you can't tell, write "Team unclear".`,
+    `- When people on the same team disagree, give each view its own line: "Ops (view A)", "Ops (view B)". Use these labels even when the thread names groups inside the team, such as a day desk and a night shift: they are views within one team, not separate teams.`,
     `- When the thread shows what the code or database does, add a line for "Code".`,
     `If no word is used in different ways, say so in one line.`,
   ),
