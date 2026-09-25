@@ -19,6 +19,10 @@ describe("latencyVerdict", () => {
     });
   });
 
+  it("takes the median of an even count as the mean of the middle two", () => {
+    expect(latencyVerdict([4_000, 1_000, 3_000, 2_000]).medianMs).toBe(2_500);
+  });
+
   it("pulls streaming ahead when any first turn is over 22 s", () => {
     expect(latencyVerdict([5_000, 5_000, 22_001, 5_000, 5_000]).pullStreamingAhead).toBe(true);
   });

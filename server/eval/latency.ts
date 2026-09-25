@@ -11,5 +11,7 @@ export function latencyVerdict(firstTurnMs: readonly number[]): LatencyVerdict {
 
 export function median(values: readonly number[]): number {
   const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.floor(sorted.length / 2)] ?? 0;
+  const upper = Math.floor(sorted.length / 2);
+  const middle = sorted.length % 2 === 0 ? sorted.slice(upper - 1, upper + 1) : sorted.slice(upper, upper + 1);
+  return middle.length === 0 ? 0 : middle.reduce((sum, value) => sum + value, 0) / middle.length;
 }
