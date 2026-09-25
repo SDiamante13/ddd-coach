@@ -11,7 +11,7 @@ const PASS_FORMAT = /^(\d{1,12})\.([A-Za-z0-9_-]{43})$/;
 
 export function createAccessPass(key: string, password: string): AccessPass {
   const macOf = (exp: string): string =>
-    createHmac("sha256", key).update(JSON.stringify([ACCESS_TAG, exp, password])).digest("base64url");
+    createHmac("sha256", key).update(JSON.stringify([ACCESS_TAG, exp, canonicalPassword(password)])).digest("base64url");
   const issue = (now: Date): string => {
     const exp = String(secondsOf(now) + ACCESS_MAX_AGE_S);
     return `${ACCESS_COOKIE}=${exp}.${macOf(exp)}; ${COOKIE_ATTRIBUTES}`;
@@ -37,7 +37,11 @@ export function cookieValue(cookieHeader: string | null, name: string): string |
 }
 
 export function passwordMatches(given: string, expected: string): boolean {
-  return timingSafeEqual(sha256Of(given.trim()), sha256Of(expected));
+  return timingSafeEqual(sha256Of(canonicalPassword(given)), sha256Of(canonicalPassword(expected)));
+}
+
+export function canonicalPassword(text: string): string {
+  return text.normalize("NFKC").trim().toLowerCase();
 }
 
 function sha256Of(text: string): Buffer {

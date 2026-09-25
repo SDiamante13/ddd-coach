@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ACCESS_BAD_REQUEST, ACCESS_WRONG_PASSWORD } from "../src/shared/accessContract.ts";
 import { createAccessPass } from "./accessPass.ts";
 import type { AccessPasswordResult, SigningKeyResult } from "./config.ts";
-import { cookieOf, JUST_EXPIRED_ISSUE, NOW, TEST_ACCESS_PASSWORD } from "./test/access.ts";
+import { cookieOf, fullWidthOf, JUST_EXPIRED_ISSUE, NOW, TEST_ACCESS_PASSWORD } from "./test/access.ts";
 import { TEST_SIGNING_KEY } from "./test/conversations.ts";
 import { createSessionHandler, createUnlockHandler } from "./accessHandlers.ts";
 
@@ -57,7 +57,6 @@ describe("unlock handler", () => {
 
   it.each([
     ["a wrong password", "not-the-password"],
-    ["the password in another case", TEST_ACCESS_PASSWORD.toUpperCase()],
     ["a blank password", "   "],
   ])("refuses %s without setting a cookie", async (_case, password) => {
     const response = await unlockHandler()(postPassword(password));
@@ -67,10 +66,15 @@ describe("unlock handler", () => {
     expect(response.headers.get("Set-Cookie")).toBeNull();
   });
 
-  it("ignores spaces around the right password", async () => {
-    const response = await unlockHandler()(postPassword(`  ${TEST_ACCESS_PASSWORD}  `));
+  it.each([
+    ["the right password in another case", TEST_ACCESS_PASSWORD.toUpperCase()],
+    ["the right password in full-width characters", fullWidthOf(TEST_ACCESS_PASSWORD)],
+    ["the right password with spaces around it", `  ${TEST_ACCESS_PASSWORD}  `],
+  ])("unlocks with %s", async (_case, password) => {
+    const response = await unlockHandler()(postPassword(password));
 
     expect(response.status).toBe(204);
+    expect(response.headers.get("Set-Cookie")).toMatch(/^coach_access=/);
   });
 
   it.each([

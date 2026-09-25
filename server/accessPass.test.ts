@@ -1,7 +1,8 @@
 // @vitest-environment node
+import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { createAccessPass, passwordMatches } from "./accessPass.ts";
-import { cookieOf, NOW, OTHER_SIGNING_KEY, TEST_ACCESS_PASSWORD } from "./test/access.ts";
+import { cookieOf, fullWidthOf, NOW, OTHER_SIGNING_KEY, TEST_ACCESS_PASSWORD } from "./test/access.ts";
 import { TEST_SIGNING_KEY } from "./test/conversations.ts";
 import { createTurnSigner } from "./turnSignature.ts";
 
@@ -66,6 +67,20 @@ describe("access pass", () => {
     expect(pass.admits(`x${issued}`, NOW)).toBe(false);
   });
 
+  it("signs a lowercase password exactly as before, so passes issued before case stopped counting still admit", () => {
+    const macBefore = createHmac("sha256", TEST_SIGNING_KEY)
+      .update(JSON.stringify(["ddd-coach/access/v1", String(EXP), TEST_ACCESS_PASSWORD]))
+      .digest("base64url");
+
+    expect(issued).toBe(`coach_access=${EXP}.${macBefore}`);
+  });
+
+  it("admits a cookie issued under the same password in another case", () => {
+    const issuedUnderCapitals = cookieOf(createAccessPass(TEST_SIGNING_KEY, "Tidal-Lantern-Quartz").issue(NOW));
+
+    expect(pass.admits(issuedUnderCapitals, NOW)).toBe(true);
+  });
+
   it("refuses a turn signature over the same expiry and password as its MAC", () => {
     const turnSignature = createTurnSigner(TEST_SIGNING_KEY).sign({ prompt: expPart, reply: TEST_ACCESS_PASSWORD });
 
@@ -74,20 +89,20 @@ describe("access pass", () => {
 });
 
 describe("passwordMatches", () => {
-  it("matches the same password", () => {
-    expect(passwordMatches(TEST_ACCESS_PASSWORD, TEST_ACCESS_PASSWORD)).toBe(true);
+  it.each([
+    ["the same password", TEST_ACCESS_PASSWORD],
+    ["the password in another case", TEST_ACCESS_PASSWORD.toUpperCase()],
+    ["the password in full-width characters", fullWidthOf(TEST_ACCESS_PASSWORD)],
+    ["the password with spaces around it", `  ${TEST_ACCESS_PASSWORD}\n`],
+  ])("matches %s", (_case, given) => {
+    expect(passwordMatches(given, TEST_ACCESS_PASSWORD)).toBe(true);
   });
 
   it.each([
-    ["a different password of the same length", "tidal-lantern-quartZ"],
+    ["a different password of the same length", "tidal-lantern-quartx"],
     ["a shorter password", "tidal"],
     ["a longer password", `${TEST_ACCESS_PASSWORD}-extra`],
-    ["the password in another case", TEST_ACCESS_PASSWORD.toUpperCase()],
   ])("does not match %s, without throwing", (_case, given) => {
     expect(passwordMatches(given, TEST_ACCESS_PASSWORD)).toBe(false);
-  });
-
-  it("ignores spaces around the given password", () => {
-    expect(passwordMatches(`  ${TEST_ACCESS_PASSWORD}\n`, TEST_ACCESS_PASSWORD)).toBe(true);
   });
 });

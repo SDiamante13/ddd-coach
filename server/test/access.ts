@@ -8,3 +8,9 @@ export const JUST_EXPIRED_ISSUE = new Date(NOW.getTime() - ACCESS_MAX_AGE_S * 10
 export function cookieOf(setCookie: string): string {
   return setCookie.split("; ")[0] ?? "";
 }
+
+const FULL_WIDTH_OFFSET = 0xfee0;
+
+export function fullWidthOf(ascii: string): string {
+  return [...ascii].map((char) => String.fromCharCode(char.charCodeAt(0) + FULL_WIDTH_OFFSET)).join("");
+}
