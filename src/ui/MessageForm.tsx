@@ -2,6 +2,8 @@ import type { FormEvent, KeyboardEvent } from "react";
 import { parsePrompt, type Prompt } from "../domain/exchange.ts";
 import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
+const SAFARI_COMPOSITION_KEY_CODE = 229;
+
 type MessageFormProps = {
   busy: boolean;
   draft: string;
@@ -45,7 +47,11 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
 }
 
 function sendsOnEnter(event: KeyboardEvent): boolean {
-  return event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing && !hasTouchPointer();
+  return event.key === "Enter" && !event.shiftKey && !isComposing(event) && !hasTouchPointer();
+}
+
+function isComposing(event: KeyboardEvent): boolean {
+  return event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSITION_KEY_CODE;
 }
 
 function hasTouchPointer(): boolean {

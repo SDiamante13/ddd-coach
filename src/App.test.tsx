@@ -137,12 +137,15 @@ describe("Connection test", () => {
     expect(server.bodyOf(0)).toEqual({ message: "Hello coach", history: [] });
   });
 
-  it("sends nothing on Enter while an input method is composing", async () => {
+  it.each([
+    ["composing", { isComposing: true }],
+    ["ending a composition in Safari", { keyCode: 229 }],
+  ])("sends nothing on Enter while an input method is %s", async (_state, composition) => {
     const server = stubFetch();
     const { user, input } = renderApp();
     await user.type(input(), "Hello coach");
 
-    fireEvent.keyDown(input(), { key: "Enter", isComposing: true });
+    fireEvent.keyDown(input(), { key: "Enter", ...composition });
 
     expect(server.fetchMock).not.toHaveBeenCalled();
   });
