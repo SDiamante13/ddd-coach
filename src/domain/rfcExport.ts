@@ -47,7 +47,7 @@ export const claimLine = ({ source, text }: Claim): string => `${source}: ${text
 
 function markdownEvents(events: Claim[]): string[] {
   if (events.length === 0) return [];
-  return ["## Events, in order", "", ...events.map((event, index) => `${index + 1}. ${claimLine(event)}`), ""];
+  return ["## Events, in order", "", ...events.map((event, index) => `${index + 1}. ${markdownText(claimLine(event))}`), ""];
 }
 
 export const questionLine = ({ roles, text }: RfcQuestion): string => `Question for ${roles}: ${text}`;
@@ -55,11 +55,16 @@ export const sourceLine = (source: string): string => `From thread: "${source}"`
 
 function markdownQuestions(questions: RfcQuestion[]): string[] {
   if (questions.length === 0) return [];
-  const items = questions.flatMap((question) => [`- ${questionLine(question)}`, ...question.sources.map((source) => `  - ${sourceLine(source)}`)]);
+  const items = questions.flatMap((question) => [
+    `- ${markdownText(questionLine(question))}`,
+    ...question.sources.map((source) => `  - ${markdownText(sourceLine(source))}`),
+  ]);
   return ["## Open questions", "", ...items, ""];
 }
 
-const markdownCell = (text: string): string => text.replace(/\|/g, "\\|");
+const markdownText = (text: string): string => text.replace(/[\\`[\]<>]/g, (char) => `\\${char}`);
+
+const markdownCell = (text: string): string => markdownText(text).replace(/\|/g, "\\|");
 
 function markdownTable(words: WordRow[]): string[] {
   if (words.length === 0) return [];

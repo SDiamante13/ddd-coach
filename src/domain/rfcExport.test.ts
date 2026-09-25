@@ -81,6 +81,32 @@ describe("toMarkdown", () => {
   });
 });
 
+describe("toMarkdown escaping", () => {
+  const LIVE = "[x](javascript:alert(1)) <img src=x onerror=alert(1)> `run` a\\b";
+  const ESCAPED = "\\[x\\](javascript:alert(1)) \\<img src=x onerror=alert(1)\\> \\`run\\` a\\\\b";
+
+  it("escapes link, HTML and code characters in a table cell, so no renderer makes them live", () => {
+    const reply = ["Words that don't match", '"hold"', `- From thread: Ops means ${LIVE}.`].join("\n");
+
+    expect(markdownOf(reply)).toContain(`| hold | Ops | ${ESCAPED}. | From thread |`);
+  });
+
+  it("escapes the same characters in the question, its thread lines and the events", () => {
+    const reply = [
+      "Events, in order",
+      `1. From thread: Ops pastes ${LIVE}.`,
+      "",
+      `Question for the ops lead: For load 48213, which ${LIVE}?`,
+      `From thread: "${LIVE}"`,
+    ].join("\n");
+    const markdown = markdownOf(reply);
+
+    expect(markdown).toContain(`- Question for the ops lead: For load 48213, which ${ESCAPED}?`);
+    expect(markdown).toContain(`  - From thread: "${ESCAPED}"`);
+    expect(markdown).toContain(`1. From thread: Ops pastes ${ESCAPED}.`);
+  });
+});
+
 describe("copiedMessage", () => {
   it.each([
     [0, "Copied for your RFC."],
