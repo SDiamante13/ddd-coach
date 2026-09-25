@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { fail, isBusy, parsePrompt, reply, retry, submit, type ExchangeId, type Prompt } from "./exchange.ts";
+import {
+  fail,
+  isBusy,
+  parsePrompt,
+  reply,
+  retry,
+  settle,
+  submit,
+  type ExchangeId,
+  type Prompt,
+} from "./exchange.ts";
 
 const id = "exchange-1" as ExchangeId;
 const prompt = "Hello coach" as Prompt;
@@ -46,6 +56,31 @@ describe("Exchange", () => {
     const failed = fail(submit(id, prompt), "Coach unavailable");
 
     expect(isBusy([replied, failed])).toBe(false);
+  });
+});
+
+describe("settle", () => {
+  const otherId = "exchange-2" as ExchangeId;
+
+  it("replies to the matching pending exchange only", () => {
+    const other = submit(otherId, prompt);
+
+    expect(settle([submit(id, prompt), other], id, { ok: true, reply: "Hi there" })).toEqual([
+      reply(submit(id, prompt), "Hi there"),
+      other,
+    ]);
+  });
+
+  it("fails the matching pending exchange with the error", () => {
+    expect(settle([submit(id, prompt)], id, { ok: false, error: "Coach unavailable" })).toEqual([
+      fail(submit(id, prompt), "Coach unavailable"),
+    ]);
+  });
+
+  it("leaves a matching exchange that is no longer pending unchanged", () => {
+    const replied = reply(submit(id, prompt), "Hi there");
+
+    expect(settle([replied], id, { ok: false, error: "Coach unavailable" })).toEqual([replied]);
   });
 });
 
