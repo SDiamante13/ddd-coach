@@ -703,3 +703,14 @@ table.words {
   font-size: var(--text-xs);
   color: var(--color-ink-muted);
 }
+
+/* #6: Copy for your RFC, under a laid-out reply. */
+.reply .rfc-copy {
+  align-self: flex-start;
+}
+
+.reply .rfc-status:not(:empty) {
+  margin-top: calc(-1 * var(--space-2));
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}

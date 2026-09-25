@@ -3,6 +3,7 @@ import type { SwappedText } from "../domain/swaps.ts";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { EventList } from "./EventList.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
+import { RfcCopyButton } from "./RfcCopyButton.tsx";
 import { WordTable } from "./WordTable.tsx";
 
 export type RestoreNames = (text: string) => SwappedText;
@@ -11,17 +12,21 @@ export const RESTORED_NOTE = "Names restored in this browser from your swaps.";
 
 export function ReplyView({ reply, restoreNames }: { reply: string; restoreNames: RestoreNames }) {
   const restored = restoreNames(reply);
+  const blocks = displayOrder(parseReply(restored.text));
   return (
     <div className="reply">
-      {displayOrder(parseReply(restored.text)).map((block, index) => (
+      {blocks.map((block, index) => (
         <ReplyPart key={index} block={block} />
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
+      {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
     </div>
   );
 }
 
 const LAST_KINDS: readonly ReplyBlock["kind"][] = ["question", "cut"];
+
+const isAnalysis = (block: ReplyBlock): boolean => block.kind === "words" || block.kind === "question";
 
 function displayOrder(blocks: ReplyBlock[]): ReplyBlock[] {
   const lastOf = (kind: ReplyBlock["kind"]) => blocks.filter((block) => block.kind === kind);

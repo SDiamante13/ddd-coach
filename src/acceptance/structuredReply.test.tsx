@@ -73,8 +73,8 @@ describe("Structured reply", () => {
     const { log } = await replyWith(`${LAID_OUT_REPLY}\nHope this helps with the review.`);
     const card = await within(log()).findByRole("region", { name: "Question" });
 
-    expect(card.parentElement?.lastElementChild).toBe(card);
-    expect(within(log()).getByText("Hope this helps with the review.")).toBeInTheDocument();
+    const stray = within(log()).getByText("Hope this helps with the review.");
+    expect(stray.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows the parts a cut reply has, then the cut-short note", async () => {
