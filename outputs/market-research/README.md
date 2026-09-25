@@ -68,4 +68,5 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
 - **#85:** the question shows its two source lines. Does that make it checkable, and does it change what she copies?
 - The new hard checks: does every real run's question name a concrete case? Does any "should X or Y" ruling slip through?
 - Build order after #77 (from the PO): #56 sanitizing → #64 structured reply → #6 export → #58 knowledge base → #8 streaming. Test each deployed slice with the solo ICP.
+- **Length check:** on a 400+ word v8 reply, ask "Where did you stop reading?" and "Where's the question?" Interview 06 says length is fine without advice, but it was never probed directly.
 - #70 (a real practitioner with a real thread) remains the top research ask. Don't spend its questions on the persona.
