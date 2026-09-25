@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { isBusy } from "../domain/exchange.ts";
+import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { useExchanges } from "./useExchanges.ts";
 
 export function ConnectionTest() {
-  const { exchanges, send, retry } = useExchanges();
-  const busy = isBusy(exchanges);
   const [draft, setDraft] = useState("");
+  const { exchanges, send, retry } = useExchanges({
+    onRefused: (prompt) => setDraft((current) => restoredDraft(current, prompt)),
+  });
+  const busy = isBusy(exchanges);
 
   return (
     <>

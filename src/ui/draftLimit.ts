@@ -12,3 +12,7 @@ export function draftLimit(length: number, max: number): DraftLimit {
   if (length > max) return "over";
   return length >= NEAR_SHARE * max ? "near" : "ok";
 }
+
+export function restoredDraft(current: string, refused: string): string {
+  return current.trim() === "" ? refused : current;
+}
