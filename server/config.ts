@@ -5,6 +5,8 @@ export type Env = Readonly<Record<string, string | undefined>>;
 
 const API_KEY = "OPENROUTER_API_KEY";
 const MODEL = "OPENROUTER_MODEL";
+const TIMEOUT = "COACH_TIMEOUT_MS";
+const DEFAULT_TIMEOUT_MS = 25_000;
 
 export function readConfig(env: Env): ConfigResult {
   const apiKey = present(env[API_KEY]);
@@ -21,4 +23,9 @@ function present(value: string | undefined): string | undefined {
 
 function missing(name: string): ConfigResult {
   return { ok: false, error: `${name} is not set.` };
+}
+
+export function readTimeoutMs(env: Env): number {
+  const timeoutMs = Number(present(env[TIMEOUT]));
+  return Number.isInteger(timeoutMs) && timeoutMs > 0 ? timeoutMs : DEFAULT_TIMEOUT_MS;
 }

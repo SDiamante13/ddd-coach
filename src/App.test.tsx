@@ -102,6 +102,23 @@ describe("Connection test", () => {
     expect(within(log()).queryByRole("alert")).not.toBeInTheDocument();
   });
 
+  it("disables Retry while another exchange is pending, then enables it once that settles", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+    await user.type(input(), "First message{Enter}");
+    server.fail(0);
+    const retryButton = await within(log()).findByRole("button", { name: "Retry" });
+
+    await user.type(input(), "Second message{Enter}");
+    await user.click(retryButton);
+
+    expect(retryButton).toBeDisabled();
+    expect(server.fetchMock).toHaveBeenCalledTimes(2);
+    server.reply(1, 200, { reply: "Hi there" });
+    await within(log()).findByText("Hi there");
+    expect(retryButton).toBeEnabled();
+  });
+
   it("shows a network failure inline with Retry", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();

@@ -1,8 +1,12 @@
 import type { Exchange, FailedExchange } from "../domain/exchange.ts";
 
-export type ExchangeProps = { exchange: Exchange; onRetry: (failed: FailedExchange) => void };
+export type ExchangeProps = {
+  exchange: Exchange;
+  busy: boolean;
+  onRetry: (failed: FailedExchange) => void;
+};
 
-export function ExchangeOutcome({ exchange, onRetry }: ExchangeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry }: ExchangeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
@@ -12,7 +16,7 @@ export function ExchangeOutcome({ exchange, onRetry }: ExchangeProps) {
       return (
         <>
           <p role="alert">{exchange.error}</p>
-          <button type="button" onClick={() => onRetry(exchange)}>
+          <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>
             Retry
           </button>
         </>

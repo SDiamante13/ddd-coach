@@ -1,10 +1,10 @@
 import { ExchangeOutcome, type ExchangeProps } from "./ExchangeOutcome.tsx";
 
-export function ExchangeEntry({ exchange, onRetry }: ExchangeProps) {
+export function ExchangeEntry({ exchange, busy, onRetry }: ExchangeProps) {
   return (
     <li>
       <p>{exchange.prompt}</p>
-      <ExchangeOutcome exchange={exchange} onRetry={onRetry} />
+      <ExchangeOutcome exchange={exchange} busy={busy} onRetry={onRetry} />
     </li>
   );
 }

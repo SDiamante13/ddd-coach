@@ -42,12 +42,21 @@ describe("askCoach", () => {
     });
   });
 
-  it("reports an unexpected response when the body is not JSON", async () => {
-    respondWith(new Response("<html>Not Found</html>", { status: 404 }));
+  it("reports a timeout for a 504 whose body is not JSON", async () => {
+    respondWith(new Response("Function invocation timed out", { status: 504 }));
 
     expect(await askCoach("Hello coach")).toEqual({
       ok: false,
-      error: "Unexpected response from the coach.",
+      error: "The coach took too long. Try a shorter question or Retry.",
+    });
+  });
+
+  it("reports an unavailable coach for any other error whose body is not JSON", async () => {
+    respondWith(new Response("TimeoutError: task timed out", { status: 500 }));
+
+    expect(await askCoach("Hello coach")).toEqual({
+      ok: false,
+      error: "The coach is unavailable. Try again.",
     });
   });
 });

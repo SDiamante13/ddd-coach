@@ -36,6 +36,11 @@ export function isBusy(exchanges: readonly Exchange[]): boolean {
   return exchanges.some((exchange) => exchange.status === "pending");
 }
 
+export function canRetry(exchanges: readonly Exchange[], id: ExchangeId): boolean {
+  const target = exchanges.find((exchange) => exchange.id === id);
+  return target?.status === "failed" && !isBusy(exchanges);
+}
+
 export function parsePrompt(text: string): Prompt | null {
   const trimmed = text.trim();
   return trimmed === "" ? null : (trimmed as Prompt);

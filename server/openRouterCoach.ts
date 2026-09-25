@@ -1,4 +1,5 @@
 import { OpenRouter } from "@openrouter/sdk";
+import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
 import type { ChatContentItems } from "@openrouter/sdk/models";
 import type {
   SendChatCompletionRequestRequest,
@@ -9,20 +10,34 @@ import type { Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
 
 export type ChatClient = {
-  send(request: SendChatCompletionRequestRequest): Promise<SendChatCompletionRequestResponse>;
+  send(
+    request: SendChatCompletionRequestRequest,
+    options?: RequestOptions,
+  ): Promise<SendChatCompletionRequestResponse>;
 };
+
+const MAX_COMPLETION_TOKENS = 600;
+const WITHOUT_RETRIES: RequestOptions = { retries: { strategy: "none" } };
 
 export function createOpenRouterCoach(
   config: CoachConfig,
   chat: ChatClient = new OpenRouter({ apiKey: config.apiKey }).chat,
 ): Coach {
   return {
-    reply: async (prompt: Prompt) => extractText(await chat.send(userMessage(config.model, prompt))),
+    reply: async (prompt: Prompt) =>
+      extractText(await chat.send(userMessage(config.model, prompt), WITHOUT_RETRIES)),
   };
 }
 
 function userMessage(model: string, prompt: Prompt): SendChatCompletionRequestRequest {
-  return { chatRequest: { model, messages: [{ role: "user", content: prompt }], stream: false } };
+  return {
+    chatRequest: {
+      model,
+      messages: [{ role: "user", content: prompt }],
+      stream: false,
+      maxCompletionTokens: MAX_COMPLETION_TOKENS,
+    },
+  };
 }
 
 function extractText(response: SendChatCompletionRequestResponse): string {

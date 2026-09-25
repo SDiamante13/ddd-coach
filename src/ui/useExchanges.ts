@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { askCoach } from "../api/askCoach.ts";
 import {
+  canRetry,
   retry,
   settle,
   submit,
@@ -25,6 +26,7 @@ export function useExchanges() {
   }
 
   function retryFailed(failed: FailedExchange) {
+    if (!canRetry(exchanges, failed.id)) return;
     setExchanges((current) => current.map((e) => (e.id === failed.id ? retry(e) : e)));
     void ask(failed.id, failed.prompt);
   }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canRetry,
   fail,
   isBusy,
   parsePrompt,
@@ -81,6 +82,23 @@ describe("settle", () => {
     const replied = reply(submit(id, prompt), "Hi there");
 
     expect(settle([replied], id, { ok: false, error: "Coach unavailable" })).toEqual([replied]);
+  });
+});
+
+describe("canRetry", () => {
+  const otherId = "exchange-2" as ExchangeId;
+  const failed = fail(submit(id, prompt), "Coach unavailable");
+
+  it("allows retrying a failed exchange while nothing is pending", () => {
+    expect(canRetry([failed, reply(submit(otherId, prompt), "Hi there")], id)).toBe(true);
+  });
+
+  it("blocks retrying while another exchange is pending", () => {
+    expect(canRetry([failed, submit(otherId, prompt)], id)).toBe(false);
+  });
+
+  it("allows retrying only an exchange that failed", () => {
+    expect(canRetry([reply(submit(id, prompt), "Hi there")], id)).toBe(false);
   });
 });
 

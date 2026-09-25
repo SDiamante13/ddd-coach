@@ -1,6 +1,7 @@
 // @vitest-environment node
 import type { ChatContentItems, ChatResult } from "@openrouter/sdk/models";
 import type { SendChatCompletionRequestRequest } from "@openrouter/sdk/models/operations";
+import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
 import { describe, expect, it } from "vitest";
 import type { Prompt } from "../src/domain/exchange.ts";
 import { createOpenRouterCoach } from "./openRouterCoach.ts";
@@ -19,29 +20,33 @@ function resultWith(content: string | ChatContentItems[] | null): ChatResult {
 }
 
 function fakeChat(content: string | ChatContentItems[] | null) {
-  const requests: SendChatCompletionRequestRequest[] = [];
-  const send = async (request: SendChatCompletionRequestRequest) => {
-    requests.push(request);
+  const requests: [SendChatCompletionRequestRequest, RequestOptions?][] = [];
+  const send = async (request: SendChatCompletionRequestRequest, options?: RequestOptions) => {
+    requests.push([request, options]);
     return resultWith(content);
   };
   return { chat: { send }, requests };
 }
 
 describe("OpenRouter coach", () => {
-  it("sends the prompt as a single non-streaming user message to the configured model", async () => {
+  it("sends the prompt as one capped, non-streaming user message without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
 
     const reply = await createOpenRouterCoach(config, chat).reply("Hello coach" as Prompt);
 
     expect(reply).toBe("Hi there");
     expect(requests).toEqual([
-      {
-        chatRequest: {
-          model: "test/model",
-          messages: [{ role: "user", content: "Hello coach" }],
-          stream: false,
+      [
+        {
+          chatRequest: {
+            model: "test/model",
+            messages: [{ role: "user", content: "Hello coach" }],
+            stream: false,
+            maxCompletionTokens: 600,
+          },
         },
-      },
+        { retries: { strategy: "none" } },
+      ],
     ]);
   });
 
