@@ -21,9 +21,10 @@ import {
 export type CoachFailure = { name: string; statusCode: number | undefined };
 export type CoachFailureLog = (failure: CoachFailure) => void;
 
-type ReplyDeps = { deadlineMs: number; log: CoachFailureLog; signer: TurnSigner };
+type CoachCallDeps = { deadlineMs: number; log: CoachFailureLog };
+type ReplyDeps = CoachCallDeps & { signer: TurnSigner };
 
-type ChatHandlerDeps = Omit<ReplyDeps, "signer"> & {
+type ChatHandlerDeps = CoachCallDeps & {
   config: ConfigResult;
   createCoach: (config: CoachConfig) => Coach;
   signingKey: SigningKeyResult;
