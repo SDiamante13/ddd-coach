@@ -284,6 +284,37 @@ Each check change re-scores `ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.json` with
 | New hard check `at most 600 words` on every fixture: a runaway ceiling (PO decision; `under400Words` stays reported only, with no 300-word gate) | Ship: no (unchanged) | no runaways. Longest replies: v8 F1 400–438 words, v6 F1 361–419; every other fixture is under 330 |
 | Views may be named after their group ("Ops (night shift)"), as well as "(view A)"/"(view B)" (#77 U2, check side). Holders, split labels, stable views and the `split` score read either label; a bare "Ops night shift means" still fails holders | Ship: no (unchanged) | byte-identical re-score, as is the v8 full eval's: no recorded reply uses names yet |
 
+## v9 against v8 under the ship rule, n=6 (2026-09-25, #77): no ship
+
+v9 = v8 plus #77's changes:
+- group-named views ("Ops (night shift)", "Ops (day desk)") replace "(view A)"/"(view B)";
+- the question names its case (load, customer or message time);
+- the question starts with what/which/who/how and has no clause that starts with "should".
+
+The command: `OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run eval -- --ab 9 --live 8 --target "booking-split:question asks,example-thread:question asks,rebook-notes:split labels"` ([md](ab-2026-09-25-openai-gpt-5-6-terra-v8-v9.md), [data](ab-2026-09-25-openai-gpt-5-6-terra-v8-v9.json)). The JSON records model terra, effort none, n=6, and system sha256s v8 `c5f6c6aa…` and v9 `156eed74…` (`coach-instructions.v9.txt`). 84 calls, all `stop`, no aborts.
+
+**Ship: no.** The target goes from v8 14/18 to v9 17/18 (+3, needs +2), but two gating checks drop by two runs:
+- **F1 split labels, 6/6 → 4/6.** Runs 2 and 6 write a plain "Ops" line next to "Ops (night shift)" under "booking count": a named view with no partner. That's interview 07's failure mode, now with names.
+- **F3 attribution, 6/6 → 4/6.** Holders took the 990 meaning: "Team unclear means the portal label Confirmed…" (r5) and "Customer-facing portal means…" (r6, which also fails holders).
+
+What v9 improved:
+
+| Check | v8 | v9 |
+|---|---|---|
+| F1 question asks | 4/6 | 6/6 |
+| example question asks | 4/6 | 6/6 |
+| F1 attribution | 2/6 | 6/6 |
+| F1 sameMeaningNamed (reported) | 0/6 | 5/6, #76's "hold" named as one meaning |
+| F1 under 400 words (reported) | 4/6 | 6/6 |
+
+F2 split labels goes 6/6 → 5/6, within noise.
+
+**Noise note:** v8's F1 question asks is 4/6 here, against 1/6 in the v6/v8 run.
+
+**Spend:** v8 $0.1517, v9 $0.1732, total **$0.3249**. #77's running total is $0.32 of its $1.50 cap. The v6/v8 run was #78's.
+
+v8 stays live, and main keeps v8. `coach-instructions.v9.txt` is kept as the record of what ran.
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.

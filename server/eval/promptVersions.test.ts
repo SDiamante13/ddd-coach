@@ -6,7 +6,7 @@ import { instructionsOf } from "./promptVersions.ts";
 
 describe("instructionsOf", () => {
   it("gives the current version as the prompt the coach sends", () => {
-    expect(instructionsOf(8)).toBe(coachInstructions());
+    expect(instructionsOf(COACH_INSTRUCTIONS_VERSION)).toBe(coachInstructions());
   });
 
   it("gives an earlier version as its snapshot, byte for byte", () => {
