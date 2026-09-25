@@ -13,4 +13,7 @@ export default (request: Request): Promise<Response> =>
     log: logCoachFailure,
   })(request);
 
-export const config: Config = { path: "/api/chat" };
+export const config: Config = {
+  path: "/api/chat",
+  rateLimit: { windowLimit: 20, windowSize: 60, aggregateBy: ["ip", "domain"] },
+};
