@@ -29,11 +29,12 @@ describe("Exchange", () => {
   });
 
   it("replies to a pending exchange", () => {
-    expect(reply(submit(id, prompt), "Hi there")).toEqual({
+    expect(reply(submit(id, prompt), "Hi there", "sig-1")).toEqual({
       id,
       prompt,
       status: "replied",
       reply: "Hi there",
+      signature: "sig-1",
     });
   });
 
@@ -44,19 +45,19 @@ describe("Exchange", () => {
   });
 
   it("leaves an exchange that has not failed unchanged on retry", () => {
-    const replied = reply(submit(id, prompt), "Hi there");
+    const replied = reply(submit(id, prompt), "Hi there", "sig-1");
 
     expect(retry(replied)).toBe(replied);
   });
 
   it("is busy while any exchange is pending", () => {
-    const replied = reply(submit(id, prompt), "Hi there");
+    const replied = reply(submit(id, prompt), "Hi there", "sig-1");
 
     expect(isBusy([replied, submit(id, prompt)])).toBe(true);
   });
 
   it("is idle when no exchange is pending", () => {
-    const replied = reply(submit(id, prompt), "Hi there");
+    const replied = reply(submit(id, prompt), "Hi there", "sig-1");
     const failed = fail(submit(id, prompt), unavailable);
 
     expect(isBusy([replied, failed])).toBe(false);
@@ -69,8 +70,8 @@ describe("settle", () => {
   it("replies to the matching pending exchange only", () => {
     const other = submit(otherId, prompt);
 
-    expect(settle([submit(id, prompt), other], id, { ok: true, reply: "Hi there" })).toEqual([
-      reply(submit(id, prompt), "Hi there"),
+    expect(settle([submit(id, prompt), other], id, { ok: true, reply: "Hi there", signature: "sig-1" })).toEqual([
+      reply(submit(id, prompt), "Hi there", "sig-1"),
       other,
     ]);
   });
@@ -82,7 +83,7 @@ describe("settle", () => {
   });
 
   it("leaves a matching exchange that is no longer pending unchanged", () => {
-    const replied = reply(submit(id, prompt), "Hi there");
+    const replied = reply(submit(id, prompt), "Hi there", "sig-1");
 
     expect(settle([replied], id, { ok: false, ...unavailable })).toEqual([replied]);
   });
@@ -93,7 +94,7 @@ describe("canRetry", () => {
   const failed = fail(submit(id, prompt), unavailable);
 
   it("allows retrying a failed exchange while nothing is pending", () => {
-    expect(canRetry([failed, reply(submit(otherId, prompt), "Hi there")], id)).toBe(true);
+    expect(canRetry([failed, reply(submit(otherId, prompt), "Hi there", "sig-2")], id)).toBe(true);
   });
 
   it("blocks retrying while another exchange is pending", () => {
@@ -107,7 +108,7 @@ describe("canRetry", () => {
   });
 
   it("allows retrying only an exchange that failed", () => {
-    expect(canRetry([reply(submit(id, prompt), "Hi there")], id)).toBe(false);
+    expect(canRetry([reply(submit(id, prompt), "Hi there", "sig-1")], id)).toBe(false);
   });
 });
 

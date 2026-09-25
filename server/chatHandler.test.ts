@@ -63,7 +63,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("B", [{ prompt: "A", reply: "R1" }]));
 
     expect(response.status).toBe(200);
-    expect(coach.reply).toHaveBeenCalledWith({ history: [{ prompt: "A", reply: "R1" }], prompt: "B" });
+    expect(coach.reply).toHaveBeenCalledWith({ history: [{ prompt: "A", reply: "R1", signature: "" }], prompt: "B" });
   });
 
   it("fails with the missing variable's name without creating a coach", async () => {

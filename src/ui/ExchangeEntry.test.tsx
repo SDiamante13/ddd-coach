@@ -8,7 +8,7 @@ const pending = submit("1" as ExchangeId, "What is an aggregate?" as Prompt);
 describe("ExchangeEntry", () => {
   it.each<Exchange>([
     pending,
-    reply(pending, "A consistency boundary."),
+    reply(pending, "A consistency boundary.", "sig-1"),
     fail(pending, { error: "The coach is unavailable.", retryable: true }),
   ])("exposes the $status exchange status on its log item", (exchange) => {
     render(

@@ -18,10 +18,10 @@ describe("askCoach", () => {
     const fetchMock = respondWith(jsonResponse(200, { reply: "Hi there" }));
     const followUp = conversationOf("B", [{ prompt: "A", reply: "R1" }]);
 
-    expect(await askCoach(followUp)).toEqual({ ok: true, reply: "Hi there" });
+    expect(await askCoach(followUp)).toEqual({ ok: true, reply: "Hi there", signature: "" });
     expect(fetchMock).toHaveBeenCalledWith("/api/chat", expect.objectContaining({
       method: "POST",
-      body: JSON.stringify({ message: "B", history: [{ prompt: "A", reply: "R1" }] }),
+      body: JSON.stringify({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "" }] }),
     }));
   });
 

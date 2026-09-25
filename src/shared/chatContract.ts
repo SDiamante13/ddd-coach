@@ -1,4 +1,4 @@
-export type ChatTurn = { prompt: string; reply: string };
+export type ChatTurn = { prompt: string; reply: string; signature: string };
 export type ChatRequestBody = { message: string; history: readonly ChatTurn[] };
 export type ChatResponseBody = { reply: string } | { error: string };
 

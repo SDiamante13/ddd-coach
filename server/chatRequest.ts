@@ -46,7 +46,7 @@ function readHistory(body: unknown): Turn[] | null {
 function readTurn(item: unknown): Turn | null {
   const prompt = promptField(item, "prompt");
   const reply = stringField(item, "reply");
-  return prompt === null || !reply?.trim() ? null : { prompt, reply };
+  return prompt === null || !reply?.trim() ? null : { prompt, reply, signature: "" };
 }
 
 function promptField(body: unknown, key: string): Prompt | null {

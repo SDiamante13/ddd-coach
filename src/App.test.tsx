@@ -185,7 +185,7 @@ describe("Connection test", () => {
     await send("B");
 
     expect(server.bodyOf(0)).toEqual({ message: "A", history: [] });
-    expect(server.bodyOf(1)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1" }] });
+    expect(server.bodyOf(1)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "" }] });
   });
 
   it("leaves a failed turn out of the next message's history", async () => {
@@ -208,13 +208,13 @@ describe("Connection test", () => {
     await within(log()).findByText("RB");
     await send("D");
 
-    expect(server.bodyOf(3)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1" }] });
+    expect(server.bodyOf(3)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "" }] });
     expect(server.bodyOf(4)).toEqual({
       message: "D",
       history: [
-        { prompt: "A", reply: "R1" },
-        { prompt: "B", reply: "RB" },
-        { prompt: "C", reply: "R3" },
+        { prompt: "A", reply: "R1", signature: "" },
+        { prompt: "B", reply: "RB", signature: "" },
+        { prompt: "C", reply: "R3", signature: "" },
       ],
     });
   });
