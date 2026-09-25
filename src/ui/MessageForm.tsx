@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { FormEvent, KeyboardEvent } from "react";
 import { parsePrompt, type Prompt } from "../domain/exchange.ts";
 import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
@@ -13,16 +13,29 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const prompt = parsePrompt(draft);
-    if (prompt === null) return;
+    if (busy || prompt === null) return;
     onDraftChange("");
     onSend(prompt);
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    event.currentTarget.form?.requestSubmit();
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <label>
         Message
-        <input type="text" autoFocus placeholder={PASTE_EXAMPLE} value={draft} onChange={(e) => onDraftChange(e.target.value)} />
+        <textarea
+          autoFocus
+          rows={2}
+          placeholder={PASTE_EXAMPLE}
+          value={draft}
+          onChange={(e) => onDraftChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
       </label>
       <button type="submit" disabled={busy}>
         Send

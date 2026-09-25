@@ -91,6 +91,18 @@ describe("Connection test", () => {
     expect(within(log()).queryByText("Coach is thinking…")).not.toBeInTheDocument();
   });
 
+  it("sends a pasted thread with its speaker lines and line breaks unchanged", async () => {
+    const server = stubFetch();
+    const { user, input } = renderApp();
+    const thread = "Ops: shipment delayed\nTom (Finance): we can't invoice until carrier confirms";
+
+    await user.click(input());
+    await user.paste(thread);
+    await user.keyboard("{Enter}");
+
+    expect(server.bodyOf(0)).toEqual({ message: thread, history: [] });
+  });
+
   it("sends with the Send button, clears the input and disables Send while pending", async () => {
     stubFetch();
     const { user, input, log, sendButton } = renderApp();
