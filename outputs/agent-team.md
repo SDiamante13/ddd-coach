@@ -61,6 +61,7 @@ The [mockups canvas](https://claude.ai/artifact/RjbLasj538CpC29jWrqzGf) pairs ea
 
 - `record start` does not carry localStorage into the recorded context, and a mid-recording `location.reload()` can silently stop the recorder: seed storage on camera and reload at most once. Close any open composer panel before showing replies.
 - `set viewport` mid-recording stretches the page into the fixed video frame and can silently not apply: check `innerWidth` after each change, and prefer a separate take per viewport. A `screenshot` during a recording works and saves a paid call.
+- Headless Chrome blocks clipboard reads even with permissions granted. To demo a paste, spy on `navigator.clipboard.write`/`writeText` in-page, keep what the app wrote, and insert it into the target box (contenteditable or textarea).
 - After filling the password, never dump the gate's `innerHTML`, `outerHTML`, `value` or a full snapshot: React reflects the input value and the password lands in tool output. Check the gate by role or text only.
 - Verifier: after the demo, set the viewport to 1280×800 and screenshot the state the slice's acceptance check describes → `outputs/demos/slice-NN.png`. Slice 5 has no UI: capture the terminal finding instead.
 - Navigator: upload the PNG as a canvas asset, replace the placeholder body of `ActualNN.dc.html` with `<img src="/_blob/<id>">` (1280×800, descriptive `alt`), and retitle the frame `Actual · NN (built)`.
