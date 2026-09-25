@@ -46,3 +46,7 @@ export function parsePrompt(text: string): Prompt | null {
   const trimmed = text.trim();
   return trimmed === "" ? null : (trimmed as Prompt);
 }
+
+export function messageLength(text: string): number {
+  return text.trim().length;
+}

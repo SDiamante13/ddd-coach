@@ -1,5 +1,5 @@
 import { useId, type FormEvent, type KeyboardEvent } from "react";
-import { parsePrompt, type Prompt } from "../domain/exchange.ts";
+import { messageLength, parsePrompt, type Prompt } from "../domain/exchange.ts";
 import { DraftFoot } from "./DraftFoot.tsx";
 import { hasTouchPointer } from "./pointer.ts";
 import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
@@ -49,7 +49,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
           Send
         </button>
       </div>
-      <DraftFoot length={draft.length} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
+      <DraftFoot length={messageLength(draft)} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
     </form>
   );
 }

@@ -3,6 +3,7 @@ import {
   canRetry,
   fail,
   isBusy,
+  messageLength,
   parsePrompt,
   reply,
   retry,
@@ -119,5 +120,11 @@ describe("parsePrompt", () => {
 
   it("keeps meaningful text without surrounding whitespace", () => {
     expect(parsePrompt("  Hello coach \n")).toBe("Hello coach");
+  });
+});
+
+describe("messageLength", () => {
+  it("counts the trimmed text in UTF-16 code units, as the server does", () => {
+    expect(messageLength("\n  Ship 📦 \n")).toBe(7);
   });
 });

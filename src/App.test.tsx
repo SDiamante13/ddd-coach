@@ -90,11 +90,11 @@ describe("Connection test", () => {
     expect(screen.queryByText(/Enter sends/)).not.toBeInTheDocument();
   });
 
-  it("shows no character count below 80% of the limit", async () => {
+  it("shows no character count below 80% of the limit, not counting surrounding whitespace", async () => {
     const { user, input } = renderApp();
 
     await user.click(input());
-    await user.paste("M".repeat(MAX_MESSAGE_CHARS * 0.8 - 1));
+    await user.paste(`${"M".repeat(MAX_MESSAGE_CHARS * 0.8 - 1)}\n\n\n`);
 
     expect(screen.queryByText(/characters$/)).not.toBeInTheDocument();
   });
