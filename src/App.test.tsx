@@ -2,10 +2,13 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
+import { MAX_MESSAGE_CHARS } from "./shared/chatContract.ts";
 import { stubFetch } from "./test/fetchStub.ts";
 import { PASTE_EXAMPLE } from "./ui/PurposeLine.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
+
+const formatCount = (n: number) => new Intl.NumberFormat("en-US").format(n);
 
 function renderApp() {
   const user = userEvent.setup();
@@ -69,6 +72,14 @@ describe("Connection test", () => {
     const { input } = renderApp();
 
     expect(input()).toHaveAttribute("placeholder", PASTE_EXAMPLE);
+  });
+
+  it("describes the message box with its keys and its character limit", () => {
+    const { input } = renderApp();
+
+    expect(input()).toHaveAccessibleDescription(
+      `Enter sends · Shift+Enter adds a line Up to ${formatCount(MAX_MESSAGE_CHARS)} characters.`,
+    );
   });
 
   it("starts with the message input focused and an empty log", () => {

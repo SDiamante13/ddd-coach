@@ -1,5 +1,6 @@
-import type { FormEvent, KeyboardEvent } from "react";
+import { useId, type FormEvent, type KeyboardEvent } from "react";
 import { parsePrompt, type Prompt } from "../domain/exchange.ts";
+import { DraftFoot } from "./DraftFoot.tsx";
 import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
 const SAFARI_COMPOSITION_KEY_CODE = 229;
@@ -12,6 +13,8 @@ type MessageFormProps = {
 };
 
 export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormProps) {
+  const id = useId();
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const prompt = parsePrompt(draft);
@@ -28,20 +31,23 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        Message
+      <label htmlFor={`${id}-box`}>Message</label>
+      <div className="row">
         <textarea
+          id={`${id}-box`}
           autoFocus
           rows={2}
           placeholder={PASTE_EXAMPLE}
+          aria-describedby={`${id}-hint ${id}-limit`}
           value={draft}
           onChange={(e) => onDraftChange(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-      </label>
-      <button type="submit" disabled={busy}>
-        Send
-      </button>
+        <button type="submit" disabled={busy}>
+          Send
+        </button>
+      </div>
+      <DraftFoot hintId={`${id}-hint`} limitId={`${id}-limit`} />
     </form>
   );
 }

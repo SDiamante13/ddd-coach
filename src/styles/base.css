@@ -138,7 +138,7 @@ form {
   position: sticky;
   bottom: var(--space-4);
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-3);
   border: 1px solid var(--color-line);
@@ -148,14 +148,35 @@ form {
 }
 
 form label {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
   font: 500 var(--text-base) / 1 var(--font-label);
   font-variant-caps: all-small-caps;
   letter-spacing: var(--tracking-label);
   color: var(--color-ink-muted);
+}
+
+form .row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.formfoot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 20px;
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 form textarea {
@@ -168,8 +189,6 @@ form textarea {
   background: var(--color-paper);
   color: var(--color-ink);
   font: var(--text-base) / 1.45 var(--font-body);
-  font-variant-caps: normal;
-  letter-spacing: normal;
   resize: none;
   field-sizing: content;
   overflow-y: auto;
@@ -236,5 +255,9 @@ button:disabled {
 
   form textarea {
     max-height: 30vh;
+  }
+
+  .formfoot > span:first-child {
+    display: none;
   }
 }
