@@ -3,7 +3,7 @@ import type { CoachReply } from "./replyLayout.ts";
 import { withoutSourceLabel } from "./replyLayout.ts";
 
 const ALWAYS_HELD_BY = ["Code", "Team unclear"];
-const AFTER_HOLDER = /^(?: \(view ([AB])\))? (\p{Ll}+)/u;
+const AFTER_HOLDER = /^(?: \((?:view ([AB])|(\p{Ll}+(?: \p{Ll}+){0,3}))\))? (\p{Ll}+)/u;
 const GROUP_WORDS = ["night", "day", "desk", "shift", "dispatch"];
 
 export type Holder = { team: string; view: string | null };
@@ -84,8 +84,8 @@ export function holderOf(meaning: string, teams: string[]): Holder | null {
   const claim = withoutSourceLabel(meaning);
   const team = longestFirst([...teams, ...ALWAYS_HELD_BY]).find((t) => claim.toLowerCase().startsWith(t.toLowerCase()));
   const after = team === undefined ? null : AFTER_HOLDER.exec(claim.slice(team.length));
-  if (team === undefined || after === null || GROUP_WORDS.includes(after[2]!)) return null;
-  return { team, view: after[1] ?? null };
+  if (team === undefined || after === null || GROUP_WORDS.includes(after[3]!)) return null;
+  return { team, view: after[1] ?? after[2] ?? null };
 }
 
 function longestFirst(teams: string[]): string[] {

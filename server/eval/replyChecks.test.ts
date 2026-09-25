@@ -131,7 +131,6 @@ describe("hard checks", () => {
     ["holders", "a shift as the holder", GOOD_REPLY.replace("Ops (view B) means", "Night dispatch means")],
     ["holders", "a shift inside a team as the holder", GOOD_REPLY.replace("Ops (view B) means", "Night Ops means")],
     ["holders", "a shift after the team", GOOD_REPLY.replace("Ops (view B) means", "Ops night shift means")],
-    ["holders", "a shift as the view label", GOOD_REPLY.replace("Ops (view B) means", "Ops (night) means")],
     ["holders", "a thing as the holder", GOOD_REPLY.replace("Finance means", "The dashboard counts")],
     ["holders", "a party the thread doesn't give a view", GOOD_REPLY.replace("Finance means", "Customers see")],
     ["split labels", "two plain lines for one team", GOOD_REPLY.replace("Finance means a shipment", "Ops means a shipment")],
@@ -155,6 +154,19 @@ describe("hard checks", () => {
     const reply = GOOD_REPLY.replace("Finance means", "Carrier desk means").replace("Ops means", "Team unclear means");
 
     expect(failedHardChecks(reply, "stop", withDesk)).toEqual([]);
+  });
+
+  it("pass a split whose views are named after their groups (#77 U2)", () => {
+    const named = GOOD_REPLY.replaceAll("Ops (view A)", "Ops (day desk)").replaceAll("Ops (view B)", "Ops (night shift)");
+
+    expect(failedHardChecks(named, "stop", fixture)).toEqual([]);
+  });
+
+  it("fail stable views when a group's name moves to the other group under another word", () => {
+    const named = GOOD_REPLY.replaceAll("Ops (view A)", "Ops (day desk)").replaceAll("Ops (view B)", "Ops (night shift)");
+    const swapped = '"booking count"\n- From thread: Ops (night shift) means same carrier keeps one row.\n- From thread: Ops (day desk) means every change adds a row.';
+
+    expect(failedHardChecks(named.replace("\n\nQuestion for", `\n${swapped}\n\nQuestion for`), "stop", fixture)).toEqual(["stable views"]);
   });
 
   it("pass split labels for a lone view line under a word", () => {
@@ -277,6 +289,12 @@ describe("soft scores", () => {
     ["forum", "no forum when the thread names one", GOOD_REPLY.replace(", at the 27 Oct review", "")],
   ])("miss %s for %s", (score, _case, reply) => {
     expect(softScores(reply, fixture)).toMatchObject({ [score]: false });
+  });
+
+  it("hold split when the team's views are named after their groups (#77 U2)", () => {
+    const named = GOOD_REPLY.replaceAll("Ops (view A)", "Ops (day desk)").replaceAll("Ops (view B)", "Ops (night shift)");
+
+    expect(softScores(named, fixture)).toMatchObject({ split: true });
   });
 
   it("hold attribution when another team's line names the phrase's owner", () => {

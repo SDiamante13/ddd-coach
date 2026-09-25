@@ -4,6 +4,7 @@ import {
   hasCleanSplitLabels,
   hasKnownHolders,
   hasStableViews,
+  holderOf,
   keepsSameMeaningWhole,
   namesSameMeaning,
 } from "./viewChecks.ts";
@@ -174,7 +175,7 @@ export function softScores(reply: string, fixture: Fixture): SoftScores {
   const question = parsed?.question;
   return {
     attribution: fixture.key.attributions.every((attribution) => isAttributed(meanings, attribution)),
-    split: hasSplit(meanings, reply, fixture.key.expect),
+    split: hasSplit(meanings, reply, fixture.key),
     codeLine: !fixture.key.expect.codeLine || meanings.some((meaning) => meaning.startsWith("Code ")),
     noStaleMeaning: !meanings.some((meaning) => matches(fixture.key.expect.stalePattern, meaning)),
     quotedWordsInThread: layout.quotedWords.every((word) => includesIgnoringCase(fixture.thread, word)),
@@ -195,10 +196,14 @@ function isAttributed(meanings: string[], { phrase, teams }: Attribution): boole
   return holding.every((meaning) => teams.some((team) => meaning.startsWith(team) || wholeWord(team).test(meaning)));
 }
 
-function hasSplit(meanings: string[], reply: string, { splitTeam, splitTerms = [] }: FixtureKey["expect"]): boolean {
+function hasSplit(meanings: string[], reply: string, { teams, expect: { splitTeam, splitTerms = [] } }: FixtureKey): boolean {
   if (splitTeam === undefined) return true;
-  const views = ["A", "B"].every((view) => meanings.some((meaning) => meaning.startsWith(`${splitTeam} (view ${view})`)));
-  return views && splitTerms.every((term) => reply.includes(term));
+  return viewsOf(splitTeam, meanings, teams).size >= 2 && splitTerms.every((term) => reply.includes(term));
+}
+
+function viewsOf(team: string, meanings: string[], teams: string[]): Set<string> {
+  const holders = meanings.flatMap((meaning) => holderOf(meaning, teams) ?? []);
+  return new Set(holders.flatMap(({ team: holder, view }) => (holder === team && view !== null ? [view] : [])));
 }
 
 function matches(pattern: string | undefined, text: string): boolean {
