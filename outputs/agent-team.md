@@ -8,6 +8,9 @@ pathfinder plan → builder test + code → committer `feat` commit → sweeper 
 
 One working tree; agents run sequentially so builder and sweeper never edit concurrently.
 
+- **Commit requests are final.** Once a request is sent to committer, never withdraw or hold it; fix forward with a follow-up commit (holds and commits crossed twice in slice 2a).
+- **`netlify dev` hot-reloads functions on every save.** Do multi-file renames in one atomic edit, or the shared dev server crashes.
+
 ## Archetypes
 
 | Name | Role | Responsibilities | Tools / skills | Active |
