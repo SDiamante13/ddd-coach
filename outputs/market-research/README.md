@@ -23,8 +23,9 @@ Synthetic interviews generate hypotheses, not evidence. Promote an insight only 
 | 5c | concept: Exploration 03c, before #6 | [md](interviews/interview-05c-explore-03c.md) · [html](interviews/interview-05c-explore-03c.html) | 6 ok / 7 stale / 5 missing; retyping ~7 min (from 8), but now hunting wrong content; split row → two credited rows with loads; one check must update the cell, the question and Dana's line |
 | 6 | 03 (#4 paste → disagreements) + Explorations 06, 05b | [md](interviews/interview-06-after-slice-03.md) · [html](interviews/interview-06-after-slice-03.html) | Win condition partly met: run 1 asked a question she'd missed, run 2 proposed an answer; tie with Claude broken for the question only ('one tab, one job'); reused the move unprompted but can't name it; view A/B unstable; notice still 1.5/5; #68 not fixed |
 | 6b | 41 (conference password gate) | [md](interviews/interview-06b-after-slice-41.md) · [html](interviews/interview-06b-after-slice-41.html) | A slide password is 'a room key, not an account'; nobody has a thread at a meetup, so 'Try an example' (#63) is now a yes; rotating the password after the conference breaks the 90-day promise; hitting the spend limit shows a generic error |
+| 7 | 63 (prompt v8, 3 real replies, 'Try an example') | [md](interviews/interview-07-after-slice-63.md) · [html](interviews/interview-07-after-slice-63.html) | #73 partly fixed: views stable 3/3, win condition 2/3 (run 2 is a ruling); #77 in 1/3, medium impact; 'if the question hasn't got a load in it, it's the wrong run'; #63 yes as a free sample |
 
-Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`, `slice-03.md`, `slice-41.md`
+Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`, `slice-03.md`, `slice-41.md`, `slice-63.md`
 
 ## Queued for interview 04
 
@@ -61,10 +62,10 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   4. After using it, can she name or reuse one move herself? This is a light check that learning actually happened, not just a preference.
 - Tooling: `agent-browser` and headed Chrome screenshots hang on this machine. Use `npx -y playwright@1.63.0 screenshot --channel chrome …` (headless) over `python3 -m http.server`.
 
-## Queued for interview 07 (trigger: the #73 fixed-prompt demo)
+## Queued for interview 08 (trigger: the next slice demo, likely #77)
 
-- **#73 retest using REAL replies, not planted slips.** Take 3+ actual replies from the fixed prompt on her 12k thread, from the demo or evals. Check whether any view A/B flip or shift/desk holder remains. Planting slips tests Priya's detection, not the fix. Keep planting only as a control if the real replies are clean.
-- Win condition, re-run: across the 3 real replies, does every question ask rather than propose?
-- #68, if deployed: is her thread restored after starting over?
-- #66: are the refusal buttons visible without scrolling? Force a refusal if possible.
-- The "For the real practitioner (#70)" questions stay for the real session. Don't burn them on the synthetic persona.
+- **#77 group-named views (U2), from real replies.** Does the plain "Ops" ambiguity go away? Are the group names in her words?
+- **#85:** the question shows its two source lines. Does that make it checkable, and does it change what she copies?
+- The new hard checks: does every real run's question name a concrete case? Does any "should X or Y" ruling slip through?
+- Build order after #77 (from the PO): #56 sanitizing → #64 structured reply → #6 export → #58 knowledge base → #8 streaming. Test each deployed slice with the solo ICP.
+- #70 (a real practitioner with a real thread) remains the top research ask. Don't spend its questions on the persona.
