@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applySwaps, type SwapList } from "./swaps.ts";
+import { applySwaps, removeSwap, type SwapList } from "./swaps.ts";
 
 const swaps = (...pairs: [string, string][]): SwapList => pairs.map(([from, to]) => ({ from, to }));
 
@@ -65,5 +65,12 @@ describe("applySwaps", () => {
     "x".repeat(500),
   ])("leaves %j unchanged with no swaps", (text) => {
     expect(applySwaps([], text)).toEqual({ text, spans: [] });
+  });
+});
+
+describe("removeSwap", () => {
+  it("drops the swap for a listed word and keeps the rest", () => {
+    const list = swaps(["Acme", "Customer A"], ["Laredo", "Lane 1"]);
+    expect(removeSwap(list, "Acme")).toEqual(swaps(["Laredo", "Lane 1"]));
   });
 });

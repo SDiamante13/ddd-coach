@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { cleanup, screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { startConversation } from "../test/appDriver.tsx";
@@ -111,5 +111,32 @@ describe("Swapping sensitive words", () => {
     expect(screen.queryByRole("region", { name: "What's sent" })).not.toBeInTheDocument();
     await user.type(input(), "A");
     expect(toggle()).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps the swaps in this browser for the next visit", async () => {
+    const first = await startConversation();
+    await addSwap(first.user, "Acme Foods", "Customer A");
+
+    cleanup();
+    const { user } = await startConversation();
+    await openSwaps(user);
+
+    expect(screen.getByText("Your swaps (1)")).toBeInTheDocument();
+    expect(screen.getByText("Acme Foods → Customer A")).toBeVisible();
+  });
+
+  it("removes a swap for good", async () => {
+    const first = await startConversation();
+    await addSwap(first.user, "Acme Foods", "Customer A");
+    await addSwap(first.user, "Laredo", "Lane 1");
+
+    await first.user.click(screen.getByRole("button", { name: "Remove swap Acme Foods" }));
+    cleanup();
+    const { user } = await startConversation();
+    await openSwaps(user);
+
+    expect(screen.getByText("Your swaps (1)")).toBeInTheDocument();
+    expect(screen.queryByText("Acme Foods → Customer A")).not.toBeInTheDocument();
+    expect(screen.getByText("Laredo → Lane 1")).toBeVisible();
   });
 });

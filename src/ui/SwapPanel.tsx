@@ -1,14 +1,19 @@
 import { useId, useState, type KeyboardEvent } from "react";
 import type { Swaps } from "./useSwaps.ts";
 
-export function SwapPanel({ swaps, add }: Swaps) {
+export function SwapPanel({ swaps, add, remove }: Swaps) {
   return (
     <details className="swaps">
       <summary>Your swaps ({swaps.length})</summary>
       <ul>
         {swaps.map(({ from, to }) => (
           <li key={from}>
-            {from} → {to}
+            <span>
+              {from} → {to}
+            </span>
+            <button type="button" aria-label={`Remove swap ${from}`} onClick={() => remove(from)}>
+              ×
+            </button>
           </li>
         ))}
       </ul>

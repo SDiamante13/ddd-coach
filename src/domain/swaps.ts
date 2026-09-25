@@ -44,3 +44,7 @@ export type SwapResult = { readonly ok: true; readonly list: SwapList } | { read
 export function addSwap(list: SwapList, from: string, to: string): SwapResult {
   return { ok: true, list: [...list, { from, to }] };
 }
+
+export function removeSwap(list: SwapList, from: string): SwapList {
+  return list.filter((swap) => swap.from !== from);
+}
