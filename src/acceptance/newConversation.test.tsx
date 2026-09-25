@@ -33,6 +33,17 @@ describe("New conversation", () => {
     expect(screen.getByRole("button", { name: "New conversation" })).toHaveFocus();
   });
 
+  it("says what clearing takes away and what it keeps", async () => {
+    const { user, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+
+    expect(screen.getByRole("group", { name: "Clear this conversation?" })).toHaveAccessibleDescription(
+      "The log and history go; your draft stays.",
+    );
+  });
+
   it("copies the conversation from the question before clearing it", async () => {
     const { user, log, sendAndReply } = startConversation();
     await sendAndReply("A", "R1", "sig-A");

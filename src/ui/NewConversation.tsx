@@ -23,8 +23,11 @@ export function NewConversation({ busy, onClear, conversation }: NewConversation
   }
 
   return (
-    <span className="confirm" role="group" aria-labelledby={questionId}>
-      <span id={questionId}>Clear this conversation?</span>
+    <span className="confirm" role="group" aria-labelledby={questionId} aria-describedby={`${questionId}-effect`}>
+      <span>
+        <span id={questionId}>Clear this conversation?</span>{" "}
+        <span id={`${questionId}-effect`}>The log and history go; your draft stays.</span>
+      </span>
       <CopyConversationButton text={conversation} label="Copy first" />
       <button type="button" disabled={busy} onClick={clear}>
         Clear
