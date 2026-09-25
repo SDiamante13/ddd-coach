@@ -2,7 +2,9 @@
 
 *Synthetic interview. Treat every point as a hypothesis until a real practitioner confirms it.*
 
-Early October 2026, about two weeks after interview 02. Since then Priya has had a third hour with Dana. This session covers policy and trust against the live hosted app at https://ddd-coach.netlify.app. Shown: the live page (unstyled at the time it was viewed: notice under the title, one-line "Message" box, "Powered by Netlify" badge), then `slice-02a.png` and the 413 step of the slice 2a demo. The design-tokens restyle (#42) reached production later the same day, so Part E used the #42 demo's production screenshots (`slice-42-light.png`, `slice-42-phone.png`). Nothing was typed into the live app.
+Early October 2026, about two weeks after interview 02. Since then Priya has had a third hour with Dana, and she has tried the hosted app once herself. This session covers policy and trust against the live app at https://ddd-coach.netlify.app, and it counts as covering both slice 2a and the #42 restyle.
+
+Shown: the live page after the #42 restyle (deploy `6ab5fef3`: tokens, self-hosted fonts, small-caps labels), the #42 demo shots `slice-42-light.png`, `slice-42-failed.png` and `slice-42-phone.png`, and the 413 step of the slice 2a demo. Priya's own attempt on Sunday was on the pre-restyle page. The interviewer didn't type anything into the live app. Live facts behind the probes: the input is a single-line `<input type="text">`, so pasted newlines get flattened (#50); a first visit shows only a title, the notice and a "Message" box, with no purpose line and no example; one message over 8,000 characters is rejected with a 413 that clears the draft; and on a phone the Netlify badge covers part of Send (#52).
 
 ## Part A: since last time
 
@@ -12,15 +14,67 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 
 **Q:** You had the link to the hosted app. Did you open it?
 
-**Priya:** Once, Saturday, on my phone. I read the notice, scrolled, saw a text box, and closed it. I didn't paste anything, because I didn't have the sanitized thread on my phone and I wasn't going to sanitize it with my thumbs. Then on Sunday I spent twenty minutes reading OpenRouter's privacy page on the laptop, which is more time than I spent on your app. <mark>So the first thing your hosted app made me do was research your vendor.</mark>
+**Priya:** Twice. Saturday on my phone, on the sofa: I read the notice, saw a text box, and closed it. Then Sunday night on the laptop. First I spent twenty minutes reading OpenRouter's privacy page, then I actually tried it with the sanitized thread. <mark>So the first thing your hosted app made me do was research your vendor.</mark>
 
 **Q:** What did you find on that page?
 
 **Priya:** If I read it right, OpenRouter doesn't keep prompts unless the account turns logging on, and then each model provider behind it has its own policy, and some keep things for a while for abuse checks. So the honest answer to "is my text stored?" is "it depends on settings the operator chose, which I can't see." That's not a gotcha. It's just what I'd need you to tell me.
 
-## Part B: the notice as shipped
+## Part B: her first real attempt
 
-*(Shown the live page. The notice reads: "Your messages are sent to OpenRouter, an AI model provider, to generate replies. Nothing is stored on our server. Don't paste customer names or rates.")*
+**Q:** What did you try to paste first, and what broke? Walk me through Sunday step by step.
+
+**Priya:** The sanitized Slack thread, from the text file where I keep it. Customer names are "Customer A," rates are gone, and it's about twelve thousand characters. I opened your page, and there's the title, the notice, the word "Message" and a box about as wide as a URL bar. I selected all in the text file, copied, clicked the box and pasted. The box showed the tail end of the last message and nothing else. I didn't think about it. I pressed Send.
+
+**Q:** When did you notice the line breaks were gone?
+
+**Priya:** After Send. My message showed up in the log as one enormous paragraph: "Customer A booked 10:14 ops creates it on submit Tom 10:16 no finance only counts it when…". The names, timestamps and messages all ran together into one line. <mark>A Slack thread without line breaks isn't a thread any more. It's a wall, and you can't tell who's talking.</mark> Then, under it, in about a tenth of a second: "This message is too long for the coach. Shorten it and send it again."
+
+**Q:** Then what did you do?
+
+**Priya:** The box was empty. My text was only in the log, as that wall, so I went back to the text file instead. I didn't know the limit, so I guessed. I deleted the first forty-odd messages, the "following" and "+1" and the original question, and kept the argument. It came to about seven thousand. That was another ten minutes. I pasted that and it went through. The reply came back in a couple of seconds.
+
+**Q:** What did the reply say?
+
+**Priya:** A tidy summary: "The thread discusses differing definitions of when a booking is created," then some advice to "align on a shared booking lifecycle and document status transitions." No question for me at all. It never mentioned REBOOKED versus AMENDED, because the part where ops explains it was in what I'd cut. And it said *ops* thinks a booking starts when it's invoiceable. That's Tom's line, and Tom is finance. <mark>With the line breaks gone it glued Tom's sentence onto the ops person before him, so the one thing it attributed, it got wrong.</mark> That's the wrong-label problem I told you about last time, except this time it's real, not a mockup.
+
+**Q:** How long did that take all together? What did you do next?
+
+**Priya:** About forty minutes, with the sanitizing. Then I did what I always do. I pasted the same thread, with its line breaks, into our company Claude, which is allowed because it's sanitized anyway. I got a better summary, with the speakers right, and still no questions. I closed your tab. I haven't been back since.
+
+**Q:** Before Sunday, when was the last time a tool rejected your input for length? What did you do?
+
+**Priya:** August, our company Claude. I'd attached the Rails model and the enum and a chunk of the callbacks, and after a few turns it said the conversation was too long and to start a new chat. I started a new chat, pasted the half I thought mattered, and lost the connection between the callbacks and the statuses. That's one of the forty chats called "Booking notes." <mark>What I did was retry once, cut, and then stop trusting the answer, because I knew it hadn't seen everything.</mark> Sunday went exactly the same way. Cut once, and I didn't trust the answer.
+
+**Q:** What would you want the message to say?
+
+**Priya:** The number. "Your message is 12,040 characters; the limit is 8,000." Then I know it's a 35% cut and not a 5% one. And leave my text in the box. Honestly, though, I'd rather it just took the thread, line breaks and all. The thread is the input. Everything I type after that is a sentence or two.
+
+**Q:** If you did get the thread in, a few turns later you'd hit the 24k conversation limit. One idea is to trim or summarize older turns automatically. How would that land?
+
+**Priya:** Depends what "older" means. In my case the oldest turn is the thread, and everything after it is me asking about it. If you summarize my thread to make room for my chat, you've kept the wrong half. <mark>Keep the paste, squash the chat.</mark> And tell me you did it, in one line, beside the reply.
+
+## Part C: the first visit
+
+**Q:** When you landed on Saturday, what told you what the tool was for and what to paste?
+
+**Priya:** Nothing on the page. There's "DDD Coach," a paragraph about where my data goes, and a box that says "Message." The only instruction on the whole screen is what *not* to paste. I knew to paste the thread because I've done two interviews with you. If a colleague had sent me the link, I'd have typed "what is a bounded context?", which, funnily enough, is exactly what your own demo screenshot shows.
+
+**Q:** The last time you opened a new tool from a link with nobody explaining it, what happened?
+
+**Priya:** August, a context-mapping tool someone posted on Bluesky. It opened on an empty canvas with a toolbar. I gave it maybe thirty seconds, couldn't see what I was supposed to do first, and closed it. I've never been back, and I couldn't tell you its name now. <mark>An empty box with no hint is a thirty-second tool.</mark>
+
+**Q:** And if you forwarded this link to Aisha or Ravi without a word?
+
+**Priya:** Ravi would type a textbook question, get a textbook sentence, and decide it's ChatGPT with a nicer font. Aisha wouldn't open it, because it says "DDD" and she doesn't know what that is. Neither of them would paste a thread, because nothing tells them that's the point.
+
+**Q:** What would have told you?
+
+**Priya:** One line, not a tutorial. Something like "Paste a messy Slack thread or meeting notes. I'll show where people use the same word differently and what to ask your expert." And a grey example inside the box, like "Paste the thread nobody could settle…", the way your mockup had it. That tells me what to do and why in five seconds. And please don't make it a tour I have to click through.
+
+## Part D: the notice as shipped
+
+*(The notice reads: "Your messages are sent to OpenRouter, an AI model provider, to generate replies. Nothing is stored on our server. Don't paste customer names or rates.")*
 
 **Q:** That's the real wording now. Would you paste real work material?
 
@@ -44,33 +98,9 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 
 **Q:** So, overall: which items moved?
 
-**Priya:** One and a half out of five. OpenRouter is named, and there's a "don't paste" line I didn't have on the list but asked for. The placement is still right: visible, no dialog, doesn't block anything. Everything that would let me defend using it is still missing. I'd paste the sanitized thread with this notice. I'd have pasted the sanitized thread without it, too.
+**Priya:** One and a half out of five. OpenRouter is named, and there's a "don't paste" line I didn't have on the list but asked for. Everything that would let me defend using it is still missing. I pasted the sanitized thread with this notice on Sunday. I'd have pasted the sanitized thread without it, too.
 
-## Part C: the 8,000-character limit
-
-*(Shown the slice 2a demo at 1:01: a 9,000-character message is rejected with "This message is too long for the coach. Shorten it and send it again." There's no Retry button, and the input is cleared.)*
-
-**Q:** Your Slack export was about 18,000 characters. What's it at after sanitizing?
-
-**Priya:** About twelve thousand. Sanitizing removes names and rates, not messages. So even the cleaned-up version fails. And your box is one line. When I paste a Slack thread into a one-line input, the line breaks go and it's one long sentence. You lose who said what, and <mark>who said what is the entire point of that thread.</mark>
-
-**Q:** Say you've pasted the twelve thousand and you get this message. What do you do at that moment?
-
-**Priya:** First I'd look for my text, and it's gone from the box. It's in the log above, all twelve thousand characters of it, so I'd be scrolling and selecting by hand on a laptop trackpad. Then I'd have to guess how much to cut, because the message doesn't say what the limit is. I'd delete the first forty messages, the "following" and "+1" and the original question, and keep the argument. That's maybe seven thousand. Another ten minutes, on top of the fifteen for sanitizing. And the part I'd cut first is where ops explains their definition in their own words, which is the part Dana would care about.
-
-**Q:** When was the last time a tool rejected your input for length? What did you do?
-
-**Priya:** August, our company Claude. I'd attached the Rails model and the enum and a chunk of the callbacks, and after a few turns it said the conversation was too long and to start a new chat. I started a new chat, pasted the half I thought mattered, and lost the connection between the callbacks and the statuses. That's one of the forty chats called "Booking notes." <mark>What I did was retry once, cut, and then stop trusting the answer, because I knew it hadn't seen everything.</mark> I'd do the same here. Cut once. If it rejects me twice, I close the tab.
-
-**Q:** What would you want the message to say?
-
-**Priya:** The number. "Your message is 12,040 characters; the limit is 8,000." Then I know it's a 35% cut and not a 5% one. And leave my text in the box. Honestly, though, I'd rather it just took the thread. The thread is the input. Everything I type after that is a sentence or two.
-
-**Q:** If you did get the thread in, a few turns later you'd hit the 24k conversation limit. One idea is to trim or summarize older turns automatically. How would that land?
-
-**Priya:** Depends what "older" means. In my case the oldest turn is the thread, and everything after it is me asking about it. If you summarize my thread to make room for my chat, you've kept the wrong half. <mark>Keep the paste, squash the chat.</mark> And tell me you did it, in one line, beside the reply.
-
-## Part D: bring your own key, and self-hosting
+## Part E: bring your own key, and self-hosting
 
 **Q:** One option on the table: a field where you paste your own Anthropic API key, so your text goes to Anthropic under your company's terms. Is that acceptable?
 
@@ -96,13 +126,17 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 
 **Priya:** For this month, say it plainly. I'm already sanitizing. Tell me the tool is built for that, tell me what to strip, and fill in the rest of the notice. Self-host is a later conversation, and it only happens if the sanitized version wins first. The key field I'd skip. It costs you a setting and it doesn't unlock me.
 
-## Part E: the look
+## Part F: the look, and the phone
 
-*(Shown the restyled production screen from the #42 demo, desktop and phone: a warm paper background with a dot grid, a bold title, "YOU" and "COACH" cards, a docked message bar with a blue Send button, and the notice in a small grey boxed panel. On the phone, the Netlify badge overlaps the Send button.)*
+*(Shown the live restyled page, plus the #42 demo shots: desktop with a reply, the failed state with Retry, and the phone at 390 px. It has warm paper with a dot grid, a bold title, small-caps "You" and "Coach" cards, and a docked message bar with a blue Send button. The notice is now 14 px muted grey in a grey box, against 16 px body text. On the phone, the Netlify badge covers the bottom of Send.)*
 
 **Q:** This is the restyled screen, live now. Would it look trustworthy enough to show Dana?
 
-**Priya:** I'm not showing Dana the app. I said that in the first interview, and nothing's changed. I prep alone, and what Dana sees is the output: three questions in a Slack DM, or a table in Confluence. So the look matters for me, and a little for Marcus if I screenshot something. It's nicer. It no longer reads "someone's weekend project," apart from the Netlify bubble, which is now sitting on your Send button on the phone. But look what happened to the notice. Before, it was the only real text on the page. Now it's small grey type in a grey box, <mark>which is exactly what cookie banners and terms of service look like, the stuff I've trained myself not to read.</mark> And a nicer-looking page from a name I don't know is still a stranger. The name and a link help me trust it more than the fonts do.
+**Priya:** I'm not showing Dana the app. I said that in the first interview, and nothing's changed. I prep alone, and what Dana sees is the output: three questions in a Slack DM, or a table in Confluence. So the look matters for me, and a little for Marcus if I screenshot something. It's nicer. It doesn't read "someone's weekend project" any more. But look what happened to the notice. On Sunday it was the only real text on the page. Now it's small grey type in a grey box, <mark>which is exactly what cookie banners and terms of service look like, the stuff I've trained myself not to read.</mark> And the message box is still one line, so Sunday would go exactly the same way, just in a nicer font. A nicer-looking page from a name I don't know is still a stranger.
+
+**Q:** Anything on these screens you'd call trustworthy?
+
+**Priya:** The failed one, actually. Red box, "Could not reach the coach," Retry right there. It admits it broke, and it doesn't pretend. That's the kind of honest I'd want everywhere. The cards are fine. "You" and "Coach" are clear, and the example on it is a textbook question again.
 
 **Q:** When was the last time you showed Dana a tool? How did she react?
 
@@ -110,9 +144,13 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 
 **Q:** So what would make something trustworthy enough for Dana?
 
-**Priya:** Her words, and her format. If the three questions use "rebook" and "TONU" and a real load number, she answers them. If they say "BookingReassigned" she's gone. And it has to arrive somewhere she already is, which is Slack or Excel. Whatever tool made it is irrelevant to her, as long as it doesn't pretend she said something she didn't.
+**Priya:** Her words, and her format. If the three questions use "rebook" and "TONU" and a real load number, she answers them. If they say "BookingReassigned" she's gone. And it has to arrive somewhere she already is, which is Slack or Excel. Whatever tool made it is irrelevant to her, as long as it doesn't pretend she said something she didn't. Sunday's reply put Tom's words in ops' mouth. If that reached Dana, she'd be done with it.
 
-## Part F: leftovers from last time
+**Q:** Would you open it on your phone at all, say right after a Dana call?
+
+**Priya:** No. Dana's calls are Zoom on the laptop, and the second she hangs up I'm typing into the text file on the same laptop, because that's where my notes already are. My phone was for Saturday on the sofa, to look, not to work. The only time I'm on the phone after a call is walking to get coffee, and then I'd rather talk than type. I told you last time I've never actually done that. And look at your phone screenshot: the Netlify badge sits on top of Send. <mark>The one time I'd type on the phone, I'd hit Netlify's ad instead of Send.</mark> So fix the badge, but don't build anything for the phone on my account.
+
+## Part G: leftovers from last time
 
 **Q:** Last time you said to ask who approves a new AI vendor. Who does, and what happened the last time someone asked?
 
@@ -130,15 +168,15 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 
 **Priya:** The glossary, again. I pasted my Dana summary from the text file, and the table came through as pipes, so I rebuilt six rows with the table button. About twenty-five minutes. Same as last time. That hasn't changed, because nothing I use has changed.
 
-## Part G: close
+## Part H: close
 
 **Q:** If you could only have one thing in the next month, what is it now?
 
-**Priya:** Take my twelve-thousand-character sanitized thread in one go, and give me the words that don't match as a table I can paste into the glossary. Before the 30th. Last time I said "and it's still there when I come back," and I still want that in general. But I have one Dana session left, so this month, <mark>the paste has to fit and the table has to paste. That's more urgent than persistence now.</mark> I know that's different from what I said before.
+**Priya:** Take my twelve-thousand-character sanitized thread in one go, with its line breaks, and give me the words that don't match as a table I can paste into the glossary. Before the 30th. Last time I said "and it's still there when I come back," and I still want that in general. But I have one Dana session left, so this month, <mark>the paste has to fit and the table has to paste. That's more urgent than persistence now.</mark> I know that's different from what I said before.
 
 **Q:** Would you use it this week? For what?
 
-**Priya:** Honestly, as it is today, no. The box is one line, it takes eight thousand characters, and it doesn't untangle anything. It's a chat. I might try it Saturday at home with the thread cut down to fit, to see one thing: does it find the REBOOKED versus AMENDED split without me pointing at it? Company Claude didn't. That's a twenty-minute test, not using it. If it finds the split, I'll tell you. If it tells me to make a Booking aggregate, I won't be back.
+**Priya:** I already tried it this week, and it cost me forty minutes and got a speaker wrong. As it is today, no. The box is one line, it takes eight thousand characters, and it doesn't untangle anything. It's a chat. When the box keeps line breaks, I'll re-run the same sanitized thread once, at home, and check two things. Does it get the speakers right? Does it find the REBOOKED versus AMENDED split without me pointing at it? That's a twenty-minute test, not using it. <mark>If it tells me to make a Booking aggregate, I won't be back.</mark>
 
 ---
 
@@ -146,22 +184,22 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 
 ### Key insights
 
-1. **The shipped notice meets 1.5 of her 5 checklist items.** OpenRouter is named, but the company behind the router isn't. "OpenRouter, an AI model provider" is inaccurate. No retention beyond "our server," no training line, no link, no operator. The notice read the same with a Claude model as with today's OpenAI model, so it can't tell her who processes the text. The "don't paste customer names or rates" line is the only part that raised trust. [strong signal] [contradicts roadmap: #2 closed as done; #34 comment says links "wait on this decision," but OpenRouter's and OpenAI's policy pages exist today]
-2. **A forwardable page protects her. It doesn't get the tool approved.** Security's last AI-vendor review (April) required a DPA, SOC 2, subprocessors, retention, training use and SSO. It took six weeks and ended in "use what we pay for." A side project with no legal entity gets a flat no. She walked back her interview-02 claim. [strong signal: past behavior, secondhand] [contradicts roadmap: disclosure as a route to work use (#2, #34)]
-3. **Bring-your-own Anthropic key doesn't unlock her.** Her Claude Enterprise workspace has no API keys. API keys are per service, owned by platform and held in Vault (Ravi's July ticket). Security forbids pasting credentials into third-party sites, and a key relayed through the app's server still makes the app a vendor. An optional, folded field wouldn't bother her. A required one is "the account gate with a different name." [strong signal on "no personal keys"; the key mechanics are secondhand] [contradicts #34 option "BYO key"; supports "no settings before first reply"]
-4. **Self-hosting with a company key is the only work-legal path, and it comes after a solo win.** Running locally or in company infra with a Vault key would make it an internal tool reviewed like Ravi's script (about two weeks). She won't do it before a win, and not before the RFC. [weak signal: stated intent, secondhand timing] [contradicts icebox #33 "B10/B19/B20 blocked by ICP AI policy", which is true only while inference goes through OpenRouter]
-5. **Her real paste doesn't fit, and the 413 makes it worse.** 18k raw, about 12k sanitized. The 8k cap rejects even the cleaned version. The one-line input flattens who-said-what. The 413 clears her draft and doesn't give the limit. Past behavior (August, company Claude "too long"): retried once, cut, then distrusted the answer. Here: "Cut once. If it rejects me twice, I close the tab." [strong signal] [contradicts #4's "1–5k chars"; supports #50, #51; challenges B40 #35's 8k per-message cap]
-6. **Trimming has to keep the paste.** In her flow the oldest turn is the source material, so summarizing older turns first keeps the wrong half. "Keep the paste, squash the chat," with a visible note. [strong signal: follows from her flow, not from past behavior] [refines B38 #7]
-7. **The restyle won't earn Dana's trust, and it demoted the notice.** She never shows Dana the app; Dana sees output in Slack or Confluence. Past anchor: Dana dismissed a Retool timeline in ten seconds over one wrong term, then asked for Excel. The live restyle fixes the "weekend project" look for Priya and Marcus, but it styles the notice as small grey text in a grey box, "exactly what cookie banners … look like." The Netlify badge covers Send on the phone. "A nicer-looking page from a name I don't know is still a stranger." [strong signal on Dana; weak on styling] [contradicts #42's notice treatment; supports #52 badge removal]
-8. **The expert confirmation loop already exists, by hand, in Slack.** She did the "did I get this right?" DM that she asked the tool for in interview 02, and Dana corrected one answer. That correction now lives in three places, none of them the RFC. She rebuilt the glossary table by hand again (about 25 minutes). This month, paste capacity and a pasteable table beat persistence (one Dana session left before she's away). [strong signal: past behavior; the priority shift is a self-contradiction] [supports #6, B22 #19; reorders #5 vs #4/#50 for her calendar]
+1. **Her first real attempt failed twice before any coaching happened.** She pasted a 12k sanitized thread into the one-line box, and the newlines were flattened. She pressed Send and got a 413 in about 0.1 s, with the draft cleared. She cut the thread by guesswork to about 7k (10 more minutes). The reply was generic, asked no question, and gave Tom's (finance) line to ops, because the flattened text had lost speaker boundaries. She then took the same thread to company Claude, which got the speakers right, and hasn't come back. It cost about 40 minutes. [strong signal: past behavior on the live app] [supports #50 as urgent now, not only "before slice 3"; supports #51; contradicts #4's "1–5k chars" and B40 #35's 8k cap for her input]
+2. **A first visit doesn't say what the tool is for.** The only instruction on the page is what *not* to paste. She knew to paste a thread only because of the interviews. Past anchor: a Bluesky context-mapping tool that opened on an empty canvas got 30 seconds and was never reopened. Her guess about colleagues: Ravi types a textbook question, and Aisha doesn't open it. She wants one line plus a placeholder example, and no tour. [strong signal for her own anchor; weak for colleagues (secondhand guess)] [contradicts the backlog friction check "a first-time visitor can understand the next action from the main screen"; supports 2a fresh-eyes 3 and #4]
+3. **The shipped notice meets 1.5 of her 5 checklist items, and the restyle demoted it.** OpenRouter is named, but the company behind it isn't, and "an AI model provider" is inaccurate. Nothing on retention beyond "our server," no training line, no link, no operator. The notice read the same with a Claude model as with an OpenAI one. The "don't paste" line was the only trust gain. The #42 restyle sets the notice at 14 px muted grey against 16 px body text: "exactly what cookie banners … look like." [strong signal] [contradicts #2 closed as done, and #42's notice treatment; #34's comment defers links that could be added today]
+4. **A forwardable page protects her. It doesn't get the tool approved.** Security's April review required a DPA, SOC 2, subprocessors, retention, training use and SSO. It took six weeks and ended in "use what we pay for." A side project gets a flat no. She walked back her interview-02 claim. [strong signal: past behavior, secondhand] [contradicts disclosure as a route to work use (#2, #34)]
+5. **Bring-your-own key doesn't unlock her. Self-hosting is the only work-legal path, and only after a solo win.** She has no personal API keys: they're per service, owned by platform and held in Vault (Ravi, July). The secrets policy forbids pasting credentials into sites, and a key relayed through the server still makes the app a vendor. An optional folded field would be tolerated; a required one is "the account gate with a different name." Self-hosting with a Vault key would be reviewed like an internal tool (about 2 weeks, secondhand), but "after it's already saved me a week." [strong on "no keys"; weak on self-host intent] [contradicts the #34 BYO-key option; contradicts icebox #33 "B10/B19/B20 blocked by ICP AI policy"]
+6. **Trimming has to keep the paste.** The oldest turn is her source. "Keep the paste, squash the chat," with a visible note. [strong signal: follows from her flow and Sunday's cut] [refines B38 #7]
+7. **The restyle doesn't earn Dana's trust, and the phone isn't her device.** Dana sees only output (Slack, Excel, Confluence). In April she dismissed a Retool view over one wrong term. The failed state (red box plus Retry) is the one screen Priya called trustworthy. After a Dana call she's already typing on the laptop. She used the phone once, to look. On the phone the Netlify badge covers Send: "I'd hit Netlify's ad instead of Send." [strong signal on Dana and the post-call laptop; weak on phone use] [neutral on #42; supports #52 as a fix but argues against any phone-first work]
+8. **The expert confirmation loop already exists, by hand, in Slack, and her priorities shifted this month.** She sent Dana a "did I get this right?" DM, and Dana corrected one answer. The correction lives in three places, none of them the RFC. She rebuilt the glossary table by hand again (about 25 min). With one Dana session left, paste capacity and a pasteable table beat persistence. [strong signal: past behavior; the priority shift is a self-contradiction] [supports #6, B22 #19; reorders #5 vs #50/#4 for her calendar]
 
 ### What changed since interview 02
 
-- **Confirmed:** OpenRouter blocks real material ("no sentence fixes that"); she'd use it only for sanitized text; the notice placement (visible, no dialog) is right; the Confluence table still pastes as pipes.
-- **Strengthened:** the "don't paste" line. She asked for it in interview 02, and it's now the only notice line that raised trust. The length problem also got stronger: she gave a concrete sanitized size (about 12k) and a past length rejection (August).
-- **Weakened:** "a page I can forward to security is how anything gets approved." She now says it covers her but won't pass review without a company and a DPA. Persistence as the one thing *this month*: one Dana session left, so paste capacity and the glossary table come first. She still wants persistence in general.
-- **New:** she spent more time researching OpenRouter than using the app. The hosted model is OpenAI's, and the notice doesn't say so. She has no personal API key, and there's a secrets rule against pasting keys into sites. Self-hosting is a possible later path. Security's April review is a concrete bar (DPA, SOC 2, subprocessors, retention, training, SSO). The Retool anecdote shows how Dana judges tools. She did the expert-confirmation DM by hand. The one-line input breaks her paste. The live restyle made the notice look like small print.
-- **Interview-02 asks vs what shipped:** of her five checklist items, one is partly met (OpenRouter named, no provider). Her "don't paste" line shipped. Persistence and the untangle haven't shipped.
+- **Confirmed:** OpenRouter blocks real material ("no sentence fixes that"), so she'll use sanitized text only. Confluence still pastes tables as pipes. "Wrong labels kill trust" is now real: the live app misattributed a speaker.
+- **Strengthened:** the length and paste problem went from a worry to past behavior. On Sunday she hit the flattening, then the 413, then a guessed cut, then a wrong answer, then left for company Claude. The "don't paste" line held up as the only trust gain.
+- **Weakened:** "a page I can forward to security is how anything gets approved": now it covers her but won't pass review. The notice placement: still no dialog, but #42 made it small print. Persistence as *this month's* one thing: one Dana session left. Phone or voice right after a call: she's on the laptop.
+- **New:** her first real attempt (about 40 minutes, a speaker misattributed, then company Claude). No purpose line (the Bluesky thirty-second anchor). The hosted model is OpenAI's, and the notice doesn't say so. No personal API keys, and a secrets rule against pasting keys. Self-hosting as a later path. Security's April bar. The Retool anecdote. The expert-confirmation DM done by hand. The Netlify badge over Send on the phone.
+- **Interview-02 asks vs what shipped:** of her five checklist items, one is partly met. Her "don't paste" line shipped. Persistence and the untangle haven't shipped.
 
 ### Decision input for #34 (provider path)
 
@@ -170,7 +208,7 @@ Early October 2026, about two weeks after interview 02. Since then Priya has had
 | Option | Unlocks real material for Priya? | Evidence |
 |---|---|---|
 | BYO Anthropic key field | No | No personal keys exist: Enterprise is chat only, and API keys are per service in Vault (Ravi, July). The secrets policy forbids pasting credentials into third-party sites. If the key passes through the app's server, the app is still a vendor. An optional folded field is tolerated but builds nothing for her; a required one makes her bounce. |
-| Accept sanitized-only (say so) | No, but it matches what she already does | She already sanitizes (about 15 min). "Tell me the tool is built for that, tell me what to strip, and fill in the rest of the notice." The "don't paste" line was the only trust gain. |
+| Accept sanitized-only (say so) | No, but it matches what she already does | She already sanitized and pasted on Sunday (about 15 min). "Tell me the tool is built for that, tell me what to strip, and fill in the rest of the notice." The "don't paste" line was the only trust gain. |
 | Self-host / local with company key | Yes, later | "Internal tool, not a vendor." About a 2-week platform review (secondhand). "What I'd do after it's already saved me a week." Keep the `Coach` port provider-agnostic so an Anthropic adapter stays cheap. |
 | Hosted Anthropic path (operator's key) | No | Still an unapproved vendor (the operator). She said "not even Anthropic… that's fine for sanitized text", so which model runs doesn't change her decision. |
 
@@ -180,34 +218,40 @@ What would reopen BYO key: a real practitioner at a company that issues personal
 
 B-IDs verified against GitHub issue titles and the icebox (#33). `outputs/ddd-coach-backlog.md` is a pointer and lists no B-IDs itself.
 
-- **The data-flow notice is done** (#2, closed). One and a half of five checklist items are met. "An AI model provider" mislabels OpenRouter. No provider, retention, training, link or operator. The #34 comment defers the links to the provider decision, but the current vendors' policy pages can be linked today.
-- **Pastes run 1–5k characters** (#4 acceptance; #7 "pastes run 1–5k"). Her real thread is 18k (about 12k sanitized). The 8k per-message cap (B40, #35) rejects it, and the one-line input (#50) flattens it before it's even sent.
-- **A 413 without Retry is enough recovery** (B41, #36). No Retry is right, but the cleared draft (#51) and the missing limit number turn one rejection into a scroll-and-guess. Her past behavior is "cut once, then leave."
-- **Trim or summarise older turns** (B38, #7). For a paste-first user the oldest turn is the source. Trimming has to pin the first pasted message and squash the chat.
-- **BYO key is a viable #34 option** (#34). Not for this ICP: she has no key, and the policy forbids pasting one.
-- **Local folder, private repos and a local companion are blocked by the AI policy** (B10/B19/B20, icebox #33). They're blocked only while inference goes through OpenRouter. A self-hosted build with a company key is the one path she says could be work-legal.
-- **The restyle raises trust enough to show the expert** (#42, live). She never shows Dana the app. Dana judges terms and wants Excel or Slack. The restyle helps Priya's own "weekend project" read, but it renders the notice as muted small print, the look she's trained herself to skip. The Netlify badge (#52) now covers Send on the phone. A named operator matters more than any of it.
-- **Persistence is her top ask** (#5; interviews 01 and 02). It's still wanted, but for the next four weeks her calendar ranks paste capacity (#50, #35) and a pasteable table (#6) higher. This is a self-contradiction, so confirm it with a real practitioner.
-- **Export is Markdown into Confluence and Miro** (#6 acceptance). This is the second time she's rebuilt a pasted table by hand (about 25 min). Rich text table first. Miro is gone (interview 02).
+- **The single-line input can wait until slice 3** (#50, "do before #4"). It's already costing the live app: the flattened thread lost speaker boundaries, and the reply misattributed Tom's line. It's the first thing a paste-first visitor hits.
+- **A first-time visitor can understand the next action from the main screen** (backlog friction check; slice 3 briefing, #4). The page says only what not to paste. Her anchor for an unexplained tool is a 30-second visit.
+- **Pastes run 1–5k characters** (#4 acceptance; #7 "pastes run 1–5k"). Her real thread is 18k (12k sanitized). The 8k per-message cap (B40, #35) rejected it on Sunday.
+- **A 413 without Retry is enough recovery** (B41, #36). No Retry is right, but the cleared draft (#51) and the missing limit number forced a guessed cut, and the cut removed the part that mattered.
+- **Trim or summarise older turns** (B38, #7). For a paste-first user the oldest turn is the source. Pin the first paste and shorten the chat.
+- **The data-flow notice is done** (#2, closed). 1.5 of 5 items are met, and "an AI model provider" mislabels OpenRouter. The links can be added today.
+- **The restyle raises trust** (#42, live). It demoted the notice to muted small print, and it doesn't change the one-line input that broke Sunday. Dana never sees the app anyway.
+- **The Netlify badge is a P2 cosmetic** (#52). It covers Send on phones. She won't work on the phone, so P2 is fair for her, but it's the first thing any phone visitor taps.
+- **BYO key is a viable #34 option** (#34). Not for this ICP.
+- **Local and private sources are blocked by the AI policy** (B10/B19/B20, icebox #33). They're blocked only while inference goes through OpenRouter. Self-hosting with a company key could be work-legal.
+- **Persistence is her top ask** (#5). Still wanted, but this month paste capacity (#50, #35) and a pasteable table (#6) rank higher. This is a self-contradiction, so confirm it with a real practitioner.
+- **Export is Markdown into Confluence and Miro** (#6). This is the second hand-rebuilt glossary table. Rich-text table first; Miro is gone.
 
 ### Small slice suggestions
 
-1. **Complete the notice with a linked data page.** Reopen #2, or a #34 follow-up.
-   - *Smallest result:* the notice names the company behind the model (from server config), links "Data & retention" to one static page, and says "Built for sanitized text." The page names the operator, OpenRouter and the provider, and links each one's privacy and training policy, plus the OpenRouter logging setting the operator chose.
-   - *Acceptance:* at 400px and 1280px the notice fits without a dialog, and the first reply isn't blocked. The notice text is body size and full ink colour, not the muted small style #42 gave it. Changing the configured model changes the named company. Every retention or training claim on the page links to that vendor's own policy page. Otherwise it isn't shown. "An AI model provider" no longer describes OpenRouter. Each of her five checklist items maps to a line on the page.
-2. **A 413 that keeps the draft and names the limit.** Extends #51.
-   - *Smallest result:* on a message over 8,000 characters, the draft stays in the input, and the message reads "Your message is N characters; the limit is 8,000." There's still no Retry.
-   - *Acceptance:* paste 12,040 characters and send. The input still holds all 12,040 characters, the error shows both numbers, and there are 0 buttons in the entry. The server isn't called (413 in under 300 ms).
-3. **Fit a sanitized thread: multiline input plus a pinned first paste.** #50 plus a B38 (#7) variant, before #4.
-   - *Smallest result:* a textarea keeps line breaks. The per-message cap rises to fit about 12k within the 24k conversation budget. When the budget runs out, the first pasted message is kept verbatim and the later chat turns are shortened, with a one-line note under the reply.
-   - *Acceptance:* paste a 12,000-character multi-line thread. The request body keeps the `\n`s and returns 200. Keep chatting until the budget is hit. The next reply quotes a detail from the first paste, the note says what was shortened, and no 413 appears.
+1. **Keep the paste intact: a multiline box plus a draft that survives a 413.** #50 plus #51, now rather than "before slice 3".
+   - *Smallest result:* a full-width textarea keeps pasted line breaks. On a message over 8,000 characters the draft stays in the box, and the message reads "Your message is N characters; the limit is 8,000." There's still no Retry.
+   - *Acceptance:* paste a 12,040-character, 200-line Slack export and send. The box still holds all 12,040 characters with line breaks, both numbers show, and there are 0 buttons in the entry. Paste a 3-line thread and send: the request body contains 2 `\n`s. Works at 390 px, and the Netlify badge doesn't overlap Send (#52).
+2. **One purpose line and an example placeholder on first visit.** A thin slice of #4's briefing.
+   - *Smallest result:* under the title, one line: "Paste a messy thread or meeting notes. I'll show where people use the same word differently and what to ask your expert." The empty box shows a grey placeholder example. No tour, no dialog.
+   - *Acceptance:* at 400 px and 1280 px the purpose line, the notice and the box all fit above the fold. The placeholder vanishes on input. A 5-second test with someone who has never seen the app gets "paste a thread" as the answer to "what do you do here?"
+3. **Complete the notice with a linked data page.** Reopen #2, or a #34 follow-up.
+   - *Smallest result:* the notice names the company behind the model (from server config), says "Built for sanitized text" and links "Data & retention" to one static page. That page names the operator, OpenRouter and the provider, and links each one's privacy and training policy plus the OpenRouter logging setting.
+   - *Acceptance:* the notice is body size and full ink colour, not #42's muted 14 px. Changing the configured model changes the named company. Every retention or training claim links to that vendor's own policy, or it isn't shown. OpenRouter is no longer called "an AI model provider." Each of her five checklist items maps to a line on the page.
+4. **Pin the first paste when the conversation fills up.** A B38 (#7) variant, after suggestion 1.
+   - *Smallest result:* when the 24k budget runs out, the first pasted message stays verbatim, later chat turns are shortened, and a one-line note under the reply says so.
+   - *Acceptance:* paste a 12,000-character thread, then chat until the budget is hit. The next reply quotes a detail from the paste, the note says what was shortened, and there's no 413.
 
 ### Questions for interview 04
 
+- Once #50 lands, re-run Sunday's thread. Are the speakers right? Does it find REBOOKED vs AMENDED without a hint?
+- (Ravi or Aisha, cold) Here's the link with no explanation. What do you type first?
 - (A real platform engineer) Can an engineer at your company get a personal Anthropic API key? What would they be allowed to paste it into?
 - (A real security reviewer) Here's a self-hosted repo that calls Anthropic with your company key. What's the review, and how long does it take?
-- Did you run the Saturday test? Did it find the REBOOKED vs AMENDED split? What did you cut to make it fit?
 - After Dana leaves on the 15th, what did you do with the questions only she can answer?
 - Where did Dana's Slack-DM correction end up in the RFC? Who else read it?
-- (Aisha, the PM, carried over) What did you prepare before your last finance meeting, and what did you bring back?
-- If the notice said "Built for sanitized text," would you sanitize differently, or less? Show me the last thing you sanitized.
+- If the notice said "Built for sanitized text," would you sanitize differently? Show me the last thing you sanitized.

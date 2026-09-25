@@ -19,4 +19,17 @@ Last interviewed demos: `slice-02a.md`, `slice-42.md`
 
 ## Queued for interview 04
 
+Split it like 03: **04a** covers the built paste-box slice with Exploration 04 and the Sunday replay. **04b** covers Explorations 03 and 02b. The trigger is the paste-box slice demo.
+
 - The "questions for interview 04" sections in 03a and 03b.
+- **Design Exploration 03, "Leave with a table"** (`outputs/design/explore-03/`: stills t1-what-leaves → t2-table → t3-next-step → t4-in-rfc, `explore-03-2.5x.mp4`, `table.html`). Probes:
+  1. Would the table survive Dana's and finance's review as-is? What would she retype? Anchor: the last table she pasted into the RFC.
+  2. Is "Status" the right column name, or does it confuse people reading the doc?
+  3. Does "Ops is split" feel safe to put in a doc that Ops will read?
+  4. Does "Show what's sent" together with her own swap list change what she pastes?
+- Any 02b, notice-weight or too-long-paste concepts the DESIGNER delivers before the next demo.
+- **The PO's test: replay her Sunday attempt end to end** on the paste-box slice. Paste the 12k sanitized thread (multiline, speaker lines intact), hit the limit, and see whether the draft is kept and the limit stated. Does the reply attribute Tom's line to finance? Is there a purpose line and placeholder (#57)? Would she still switch to company Claude?
+- **Design Exploration 04, "Paste box"** (`outputs/design/explore-04/`: stills p1-first-visit → p2b-replied → p3-too-long → p4-two-parts, p5-phone, `explore-04-2.5x.mp4`, `pastebox.html`). Pair it with the Sunday replay. Probes:
+  1. Does the notice now read as content, not a banner? Which of her 5 checklist items does it meet?
+  2. At "Your text stays here · 1,412 over": trim, or send in two parts? Does she trust that the coach waits for part 2 before replying, and that two parts don't use up the conversation cap?
+  3. Is the example placeholder enough, or does she click "Try an example"?
