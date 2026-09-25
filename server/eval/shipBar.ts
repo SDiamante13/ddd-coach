@@ -5,10 +5,13 @@ export type Tally = { passed: number; total: number };
 export type ShipBar = ReturnType<typeof shipBar>;
 type FixtureTallies = ReturnType<typeof fixtureTallies>;
 
-const EVERY_RUN_SCORES = ["split", "codeLine", "questionSpansThread", "sameMeaningNamed"] as const;
+const REPORTED_ONLY_HARD = ["same meaning not split"];
+
+const EVERY_RUN_SCORES = ["split", "codeLine", "questionSpansThread"] as const;
+const TALLIED_SCORES = [...EVERY_RUN_SCORES, "sameMeaningNamed"] as const;
 
 export function shipBar(runs: readonly ScoredRun[]) {
-  const hard = tally(runs, (run) => run.hardFailures.length === 0);
+  const hard = tally(runs, (run) => run.hardFailures.every((check) => REPORTED_ONLY_HARD.includes(check)));
   const attribution = tally(runs, (run) => run.soft.attribution);
   const perFixture = fixturesOf(runs).map((fixture) => fixtureTallies(fixture, runs));
   const ships = isFull(hard) && isFull(attribution) && perFixture.every(holdsInEveryRun);
@@ -17,7 +20,7 @@ export function shipBar(runs: readonly ScoredRun[]) {
 
 function fixtureTallies(fixture: string, runs: readonly ScoredRun[]) {
   const own = runs.filter((run) => run.fixture === fixture);
-  const [split, codeLine, questionSpansThread, sameMeaningNamed] = EVERY_RUN_SCORES.map((score) =>
+  const [split, codeLine, questionSpansThread, sameMeaningNamed] = TALLIED_SCORES.map((score) =>
     tally(own, (run) => run.soft[score]),
   );
   return { fixture, split: split!, codeLine: codeLine!, questionSpansThread: questionSpansThread!, sameMeaningNamed: sameMeaningNamed! };

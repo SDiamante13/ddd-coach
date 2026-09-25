@@ -37,9 +37,15 @@ describe("shipBar", () => {
 
 
   it.each([
+    ["the synonym check fails", run("booking-split", { hardFailures: ["same meaning not split"] })],
+    ["no line names both same-meaning words", run("booking-split", { soft: { ...ALL_SOFT, sameMeaningNamed: false } })],
+  ])("still ships when only a reported-only synonym result misses (#76): %s", (_case, changed) => {
+    expect(shipBar([...passingRuns.slice(1), changed]).ships).toBe(true);
+  });
+
+  it.each([
     ["one hard check fails in one run", [run("carrier-status", { hardFailures: ["no names"] })]],
     ["a fixture shows the split in only 2 of 3 runs", [run("booking-split", { soft: { ...ALL_SOFT, split: false } })]],
-    ["a fixture names both same-meaning words in only 2 of 3 runs", [run("booking-split", { soft: { ...ALL_SOFT, sameMeaningNamed: false } })]],
     ["one run misattributes", [run("carrier-status", { soft: { ...ALL_SOFT, attribution: false } })]],
     ["a fixture shows the split in only 1 of 3 runs", twoOf("booking-split", { split: false })],
     ["a fixture has a Code line in only 1 of 3 runs", twoOf("booking-split", { codeLine: false })],

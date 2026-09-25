@@ -1,6 +1,6 @@
 # Slice 3 eval summary (#4)
 
-**Ships on `openai/gpt-5.6-terra` at effort `none` with prompt v4 (`COACH_INSTRUCTIONS_VERSION = 4`).** That's Steven's decision, made 2026-09-25, and production's `OPENROUTER_MODEL` is terra. Local dev stays on `openai/gpt-6-luna`, which is cheaper but misses the ship bar (see below). Latency for both is in `latency.md`: terra's 20k first turn has a median of 8.1 s, so the 15 s rule doesn't fire.
+**Ships on `openai/gpt-5.6-terra` at effort `none` with prompt v6 (`COACH_INSTRUCTIONS_VERSION = 6`), under #73's every-run bar.** Steven decided on 2026-09-25 to ship v6. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Before this, v4 shipped under the older 2/3 bar. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
 
 ## How it's measured
 
@@ -31,7 +31,9 @@ Each eval runs 3 fixtures × 3 repeats through the real `createOpenRouterCoach` 
 **The ship bar** (tightened by #73 from 2/3 to every run):
 - hard checks 9/9;
 - attribution 9/9;
-- in each fixture, **3 of 3** runs for the "Ops (view A)/(view B)" split, the Code line, a question drawing on two distant parts of the thread, and (#73) a same-meaning word whose line names both words.
+- in each fixture, **3 of 3** runs for the "Ops (view A)/(view B)" split, the Code line, and a question drawing on two distant parts of the thread.
+
+**Reported only (#76, known limitation):** the "same meaning not split" hard check and the `sameMeaningNamed` score are tallied and shown, but they don't gate shipping. Terra at effort none or low, with v5–v7, keeps splitting F1's "hold" into "Ops (view A) means “waiting on customer.”" / "Ops (view B) means a booking waiting on the customer." That happens even though thread lines 418 and 427 make them one meaning. #76 takes it forward (the effort-low experiment and other approaches).
 
 F1 and F2 have a split key; only F1 has question-evidence and same-meaning keys, so those columns always pass elsewhere. Joint roles and the forum are reported but aren't in the bar.
 
@@ -106,6 +108,7 @@ F3's "Customers see…" passes, because the key allows Customers (U1). The inter
 | v5 | no | 4/9 | 8/9 | F1 same meaning named 0/3 | same meaning not split ×3 (F1), holders ×2 (F3) | 9/9 | 7,231 / 8,341 | 0.071 | [v5](2026-09-25-openai-gpt-5-6-terra-v5.md) |
 | v6 | no | 6/9 | 8/9 | F1 same meaning named 0/3 | same meaning not split ×2 (F1), code guess ×1 (F2) | 9/9 | 4,909 / 7,199 | 0.072 | [v6](2026-09-25-openai-gpt-5-6-terra-v6.md) |
 | v7 | no | 4/9 | 6/9 | F1 same meaning named 0/3, F2 split 2/3 | same meaning not split ×3 (F1), code guess ×1 (F2), split labels ×1 (F2) | 9/9 | 5,004 / 6,945 | 0.071 | [v7](2026-09-25-openai-gpt-5-6-terra-v7.md) |
+| **v6 (re-score, ships)** | **yes** | **9/9** | **9/9** | none (F1 same meaning named 0/3 is reported only) | none; same meaning not split ×2 (F1) is reported only | 9/9 | 4,909 / 7,199 | 0.072 | re-scored with the current checks and the #76 bar |
 
 **v5, read by hand:**
 - **The question now asks in every run.** It's open ("which should count as the booking: the original ref, the new REBOOKED row, or only the delivered invoiceable shipment?") or a choice joined by "or". There are no proposals and no yes/no questions.
@@ -160,6 +163,17 @@ The rows are re-scored with the key fixes below.
 - F3 `teams` += "Customer". Low v6 F3 r2 wrote "From thread: Customer sees Confirmed on the portal…", the customers' view that U1 allows. "Customer-facing portal shows…" still fails holders.
 
 With these, the none rows re-score the same, apart from v5 F3 (holders ×2 stays).
+
+## v6 ships (2026-09-25)
+
+`node server/eval/rescore.ts outputs/evals/slice-03/2026-09-25-openai-gpt-5-6-terra-v6.json` with the final checks, keys and bar gives **Ships: yes**:
+- hard 9/9, with "same meaning not split" reported only (it fails in F1 r1 and r3);
+- attribution 9/9;
+- split, Code line and question spans the thread 3/3 in every fixture;
+- the question asks in 9/9 runs;
+- every finishReason is `stop`, median 4,909 ms and max 7,199 ms.
+
+**Flag:** F1 r1 and r3 run over 400 words. That's a soft score, not part of the bar. The hosted check should watch reply length.
 
 ## Limits
 
