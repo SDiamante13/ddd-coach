@@ -22,6 +22,8 @@ describe("coach instructions", () => {
     ["teams as holders", "Never start it with a shift, desk or group inside a team"],
     ["a question that asks", "Ask; don't propose."],
     ["an example question that offers a choice", "which does billing see: an appointment, a request, or nothing yet?"],
+    ["a natural answer to a message that isn't material", "answer it the way a colleague would"],
+    ["no role statement", "Don't introduce yourself or describe what you're for."],
   ])("ask for %s", (_rule, text) => {
     expect(coachInstructions()).toContain(text);
   });

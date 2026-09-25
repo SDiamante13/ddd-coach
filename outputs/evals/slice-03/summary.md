@@ -175,6 +175,46 @@ With these, the none rows re-score the same, apart from v5 F3 (holders ×2 stays
 
 **Flag:** F1 r1 and r3 run over 400 words. That's a soft score, not part of the bar. The hosted check should watch reply length.
 
+## v8: non-thread input (#63, moved from #73), 2026-09-25
+
+v8 = v6 with one change. The Follow-ups sentence "say in one sentence what you're for and invite them to paste a thread" becomes a "Messages that aren't material" paragraph: answer a greeting, a DDD question or a short note naturally in one to three sentences, with no self-introduction, then add one line inviting a pasted thread; "Reply only OK" gets exactly that. v7's number was already taken by a reverted prompt. The thread rules are unchanged.
+
+New fixtures and checks:
+- `greeting` ("hi"), `ddd-question` ("what is DDD?") and `one-line-note`, with `expect.nonThread`.
+- Their hard checks: no boilerplate ("I'm here to help", "I'm for helping", "I'm DDD Coach", "as a DDD coach"), no three parts, invites a thread ("paste"), no markdown, and `stop`.
+- `example-thread` (#63) joins the ship bar. Its question evidence gains "appointment", because terra writes "delivery 40 minutes before the appointment" and "the delivery-appointment rule" (v8 r1, A/B v8 r1–r3).
+
+| Non-thread, terra, effort none | greeting | ddd-question | one-line-note |
+|---|---|---|---|
+| v6 (scratch baseline, re-scored with the final checks) | 0/3: I'm here to help ×3 | 0/3: never invites a thread | 0/3: I'm here to help ×1, I'm for helping ×2 |
+| v8 (full eval) | 3/3 | 3/3 | 3/3 |
+
+**Full eval, v8** ([v8](2026-09-25-openai-gpt-5-6-terra-v8.md)): **Ships: no** by the strict bar. Hard 18/21, attribution 20/21, $0.095. Every non-thread and example-thread run passes. The three failures are thread fixtures, all known modes:
+- F1 r2 split labels;
+- F2 r2 code guess: "Code means amend! portal sync is not yet available";
+- F3 r1 holders: "Customer-facing portal means…", as in v5.
+
+**Same-session A/B, v6 vs v8** snapshot texts, 4 thread fixtures ×3 ([data](2026-09-25-ab-terra-v6-v8-threads.json), $0.153):
+
+| | Hard (synonym check reported only) | Attribution | Example question spans |
+|---|---|---|---|
+| v6 | 9/12: holders ×3, including "Ops day desk means…" ×2 on the example | 9/12 | 3/3 |
+| v8 | 11/12: split labels ×1 | 9/12 | 3/3 |
+
+v8 doesn't regress the thread analysis. v6 doesn't hold its 9/9 on a rerun either.
+
+**The n=3 bar is flaky.** v6 didn't reproduce its own 9/9 in the same session (9/12 hard, with holder slips), so "3/3 per fixture" can't tell two prompts apart. That's the input for #78: a larger n, or a rate threshold.
+
+**Decision: v8 ships (team-lead, 2026-09-25)**, the first decision under #78's rule:
+- the paired A/B against live v6: the target (non-thread input) goes from 0/9 to 9/9;
+- no gating check drops by more than one run per fixture: thread hard 11/12 against 9/12, attribution 9/12 against 9/12.
+
+It's **below #78's n ≥ 6 per fixture per arm** (n=3 per arm), accepted because the budget was near its cap. The strict n=3 bar says no.
+
+**Conditions (#77):**
+- Prompt assembly matches production. Both `measure` and `netlify/functions/chat.mts` build the coach with `createOpenRouterCoach(config, coachInstructions())`, with no reference block.
+- These runs were **not** nonce'd: the fixture text went in as is, while hosted first turns carried a nonce line. From the next commit, nonce'd first turns are the eval default for thread fixtures. There's been no paid run under it yet.
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.

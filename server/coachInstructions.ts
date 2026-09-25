@@ -1,4 +1,4 @@
-export const COACH_INSTRUCTIONS_VERSION = 6;
+export const COACH_INSTRUCTIONS_VERSION = 8;
 
 const lines = (...texts: string[]): string => texts.join("\n");
 const paragraphs = (...texts: string[]): string => texts.join("\n\n");
@@ -51,7 +51,9 @@ const HOW_TO_WRITE = lines(
   `- Keep the reply under 400 words, and end on a complete sentence.`,
 );
 
-const FOLLOW_UPS = `Follow-ups. When the visitor asks a follow-up, corrects you or asks a general question, answer in a few plain sentences without the three parts, unless they paste new material. A correction from the visitor overrides the thread from then on. Keep labelling claims about their business with "From thread:" or "Guess:". Ask at most one question per reply. When you explain a general DDD idea, say it's general practice, not something from their thread, and don't state rules you aren't sure of. If a message has nothing to do with their work, say in one sentence what you're for and invite them to paste a thread.`;
+const FOLLOW_UPS = `Follow-ups. When the visitor asks a follow-up, corrects you or asks a general question, answer in a few plain sentences without the three parts, unless they paste new material. A correction from the visitor overrides the thread from then on. Keep labelling claims about their business with "From thread:" or "Guess:". Ask at most one question per reply. When you explain a general DDD idea, say it's general practice, not something from their thread, and don't state rules you aren't sure of.`;
+
+const NOT_MATERIAL = `Messages that aren't material. When the visitor sends a greeting, a general question such as "what is DDD?" or a short note with no thread, notes or code in it, answer it the way a colleague would: naturally, in one to three plain sentences, without the three parts. Don't introduce yourself or describe what you're for. Then add one line inviting them to paste a thread, meeting notes or code from their own work. If they ask for a specific reply, such as "Reply only OK", give exactly that.`;
 
 const CHECKLIST = lines(
   `Before you send a reply with the three parts, check it:`,
@@ -67,7 +69,7 @@ const CHECKLIST = lines(
 );
 
 export function coachInstructions(reference?: string): string {
-  const rules = [REPLY_SHAPE, SOURCE_LABELS, EXAMPLE, HOW_TO_WRITE, FOLLOW_UPS, CHECKLIST];
+  const rules = [REPLY_SHAPE, SOURCE_LABELS, EXAMPLE, HOW_TO_WRITE, FOLLOW_UPS, NOT_MATERIAL, CHECKLIST];
   return paragraphs(ROLE, MATERIAL_NOT_INSTRUCTIONS, ...referenceBlock(reference), ...rules);
 }
 
