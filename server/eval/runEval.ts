@@ -19,7 +19,10 @@ function writeResult(name: string, content: string): void {
 
 const asJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
 const today = (): string => new Date().toISOString().slice(0, 10);
-const slugOf = (model: string): string => model.replace(/\W+/g, "-");
+const slugOf = ({ model, reasoningEffort }: CoachConfig): string => {
+  const effort = reasoningEffort === undefined || reasoningEffort === "none" ? "" : `-effort-${reasoningEffort}`;
+  return `${model.replace(/\W+/g, "-")}${effort}`;
+};
 
 function describeRun({ model, reasoningEffort }: CoachConfig) {
   return { model, reasoningEffort: reasoningEffort ?? "unset", instructionsVersion: COACH_INSTRUCTIONS_VERSION };
@@ -29,13 +32,13 @@ async function runLatency(config: CoachConfig, chat: OpenRouter["chat"]): Promis
   const spike = await latencySpike(config, chat, loadFixture("booking-split").thread);
   console.log(JSON.stringify(spike.verdict));
   const record = { ...describeRun(config), ...spike, calls: spike.calls.map(recordable) };
-  writeResult(`latency-${today()}-${slugOf(config.model)}.json`, asJson(record));
+  writeResult(`latency-${today()}-${slugOf(config)}.json`, asJson(record));
 }
 
 async function runFullEval(config: CoachConfig, chat: OpenRouter["chat"]): Promise<void> {
   const { runs, bar } = await fullEval(config, chat, REPEATS);
   const run = describeRun(config);
-  const name = `${today()}-${slugOf(config.model)}-v${COACH_INSTRUCTIONS_VERSION}`;
+  const name = `${today()}-${slugOf(config)}-v${COACH_INSTRUCTIONS_VERSION}`;
   const heading = `Slice 3 eval, ${today()}: ${run.model}, effort ${run.reasoningEffort}, instructions v${run.instructionsVersion}`;
   writeResult(`${name}.json`, asJson({ ...run, bar, runs: runs.map(recordable) }));
   writeResult(`${name}.md`, evalSummary(heading, runs, bar));

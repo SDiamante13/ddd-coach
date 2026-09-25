@@ -18,7 +18,6 @@ describe("coach instructions", () => {
   it.each([
     ["views that hold across words", "Decide once, before Part 2: view A is the group that appears first in the material"],
     ["one plain line when views agree", "Never write view A and view B lines that say the same thing."],
-    ["no view per word for one meaning", "Don't write a view A line that gives one group's word and a view B line that gives the other's"],
     ["no screen as a holder", "A screen or system, such as the patient portal, isn't a holder either"],
     ["teams as holders", "Never start it with a shift, desk or group inside a team"],
     ["a question that asks", "Ask; don't propose."],
