@@ -27,10 +27,14 @@ export function DraftFoot({ length, limit, keyHint, hintId, limitId }: DraftFoot
 function OverLimitAlert({ length }: { length: number }) {
   return (
     <p role="alert" className="overbox">
-      {formatCount(length - MAX_MESSAGE_CHARS)} character over the {formatCount(MAX_MESSAGE_CHARS)} limit. Your text
-      stays here. Trim it to send.
+      {charactersOf(length - MAX_MESSAGE_CHARS)} over the {formatCount(MAX_MESSAGE_CHARS)} limit. Your text stays
+      here. Trim it to send.
     </p>
   );
+}
+
+function charactersOf(count: number): string {
+  return `${formatCount(count)} ${count === 1 ? "character" : "characters"}`;
 }
 
 function DraftCount({ length, limit }: { length: number; limit: DraftLimit }) {

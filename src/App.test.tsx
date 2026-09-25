@@ -128,16 +128,19 @@ describe("Connection test", () => {
     expect(within(composerOf(input())).queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("flags a draft one character over the limit, disables Send and says by how much", async () => {
+  it.each([
+    [1, "1 character"],
+    [1412, "1,412 characters"],
+  ])("flags a draft %i over the limit, disables Send and says by how much", async (over, overage) => {
     const { user, input, sendButton } = renderApp();
 
     await user.click(input());
-    await user.paste("M".repeat(MAX_MESSAGE_CHARS + 1));
+    await user.paste("M".repeat(MAX_MESSAGE_CHARS + over));
 
     expect(input()).toHaveAttribute("aria-invalid", "true");
     expect(sendButton()).toBeDisabled();
     expect(within(composerOf(input())).getByRole("alert")).toHaveTextContent(
-      `1 character over the ${formatCount(MAX_MESSAGE_CHARS)} limit. Your text stays here. Trim it to send.`,
+      `${overage} over the ${formatCount(MAX_MESSAGE_CHARS)} limit. Your text stays here. Trim it to send.`,
     );
   });
 
