@@ -22,7 +22,29 @@ export function nonceLine(pastedAt: Date): string {
   return `(${NONCE_WORDING} ${pastedAt.toISOString()}.)`;
 }
 
-export function mentionsNonce(reply: string, pastedAt: Date): boolean {
+export function mentionsNonce(reply: string, pastedAt: Date, thread = ""): boolean {
   const text = reply.toLowerCase();
-  return text.includes(pastedAt.toISOString().toLowerCase()) || text.includes(NONCE_WORDING.toLowerCase());
+  const verbatim = text.includes(pastedAt.toISOString().toLowerCase()) || text.includes(NONCE_WORDING.toLowerCase());
+  const ownForms = restatedForms(pastedAt).filter((form) => !form.test(thread));
+  return verbatim || ownForms.some((form) => form.test(reply));
+}
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+function restatedForms(at: Date): RegExp[] {
+  return [clockTime(at), ...dateForms(at)];
+}
+
+function clockTime(at: Date): RegExp {
+  const hours = at.getUTCHours();
+  const minutes = String(at.getUTCMinutes()).padStart(2, "0");
+  return new RegExp(String.raw`(?<![\d:])${hours < 10 ? "0?" : ""}${hours}:${minutes}(?::\d{2})?(?![\d:])`);
+}
+
+function dateForms(at: Date): RegExp[] {
+  const day = at.getUTCDate();
+  const month = MONTHS[at.getUTCMonth()]!;
+  const monthName = `(?:${month.slice(0, 3)}|${month})`;
+  const forms = [at.toISOString().slice(0, 10), `${monthName}\\.? ${day}`, `${day} ${monthName}`];
+  return forms.map((form) => new RegExp(String.raw`(?<!\d)${form}(?!\d)`, "i"));
 }

@@ -41,4 +41,28 @@ describe("mentionsNonce", () => {
   it("passes a reply that ignores the nonce", () => {
     expect(mentionsNonce("1. From thread: Customer submits a booking on the portal.", pastedAt)).toBe(false);
   });
+
+  describe("restated in the reply's own format", () => {
+    const at = new Date("2026-09-25T09:14:02.000Z");
+
+    it.each([
+      ["1. From thread: Ops pasted this on Sep 25, 09:14."],
+      ["1. From thread: The export ran at 2026-09-25 09:14."],
+      ["1. From thread: The thread was copied at 9:14 UTC."],
+      ["1. From thread: The thread was copied at 09:14:02."],
+    ])("catches the nonce's minute: %s", (reply) => {
+      expect(mentionsNonce(reply, at)).toBe(true);
+    });
+
+    it("catches the nonce's date alone", () => {
+      expect(mentionsNonce("1. From thread: The thread was copied on 25 September.", at)).toBe(true);
+    });
+
+    it("passes a time or date the thread itself contains", () => {
+      const thread = "Dana (8:30, Sep 25): the load is still on hold.";
+      const reply = "1. From thread: At 8:30 on Sep 25, Ops says the load is on hold.";
+
+      expect(mentionsNonce(reply, new Date("2026-09-25T08:30:00.000Z"), thread)).toBe(false);
+    });
+  });
 });
