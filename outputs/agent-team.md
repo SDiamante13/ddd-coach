@@ -33,6 +33,10 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 - Output: `outputs/demos/slice-NN.{mp4,gif,md}`.
 - Never reload or open mid-recording: the recorder silently stops capturing. Split with `record stop`/`start` and join with ffmpeg concat.
 - Recording ignores `set viewport`, so take the 1280×800 PNG outside the recording. If `record stop` fails with "ffmpeg wait failed", retry it.
+- Injected overlays (captions, spy panels) need `pointer-events:none` and body padding so they don't hide results or catch clicks.
+- Mid-script, use CSS selectors or `form.requestSubmit()` instead of `@eN` refs, which go stale. Avoid `wait --fn` (it hangs past the tool timeout).
+- Always give `screenshot` an absolute path: a relative path lands in the repo root.
+- Run a rate-limit burst truly last. Afterwards every POST returns 429 for about 60 s, even oversized ones.
 
 ## Slice screenshot
 
