@@ -282,4 +282,20 @@ describe("Swapping sensitive words", () => {
     await startConversation();
     expect(screen.getByText("Your swaps (0)")).toBeInTheDocument();
   });
+
+  it("suggests made-up placeholders that neither the message nor the list uses", async () => {
+    const { user, input } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+    await addSwap(user, "Maya", "Person 1");
+    await user.type(input(), "Maya asked Person 1");
+
+    await user.click(screen.getByRole("button", { name: "Show what's sent" }));
+
+    expect(
+      within(screen.getByRole("region", { name: "What's sent" })).getByText(
+        '"Person 1" is already in your message, so the coach can\'t tell the two apart. ' +
+          'Try a made-up placeholder like "Customer B" or "Person 2".',
+      ),
+    ).toBeVisible();
+  });
 });

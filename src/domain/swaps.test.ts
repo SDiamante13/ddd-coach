@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addSwap, applySwaps, placeholderClash, removeSwap, type SwapList } from "./swaps.ts";
+import { addSwap, applySwaps, madeUpPlaceholders, placeholderClash, removeSwap, type SwapList } from "./swaps.ts";
 
 const swaps = (...pairs: [string, string][]): SwapList => pairs.map(([from, to]) => ({ from, to }));
 
@@ -139,5 +139,12 @@ describe("placeholderClash", () => {
 
   it("says nothing about a blank placeholder", () => {
     expect(placeholderClash("", "Maya asked ops, then Finance.")).toBeNull();
+  });
+});
+
+describe("madeUpPlaceholders", () => {
+  it("suggests the first customer letter and person number the thread and list don't use", () => {
+    const list = swaps(["Acme", "Customer A"], ["Maya", "Person 1"]);
+    expect(madeUpPlaceholders(list, "Customer B asked Person 2")).toEqual(["Customer C", "Person 3"]);
   });
 });

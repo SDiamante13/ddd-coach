@@ -22,7 +22,7 @@ export function SwapPanel({ swaps, add, remove, clear, thread }: Swaps & { threa
           </li>
         ))}
       </ul>
-      <AddSwapRow add={add} thread={thread} />
+      <AddSwapRow add={add} swaps={swaps} thread={thread} />
       {swaps.length > 0 && (
         <button type="button" className="clearswaps" onClick={clear}>
           Clear swaps

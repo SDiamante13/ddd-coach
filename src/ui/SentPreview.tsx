@@ -17,7 +17,7 @@ export function SentPreview({ swaps, draft }: { swaps: SwapList; draft: string }
         <p>{appliedLine(swapped.spans.length)}</p>
         {placeholdersIn(swaps, draft).map((placeholder) => (
           <p key={placeholder} className="warning">
-            {clashWarning(placeholder, "in-thread")}
+            {clashWarning(placeholder, "in-thread", { swaps, thread: draft })}
           </p>
         ))}
       </section>

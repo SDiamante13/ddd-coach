@@ -1,13 +1,13 @@
 import { useId, useState, type KeyboardEvent } from "react";
 import { placeholderClash, type SwapField, type SwapRefusal } from "../domain/swaps.ts";
-import { clashWarning } from "./clashWarning.ts";
+import { clashWarning, type ClashContext } from "./clashWarning.ts";
 import type { Swaps } from "./useSwaps.ts";
 
 type FieldNote = { text: string; kind: "refusal" | "warning" };
 
-type AddSwapRowProps = Pick<Swaps, "add"> & { thread: string };
+type AddSwapRowProps = Pick<Swaps, "add" | "swaps"> & { thread: string };
 
-export function AddSwapRow({ add, thread }: AddSwapRowProps) {
+export function AddSwapRow({ add, swaps, thread }: AddSwapRowProps) {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [refusal, setRefusal] = useState<SwapRefusal | null>(null);
@@ -35,7 +35,7 @@ export function AddSwapRow({ add, thread }: AddSwapRowProps) {
         value={to}
         onChange={setTo}
         onKeyDown={addOnEnter}
-        note={noteFor("to") ?? clashNote(to, thread)}
+        note={noteFor("to") ?? clashNote(to, { swaps, thread })}
       />
       <button type="button" onClick={submit}>
         Add swap
@@ -44,12 +44,12 @@ export function AddSwapRow({ add, thread }: AddSwapRowProps) {
   );
 }
 
-function clashNote(to: string, thread: string): FieldNote | undefined {
-  const clash = placeholderClash(to, thread);
+function clashNote(to: string, context: ClashContext): FieldNote | undefined {
+  const clash = placeholderClash(to, context.thread);
   if (clash === null) return undefined;
   return {
     kind: "warning",
-    text: clashWarning(to.trim(), clash),
+    text: clashWarning(to.trim(), clash, context),
   };
 }
 

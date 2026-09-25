@@ -89,3 +89,14 @@ export function placeholderClash(to: string, thread: string): PlaceholderClash |
   if (anyOf([placeholder]).test(thread)) return "in-thread";
   return TEAM_AND_ROLE_NAMES.some((name) => sameWord(name, placeholder)) ? "role-name" : null;
 }
+
+const CUSTOMER_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+export function madeUpPlaceholders(list: SwapList, thread: string): readonly [string, string] {
+  const unused = (placeholder: string) =>
+    !list.some((swap) => sameWord(swap.to, placeholder)) && !anyOf([placeholder]).test(thread);
+  const customer = CUSTOMER_LETTERS.map((letter) => `Customer ${letter}`).find(unused) ?? "Customer X";
+  let person = 1;
+  while (!unused(`Person ${person}`)) person += 1;
+  return [customer, `Person ${person}`];
+}
