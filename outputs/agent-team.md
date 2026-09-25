@@ -36,6 +36,8 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 - Injected overlays (captions, spy panels) need `pointer-events:none` and body padding so they don't hide results or catch clicks.
 - Mid-script, use CSS selectors or `form.requestSubmit()` instead of `@eN` refs, which go stale. Avoid `wait --fn` (it hangs past the tool timeout).
 - Always give `screenshot` an absolute path: a relative path lands in the repo root.
+- If screenshots hang, run `agent-browser --session <agent> close` first. Wrap each command in `timeout 60` so a hang can't stall the take.
+- `click` doesn't check what's covering the target. A button under the sticky composer (e.g. a new entry's refusal actions) gets its click on the composer instead. Use `focus <selector>` + `press Enter`, which also exercises the scroll padding, or scroll first.
 - Run a rate-limit burst truly last. Afterwards every POST returns 429 for about 60 s, even oversized ones.
 - Put any fetch-spy panel in a right-hand column (about 300 px wide, `pointer-events:none`): a bottom panel covers the form. In zsh, wrap `agent-browser --session x` in a shell function, since `$AB` doesn't word-split.
 - Small GIFs: `palettegen=stats_mode=diff:max_colors=96` plus `paletteuse=dither=bayer`, trimmed to the key steps, kept a 68 s clip at about 2.9 MB.
