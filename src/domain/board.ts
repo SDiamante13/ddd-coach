@@ -6,6 +6,7 @@ export type EventCard = {
   readonly id: EntityId;
   readonly kind: "event";
   readonly text: string;
+  readonly previousText?: string;
   readonly provenance: Provenance;
   readonly placedBy: ExchangeId;
   readonly changedBy: ExchangeId;
@@ -27,14 +28,31 @@ export function applyAction(board: Board, action: BoardAction): Board {
   return { cards: cardsAfter(board.cards, action), latest: action.by };
 }
 
-function cardsAfter(cards: readonly EventCard[], { id, text, provenance, by }: BoardAction): readonly EventCard[] {
-  const known = cards.find((card) => card.id === id);
-  if (known === undefined) return [...cards, { id, kind: "event", text, provenance, placedBy: by, changedBy: by }];
-  if (known.provenance === provenance) return cards;
-  return cards.map((card) => (card === known ? { ...card, provenance, changedBy: by } : card));
+function cardsAfter(cards: readonly EventCard[], action: BoardAction): readonly EventCard[] {
+  const known = cards.find((card) => card.id === action.id);
+  if (known === undefined) return [...cards, placed(action)];
+  const restated = restatement(known, action);
+  return restated === known ? cards : cards.map((card) => (card === known ? restated : card));
 }
+
+function placed({ id, text, provenance, by }: BoardAction): EventCard {
+  return { id, kind: "event", text, provenance, placedBy: by, changedBy: by };
+}
+
+function restatement(card: EventCard, { text, provenance, by }: BoardAction): EventCard {
+  const reworded = wording(text) !== wording(card.text);
+  if (!reworded && provenance === card.provenance) return card;
+  const words = reworded ? { text, previousText: card.text } : { previousText: undefined };
+  return { ...card, ...words, provenance, changedBy: by };
+}
+
+const wording = (text: string): string => text.replace(/\s+/g, " ").trim();
 
 export function changeOf(board: Board, card: EventCard): CardChange {
   if (card.placedBy === board.latest) return "added";
   return card.changedBy === board.latest ? "updated" : null;
+}
+
+export function previousTextOf(board: Board, card: EventCard): string | null {
+  return card.changedBy === board.latest ? (card.previousText ?? null) : null;
 }

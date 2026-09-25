@@ -8,6 +8,7 @@ import {
   type BoardAction,
   changeOf,
   emptyBoard,
+  previousTextOf,
   type Provenance,
   PROVENANCE_LABEL,
 } from "./board.ts";
@@ -52,10 +53,18 @@ describe("applyAction", () => {
     });
   });
 
-  it("leaves the cards as they are when a later reply repeats an event, and marks that reply latest", () => {
+  it("leaves the cards as they are when a later reply repeats an event, spacing aside, and marks that reply latest", () => {
     const first = applyAction(emptyBoard, addEvent("Customer submits a bkg.", "thread", "reply-1"));
-    const repeated = applyAction(first, addEvent("customer submits  a BKG", "thread", "reply-2"));
+    const repeated = applyAction(first, addEvent(" Customer submits  a bkg.", "thread", "reply-2"));
     expect(repeated).toEqual({ cards: first.cards, latest: "reply-2" });
+  });
+
+  it("rewords a card in place, keeping its previous words, when a later reply restates it differently", () => {
+    const first = applyAction(emptyBoard, addEvent("Customer submits a bkg.", "thread", "reply-1"));
+    const reworded = applyAction(first, addEvent("Customer submits a BKG!", "thread", "reply-2"));
+    expect(reworded.cards).toEqual([
+      { ...first.cards[0], text: "Customer submits a BKG!", previousText: "Customer submits a bkg.", changedBy: "reply-2" },
+    ]);
   });
 
   it("updates a card in place when a later reply gives its event a new provenance", () => {
@@ -91,6 +100,28 @@ describe("changeOf", () => {
       addEvent("Ops chooses another carrier.", "thread", "reply-2"),
     ].reduce(applyAction, emptyBoard);
     expect(changeOf(board, board.cards[0]!)).toBe("updated");
+  });
+});
+
+describe("previousTextOf", () => {
+  const reworded = [
+    addEvent("Customer submits a bkg.", "thread", "reply-1"),
+    addEvent("Customer submits a BKG!", "thread", "reply-2"),
+  ];
+
+  it("gives a card's previous words while the reply that reworded it is the latest", () => {
+    const board = reworded.reduce(applyAction, emptyBoard);
+    expect(previousTextOf(board, board.cards[0]!)).toBe("Customer submits a bkg.");
+  });
+
+  it("gives no previous words once a later reply only repeats the card", () => {
+    const board = [...reworded, addEvent("Customer submits a BKG!", "thread", "reply-3")].reduce(applyAction, emptyBoard);
+    expect(previousTextOf(board, board.cards[0]!)).toBeNull();
+  });
+
+  it("gives no previous words when a later reply only changes the card's provenance", () => {
+    const board = [...reworded, addEvent("Customer submits a BKG!", "guess", "reply-3")].reduce(applyAction, emptyBoard);
+    expect(previousTextOf(board, board.cards[0]!)).toBeNull();
   });
 });
 
