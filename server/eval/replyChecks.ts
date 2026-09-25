@@ -32,6 +32,7 @@ export type FixtureKey = {
     splitTerms?: string[];
     codeLine?: boolean;
     codeShown?: boolean;
+    codeDescribed?: string[];
     stalePattern?: string;
     forum?: string[];
     questionEvidence?: string[][];
@@ -52,7 +53,8 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "at most 4 words": ({ layout }) => layout.quotedWords.length <= 4,
   "no markdown": ({ text }) => !MARKDOWN.test(text),
   "no offers": ({ text }) => !OFFER.test(text),
-  "code guess": ({ layout, fixture }) => fixture.key.expect.codeShown !== false || codeClaims(layout).every(isGuess),
+  "code guess": ({ layout, fixture: { key } }) =>
+    key.expect.codeShown !== false || codeClaims(layout).every((claim) => isGuess(claim) || cites(claim, key.expect.codeDescribed)),
   "no jargon": ({ layout, fixture }) =>
     !layout.lines.some((line) => AVOIDED_JARGON.test(line)) && inventedNames(layout.lines, fixture.thread).length === 0,
   holders: ({ words, fixture }) => hasKnownHolders(words, fixture.key),
@@ -75,6 +77,9 @@ function inventedNames(lines: string[], thread: string): string[] {
 }
 
 const isGuess = (claim: string): boolean => claim.startsWith("Guess: ");
+
+const cites = (claim: string, described: string[] = []): boolean =>
+  described.some((phrase) => includesIgnoringCase(claim, phrase));
 
 function codeClaims({ meaningClaims }: ReplyLayout): string[] {
   return meaningClaims.filter((claim) => withoutSourceLabel(claim).startsWith("Code "));
@@ -153,7 +158,7 @@ function includesIgnoringCase(text: string, part: string): boolean {
 
 function isAttributed(meanings: string[], { phrase, teams }: Attribution): boolean {
   const holding = meanings.filter((meaning) => includesIgnoringCase(meaning, phrase));
-  return holding.every((meaning) => teams.some((team) => meaning.startsWith(team)));
+  return holding.every((meaning) => teams.some((team) => meaning.startsWith(team) || wholeWord(team).test(meaning)));
 }
 
 function hasSplit(meanings: string[], reply: string, { splitTeam, splitTerms = [] }: FixtureKey["expect"]): boolean {

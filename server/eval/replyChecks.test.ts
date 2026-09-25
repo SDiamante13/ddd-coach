@@ -222,6 +222,13 @@ describe("hard checks", () => {
     expect(failedHardChecks(`${GOOD_REPLY}\n${lastLine}`, "stop", fixture)).toEqual(failures);
   });
 
+  it("pass code guess for a Code line the thread describes in words when no code was shown", () => {
+    const described = { ...fixture, key: { ...fixture.key, expect: { ...fixture.key.expect, codeShown: false, codeDescribed: ["new row"] } } };
+    const reply = GOOD_REPLY.replace("- Guess: Code", "- From thread: Code");
+
+    expect(failedHardChecks(reply, "stop", described)).toEqual([]);
+  });
+
   it("fail complete ending for a reply the model cut at the cap", () => {
     expect(failedHardChecks(GOOD_REPLY, "length", fixture)).toEqual(["complete ending"]);
   });
@@ -256,6 +263,12 @@ describe("soft scores", () => {
     ["forum", "no forum when the thread names one", GOOD_REPLY.replace(", at the 27 Oct review", "")],
   ])("miss %s for %s", (score, _case, reply) => {
     expect(softScores(reply, fixture)).toMatchObject({ [score]: false });
+  });
+
+  it("hold attribution when another team's line names the phrase's owner", () => {
+    const reply = GOOD_REPLY.replace("Code inserts a new row on every rebook.", "Code has no flag for when Finance calls a shipment invoiceable.");
+
+    expect(softScores(reply, fixture)).toMatchObject({ attribution: true });
   });
 
   it("miss sameMeaningNamed when the same-meaning word's line names only one of its words", () => {

@@ -125,6 +125,20 @@ F3's "Customers see…" passes, because the key allows Customers (U1). The inter
 
 **Key note after v5:** F3 `teams` gains "Ops desk". Misread line: carrier-status r2/r3 "From thread: Ops desk means the customer agreed the pickup window." The thread names the team that way (line 10: "that's not what the ops desk means"), the same way F1–F3 allow "Carrier desk". With the fix, the v5 re-score still fails F3 r2–r3 on "Customer-facing portal".
 
+## Two check fixes after v7, and the re-score ($0)
+
+- **code guess:** a "From thread: Code" line now passes when no code was pasted, as long as it cites code behavior the thread describes in words (the key's `codeDescribed`). F2 gains `["bookings today", "carrier portal"]`. Notes line 23 says 'dashboard "bookings today" counts REBOOKED rows twice', and lines 12 and 38 say amend doesn't push the date to the carrier portal. This cures v6 and v7 F2 r1: "From thread: Code counts REBOOKED rows twice in “bookings today”."
+- **attribution:** a line that holds another team's phrase no longer counts as a miss if it names that team as a whole, case-sensitive word. That makes it a mention, not a claim. This cures "Code has no status for Ops confirming the window" (v6 F3 r1, v7 F3 r1 and r3). "Customer-facing portal means the carrier's 990 acceptance" (v5 F3 r3) still misses, because "carrier's" isn't the team "Carrier".
+
+| Recording | Hard | Attribution | Per fixture below 3/3 | Hard failures left |
+|---|---|---|---|---|
+| v4 | 3/9 | 9/9 | F1 same meaning named 1/3, F2 split 2/3 | question asks ×5, split labels ×3, same meaning not split ×1 |
+| v5 | 4/9 | 8/9 | F1 same meaning named 0/3 | same meaning not split ×3, holders ×2 |
+| v6 | **7/9** | **9/9** | F1 same meaning named 0/3 | same meaning not split ×2 (F1 only) |
+| v7 | 5/9 | 8/9 | F1 same meaning named 0/3, F2 split 2/3 | same meaning not split ×3, split labels ×1 |
+
+v7's remaining attribution miss is F1 r1, "Ops means every non-CANCELLED row in the dashboard, including old REBOOKED rows and new rows". The line never names Code, so it still counts as a miss. It's a judgment call: Ops's count really does include the rows the code creates.
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.
