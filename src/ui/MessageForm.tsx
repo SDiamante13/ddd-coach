@@ -14,18 +14,23 @@ type MessageFormProps = {
   children?: ReactNode;
   boxRef?: Ref<HTMLTextAreaElement>;
   notice?: ReactNode;
+  outgoing?: (draft: string) => string;
 };
 
-export function MessageForm({ busy, draft, onDraftChange, onSend, children, boxRef, notice }: MessageFormProps) {
+const asTyped = (draft: string) => draft;
+
+export function MessageForm(props: MessageFormProps) {
+  const { busy, draft, onDraftChange, onSend, children, boxRef, notice, outgoing = asTyped } = props;
   const id = useId();
   const keyHint = !hasTouchPointer();
-  const length = messageLength(draft);
+  const sent = outgoing(draft);
+  const length = messageLength(sent);
   const limit = draftLimit(length, MAX_MESSAGE_CHARS);
   const over = limit === "over";
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const prompt = parsePrompt(draft);
+    const prompt = parsePrompt(sent);
     if (busy || over) return;
     onDraftChange("");
     if (prompt !== null) onSend(prompt);
