@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
 import { stubFetch } from "./test/fetchStub.ts";
-import { DATA_FLOW_NOTICE } from "./ui/DataFlowNotice.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -46,7 +45,12 @@ describe("Connection test", () => {
   it("tells the user on load where their messages are sent", () => {
     renderApp();
 
-    expect(screen.getByText(DATA_FLOW_NOTICE)).toBeVisible();
+    expect(
+      screen.getByText(
+        "Your messages are sent to OpenRouter, an AI model provider, to generate replies. " +
+          "Nothing is stored on our server. Don't paste customer names or rates.",
+      ),
+    ).toBeVisible();
   });
 
   it("starts with the message input focused and an empty log", () => {
@@ -109,10 +113,10 @@ describe("Connection test", () => {
     const { user, input, log } = renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
-    server.reply(0, 502, { error: "The coach is unavailable." });
+    server.reply(0, 502, { error: "The coach sent an empty reply. Try again." });
 
     const entry = await within(log()).findByRole("listitem");
-    expect(await within(entry).findByRole("alert")).toHaveTextContent("The coach is unavailable.");
+    expect(await within(entry).findByRole("alert")).toHaveTextContent("The coach sent an empty reply. Try again.");
     expect(within(entry).getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
   });
