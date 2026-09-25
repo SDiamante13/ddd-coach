@@ -1,6 +1,8 @@
 import { useId, type FormEvent, type KeyboardEvent } from "react";
 import { messageLength, parsePrompt, type Prompt } from "../domain/exchange.ts";
+import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
 import { DraftFoot } from "./DraftFoot.tsx";
+import { draftLimit } from "./draftLimit.ts";
 import { hasTouchPointer } from "./pointer.ts";
 import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
@@ -16,6 +18,8 @@ type MessageFormProps = {
 export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormProps) {
   const id = useId();
   const keyHint = !hasTouchPointer();
+  const length = messageLength(draft);
+  const limit = draftLimit(length, MAX_MESSAGE_CHARS);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -41,15 +45,16 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
           rows={2}
           placeholder={PASTE_EXAMPLE}
           aria-describedby={keyHint ? `${id}-hint ${id}-limit` : `${id}-limit`}
+          aria-invalid={limit === "over" || undefined}
           value={draft}
           onChange={(e) => onDraftChange(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button type="submit" disabled={busy}>
+        <button type="submit" disabled={busy || limit === "over"}>
           Send
         </button>
       </div>
-      <DraftFoot length={messageLength(draft)} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
+      <DraftFoot length={length} limit={limit} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
     </form>
   );
 }

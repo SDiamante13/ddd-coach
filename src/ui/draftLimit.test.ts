@@ -8,6 +8,7 @@ describe("draftLimit", () => {
     [79, "ok"],
     [80, "near"],
     [100, "near"],
+    [101, "over"],
   ])("rates a %i-character draft against a cap of 100 as %s", (length, expected) => {
     expect(draftLimit(length, max)).toBe(expected);
   });

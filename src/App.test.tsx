@@ -10,6 +10,12 @@ afterEach(() => vi.unstubAllGlobals());
 
 const formatCount = (n: number) => new Intl.NumberFormat("en-US").format(n);
 
+function composerOf(box: HTMLElement): HTMLFormElement {
+  const form = (box as HTMLTextAreaElement).form;
+  if (!form) throw new Error("The message box is not in a form");
+  return form;
+}
+
 function renderApp() {
   const user = userEvent.setup();
   render(<App />);
@@ -109,6 +115,30 @@ describe("Connection test", () => {
     expect(
       screen.getByText(`${formatCount(nearLimit)} / ${formatCount(MAX_MESSAGE_CHARS)} characters`),
     ).toBeVisible();
+  });
+
+  it("does not flag a draft at the limit with surrounding spaces", async () => {
+    const { user, input, sendButton } = renderApp();
+
+    await user.click(input());
+    await user.paste(`  ${"M".repeat(MAX_MESSAGE_CHARS)}  `);
+
+    expect(input()).not.toHaveAttribute("aria-invalid");
+    expect(sendButton()).toBeEnabled();
+    expect(within(composerOf(input())).queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("flags a draft one character over the limit, disables Send and says by how much", async () => {
+    const { user, input, sendButton } = renderApp();
+
+    await user.click(input());
+    await user.paste("M".repeat(MAX_MESSAGE_CHARS + 1));
+
+    expect(input()).toHaveAttribute("aria-invalid", "true");
+    expect(sendButton()).toBeDisabled();
+    expect(within(composerOf(input())).getByRole("alert")).toHaveTextContent(
+      `1 character over the ${formatCount(MAX_MESSAGE_CHARS)} limit. Your text stays here. Trim it to send.`,
+    );
   });
 
   it("starts with the message input focused and an empty log", () => {

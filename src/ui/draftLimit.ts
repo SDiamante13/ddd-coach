@@ -9,5 +9,6 @@ export type DraftLimit = "ok" | "near" | "over";
 const NEAR_SHARE = 0.8;
 
 export function draftLimit(length: number, max: number): DraftLimit {
+  if (length > max) return "over";
   return length >= NEAR_SHARE * max ? "near" : "ok";
 }

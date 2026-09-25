@@ -179,6 +179,11 @@ form .row {
   color: var(--color-warn);
 }
 
+.count.over {
+  color: var(--color-alert);
+  font-weight: 600;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -201,6 +206,11 @@ form textarea {
   resize: none;
   field-sizing: content;
   overflow-y: auto;
+}
+
+form textarea[aria-invalid="true"] {
+  border-color: var(--color-alert-line);
+  background: var(--color-alert-tint);
 }
 
 form textarea::placeholder {

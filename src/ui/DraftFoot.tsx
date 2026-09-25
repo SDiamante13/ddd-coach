@@ -1,29 +1,39 @@
 import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
-import { draftLimit, formatCount } from "./draftLimit.ts";
+import { formatCount, type DraftLimit } from "./draftLimit.ts";
 
 const KEY_HINT = "Enter sends · Shift+Enter adds a line";
 
-type DraftFootProps = { length: number; keyHint: boolean; hintId: string; limitId: string };
+type DraftFootProps = { length: number; limit: DraftLimit; keyHint: boolean; hintId: string; limitId: string };
 
-export function DraftFoot({ length, keyHint, hintId, limitId }: DraftFootProps) {
+export function DraftFoot({ length, limit, keyHint, hintId, limitId }: DraftFootProps) {
   return (
-    <div className="formfoot">
-      {keyHint && (
-        <span id={hintId} className="keyhint">
-          {KEY_HINT}
+    <>
+      {limit === "over" && <OverLimitAlert length={length} />}
+      <div className="formfoot">
+        {keyHint && (
+          <span id={hintId} className="keyhint">
+            {KEY_HINT}
+          </span>
+        )}
+        {limit !== "ok" && <DraftCount length={length} limit={limit} />}
+        <span id={limitId} className="visually-hidden">
+          Up to {formatCount(MAX_MESSAGE_CHARS)} characters.
         </span>
-      )}
-      <DraftCount length={length} />
-      <span id={limitId} className="visually-hidden">
-        Up to {formatCount(MAX_MESSAGE_CHARS)} characters.
-      </span>
-    </div>
+      </div>
+    </>
   );
 }
 
-function DraftCount({ length }: { length: number }) {
-  const limit = draftLimit(length, MAX_MESSAGE_CHARS);
-  if (limit === "ok") return null;
+function OverLimitAlert({ length }: { length: number }) {
+  return (
+    <p role="alert" className="overbox">
+      {formatCount(length - MAX_MESSAGE_CHARS)} character over the {formatCount(MAX_MESSAGE_CHARS)} limit. Your text
+      stays here. Trim it to send.
+    </p>
+  );
+}
+
+function DraftCount({ length, limit }: { length: number; limit: DraftLimit }) {
   return (
     <span className={`count ${limit}`}>
       {formatCount(length)} / {formatCount(MAX_MESSAGE_CHARS)} characters
