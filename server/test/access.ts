@@ -1,4 +1,4 @@
-import { ACCESS_MAX_AGE_S } from "../accessPass.ts";
+import { ACCESS_MAX_AGE_S } from "../../src/shared/accessContract.ts";
 
 export const TEST_ACCESS_PASSWORD = "tidal-lantern-quartz";
 export const OTHER_SIGNING_KEY = "other-signing-key-0123456789abcdefghijklmn";

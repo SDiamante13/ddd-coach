@@ -1,10 +1,10 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { ACCESS_MAX_AGE_S } from "../src/shared/accessContract.ts";
 import { sameText } from "./constantTime.ts";
 
 export type AccessPass = { issue(now: Date): string; admits(cookieHeader: string | null, now: Date): boolean };
 
 export const ACCESS_COOKIE = "coach_access";
-export const ACCESS_MAX_AGE_S = 7_776_000;
 const ACCESS_TAG = "ddd-coach/access/v1";
 const COOKIE_ATTRIBUTES = `Max-Age=${ACCESS_MAX_AGE_S}; Path=/api; HttpOnly; Secure; SameSite=Lax`;
 const PASS_FORMAT = /^(\d{1,12})\.([A-Za-z0-9_-]{43})$/;
