@@ -1,0 +1,308 @@
+{
+  "model": "openai/gpt-6-luna",
+  "reasoningEffort": "none",
+  "instructionsVersion": 3,
+  "bar": {
+    "ships": false,
+    "hard": {
+      "passed": 5,
+      "total": 9
+    },
+    "attribution": {
+      "passed": 7,
+      "total": 9
+    },
+    "perFixture": [
+      {
+        "fixture": "booking-split",
+        "split": {
+          "passed": 1,
+          "total": 3
+        },
+        "codeLine": {
+          "passed": 3,
+          "total": 3
+        },
+        "questionSpansThread": {
+          "passed": 3,
+          "total": 3
+        }
+      },
+      {
+        "fixture": "rebook-notes",
+        "split": {
+          "passed": 3,
+          "total": 3
+        },
+        "codeLine": {
+          "passed": 3,
+          "total": 3
+        },
+        "questionSpansThread": {
+          "passed": 3,
+          "total": 3
+        }
+      },
+      {
+        "fixture": "carrier-status",
+        "split": {
+          "passed": 3,
+          "total": 3
+        },
+        "codeLine": {
+          "passed": 3,
+          "total": 3
+        },
+        "questionSpansThread": {
+          "passed": 3,
+          "total": 3
+        }
+      }
+    ]
+  },
+  "runs": [
+    {
+      "ms": 5031,
+      "promptTokens": 6761,
+      "cachedTokens": 1164,
+      "completionTokens": 523,
+      "reasoningTokens": 0,
+      "cost": 0.00097269,
+      "finishReason": "stop",
+      "label": "booking-split 1",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal, and Ops starts working the booking.\n2. From thread: Ops tenders the load, the carrier accepts, and the load is picked up before proof of delivery makes it invoiceable.\n3. From thread: For load 48213, a same-carrier date change was handled with Rebook, the carrier treated it as cancel plus new tender, and Ops incurred a TONU.\n4. From thread: Code makes Rebook create a new row and ref, while Amend updates the existing row and ref but does not sync the change to the carrier portal.\n5. From thread: Night dispatch used Rebook for two same-carrier date changes on Customer B; the first had no TONU, and the second might have one.\n\nWords that don't match\n\"booking\"\n- From thread: Ops means the customer’s submitted request that the desk works.\n- From thread: Finance means an invoiceable item, with invoiceability at proof of delivery.\n- From thread: Carriers use “load” or “tender,” not “booking.”\n- From thread: Code treats a Rebook as a new booking row, but the customer portal shows the original ref for both rows.\n\n\"rebook\"\n- From thread: Ops day-desk view means a new booking when the carrier or lane changes, but a same-carrier date or window change is AMENDED.\n- From thread: Ops night-dispatch view means using Rebook for changes because Amend does not sync to the carrier portal.\n- From thread: Carriers treat Rebook as cancelling the original load and sending a new tender, which can trigger a TONU.\n- From thread: Finance treats a rebook as a new booking and invoice line when it is invoiceable; the old one is voided.\n- From thread: Code creates a new row and ref, clears the carrier assignment, and treats the new row as separately billable.\n\n\"booking count\"\n- From thread: Ops uses the dashboard, which counts every row not CANCELLED, including both rows after a rebook.\n- From thread: Finance counts invoiceable bookings from the ledger export.\n\n\"hold\"\n- From thread: Ops night-dispatch view means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account.\n\nQuestion for the Ops lead who sets the rebook rule: For a same-carrier date change like Customer B’s second change, should the desk use AMENDED once portal sync works, even if the truck has already been dispatched?",
+      "fixture": "booking-split",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false
+      },
+      "promptChars": 20000,
+      "promptSha256": "84fd786450eefd326dd86e57e6fcd55abafb2764db70d9947f9b0e29b53f644a"
+    },
+    {
+      "ms": 4968,
+      "promptTokens": 6761,
+      "cachedTokens": 6758,
+      "completionTokens": 506,
+      "reasoningTokens": 0,
+      "cost": 0.00032088,
+      "finishReason": "stop",
+      "label": "booking-split 2",
+      "reply": "Events, in order\n1. From thread: The customer submits on the portal, and Ops starts working the booking.\n2. From thread: Ops finds a carrier and sets the pickup window, then the load is tendered and the carrier accepts.\n3. From thread: A customer may change the date after tender; the timing can be before or after the carrier accepts.\n4. From thread: Rebook sets the old row to REBOOKED and creates a new row with a new ref; Amend changes the existing row and ref.\n5. From thread: Proof of delivery makes the load invoiceable; pickup alone is not enough.\n\nWords that don't match\n\"booking\"\n- From thread: Ops means the customer's request from portal submission, which Ops starts working right away.\n- From thread: Finance means something invoiceable; the thread says that is at proof of delivery.\n- From thread: Code creates a new booking row on rebook, while Amend updates the existing row.\n- From thread: Carriers use “load” or “tender,” rather than “booking.”\n\n\"rebook\"\n- From thread: Ops day desk (view A) means a same-carrier date change stays the same booking and ref, so it is AMENDED.\n- From thread: Ops night dispatch (view B) means using REBOOKED for changes, including date changes, because Amend does not sync to the carrier portal.\n- From thread: Carriers mean cancel the original load and send a new tender; a TONU may result if the truck was dispatched.\n- From thread: Code sets the old row to REBOOKED and creates a new row and ref, which the invoice job treats as separately billable.\n\n\"booking count\"\n- From thread: Ops counts dashboard rows whose status is not CANCELLED, so a rebooked shipment counts twice.\n- From thread: Finance counts invoiceable bookings from the ledger export.\n- From thread: Ops night dispatch subtracts rebooks mentally.\n\n\"hold\"\n- From thread: Ops night dispatch means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account, which stops shipment.\n- From thread: Ops day desk says “waiting on customer,” not “hold.”\n\nQuestion for the ops lead who sets the rebook rule: For a same-carrier, same-lane date change after the truck is already rolling, should Ops use AMENDED or REBOOKED if Amend syncs the new date to the carrier portal?",
+      "fixture": "booking-split",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": false,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false
+      },
+      "promptChars": 20000,
+      "promptSha256": "84fd786450eefd326dd86e57e6fcd55abafb2764db70d9947f9b0e29b53f644a"
+    },
+    {
+      "ms": 5129,
+      "promptTokens": 6761,
+      "cachedTokens": 6758,
+      "completionTokens": 519,
+      "reasoningTokens": 0,
+      "cost": 0.00032738,
+      "finishReason": "stop",
+      "label": "booking-split 3",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal, then Ops starts working the booking and looks for a carrier.\n2. From thread: The booking is tendered to the carrier, and the carrier accepts it in their portal as CARRIER_ACK.\n3. From thread: A same-carrier date change can happen before or after the carrier accepts; night dispatch may use Rebook because Amend does not sync the new date to the carrier portal.\n4. From thread: Rebook marks the old row REBOOKED and creates a new row and ref; the carrier sees a cancelled load and a new tender.\n5. From thread: Finance says a booking becomes invoiceable at delivery, when proof of delivery closes it.\n\nWords that don't match\n\"booking\"\n- From thread: Ops means the customer's request as soon as it is submitted, which Ops then works.\n- From thread: Finance means an invoiceable item; it is counted from the ledger export.\n- From thread: Carriers refer to the work as a load or tender, not a booking.\n- From thread: Code creates a new booking row on Rebook, while the portal shows the original ref for both rows.\n- Guess: Code and Finance may count differently: the dashboard includes every non-CANCELLED row, while Finance counts invoiceable bookings.\n\n\"rebook\"\n- From thread: Ops (view A) says a same-carrier date change is AMENDED; a carrier or lane change is a new booking.\n- From thread: Ops (view B) uses Rebook for changes broadly when Amend will not update the carrier portal, including same-carrier date changes.\n- From thread: Carriers treat Rebook as cancelling the original load and sending a new tender; a TONU may result if the truck was dispatched.\n- From thread: Finance treats Rebook as a new booking with its own invoice, while the old one is voided.\n- From thread: Code marks the old row REBOOKED and creates a new row with a new ref.\n\n\"hold\"\n- From thread: Ops (view A) says “waiting on customer” rather than hold.\n- From thread: Ops (view B) uses hold for a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account.\n\nQuestion for the ops lead who sets the rebook rule: For a same-carrier, same-lane date change like Customer B’s Wednesday changes, should Ops use AMENDED once the portal sync works, including when the truck is already dispatched?",
+      "fixture": "booking-split",
+      "hardFailures": [],
+      "soft": {
+        "attribution": false,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false
+      },
+      "promptChars": 20000,
+      "promptSha256": "84fd786450eefd326dd86e57e6fcd55abafb2764db70d9947f9b0e29b53f644a"
+    },
+    {
+      "ms": 4734,
+      "promptTokens": 1751,
+      "cachedTokens": 1164,
+      "completionTokens": 448,
+      "reasoningTokens": 0,
+      "cost": 0.00030894,
+      "finishReason": "stop",
+      "label": "rebook-notes 1",
+      "reply": "Events, in order\n1. From thread: Load 48213’s date moved by one day, and the night shift rebooked it with the same carrier.\n2. From thread: The carrier billed TONU on the original load, hauled the new one, and Finance paid the TONU.\n3. From thread: On Thu 24 Sep, Dana corrected the notes: with the same carrier and lane, a date or window change is AMENDED; a lane or carrier change is a new booking.\n4. From thread: Maya agreed a lane change is a new booking but still rebooks date-only changes at night until amend syncs to the carrier portal.\n5. From thread: The glossary rows are to be updated before the RFC review, where Finance chairs and Ops signs off.\n\nWords that don't match\n\"rebook\"\n- From thread: Ops (view A) uses it for a new booking when the carrier changes; Dana’s corrected rule treats a lane or carrier change as a new booking.\n- From thread: Ops (view B) uses it at night for date-only changes until amend syncs to the carrier portal.\n- From thread: Finance uses it in connection with a new invoice and void on the old one, but wants one invoice per shipment that actually moves.\n- From thread: Code counts REBOOKED rows twice in “bookings today.”\n\"booking\"\n- From thread: Ops (view A) treats a lane or carrier change as a new booking.\n- From thread: Ops (view A) treats a date or window change with the same carrier and lane as AMENDED, not a new booking.\n\"amend\"\n- From thread: Ops (view A) means a date or window change with the same carrier and lane.\n- From thread: Ops (view B) says amend does not push the date to the carrier portal yet.\n- From thread: Code has an amend-to-portal sync spike planned.\n\nQuestion for the ops lead responsible for carrier portal sync: For a same-carrier, same-lane date change like load 48213, should the night shift use AMENDED once the sync is live, and what must happen to prevent a TONU?",
+      "fixture": "rebook-notes",
+      "hardFailures": [
+        "no names",
+        "code guess"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false
+      },
+      "promptChars": 2230,
+      "promptSha256": "2aa21f92858880bf4e24cf96be8ec805f176af936a952dbdac80477fe085be1c"
+    },
+    {
+      "ms": 4512,
+      "promptTokens": 1751,
+      "cachedTokens": 1748,
+      "completionTokens": 388,
+      "reasoningTokens": 0,
+      "cost": 0.00021178,
+      "finishReason": "stop",
+      "label": "rebook-notes 2",
+      "reply": "Events, in order\n1. From thread: On Tue 22 Sep, the team discussed different meanings of “rebook” and the invoice impact.\n2. From thread: Load 48213 moved one day with the same carrier, was rebooked at night, and the carrier billed TONU on the original load.\n3. From thread: On Thu 24 Sep, Dana corrected the notes: same carrier and same lane with a date or window change is AMENDED; a lane or carrier change is a new booking.\n4. From thread: Maya agreed that a lane change is a new booking but said nights still RB date-only changes until amend! syncs the date to the carrier portal.\n5. From thread: The glossary rows are to be updated before the RFC review on Tue 27 Oct, with Finance chairing and Ops signing off.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (view A) means a date-only change with the same carrier and same lane is AMENDED, while lane or carrier changes create a new booking.\n- From thread: Ops (view B) calls date-only changes RB at night until amend! syncs the date to the carrier portal.\n- From thread: Finance focuses on avoiding more than one invoice per shipment that actually moves.\n- Guess: Code may count REBOOKED rows as separate bookings, since the dashboard “bookings today” counts them twice.\n\n\"new booking\"\n- From thread: Ops (view A) means a lane or carrier change creates a new booking.\n- From thread: Ops (view B) agrees a lane change is a new booking but still RBs date-only changes at night.\n\nQuestion for the ops lead who handles night rebooks: For a date-only change on the same carrier and lane at 2am, should nights keep RBing it until amend! syncs the date to the carrier portal?",
+      "fixture": "rebook-notes",
+      "hardFailures": [
+        "no names"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false
+      },
+      "promptChars": 2230,
+      "promptSha256": "2aa21f92858880bf4e24cf96be8ec805f176af936a952dbdac80477fe085be1c"
+    },
+    {
+      "ms": 5039,
+      "promptTokens": 1751,
+      "cachedTokens": 1748,
+      "completionTokens": 479,
+      "reasoningTokens": 0,
+      "cost": 0.00025728,
+      "finishReason": "stop",
+      "label": "rebook-notes 3",
+      "reply": "Events, in order\n1. From thread: On Tue 22 Sep, Dana said a date or lane change with the same carrier was AMENDED, while a carrier change was REBOOKED with a new ref.\n2. From thread: On Tue 22 Sep, load 48213 moved one day with the same carrier, was rebooked at night, and the carrier billed TONU on the original load.\n3. From thread: On Thu 24 Sep, Dana corrected the notes: a date or window change with the same carrier and same lane is AMENDED; a lane or carrier change is a new booking.\n4. From thread: Maya agreed a lane change is a new booking but still RBs date-only changes at night until amend! syncs to the carrier portal.\n5. From thread: The glossary rows are due before the RFC review on Tue 27 Oct, with finance chairing and ops signing off.\n\nWords that don't match\n\"RB\"\n- From thread: Ops (view A) uses RB for the same booking unless the lane or date changes, following the Tue notes.\n- From thread: Ops (view B) uses RB for everything at night because amend doesn't sync the date to the carrier portal.\n- From thread: Finance uses RB for a new invoice plus a void on the old one, but only needs one invoice per shipment that actually moves.\n- Guess: Code may count REBOOKED rows as separate bookings in “bookings today,” since the dashboard counts those rows twice.\n\n\"AMENDED\"\n- From thread: Ops (view A) means a date or window change with the same carrier and same lane.\n- From thread: Ops (view B) says amend! does not sync the date to the carrier portal, so it is not safe at night.\n- From thread: Carriers desk says amend plus a phone call would have avoided the TONU on load 48213.\n\n\"new booking\"\n- From thread: Ops means a lane change or carrier change creates a new booking.\n- From thread: Finance means a shipment that actually moves should have one invoice.\n\nQuestion for the ops lead who owns the carrier portal sync: For a same-carrier, same-lane date change at night like load 48213, should it be AMENDED once amend! syncs the date, or still RB’d?",
+      "fixture": "rebook-notes",
+      "hardFailures": [
+        "no names"
+      ],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": false
+      },
+      "promptChars": 2230,
+      "promptSha256": "2aa21f92858880bf4e24cf96be8ec805f176af936a952dbdac80477fe085be1c"
+    },
+    {
+      "ms": 5727,
+      "promptTokens": 1748,
+      "cachedTokens": 1164,
+      "completionTokens": 515,
+      "reasoningTokens": 0,
+      "cost": 0.000342065,
+      "finishReason": "stop",
+      "label": "carrier-status 1",
+      "reply": "Events, in order\n1. From thread: Customer D asks why the portal says Confirmed when the carrier has no truck on it yet.\n2. From thread: The carrier desk says Confirmed means the carrier accepted the tender and sent the 990.\n3. From thread: Ops says confirmed means they called the customer and agreed the pickup window.\n4. From thread: The booking service sets CONFIRMED when the carrier's 990 acceptance arrives, while ops records its confirmation in notes.\n5. From thread: The portal displays the enum name, so it shows Confirmed when the carrier accepts.\n\nWords that don't match\n\"confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and returned a 990.\n- From thread: Ops means the pickup window was agreed with the customer.\n- From thread: Code sets CONFIRMED on receipt of the carrier's 990 acceptance, and has no status for ops confirming the window.\n- From thread: Carriers treat acceptance as contractual; cancelling after the truck is rolling can cost a TONU.\n\nQuestion for the portal/product owner: For Customer D's load, should the portal's Confirmed label mean the carrier accepted the tender, or that Ops agreed the pickup window with the customer?\n\nEvents, in order\n1. From thread: Customer D asks why the portal says Confirmed when the carrier has no truck on it yet.\n2. From thread: Carrier desk says Confirmed means the carrier accepted the tender and sent the 990.\n3. From thread: Ops says confirmed means they called the customer and agreed the pickup window.\n4. From thread: The booking service sets CONFIRMED when the carrier's 990 acceptance arrives; Ops records its confirmation in notes.\n5. From thread: The portal displays the enum name, so customers see Confirmed as soon as the carrier accepts.\n\nWords that don't match\n\"confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and returned the 990.\n- From thread: Ops means the pickup window was agreed with the customer.\n- From thread: Code sets CONFIRMED when the carrier's 990 acceptance arrives; there is no status for Ops confirming the window.\n- From thread: Carriers treat acceptance as contractual; cancelling after the truck is rolling can cost a TONU.\n\nQuestion for the portal/product owner: For Customer D's load, should the portal's Confirmed label mean the carrier accepted the tender or that Ops agreed the pickup window with the customer?",
+      "fixture": "carrier-status",
+      "hardFailures": [
+        "one question"
+      ],
+      "soft": {
+        "attribution": false,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true
+      },
+      "promptChars": 2216,
+      "promptSha256": "76805dfa20745daf3175ceb3cdd04a7be34c2ea73f9c679cfcc46de9ee170e74"
+    },
+    {
+      "ms": 3759,
+      "promptTokens": 1748,
+      "cachedTokens": 1745,
+      "completionTokens": 250,
+      "reasoningTokens": 0,
+      "cost": 0.00014275,
+      "finishReason": "stop",
+      "label": "carrier-status 2",
+      "reply": "Events, in order\n1. From thread: The carrier sends a 990 accepting the tender.\n2. From thread: Ops calls the customer to agree on the pickup window, but may do this before or after carrier acceptance.\n3. From thread: The booking service sets CONFIRMED when the carrier’s 990 acceptance arrives.\n4. From thread: The portal shows Confirmed when the carrier accepts, while ops records its customer confirmation in notes.\n5. From thread: Customer D asks why the portal says Confirmed when the carrier has no truck on it yet.\n\nWords that don't match\n\"Confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender by sending a 990; it does not necessarily mean a truck is on the load.\n- From thread: Ops desk means ops called the customer and agreed the pickup window.\n- From thread: Code sets CONFIRMED when the carrier’s 990 acceptance arrives.\n- From thread: The portal shows the code’s Confirmed status.\n\nQuestion for the ops lead who handles customer pickup windows: For Customer D’s load, if the carrier has sent a 990 but ops has not agreed the pickup window with the customer, should the portal say Confirmed?",
+      "fixture": "carrier-status",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true
+      },
+      "promptChars": 2216,
+      "promptSha256": "76805dfa20745daf3175ceb3cdd04a7be34c2ea73f9c679cfcc46de9ee170e74"
+    },
+    {
+      "ms": 7082,
+      "promptTokens": 1748,
+      "cachedTokens": 1745,
+      "completionTokens": 268,
+      "reasoningTokens": 0,
+      "cost": 0.00015175,
+      "finishReason": "stop",
+      "label": "carrier-status 3",
+      "reply": "Events, in order\n1. From thread: The carrier accepts the tender and returns the 990.\n2. From thread: The portal shows Confirmed when the carrier accepts.\n3. From thread: Ops calls the customer and agrees the pickup window, then tells them they’re confirmed.\n4. From thread: Customer D sees Confirmed on the portal but the carrier has no truck on it yet.\n5. Guess: Customer D asks which meaning the portal’s Confirmed represents.\n\nWords that don't match\n\"confirmed\"\n- From thread: Carrier desk means the carrier accepted the tender and returned the 990.\n- From thread: Ops means ops and the customer agreed the pickup window.\n- From thread: Code sets CONFIRMED when the carrier’s 990 acceptance arrives; ops confirmation is kept in notes.\n- From thread: Customers see Confirmed on the portal as soon as the carrier accepts.\n\n\"contractual\"\n- From thread: Carrier desk means cancelling after acceptance can cost a TONU if the truck’s rolling.\n- Guess: Ops means its customer promise is separate from the carrier’s acceptance.\n\nQuestion for the ops lead who handles customer confirmations: For Customer D’s load, if the carrier has accepted the tender but ops has not agreed the pickup window with the customer, should the portal say Confirmed?",
+      "fixture": "carrier-status",
+      "hardFailures": [],
+      "soft": {
+        "attribution": true,
+        "split": true,
+        "codeLine": true,
+        "noStaleMeaning": true,
+        "quotedWordsInThread": true,
+        "under400Words": true,
+        "questionSpansThread": true,
+        "jointRoles": false,
+        "forum": true
+      },
+      "promptChars": 2216,
+      "promptSha256": "76805dfa20745daf3175ceb3cdd04a7be34c2ea73f9c679cfcc46de9ee170e74"
+    }
+  ]
+}
