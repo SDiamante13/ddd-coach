@@ -10,6 +10,7 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 
 - **Commit requests are final.** Once a request is sent to committer, never withdraw or hold it; fix forward with a follow-up commit (holds and commits crossed twice in slice 2a).
 - **`netlify dev` hot-reloads functions on every save.** Do multi-file renames in one atomic edit, or the shared dev server crashes.
+- **Paid model runs.** A per-command shell env override beats `node --env-file`, so every eval or latency result must record the model it actually used. Add a unique nonce line so first turns stay uncached. Production and dev models can differ (see `outputs/evals/slice-03/summary.md`), so demo on the hosted site.
 
 ## Archetypes
 
