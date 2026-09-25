@@ -20,3 +20,7 @@ export function loadFixture(name: string): Fixture {
   const thread = SHARED_THREADS[name] ?? read(`${name}.txt`);
   return { thread, key: JSON.parse(read(`${name}.key.json`)) as FixtureKey };
 }
+
+export function firstTurnOf({ thread, key }: Fixture, nonce: string): string {
+  return key.expect.nonThread ? thread.trim() : `Nonce ${nonce}.\n${thread.trim()}`;
+}
