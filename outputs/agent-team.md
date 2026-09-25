@@ -60,6 +60,7 @@ Template: `outputs/demos/chores-30af2d6-deploy.md`.
 The [mockups canvas](https://claude.ai/artifact/RjbLasj538CpC29jWrqzGf) pairs each slice's projected screen with an `ActualNN.dc.html` frame (IDs: `01`, `02`, `02a`, `03`, `04a`…`04d`, `05`…`13`).
 
 - `record start` does not carry localStorage into the recorded context, and a mid-recording `location.reload()` can silently stop the recorder: seed storage on camera and reload at most once. Close any open composer panel before showing replies.
+- `set viewport` mid-recording stretches the page into the fixed video frame and can silently not apply: check `innerWidth` after each change, and prefer a separate take per viewport. A `screenshot` during a recording works and saves a paid call.
 - After filling the password, never dump the gate's `innerHTML`, `outerHTML`, `value` or a full snapshot: React reflects the input value and the password lands in tool output. Check the gate by role or text only.
 - Verifier: after the demo, set the viewport to 1280×800 and screenshot the state the slice's acceptance check describes → `outputs/demos/slice-NN.png`. Slice 5 has no UI: capture the terminal finding instead.
 - Navigator: upload the PNG as a canvas asset, replace the placeholder body of `ActualNN.dc.html` with `<img src="/_blob/<id>">` (1280×800, descriptive `alt`), and retitle the frame `Actual · NN (built)`.
