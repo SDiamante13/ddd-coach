@@ -11,7 +11,7 @@ import {
   type FailedExchange,
   type Prompt,
 } from "./domain/exchange.ts";
-import { ExchangeOutcome, type ExchangeProps } from "./ui/ExchangeOutcome.tsx";
+import { ExchangeEntry } from "./ui/ExchangeEntry.tsx";
 
 export function App() {
   return (
@@ -63,14 +63,5 @@ function ConnectionTest() {
         </button>
       </form>
     </>
-  );
-}
-
-function ExchangeEntry({ exchange, onRetry }: ExchangeProps) {
-  return (
-    <li>
-      <p>{exchange.prompt}</p>
-      <ExchangeOutcome exchange={exchange} onRetry={onRetry} />
-    </li>
   );
 }
