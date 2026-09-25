@@ -1,4 +1,5 @@
 import { endsSentence } from "../replyEnding.ts";
+import { admitsNotCovered, citesOneOf, citesVerbatim } from "./citationChecks.ts";
 import { asksOpenly, namesACase, quotesTwoSources } from "./questionChecks.ts";
 import {
   hasCleanSplitLabels,
@@ -42,6 +43,8 @@ export type FixtureKey = {
     forum?: string[];
     questionEvidence?: string[][];
     nonThread?: boolean;
+    cites?: string[];
+    notCovered?: boolean;
   };
 };
 export type Fixture = { thread: string; key: FixtureKey };
@@ -74,6 +77,7 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
   "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
+  "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
   "question sources": ({ layout, fixture }) => quotesTwoSources(afterQuestion(layout.lines), fixture.thread),
   "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
@@ -84,6 +88,9 @@ const NON_THREAD_CHECKS: Record<string, HardCheck> = {
   "complete ending": ({ finishReason }) => finishReason === "stop",
   "no markdown": noMarkdown,
   "invites a thread": ({ text }) => INVITES_A_THREAD.test(text),
+  "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
+  "cites the reference": ({ layout, fixture }) => citesOneOf(layout.lines, fixture.key.expect.cites),
+  "admits not covered": ({ text, fixture }) => admitsNotCovered(text, fixture.key.expect.notCovered),
   "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
 

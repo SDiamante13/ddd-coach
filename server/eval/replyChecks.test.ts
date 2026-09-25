@@ -223,6 +223,12 @@ describe("hard checks", () => {
     expect(failedHardChecks(noCase, "stop", fixture)).toEqual(["question names a case"]);
   });
 
+  it("fail citations verbatim in a thread reply too", () => {
+    const cited = GOOD_REPLY.replace("\n\nWords that don't match", '\nSource: Evans, Domain-Driven Design Reference (2015), "Rebooking".\n\nWords that don\'t match');
+
+    expect(failedHardChecks(cited, "stop", fixture)).toContain("citations verbatim");
+  });
+
   it("fail question sources for a question with no source lines under it (#85)", () => {
     const noSources = GOOD_REPLY.split("\n").filter((line) => !line.startsWith('From thread: "')).join("\n");
 
@@ -380,6 +386,60 @@ describe("hard checks on a message that isn't a thread", () => {
     const runaway = `${"Domain-Driven Design shapes software around the business. ".repeat(100)}Paste a thread when you have one.`;
 
     expect(failedHardChecks(runaway, "stop", greeting)).toEqual(["at most 600 words"]);
+  });
+
+  it("fail citations verbatim for a Source line whose title isn't in the Reference (#58)", () => {
+    const reply = 'A bounded context is where a model applies.\nSource: Evans, Domain-Driven Design Reference (2015), "Bounded Contexts".\nPaste a thread when you have one.';
+
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual(["citations verbatim"]);
+  });
+
+  it.each([
+    ["passes a title as the Reference writes it", 'Source: Evans, Domain-Driven Design Reference (2015), "Bounded Context".', []],
+    ["fails a source that isn't the Reference", "Source: Wikipedia, Domain-driven design.", ["citations verbatim"]],
+  ])("citations verbatim %s", (_case, sourceLine, failures) => {
+    const reply = `A bounded context is where a model applies.\n${sourceLine}\nPaste a thread when you have one.`;
+
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual(failures);
+  });
+
+  it.each([
+    ["the expected section", "Bounded Context", []],
+    ["another real section", "Context Map", ["cites the reference"]],
+  ])("cites the reference for a Source line naming %s", (_case, title, failures) => {
+    const boundedContext: Fixture = { ...greeting, key: { ...greeting.key, expect: { nonThread: true, cites: ["Bounded Context"] } } };
+    const reply = `A bounded context is where a model applies.\nSource: Evans, Domain-Driven Design Reference (2015), "${title}".\nPaste a thread when you have one.`;
+
+    expect(failedHardChecks(reply, "stop", boundedContext)).toEqual(failures);
+  });
+
+  it("fail cites the reference when a definition question gets no Source line", () => {
+    const boundedContext: Fixture = { ...greeting, key: { ...greeting.key, expect: { nonThread: true, cites: ["Bounded Context"] } } };
+
+    expect(failedHardChecks("A bounded context is where a model applies. Paste a thread when you have one.", "stop", boundedContext)).toEqual([
+      "cites the reference",
+    ]);
+  });
+
+  describe("admits not covered", () => {
+    const eventStorming: Fixture = { ...greeting, key: { ...greeting.key, expect: { nonThread: true, notCovered: true } } };
+
+    it("fails an answer that never says its sources don't cover the question", () => {
+      const reply = "Event Storming is a workshop where people put orange stickies on a wall. Paste a thread when you have one.";
+
+      expect(failedHardChecks(reply, "stop", eventStorming)).toEqual(["admits not covered"]);
+    });
+
+    it.each([
+      ["says so plainly", "The sources I have don't cover this. As general practice, teams map events on a wall.", []],
+      [
+        "says so but cites anyway",
+        'The sources I have don\'t cover this.\nSource: Evans, Domain-Driven Design Reference (2015), "Domain Events".',
+        ["admits not covered"],
+      ],
+    ])("judges an answer that %s", (_case, answer, failures) => {
+      expect(failedHardChecks(`${answer}\nPaste a thread when you have one.`, "stop", eventStorming)).toEqual(failures);
+    });
   });
 
   it("hold jointRoles, since a reply that asks no question has no roles to join", () => {

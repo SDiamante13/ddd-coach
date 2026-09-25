@@ -400,6 +400,12 @@ No quote carries a speaker's name. The 18 non-thread replies are unchanged in ki
 
 `LIVE_INSTRUCTIONS_VERSION` becomes 11 in this commit (the A/B baseline). The deploy waits for #64's card (team-lead).
 
+## #58 grounding checks, re-scored on the v10/v11 A/B ($0)
+
+| Check change | Verdict | What moved |
+|---|---|---|
+| New gating hard checks. **`citations verbatim`** (every fixture): each `Source: Evans, Domain-Driven Design Reference (2015), "<title>"` line names one of the Reference's 54 Contents titles, word for word, and any other `Source:` line fails. **`cites the reference`** (fixtures with `expect.cites`): at least one citation names an expected title. **`admits not covered`** (fixtures with `expect.notCovered`): the reply says "The sources I have don't cover this" (or "the reference doesn't cover") and has no Source line. New non-thread fixtures: `ddd-bounded-context` ("What's a bounded context?", cites "Bounded Context") and `not-covered` ("How do I run an Event Storming workshop?", which the Reference never mentions) | Ship: yes (unchanged) | No recorded reply has a Source line, so nothing moves. The new fixtures aren't in the v10/v11 run. They're the v12 A/B's target |
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.

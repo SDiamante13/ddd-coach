@@ -8,13 +8,15 @@ describe("eval fixtures", () => {
     expect(loadFixture("example-thread").thread).toBe(EXAMPLE_THREAD);
   });
 
-  it("hold a visitor's greeting, a DDD question and a one-line note to the non-thread checks", () => {
+  it("hold a greeting, DDD questions and a one-line note to the non-thread checks, with what grounding expects (#58)", () => {
     const nonThread = FIXTURE_NAMES.map(loadFixture).filter(({ key }) => key.expect.nonThread);
 
-    expect(nonThread.map(({ thread }) => thread.trim())).toEqual([
-      "hi",
-      "what is DDD?",
-      "Just trying this out before the next talk.",
+    expect(nonThread.map(({ thread, key }) => [thread.trim(), key.expect])).toEqual([
+      ["hi", { nonThread: true }],
+      ["what is DDD?", { nonThread: true }],
+      ["Just trying this out before the next talk.", { nonThread: true }],
+      ["What's a bounded context?", { nonThread: true, cites: ["Bounded Context"] }],
+      ["How do I run an Event Storming workshop?", { nonThread: true, notCovered: true }],
     ]);
   });
 });

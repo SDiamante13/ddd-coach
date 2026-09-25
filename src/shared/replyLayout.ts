@@ -2,6 +2,7 @@ export const EVENTS_HEADING = "Events, in order";
 export const WORDS_HEADING = "Words that don't match";
 export const QUESTION = /^Question for ([^:]+): (.+\?)$/;
 export const SOURCE_QUOTE = /^From thread: ["“](.+)["”]$/;
+export const CITATION = /^Source: Evans, Domain-Driven Design Reference \(2015\), ["“](.+?)["”]\.?$/;
 
 const NUMBERED = /^\d+\. /;
 const MEANING = /^- /;

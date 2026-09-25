@@ -10,6 +10,8 @@ export const FIXTURE_NAMES = [
   "greeting",
   "ddd-question",
   "one-line-note",
+  "ddd-bounded-context",
+  "not-covered",
 ] as const;
 
 const FIXTURES = new URL("./fixtures/", import.meta.url);
