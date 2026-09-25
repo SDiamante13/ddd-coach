@@ -295,9 +295,9 @@ describe("hard checks on a message that isn't a thread", () => {
   });
 
   it.each([
-    ["I'm here to help analyze a business work thread. Paste one and I'll find the mismatched words."],
+    ["I'm here to help analyze a business work thread. Paste a thread and I'll find the mismatched words."],
     ["Hello! I am here to help you with Domain-Driven Design. Paste a thread to start."],
-    ["Hi, I'm DDD Coach. I look at work threads for words that don't match. Paste one."],
+    ["Hi, I'm DDD Coach. I look at work threads for words that don't match. Paste a thread."],
     ["As a DDD coach, my job is to analyze business conversations. Paste a thread."],
     ["I’m for helping you prepare from messy business threads, notes, status lists, or code; paste the material when you have it."],
   ])("fail no boilerplate for a canned role statement: %s", (reply) => {
@@ -320,9 +320,20 @@ describe("hard checks on a message that isn't a thread", () => {
     expect(failedHardChecks(reply, finishReason, greeting)).toContain(check);
   });
 
-  it("fail invites a thread for an answer that never asks for the visitor's material", () => {
-    const reply = "DDD means Domain-Driven Design: a way to design software around the business's own words and rules.";
-
+  it.each([
+    ["never asks", "DDD means Domain-Driven Design: a way to design software around the business's own words and rules."],
+    ["only warns", "Hi. Don't paste customer names from a thread you can't share."],
+    ["warns with never", "Hello. Never send me messages with passwords in them."],
+  ])("fail invites a thread for an answer that %s", (_case, reply) => {
     expect(failedHardChecks(reply, "stop", greeting)).toEqual(["invites a thread"]);
+  });
+
+  it.each([
+    ["Hi! Share the thread you're stuck on and I'll look for words that don't match."],
+    ["Good luck with the talk. Drop your meeting notes here when you have them."],
+    ["Hello. Send me a chat export or the messages from your team."],
+    ["Nice to meet you. Bring a conversation from your own work."],
+  ])("pass invites a thread for any invitation to share their material: %s", (reply) => {
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual([]);
   });
 });
