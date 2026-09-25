@@ -78,13 +78,14 @@ ol[role="log"] > li > p:first-child::before,
 ol[role="log"] > li > p:nth-child(2):not([role="alert"])::before {
   display: block;
   margin-bottom: var(--space-1);
-  font: 500 var(--text-xs) / 1 var(--font-label);
+  font: 500 var(--text-base) / 1 var(--font-label);
+  font-variant-caps: all-small-caps;
   letter-spacing: var(--tracking-label);
   color: var(--color-ink-muted);
 }
 
 ol[role="log"] > li > p:first-child::before {
-  content: "YOU";
+  content: "You";
 }
 
 ol[role="log"] > li > p:nth-child(2):not([role="alert"]) {
@@ -92,7 +93,7 @@ ol[role="log"] > li > p:nth-child(2):not([role="alert"]) {
 }
 
 ol[role="log"] > li > p:nth-child(2):not([role="alert"])::before {
-  content: "COACH";
+  content: "Coach";
   color: var(--color-coach);
 }
 
@@ -142,9 +143,9 @@ form label {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  font: 500 var(--text-xs) / 1 var(--font-label);
+  font: 500 var(--text-base) / 1 var(--font-label);
+  font-variant-caps: all-small-caps;
   letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
   color: var(--color-ink-muted);
 }
 
@@ -157,7 +158,6 @@ input[type="text"] {
   background: var(--color-paper);
   color: var(--color-ink);
   font: var(--text-base) / 1.4 var(--font-body);
-  text-transform: none;
   letter-spacing: normal;
 }
 
