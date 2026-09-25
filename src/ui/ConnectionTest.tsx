@@ -11,6 +11,7 @@ import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { NewReplyButton } from "./NewReplyButton.tsx";
+import { SentPreview } from "./SentPreview.tsx";
 import { SwapPanel } from "./SwapPanel.tsx";
 import type { Unlock } from "./useAccess.ts";
 import { useAccessRecovery } from "./useAccessRecovery.ts";
@@ -37,6 +38,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useCallback(() => boxRef.current?.form ?? null, []);
   const follow = useLogFollow(exchanges.at(-1), composer);
   const busy = isBusy(exchanges);
+  const draftBlank = draft.trim() === "";
   const sendFromBox = (prompt: Prompt) => {
     send(prompt);
     boxRef.current?.focus();
@@ -74,13 +76,14 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
       >
         <ComposerActions
           started={exchanges.length > 0}
-          draftBlank={draft.trim() === ""}
+          draftBlank={draftBlank}
           busy={busy}
           confirmation={confirmation}
           conversation={conversation}
           onTryExample={tryExample}
         />
         <SwapPanel {...swaps} />
+        {!draftBlank && <SentPreview swapped={applySwaps(swaps.swaps, draft)} />}
       </MessageForm>
     </>
   );

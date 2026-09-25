@@ -5,6 +5,9 @@ import { startConversation } from "../test/appDriver.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
+const fullText = (text: string) => (_: string, element: Element | null) =>
+  element?.tagName === "P" && element.textContent === text;
+
 async function openSwaps(user: UserEvent) {
   const summary = screen.getByText(/^Your swaps/);
   if (!summary.closest("details")?.open) await user.click(summary);
@@ -48,5 +51,65 @@ describe("Swapping sensitive words", () => {
     expect(server.bodyOf(0)).toEqual({ message: sent, history: [] });
     expect(JSON.stringify(server.bodyOf(0))).not.toMatch(/acme|laredo/i);
     expect(within(log()).getByText(sent)).toBeInTheDocument();
+  });
+
+  it("shows in 'What's sent' exactly the next request, with each placeholder marked", async () => {
+    const { user, server, input } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+    await addSwap(user, "Laredo", "Lane 1");
+    await user.type(input(), "acme wants the Laredo lane");
+
+    await user.click(screen.getByRole("button", { name: "Show what's sent" }));
+
+    const preview = screen.getByRole("region", { name: "What's sent" });
+    const sent = "Customer A wants the Lane 1 lane";
+    expect(within(preview).getByText(fullText(sent))).toBeVisible();
+    expect([...preview.querySelectorAll("mark")].map((mark) => mark.textContent)).toEqual(["Customer A", "Lane 1"]);
+    expect(within(preview).getByText("2 swaps applied")).toBeVisible();
+    await user.type(input(), "{Enter}");
+    expect(server.bodyOf(0)).toEqual({ message: sent, history: [] });
+  });
+
+  it("shows the draft as it is in 'What's sent' when there are no swaps", async () => {
+    const { user, input } = await startConversation();
+    await user.type(input(), "Acme is late");
+
+    await user.click(screen.getByRole("button", { name: "Show what's sent" }));
+
+    const preview = screen.getByRole("region", { name: "What's sent" });
+    expect(within(preview).getByText(fullText("Acme is late"))).toBeVisible();
+    expect(within(preview).getByText("No swaps applied")).toBeVisible();
+  });
+
+  it("updates 'What's sent' as the draft and the list change", async () => {
+    const { user, input } = await startConversation();
+    await user.type(input(), "Acme");
+    await user.click(screen.getByRole("button", { name: "Show what's sent" }));
+    const preview = screen.getByRole("region", { name: "What's sent" });
+
+    await addSwap(user, "Acme", "Customer A");
+    expect(within(preview).getByText(fullText("Customer A"))).toBeVisible();
+    expect(within(preview).getByText("1 swap applied")).toBeVisible();
+
+    await user.type(input(), " and ACME");
+    expect(within(preview).getByText(fullText("Customer A and Customer A"))).toBeVisible();
+    expect(within(preview).getByText("2 swaps applied")).toBeVisible();
+  });
+
+  it("offers 'Show what's sent' only for a draft, and says whether it is open", async () => {
+    const { user, input } = await startConversation();
+    const toggle = () => screen.queryByRole("button", { name: "Show what's sent" });
+    expect(toggle()).not.toBeInTheDocument();
+
+    await user.type(input(), "Acme");
+    await user.click(toggle()!);
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
+    expect(toggle()).toHaveAttribute("aria-controls", screen.getByRole("region", { name: "What's sent" }).id);
+
+    await user.clear(input());
+    expect(toggle()).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "What's sent" })).not.toBeInTheDocument();
+    await user.type(input(), "A");
+    expect(toggle()).toHaveAttribute("aria-expanded", "false");
   });
 });
