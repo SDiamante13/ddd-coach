@@ -143,6 +143,7 @@ describe("Following the log", () => {
 
   it("still brings an instant failure's Retry into view when the reveal's own glide fires a scroll", async () => {
     const { send, server, log } = await startConversation();
+    newestEntryBottom = READING_UP;
     const index = await send("Hello coach");
 
     scrollTo(READING_UP);
@@ -158,6 +159,17 @@ describe("Following the log", () => {
     const index = await send("Hello coach");
 
     now.mockReturnValue(performance.now() + 1_001);
+    scrollTo(READING_UP);
+    server.reply(index, 200, { reply: "Hi there", signature: "sig-1" });
+    await within(log()).findByText("Hi there");
+
+    expect(screen.getByRole("button", { name: "New reply ↓" })).toBeInTheDocument();
+  });
+
+  it("counts the visitor's scroll right away when the reveal had nothing to move", async () => {
+    const { send, server, log } = await startConversation();
+    const index = await send("Hello coach");
+
     scrollTo(READING_UP);
     server.reply(index, 200, { reply: "Hi there", signature: "sig-1" });
     await within(log()).findByText("Hi there");

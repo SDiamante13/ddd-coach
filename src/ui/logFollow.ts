@@ -15,3 +15,7 @@ const TOP_GAP_PX = 16;
 export function fitsAbove({ height, composerTop }: { height: number; composerTop: number }): boolean {
   return height <= composerTop - TOP_GAP_PX;
 }
+
+export function inView({ top, bottom, composerTop }: { top: number; bottom: number; composerTop: number }): boolean {
+  return top >= 0 && bottom <= composerTop;
+}

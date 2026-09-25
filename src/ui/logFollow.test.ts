@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fitsAbove, isFollowing, revealOptions } from "./logFollow.ts";
+import { fitsAbove, inView, isFollowing, revealOptions } from "./logFollow.ts";
 
 describe("revealOptions", () => {
   it("glides to the entry's end", () => {
@@ -31,5 +31,15 @@ describe("fitsAbove", () => {
     [385, false],
   ])("says whether an outcome %i px tall fits above a composer at 400 px, leaving a 16 px gap at the top", (height, fits) => {
     expect(fitsAbove({ height, composerTop: 400 })).toBe(fits);
+  });
+});
+
+describe("inView", () => {
+  it.each([
+    [0, 400, true],
+    [-1, 300, false],
+    [300, 401, false],
+  ])("says whether an outcome from %i to %i px sits between the viewport top and a composer at 400 px", (top, bottom, expected) => {
+    expect(inView({ top, bottom, composerTop: 400 })).toBe(expected);
   });
 });

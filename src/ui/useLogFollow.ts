@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import type { Exchange, ExchangeId } from "../domain/exchange.ts";
-import { fitsAbove, isFollowing, revealOptions } from "./logFollow.ts";
+import { fitsAbove, inView, isFollowing, revealOptions } from "./logFollow.ts";
 import { prefersReducedMotion } from "./motion.ts";
 
 export function useLogFollow(newest: Exchange | undefined, composer: () => Element | null) {
@@ -11,8 +11,8 @@ export function useLogFollow(newest: Exchange | undefined, composer: () => Eleme
   const following = useFollowing(logRef, composer, revealing, () => setNewReply(false));
 
   const revealNewest = () => {
-    revealing.start();
     const outcome = newestOutcomeOf(logRef.current);
+    if (!nothingToMove(outcome, composer())) revealing.start();
     const fits = fitsAboveComposer(outcome, composer());
     outcome?.scrollIntoView(revealOptions({ reducedMotion: prefersReducedMotion(), fits }));
     following.current = true;
@@ -76,6 +76,13 @@ function followingNow(log: HTMLOListElement | null, composer: Element | null): b
     newestEntryBottom: newestEntry.getBoundingClientRect().bottom,
     composerTop: composer.getBoundingClientRect().top,
   });
+}
+
+function nothingToMove(outcome: Element | null | undefined, composer: Element | null): boolean {
+  if (!outcome) return true;
+  if (!composer) return false;
+  const { top, bottom } = outcome.getBoundingClientRect();
+  return inView({ top, bottom, composerTop: composer.getBoundingClientRect().top });
 }
 
 function fitsAboveComposer(outcome: Element | null | undefined, composer: Element | null): boolean {
