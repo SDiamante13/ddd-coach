@@ -78,6 +78,6 @@ Luna arm $0.0092, luna latency $0.0104, terra latency $0.0418, terra arm $0 (re-
 ### Recommendation
 **Keep terra.** Luna fails the #78 rule on 8 gating rows, 4 of them in the thread-analysis core: names in notes, holders, split labels and verbatim sources. It's fast enough and 20× cheaper, but at v11 it isn't reliable enough.
 
-If cost becomes pressing (public use, #58's knowledge-base prefix), a luna-specific prompt would be a separate experiment, not a model swap. It would need to target the name-to-team rewrite in notes, screens as holders, and the doubled output. **Steven decides the switch.**
+If cost becomes pressing (public use, #58's knowledge-base prefix), a luna-specific prompt would be a separate experiment, not a model swap. It would need to target the name-to-team rewrite in notes, screens as holders, and the doubled output. **The owner decides the switch.**
 
 Data: `outputs/evals/spikes/2026-09-25-luna-vs-terra-v11.json`, which holds every call with its reply, scores, costs and the 20k latency runs.
