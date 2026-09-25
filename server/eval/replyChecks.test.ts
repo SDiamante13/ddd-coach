@@ -324,6 +324,8 @@ describe("hard checks on a message that isn't a thread", () => {
     ["never asks", "DDD means Domain-Driven Design: a way to design software around the business's own words and rules."],
     ["only warns", "Hi. Don't paste customer names from a thread you can't share."],
     ["warns with never", "Hello. Never send me messages with passwords in them."],
+    ["says not to paste", "Don't paste it here."],
+    ["asks to share with no thread noun and no place", "Share it with me."],
   ])("fail invites a thread for an answer that %s", (_case, reply) => {
     expect(failedHardChecks(reply, "stop", greeting)).toEqual(["invites a thread"]);
   });
@@ -335,5 +337,24 @@ describe("hard checks on a message that isn't a thread", () => {
     ["Nice to meet you. Bring a conversation from your own work."],
   ])("pass invites a thread for any invitation to share their material: %s", (reply) => {
     expect(failedHardChecks(reply, "stop", greeting)).toEqual([]);
+  });
+
+  it.each([
+    ["Paste it here."],
+    ["Hi! Paste it here when you're ready."],
+    ["Feel free to paste a Slack export."],
+  ])("pass invites a thread for a paste invite without a thread noun: %s", (reply) => {
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual([]);
+  });
+
+  it.each([
+    ["Don't hesitate to paste your thread."],
+    ["Don't hesitate to paste it here."],
+  ])("pass invites a thread when the negation is not on the verb: %s", (reply) => {
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual([]);
+  });
+
+  it("pass invites a thread for a send invite that names where to put it", () => {
+    expect(failedHardChecks("Send it here.", "stop", greeting)).toEqual([]);
   });
 });

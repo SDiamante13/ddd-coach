@@ -83,8 +83,12 @@ const isReplyPart = (line: string): boolean => line === EVENTS_HEADING || line =
 
 const BOILERPLATE = /\bI(?:['’]m| am) (?:here to help|for helping|(?:a )?DDD Coach)\b|\bas (?:a|your) DDD coach\b/i;
 
-const INVITES_A_THREAD =
-  /(?<!\b(?:don['’]t|do not|never)\s+)\b(?:paste|share|drop|send|bring)\b(?:\W+\w+){0,6}?\W+(?:threads?|notes|messages|chats?|conversations?|material|code)\b/i;
+const NOT_NEGATED = String.raw`(?<!\b(?:don['’]t|do not|never)\s+)`;
+const NEAR_A_THREAD_NOUN = String.raw`(?:\W+\w+){0,6}?\W+(?:threads?|notes|messages|chats?|conversations?|material|code)\b`;
+const TO_A_PLACE = String.raw`(?:\s+(?:it|them|this|that))?\s+(?:here|below|in the box)\b`;
+const HANDS_OVER = String.raw`(?:share|drop|send|bring)\b(?:${NEAR_A_THREAD_NOUN}|${TO_A_PLACE})`;
+
+const INVITES_A_THREAD = new RegExp(String.raw`${NOT_NEGATED}\b(?:paste\b|${HANDS_OVER})`, "i");
 
 const MARKDOWN = /\*\*|__|`|^#{1,6} |^\s*[*•] /m;
 
