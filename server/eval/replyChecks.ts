@@ -71,8 +71,15 @@ function hasOneQuestion(lines: string[]): boolean {
 }
 
 function containsWord(lines: string[], word: string): boolean {
-  return lines.some((line) => new RegExp(`\\b${word}\\b`).test(line));
+  const pattern = wholeWord(word.normalize("NFC"));
+  return lines.some((line) => pattern.test(line.normalize("NFC")));
 }
+
+const WORD_CHAR = "[\\p{L}\\p{N}_]";
+
+const wholeWord = (word: string): RegExp => new RegExp(`(?<!${WORD_CHAR})${escapeRegExp(word)}(?!${WORD_CHAR})`, "u");
+
+const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export function failedHardChecks(reply: string, finishReason: string | null, fixture: Fixture): string[] {
   const checked: Reply = { text: reply, layout: parseLayout(reply), finishReason, fixture };

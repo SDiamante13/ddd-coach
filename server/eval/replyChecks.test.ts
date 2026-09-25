@@ -78,6 +78,18 @@ describe("hard checks", () => {
     expect(failedHardChecks(reply, "stop", noCode)).toEqual(["code guess"]);
   });
 
+  it.each([
+    ["an accented name", "José", "José in Finance means", ["no names"]],
+    ["an accented name in decomposed form", "José", "José in Finance means".normalize("NFD"), ["no names"]],
+    ["initials with full stops", "C.J.", "Finance, per C.J. means", ["no names"]],
+    ["a short name inside a longer accented one", "Ana", "Finance, per Anaïs, means", []],
+    ["a name with an unclosed bracket the reply lacks", "Kev (nights", "Finance means", []],
+  ])("check names for %s", (_case, name, meaning, failures) => {
+    const withName = { ...fixture, key: { ...fixture.key, people: [name] } };
+
+    expect(failedHardChecks(GOOD_REPLY.replace("Finance means", meaning), "stop", withName)).toEqual(failures);
+  });
+
   it("fail complete ending for a reply the model cut at the cap", () => {
     expect(failedHardChecks(GOOD_REPLY, "length", fixture)).toEqual(["complete ending"]);
   });
