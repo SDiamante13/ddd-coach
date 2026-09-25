@@ -528,7 +528,15 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
-.sent p:first-child {
+.sent h2 {
+  margin: 0;
+  font: 500 var(--text-sm) / 1 var(--font-label);
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-ink-muted);
+}
+
+.sent h2 + p {
   max-height: 12rem;
   overflow-y: auto;
 }

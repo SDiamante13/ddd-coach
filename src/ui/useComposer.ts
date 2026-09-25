@@ -8,6 +8,7 @@ import { restoredDraft } from "./draftLimit.ts";
 import type { Unlock } from "./useAccess.ts";
 import { useAccessRecovery } from "./useAccessRecovery.ts";
 import { useClearConfirmation } from "./useClearConfirmation.ts";
+import { useComposerReserve } from "./useComposerReserve.ts";
 import { useExchanges } from "./useExchanges.ts";
 import { useLogFollow } from "./useLogFollow.ts";
 import { useSwaps } from "./useSwaps.ts";
@@ -26,8 +27,10 @@ export function useComposer(unlock: Unlock) {
     box.focus();
   });
   const follow = useLogFollow(exchanges.at(-1), box.form);
+  useComposerReserve(box.form);
   const submit = (prompt: Prompt) => {
     send(prompt);
+    box.swapsPanel.setOpen(false);
     box.focus();
   };
   const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
@@ -47,7 +50,9 @@ function useDraftBox() {
   };
   const outgoing = (text: string) => applySwaps(swaps.swaps, text).text;
   const restoreNames = (text: string): SwappedText => restoreSwaps(swaps.swaps, text);
-  return { draft, setDraft, boxRef, swaps, form, focus, restore, tryExample, outgoing, restoreNames, blank: draft.trim() === "" };
+  const [swapsOpen, setSwapsOpen] = useState(false);
+  const swapsPanel = { open: swapsOpen, setOpen: setSwapsOpen };
+  return { draft, setDraft, boxRef, swaps, swapsPanel, form, focus, restore, tryExample, outgoing, restoreNames, blank: draft.trim() === "" };
 }
 
 function showFromTop(box: HTMLTextAreaElement | null) {

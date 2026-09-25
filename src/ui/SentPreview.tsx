@@ -12,7 +12,8 @@ export function SentPreview({ swaps, draft }: { swaps: SwapList; draft: string }
       <button type="button" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>
         Show what's sent
       </button>
-      <section id={id} aria-label="What's sent" className="sent" hidden={!open}>
+      <section id={id} aria-labelledby={`${id}-title`} className="sent" hidden={!open}>
+        <h2 id={`${id}-title`}>What's sent</h2>
         <p>{marked(swapped)}</p>
         <p>{appliedLine(swapped.spans.length)}</p>
         {placeholdersIn(swaps, draft).map((placeholder) => (

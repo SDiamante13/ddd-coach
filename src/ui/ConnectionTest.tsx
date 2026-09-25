@@ -57,7 +57,7 @@ function ComposerForm({ composer }: { composer: Composer }) {
         conversation={composer.conversation}
         onTryExample={box.tryExample}
       />
-      <SwapPanel {...box.swaps} thread={box.draft} />
+      <SwapPanel {...box.swaps} {...box.swapsPanel} thread={box.draft} />
       {!box.blank && <SentPreview swaps={box.swaps.swaps} draft={box.draft} />}
     </MessageForm>
   );
