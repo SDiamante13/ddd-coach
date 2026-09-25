@@ -144,6 +144,8 @@ describe("hard checks", () => {
     ["question asks", "a short yes/no question", askedAs("is that still an appointment?")],
     ["question asks", "a leading question", askedAs("Shouldn't Ops amend instead of rebook?")],
     ["question asks", "an open question that proposes", askedAs("Why not amend instead of rebooking, which keeps one invoice?")],
+    ["question asks", "a should ruling between two options (#77)", askedAs("should the portal show Confirmed or a different status?")],
+    ["question asks", "a should ruling after a condition (#77)", askedAs("For a date-only change at night, should Ops create a new booking or record an AMENDED change?")],
   ])("fail %s for %s", (check, _case, reply) => {
     expect(failedHardChecks(reply, "stop", fixture)).toContain(check);
   });
@@ -188,8 +190,8 @@ describe("hard checks", () => {
 
   it.each([
     ["a choice joined by or", "was the second invoice matched to the original booking ref or to the new tender ID?"],
-    ["a choice with a fallback option", "should the portal show Confirmed or a different status?"],
-    ["a choice after a condition", "For a date-only change at night, should Ops create a new booking or record an AMENDED change?"],
+    ["a choice with a fallback option", "what should the portal show: Confirmed or a different status?"],
+    ["a choice after a condition", "For a date-only change at night, which should Ops do: create a new booking or record an AMENDED change?"],
   ])("pass question asks for %s", (_case, question) => {
     expect(failedHardChecks(askedAs(question), "stop", fixture)).toEqual([]);
   });
