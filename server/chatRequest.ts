@@ -1,5 +1,5 @@
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
-import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
+import { messageLength, parsePrompt, type Prompt } from "../src/domain/exchange.ts";
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { field, stringField } from "../src/shared/json.ts";
 
@@ -19,7 +19,7 @@ export function parseChatRequest(body: unknown): ChatRequestResult {
   if (hasTooManyTurns(body)) return TOO_LONG;
   const conversation = readConversation(body);
   if (conversation === null) return MALFORMED;
-  if (conversation.prompt.length > MAX_MESSAGE_CHARS) return MESSAGE_TOO_LONG;
+  if (messageLength(conversation.prompt) > MAX_MESSAGE_CHARS) return MESSAGE_TOO_LONG;
   return charactersIn(conversation) > MAX_CONVERSATION_CHARS ? TOO_LONG : { ok: true, conversation };
 }
 
