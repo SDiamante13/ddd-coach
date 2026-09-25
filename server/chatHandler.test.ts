@@ -4,6 +4,7 @@ import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
+import { MAX_BODY_BYTES } from "./requestBody.ts";
 
 const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key", model: "test/model" } };
 
@@ -34,6 +35,11 @@ function post(body: string): Request {
 
 function postMessage(message: unknown, history: unknown = []): Request {
   return post(JSON.stringify({ message, history }));
+}
+
+function paddedBodyOf(bytes: number): string {
+  const unpadded = JSON.stringify({ message: "Hello coach", history: [], pad: "" });
+  return JSON.stringify({ message: "Hello coach", history: [], pad: "x".repeat(bytes - unpadded.length) });
 }
 
 describe("chat handler", () => {
@@ -156,6 +162,28 @@ describe("chat handler", () => {
       error: "This conversation is too long for the coach. Reload the page to start a new one.",
     });
     expect(coach.reply).not.toHaveBeenCalled();
+  });
+
+  it("refuses a body over the size cap without calling the coach", async () => {
+    const coach = echoCoach();
+    const handle = handler({ createCoach: () => coach });
+
+    const response = await handle(post(paddedBodyOf(MAX_BODY_BYTES + 1)));
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({
+      error: "This conversation is too long for the coach. Reload the page to start a new one.",
+    });
+    expect(coach.reply).not.toHaveBeenCalled();
+  });
+
+  it("accepts the longest allowed conversation written in 3-byte characters", async () => {
+    const handle = handler();
+    const history = Array.from({ length: 50 }, () => ({ prompt: "€".repeat(240), reply: "€".repeat(239) }));
+
+    const response = await handle(postMessage("€".repeat(50), history));
+
+    expect(response.status).toBe(200);
   });
 
   it("rejects a blank message as a bad request", async () => {

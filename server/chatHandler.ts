@@ -5,11 +5,11 @@ import {
   COACH_UNAVAILABLE,
   type ChatResponseBody,
 } from "../src/shared/chatContract.ts";
-import { readJson } from "../src/shared/json.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
+import { MAX_BODY_BYTES, readJsonWithin } from "./requestBody.ts";
 
 export type CoachFailure = { name: string; statusCode: number | undefined };
 export type CoachFailureLog = (failure: CoachFailure) => void;
@@ -25,7 +25,9 @@ export function createChatHandler({ config, createCoach, ...replyDeps }: ChatHan
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
-    const parsed = parseChatRequest(await readJson(request));
+    const received = await readJsonWithin(request, MAX_BODY_BYTES);
+    if (!received.ok) return tooLong();
+    const parsed = parseChatRequest(received.body);
     if (!parsed.ok) return rejected(parsed.reason);
     return replyFrom(createCoach(config.config), parsed.conversation, replyDeps);
   };
