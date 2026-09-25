@@ -1,9 +1,9 @@
 import type { Conversation } from "../src/domain/conversation.ts";
 import {
+  COACH_MESSAGE_TOO_LONG,
   COACH_TIMED_OUT,
   COACH_TOO_LONG,
   COACH_UNAVAILABLE,
-  MESSAGE_TOO_LONG,
   type ChatResponseBody,
 } from "../src/shared/chatContract.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
@@ -27,7 +27,7 @@ export function createChatHandler({ config, createCoach, ...replyDeps }: ChatHan
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
     const received = await readJsonWithin(request, MAX_BODY_BYTES);
-    if (!received.ok) return rejected("tooLong");
+    if (!received.ok) return rejected("messageTooLong");
     const parsed = parseChatRequest(received.body);
     if (!parsed.ok) return rejected(parsed.reason);
     return replyFrom(createCoach(config.config), parsed.conversation, replyDeps);
@@ -45,7 +45,7 @@ function misconfigured(error: string): Response {
 const REJECTIONS: Record<RejectionReason, { error: string; status: number }> = {
   malformed: { error: "Send a message.", status: 400 },
   tooLong: { error: COACH_TOO_LONG, status: 413 },
-  messageTooLong: { error: MESSAGE_TOO_LONG, status: 413 },
+  messageTooLong: { error: COACH_MESSAGE_TOO_LONG, status: 413 },
 };
 
 function rejected(reason: RejectionReason): Response {

@@ -115,10 +115,10 @@ describe("Connection test", () => {
     const { user, input, log } = renderApp();
 
     await user.type(input(), "A very long message{Enter}");
-    server.reply(0, 413, { error: "This message is too long. Shorten it and try again." });
+    server.reply(0, 413, { error: "This message is too long for the coach. Shorten it and send it again." });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
-      "This message is too long. Shorten it and try again.",
+      "This message is too long for the coach. Shorten it and send it again.",
     );
   });
 

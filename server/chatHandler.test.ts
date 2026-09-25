@@ -172,20 +172,18 @@ describe("chat handler", () => {
     const response = await handle(postMessage("M".repeat(MAX_MESSAGE_CHARS + 1)));
 
     expect(response.status).toBe(413);
-    expect(await response.json()).toEqual({ error: "This message is too long. Shorten it and try again." });
+    expect(await response.json()).toEqual({ error: "This message is too long for the coach. Shorten it and send it again." });
     expect(coach.reply).not.toHaveBeenCalled();
   });
 
-  it("refuses a body over the size cap without calling the coach", async () => {
+  it("refuses a body over the size cap as a message too long, without calling the coach", async () => {
     const coach = echoCoach();
     const handle = handler({ createCoach: () => coach });
 
     const response = await handle(post(paddedBodyOf(MAX_BODY_BYTES + 1)));
 
     expect(response.status).toBe(413);
-    expect(await response.json()).toEqual({
-      error: "This conversation is too long for the coach. Reload the page to start a new one.",
-    });
+    expect(await response.json()).toEqual({ error: "This message is too long for the coach. Shorten it and send it again." });
     expect(coach.reply).not.toHaveBeenCalled();
   });
 
