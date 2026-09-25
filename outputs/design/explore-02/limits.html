@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDD Coach</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+<style>
+body{overflow:hidden}
+main{height:100dvh;min-height:0;padding-top:var(--space-6)}
+ol[role="log"]{overflow-y:auto;scroll-behavior:smooth;padding-right:var(--space-2)}
+.cut{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-2) var(--space-2) var(--space-2) var(--space-4);border:1px dashed var(--color-line-strong);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-ink-muted)}
+.cut button{min-height:36px;padding:0 var(--space-4);border-color:var(--color-coach);color:var(--color-coach)}
+.meter{display:flex;align-items:center;gap:var(--space-3);font-size:var(--text-xs);color:var(--color-ink-muted);padding:0 var(--space-2)}
+.bar{flex-grow:1;height:6px;border-radius:3px;background:var(--color-line);overflow:hidden}
+.bar i{display:block;height:100%;width:22%;background:var(--color-coach);transition:width .6s var(--ease-out),background .3s}
+.meter.warn .bar i{background:#b86a1c}
+.full{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);border:1px solid var(--color-line-strong);border-radius:var(--radius-lg);background:var(--color-surface)}
+.full h2{margin:0;font:700 var(--text-lg)/1.15 var(--font-display);letter-spacing:-.02em}
+.full p{margin:0;background:none;border:0;padding:0;color:var(--color-ink-muted)}
+.row{display:flex;gap:var(--space-2);flex-wrap:wrap}
+.primary{background:var(--color-coach)!important;border-color:var(--color-coach)!important;color:var(--color-on-coach)!important}
+.carry{padding:var(--space-4) var(--space-5);border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-coach-tint);display:flex;flex-direction:column;gap:var(--space-2)}
+.carry .k{font:500 var(--text-xs)/1 var(--font-label);letter-spacing:var(--tracking-label);color:var(--color-coach)}
+.carry ul{margin:0;padding-left:1.1em;font-size:var(--text-sm)}
+.restored{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);font-size:var(--text-sm);color:var(--color-ink-muted)}
+.restored button{min-height:36px;padding:0 var(--space-4);font-weight:500}
+.hide{display:none!important}
+.steps{position:fixed;left:16px;bottom:14px;display:flex;gap:6px}
+.steps span{font:500 11px/1 var(--font-label);letter-spacing:.06em;padding:7px 10px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink-muted)}
+.steps span.on{background:var(--color-coach);border-color:var(--color-coach);color:#fff}
+</style>
+</head>
+<body><div id="root"><main>
+<h1>DDD Coach</h1>
+<p>Messages go to OpenRouter, then the configured model. Don't paste customer names or rates. Nothing is stored on our server; this conversation is kept in this browser.</p>
+<div class="restored hide" id="restored"><span>Restored from this browser · 3 exchanges</span><button type="button" id="newconv">New conversation</button></div>
+<ol role="log" id="log">
+<li data-status="replied"><p>Paste: #booking-split thread (ops, finance, carriers disagree on what a booking is, and on rebooks).</p><p>Two words don't match. “Booking”: ops means the request, finance means confirmed and rate locked, carriers mean the tender. “Rebook”: ops keeps the booking, finance cancels and re-creates it.</p></li>
+<li data-status="replied" id="cutli"><p>What should I ask Dana?</p><p id="cutp">Three questions, each tied to load 48213. 1. It was rejected Tuesday and rebooked with another carrier: same booking, or a new one? 2. When does a load get REBOOKED instead of AMENDED, and is 48213 an example? 3. It got two invoices. Is the</p><div class="cut" id="cut"><span>Cut short at the reply length limit.</span><button type="button" id="continue">Continue</button></div></li>
+</ol>
+<div class="full hide" id="full">
+  <h2>This conversation is full</h2>
+  <p>The coach can only read so much at once. Carry on in a fresh conversation that starts from a summary of what we've found. Nothing here is deleted until you choose.</p>
+  <div class="row"><button type="button" class="primary" id="fresh">Start fresh from a summary</button><button type="button" id="copyall">Copy everything first</button></div>
+</div>
+<div class="meter" id="meter"><span id="mlabel">Room used in this conversation</span><div class="bar"><i id="mbar"></i></div><span id="mpct">22%</span></div>
+<form id="form"><label>Message<input type="text" id="msg" value="Here's the status enum too: REQUESTED, TENDERED, REJECTED, REBOOKED, AMENDED, CONFIRMED, INVOICED (and 16 more)"></label><button type="submit" id="send">Send</button></form>
+</main></div>
+<div class="steps" aria-hidden="true"><span id="s1" class="on">1 Cut short</span><span id="s2">2 Nearly full</span><span id="s3">3 Full → fresh</span><span id="s4">4 Reload</span></div>
+<script>
+const KEY = "limits-demo";
+const $ = (id) => document.getElementById(id);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const step = (n) => [1, 2, 3, 4].forEach((i) => $("s" + i).classList.toggle("on", i === n));
+const log = $("log");
+const scrollEnd = () => { log.scrollTop = log.scrollHeight; };
+function setRoom(pct) {
+  $("mbar").style.width = pct + "%"; $("mpct").textContent = pct + "%";
+  $("meter").classList.toggle("warn", pct >= 80);
+  $("mlabel").textContent = pct >= 80 ? "Nearly full: the coach will offer a fresh start" : "Room used in this conversation";
+}
+function entry(prompt, status) {
+  const li = document.createElement("li"); li.dataset.status = status;
+  li.innerHTML = `<p></p><p>${status === "pending" ? "Coach is thinking…" : ""}</p>`;
+  li.firstChild.textContent = prompt; log.appendChild(li); scrollEnd(); return li;
+}
+$("continue").onclick = async () => {
+  $("cut").remove(); const p = $("cutp");
+  p.textContent += " second one ever legitimate, for example a fee when the first carrier already sent a truck?";
+  $("cutli").insertAdjacentHTML("beforeend", "");
+  setRoom(46); scrollEnd();
+};
+let sends = 0;
+$("form").onsubmit = async (e) => {
+  e.preventDefault(); const text = $("msg").value.trim(); if (!text) return;
+  sends += 1; $("msg").value = ""; $("send").disabled = true;
+  if (sends === 1) {
+    step(2); const li = entry(text, "pending"); await wait(1400);
+    li.dataset.status = "replied";
+    li.lastChild.textContent = "Nobody on the thread explained REBOOKED vs AMENDED, so it joins question 2. TENDERED is the carriers' “booking”. I've matched 7 of 23 statuses; 16 are still unknown.";
+    setRoom(88); $("send").disabled = false;
+    $("msg").value = "And the carrier contract says rejections within 2h are free";
+    scrollEnd();
+  } else {
+    step(3); $("form").classList.add("hide"); $("meter").classList.add("hide");
+    $("full").classList.remove("hide"); $("msg").value = text;
+  }
+};
+$("fresh").onclick = async () => {
+  log.innerHTML = `<li data-status="replied"><div class="carry"><div class="k">CARRIED OVER FROM YOUR LAST CONVERSATION · EDIT ANYTHING WRONG</div><ul><li>“Booking” has 3 meanings (ops, finance, carriers); “Rebook” has 2</li><li>7 of 23 statuses matched; 16 unknown</li><li>Open for Dana: load 48213 same booking? REBOOKED vs AMENDED? second invoice legitimate?</li></ul></div></li>`;
+  $("full").classList.add("hide"); $("form").classList.remove("hide"); $("meter").classList.remove("hide");
+  $("send").disabled = false; setRoom(9);
+  try { localStorage.setItem(KEY, "fresh"); } catch (e) {}
+};
+async function softReload() {
+  step(4); document.body.style.transition = "opacity .25s"; document.body.style.opacity = 0; await wait(400);
+  $("restored").classList.remove("hide"); $("restored").firstElementChild.textContent = "Restored from this browser · carried-over summary + your draft";
+  document.body.style.opacity = 1;
+}
+$("newconv").onclick = () => {};
+</script>
+</body></html>

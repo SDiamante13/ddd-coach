@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDD Coach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../tokens.css"><link rel="stylesheet" href="../base.css">
+</head>
+<body><div id="root"><main>
+<h1>DDD Coach</h1>
+<p>Your messages are sent to OpenRouter, an AI model provider, to generate replies. Nothing is stored on our server.</p>
+<ol role="log">
+<li data-status="replied"><p>We arrange cargo shipments for customers. We request space from a carrier, record its answer, and tell the customer.</p><p>Let's go in order. When a customer asks for a shipment, what do you record first, and who records it?</p></li>
+<li data-status="failed"><p>What happens when the carrier says no?</p><p role="alert">The coach took too long to reply. Your message is kept.</p><button type="button">Retry</button></li>
+</ol>
+<form><label>Message<input type="text" value=""></label><button type="submit">Send</button></form>
+</main></div></body></html>

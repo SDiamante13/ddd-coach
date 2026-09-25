@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Untangle a thread</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--paper:#F2EEE4;--dot:#D3CBB9;--surface:#FFFCF6;--line:#DCD5C6;--ink:#1C1B18;--muted:#5C574D;--coach:#2E4FA3;--tint:#E3E9F8;--event:#F6A65C;--question:#EE9BB0;--rule:#9FC6EE;--ok:#2F6B3A}
+*{box-sizing:border-box}
+body{margin:0;font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);width:1280px;height:800px;overflow:hidden;position:relative}
+button{font:inherit;cursor:pointer}
+header{position:absolute;inset:0 0 auto 0;height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--line);z-index:5}
+.brand{font:700 19px/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+.seg{display:flex;border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.seg button{height:40px;padding:0 16px;border:0;background:var(--surface);font-weight:500;font-size:14px;color:var(--ink)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.flow{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.board{position:absolute;left:0;top:56px;width:872px;height:744px;background-color:var(--paper);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.4px);background-size:24px 24px}
+.panel{position:absolute;left:872px;top:56px;width:408px;height:744px;padding:22px 24px;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
+.btn{height:44px;padding:0 18px;border-radius:22px;border:1px solid #D6CEBE;background:var(--surface);color:var(--ink);font-weight:500;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+.primary{background:var(--coach);border-color:var(--coach);color:#fff;font-weight:600}
+.lab{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--muted)}
+h2{margin:0;font:700 24px/1.1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+/* paste screen */
+#paste{position:absolute;inset:56px 0 0 0;display:flex;justify-content:center;background-color:var(--paper);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.4px);background-size:24px 24px;z-index:4;transition:opacity .4s}
+#paste.gone{opacity:0;pointer-events:none}
+.pastecol{width:760px;margin-top:48px;display:flex;flex-direction:column;gap:18px}
+.pastecol h1{margin:0;font:700 46px/1.02 "Bricolage Grotesque",sans-serif;letter-spacing:-.035em}
+.pastecol p{margin:0;font-size:17px;line-height:1.5;color:#3F3B34}
+textarea{width:100%;height:300px;padding:16px 18px;border:1px solid #D6CEBE;border-radius:12px;background:#fff;font:400 13.5px/1.55 "IBM Plex Mono",monospace;color:var(--ink);resize:none}
+/* board items */
+.it{position:absolute;opacity:0;transform:translateY(6px) scale(.97);transition:opacity .35s,transform .35s}
+.it.in{opacity:1;transform:none}
+.card{width:150px;height:96px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;border-radius:2px;box-shadow:0 1px 0 rgba(0,0,0,.06),0 8px 16px -10px rgba(70,45,10,.45)}
+.meta{display:flex;justify-content:space-between;font:500 9px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#5A3A12}
+.ct{font:600 15px/1.18 "Bricolage Grotesque",sans-serif}
+.term{width:180px;padding:12px 14px;background:var(--surface);border:2px solid var(--ink);border-radius:8px;text-align:center}
+.mean{width:200px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;gap:4px}
+.who{font:500 10px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;color:var(--coach)}
+.ring{outline:2px dashed var(--coach);outline-offset:6px}
+.region{position:absolute;font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;color:var(--muted)}
+svg.lines{position:absolute;left:0;top:0;pointer-events:none}
+svg.lines .ln{opacity:0;transition:opacity .4s}
+svg.lines .ln.in{opacity:1}
+#cap{position:absolute;left:60px;top:618px;width:752px;display:flex;justify-content:center;transition:opacity .3s}
+.capbox{padding:12px 18px;border-radius:10px;background:rgba(28,27,24,.92);color:var(--surface);font-size:16px;line-height:1.4;display:flex;gap:12px;align-items:baseline;max-width:752px}
+.spk{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;color:#B9C8F2}
+/* questions panel */
+.q{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:#FBEFF2;border:1px solid #EFC6D1;opacity:0;transition:opacity .35s}
+.q.in{opacity:1}
+.q .n{font:600 13px/1 "IBM Plex Mono",monospace;color:#8A2A45;padding-top:3px}
+.q .t{font-size:14px;line-height:1.45}
+.q.answered{background:#EEF6EC;border-color:#BFDDB8}
+.q .ans{margin-top:6px;font-size:13px;color:#1F4A1A}
+.ans .who{color:var(--ok)}
+/* overlays */
+.overlay{position:absolute;inset:0;background:rgba(28,27,24,.35);display:none;align-items:center;justify-content:center;z-index:8}
+.overlay.show{display:flex}
+.sheet{width:720px;background:var(--surface);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px;box-shadow:0 30px 60px -20px rgba(0,0,0,.4)}
+pre{margin:0;padding:18px 20px;border-radius:10px;background:var(--ink);color:#F2EEE4;font:400 13px/1.6 "IBM Plex Mono",monospace;white-space:pre-wrap}
+.toast{position:absolute;left:50%;top:76px;transform:translateX(-50%);padding:10px 18px;border-radius:22px;background:var(--ink);color:var(--surface);font-size:14px;opacity:0;transition:opacity .3s;z-index:9}
+.toast.show{opacity:1}
+.steps{position:absolute;left:20px;bottom:16px;display:flex;gap:6px;z-index:6}
+.steps span{font:500 11px/1 "IBM Plex Mono",monospace;letter-spacing:.06em;padding:7px 10px;border-radius:12px;background:rgba(255,252,246,.85);border:1px solid var(--line);color:var(--muted)}
+.steps span.on{background:var(--coach);border-color:var(--coach);color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:16px"><div class="brand">DDD Coach</div><div style="width:1px;height:22px;background:var(--line)"></div><div style="font-size:14px">Eazy Freight · what is a booking?</div></div>
+  <div class="flow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Your text goes to OpenRouter and the model provider. Saved in this browser only.</div>
+  <div class="seg" role="group" aria-label="How you talk to the coach"><button id="mType" aria-pressed="true">Type or paste</button><button id="mTalk" aria-pressed="false">Talk</button></div>
+</header>
+
+<section id="paste">
+  <div class="pastecol">
+    <div class="lab" style="color:var(--coach)">START FROM YOUR MESS</div>
+    <h1>Paste the thread nobody could settle.</h1>
+    <p>Slack threads, a status enum, meeting notes. The coach finds the words people use differently, lays out the events, and lists what to ask your domain expert.</p>
+    <label class="lab" for="mess">PASTED TEXT</label>
+    <textarea id="mess">#booking-split  (Slack, Tue)
+Maya (ops): a booking exists the moment the customer hits submit in the portal. that's when we start working it
+Tom (finance): not for us. it's a booking once it's invoiceable, so carrier confirmed and rate locked
+Ravi (carrier integrations): fwiw the EDI mapping literally calls the tender a "booking"
+Maya (ops): and when a carrier rejects, we rebook. that's not a new booking
+Tom (finance): finance sees a rebook as cancel + new booking. sometimes two invoices
+Ravi (carrier integrations): the status enum has REBOOKED and AMENDED and nobody knows the difference
+Maya (ops): ask Dana, she wrote half of those statuses</textarea>
+    <div style="display:flex;gap:10px;align-items:center"><button class="btn primary" id="go">Untangle this</button><span style="font-size:13px;color:var(--muted)">No account. Nothing leaves this browser except the request to the model.</span></div>
+  </div>
+</section>
+
+<main class="board" id="board">
+  <svg class="lines" width="872" height="744" viewBox="0 0 872 744" aria-hidden="true">
+    <g class="ln" id="l1"><path d="M346 118 L200 196" stroke="#B0476A" stroke-width="2" stroke-dasharray="7 5" fill="none"/><path d="M436 128 L436 196" stroke="#B0476A" stroke-width="2" stroke-dasharray="7 5" fill="none"/><path d="M526 118 L672 196" stroke="#B0476A" stroke-width="2" stroke-dasharray="7 5" fill="none"/></g>
+    <g class="ln" id="l2"><path d="M190 460 L207 460 M357 460 L374 460 M524 460 L541 460 M691 460 L708 460" stroke="#1C1B18" stroke-width="1.6" fill="none"/><polygon points="214,460 206,455 206,465" fill="#1C1B18"/><polygon points="381,460 373,455 373,465" fill="#1C1B18"/><polygon points="548,460 540,455 540,465" fill="#1C1B18"/><polygon points="715,460 707,455 707,465" fill="#1C1B18"/></g>
+    <g class="ln" id="l3"><path d="M464 508 L464 540" stroke="#5C574D" stroke-width="1.6" stroke-dasharray="3 4" fill="none"/></g>
+  </svg>
+  <div class="region it" id="r1" style="left:40px;top:28px">WORDS THAT DON'T MATCH</div>
+  <div class="it term" id="t0" style="left:346px;top:70px"><div class="lab" style="margin-bottom:6px">TERM · 3 MEANINGS</div><div style="font:700 22px/1 'Bricolage Grotesque',sans-serif">“Booking”</div></div>
+  <div class="it mean" id="m1" style="left:84px;top:200px"><div class="who">OPS · MAYA</div><div style="font-size:14px">The customer submitted a request</div></div>
+  <div class="it mean" id="m2" style="left:336px;top:200px"><div class="who">FINANCE · TOM</div><div style="font-size:14px">Carrier confirmed and rate locked</div></div>
+  <div class="it mean" id="m3" style="left:588px;top:200px"><div class="who">CARRIERS · RAVI</div><div style="font-size:14px">The tender sent to a carrier</div></div>
+  <div class="region it" id="r2" style="left:40px;top:380px">EVENTS · ORDER IS THE COACH'S GUESS</div>
+  <div class="it card" id="e1" style="left:40px;top:412px;background:var(--event)"><div class="meta"><span>Event</span><span>Thread</span></div><div class="ct">Booking request submitted</div></div>
+  <div class="it card" id="e2" style="left:207px;top:412px;background:var(--event)"><div class="meta"><span>Event</span><span>Thread</span></div><div class="ct">Tender sent to carrier</div></div>
+  <div class="it card" id="e3" style="left:374px;top:412px;background:var(--event)"><div class="meta"><span>Event</span><span>Thread</span></div><div class="ct">Carrier rejected tender</div></div>
+  <div class="it card" id="e4" style="left:541px;top:412px;background:var(--event)"><div class="meta"><span>Event</span><span>Thread</span></div><div class="ct">Carrier confirmed</div></div>
+  <div class="it card" id="e5" style="left:708px;top:412px;background:#FBD3AA;border:2px dashed #9A5A1C;box-shadow:none"><div class="meta"><span>Event</span><span>Coach's idea</span></div><div class="ct">Booking became invoiceable</div></div>
+  <div class="it card" id="qb" style="left:374px;top:540px;width:180px;height:84px;background:var(--question);transform:rotate(-1.5deg)"><div class="meta" style="color:#5A1F2E"><span>Question</span><span>For Dana</span></div><div class="ct">Rebook: same booking or new?</div></div>
+  <div id="cap" style="opacity:0"><div class="capbox"><span class="spk">COACH</span><span id="capt"></span></div></div>
+</main>
+
+<aside class="panel">
+  <div class="lab" style="color:#8A2A45">QUESTIONS FOR DANA</div>
+  <h2>Your hour with the expert</h2>
+  <div style="font-size:13px;color:var(--muted);margin-top:-8px">Ranked by how much of the board they unblock.</div>
+  <div class="q" id="q1"><div class="n">1</div><div><div class="t">Is a rebook the same booking with a new carrier, or a new booking?</div></div></div>
+  <div class="q" id="q2"><div class="n">2</div><div class="t">What's the difference between REBOOKED and AMENDED?</div></div>
+  <div class="q" id="q3"><div class="n">3</div><div class="t">When ops, finance and carriers talk to each other, which moment should “booking” mean?</div></div>
+  <div style="margin-top:auto;display:flex;gap:10px"><button class="btn primary" id="prep">Prep sheet for Dana</button><button class="btn" id="later">Come back Thursday</button></div>
+</aside>
+
+<div class="overlay" id="ov"><div class="sheet">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2>Prep sheet · paste into Confluence</h2><button class="btn" id="close" aria-label="Close">Close</button></div>
+<pre>## What is a booking? (prep for Dana, Thu)
+
+**Words that don't match**
+- "Booking": ops = request submitted · finance = confirmed + rate locked · carriers = tender sent
+- "Rebook": ops = same booking, new carrier · finance = cancel + new booking
+
+**Events (order is a guess)**
+1. Booking request submitted
+2. Tender sent to carrier
+3. Carrier rejected tender
+4. Carrier confirmed
+5. Booking became invoiceable *(coach's idea)*
+
+**Questions for Dana**
+1. Is a rebook the same booking or a new one?
+2. REBOOKED vs AMENDED?
+3. Which moment should "booking" mean across teams?</pre>
+  <div style="display:flex;gap:10px"><button class="btn primary" id="copy">Copy as Markdown</button><span style="font-size:13px;color:var(--muted);align-self:center">Also: copy as image for Miro</span></div>
+</div></div>
+
+<div class="overlay" id="back"><div class="sheet" style="width:560px">
+  <div class="lab" style="color:var(--coach)">WELCOME BACK · THURSDAY</div>
+  <h2>Did you get to ask Dana?</h2>
+  <div style="font-size:15px;line-height:1.5;color:#3F3B34">Your board from Tuesday is here: 5 events, 2 words that don't match, 3 questions for Dana.</div>
+  <div style="display:flex;gap:10px"><button class="btn primary" id="yes">Yes, add her answers</button><button class="btn" id="no">Not yet</button></div>
+</div></div>
+
+<div class="toast" id="toast">Copied. Paste it into Confluence or a ticket.</div>
+<div class="steps" aria-hidden="true"><span id="s1" class="on">1 Paste</span><span id="s2">2 Untangle</span><span id="s3">3 Prep for Dana</span><span id="s4">4 Come back</span></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const step = (n) => [1, 2, 3, 4].forEach((i) => $("s" + i).classList.toggle("on", i === n));
+const show = (id) => $(id).classList.add("in");
+async function say(text) { $("cap").style.opacity = 1; $("capt").textContent = text; }
+async function flash(ids) { ids.forEach((id) => $(id).classList.add("ring")); await wait(1400); ids.forEach((id) => $(id).classList.remove("ring")); }
+async function untangle() {
+  $("paste").classList.add("gone"); step(2);
+  await say("Reading your thread…"); await wait(900);
+  show("r1"); show("t0"); await say("Three teams mean three different moments by “booking”."); await wait(500);
+  for (const id of ["m1", "m2", "m3"]) { show(id); await wait(280); }
+  show("l1"); await flash(["m1", "m2", "m3"]);
+  show("q1"); await wait(400);
+  show("r2"); await say("Here's the order events seem to happen in. The last one is my guess."); await wait(400);
+  for (const id of ["e1", "e2", "e3", "e4", "e5"]) { show(id); await wait(260); }
+  show("l2"); await wait(500);
+  show("qb"); show("l3"); show("q2"); await wait(300); show("q3");
+  await say("I'd take three questions to Dana. Start with the rebook one: it splits the board in two.");
+}
+$("go").onclick = untangle;
+$("prep").onclick = () => { step(3); $("ov").classList.add("show"); };
+$("close").onclick = () => $("ov").classList.remove("show");
+$("copy").onclick = async () => { $("toast").classList.add("show"); await wait(1600); $("toast").classList.remove("show"); $("ov").classList.remove("show"); };
+$("later").onclick = () => { step(4); $("cap").style.opacity = 0; $("back").classList.add("show"); };
+$("no").onclick = () => $("back").classList.remove("show");
+$("yes").onclick = async () => {
+  $("back").classList.remove("show");
+  const q = $("q1"); q.classList.add("answered");
+  q.querySelector(".t").insertAdjacentHTML("afterend", `<div class="ans"><span class="who">DANA SAID</span> Same booking, new carrier. Finance's second invoice is a bug.</div>`);
+  $("qb").style.background = "#A9D8A0"; $("qb").querySelector(".meta span:last-child").textContent = "Dana said";
+  $("qb").querySelector(".ct").textContent = "Rebook = same booking, new carrier";
+  await flash(["qb"]);
+  await say("That settles the rebook. Finance's two invoices now look like a bug, not a rule. Want to test it with an example?");
+};
+$("mTalk").onclick = () => { $("mTalk").setAttribute("aria-pressed", "true"); $("mType").setAttribute("aria-pressed", "false"); };
+$("mType").onclick = () => { $("mType").setAttribute("aria-pressed", "true"); $("mTalk").setAttribute("aria-pressed", "false"); };
+</script>
+</body>
+</html>
