@@ -5,6 +5,7 @@ export type CoachConfig = { apiKey: string; model: string; reasoningEffort?: Rea
 type Misconfigured = { ok: false; error: string };
 export type ConfigResult = { ok: true; config: CoachConfig } | Misconfigured;
 export type SigningKeyResult = { ok: true; key: string } | Misconfigured;
+export type AccessPasswordResult = { ok: true; password: string } | Misconfigured;
 
 export type Env = Readonly<Record<string, string | undefined>>;
 
@@ -13,6 +14,7 @@ const MODEL = "OPENROUTER_MODEL";
 const REASONING_EFFORT = "OPENROUTER_REASONING_EFFORT";
 const TIMEOUT = "COACH_TIMEOUT_MS";
 const SIGNING_KEY = "COACH_SIGNING_KEY";
+const ACCESS_PASSWORD = "ACCESS_PASSWORD";
 export const MIN_SIGNING_KEY_CHARS = 32;
 const DEFAULT_TIMEOUT_MS = 25_000;
 const REASONING_EFFORTS: readonly string[] = Object.values(ChatRequestEffort);
@@ -60,4 +62,9 @@ export function readSigningKey(env: Env): SigningKeyResult {
     return { ok: false, error: `${SIGNING_KEY} must be at least ${MIN_SIGNING_KEY_CHARS} characters.` };
   }
   return { ok: true, key };
+}
+
+export function readAccessPassword(env: Env): AccessPasswordResult {
+  const password = present(env[ACCESS_PASSWORD]);
+  return password === undefined ? missing(ACCESS_PASSWORD) : { ok: true, password };
 }

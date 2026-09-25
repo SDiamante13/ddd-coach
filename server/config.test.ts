@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { readConfig, readSigningKey, readTimeoutMs } from "./config.ts";
+import { readAccessPassword, readConfig, readSigningKey, readTimeoutMs } from "./config.ts";
 
 const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
 
@@ -83,5 +83,21 @@ describe("readSigningKey", () => {
     const key = "k".repeat(43);
 
     expect(readSigningKey({ COACH_SIGNING_KEY: ` ${key}\n` })).toEqual({ ok: true, key });
+  });
+});
+
+describe("readAccessPassword", () => {
+  it.each([
+    ["not set", {}],
+    ["whitespace only", { ACCESS_PASSWORD: " \t\n " }],
+  ])("fails naming the variable when it is %s", (_case, env) => {
+    expect(readAccessPassword(env)).toEqual({ ok: false, error: "ACCESS_PASSWORD is not set." });
+  });
+
+  it("reads the password without surrounding whitespace", () => {
+    expect(readAccessPassword({ ACCESS_PASSWORD: " tidal-lantern-quartz\n" })).toEqual({
+      ok: true,
+      password: "tidal-lantern-quartz",
+    });
   });
 });
