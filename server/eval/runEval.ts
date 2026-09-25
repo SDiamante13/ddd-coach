@@ -6,6 +6,7 @@ import { evalSummary } from "./evalSummary.ts";
 import { loadFixture } from "./fixtures.ts";
 import { fullEval } from "./fullEval.ts";
 import { latencySpike } from "./latencySpike.ts";
+import { recordable } from "./recordable.ts";
 
 const RESULTS = new URL("../../outputs/evals/slice-03/", import.meta.url);
 const REPEATS = 3;
@@ -18,6 +19,7 @@ function writeResult(name: string, content: string): void {
 
 const asJson = (value: unknown): string => `${JSON.stringify(value, null, 2)}\n`;
 const today = (): string => new Date().toISOString().slice(0, 10);
+const slugOf = (model: string): string => model.replace(/\W+/g, "-");
 
 function describeRun({ model, reasoningEffort }: CoachConfig) {
   return { model, reasoningEffort: reasoningEffort ?? "unset", instructionsVersion: COACH_INSTRUCTIONS_VERSION };
@@ -26,15 +28,16 @@ function describeRun({ model, reasoningEffort }: CoachConfig) {
 async function runLatency(config: CoachConfig, chat: OpenRouter["chat"]): Promise<void> {
   const spike = await latencySpike(config, chat, loadFixture("booking-split").thread);
   console.log(JSON.stringify(spike.verdict));
-  writeResult(`latency-${today()}.json`, asJson({ ...describeRun(config), ...spike }));
+  const record = { ...describeRun(config), ...spike, calls: spike.calls.map(recordable) };
+  writeResult(`latency-${today()}-${slugOf(config.model)}.json`, asJson(record));
 }
 
 async function runFullEval(config: CoachConfig, chat: OpenRouter["chat"]): Promise<void> {
   const { runs, bar } = await fullEval(config, chat, REPEATS);
   const run = describeRun(config);
-  const name = `${today()}-${config.model.replace(/\W+/g, "-")}-v${COACH_INSTRUCTIONS_VERSION}`;
+  const name = `${today()}-${slugOf(config.model)}-v${COACH_INSTRUCTIONS_VERSION}`;
   const heading = `Slice 3 eval, ${today()}: ${run.model}, effort ${run.reasoningEffort}, instructions v${run.instructionsVersion}`;
-  writeResult(`${name}.json`, asJson({ ...run, bar, runs }));
+  writeResult(`${name}.json`, asJson({ ...run, bar, runs: runs.map(recordable) }));
   writeResult(`${name}.md`, evalSummary(heading, runs, bar));
   console.log(JSON.stringify({ ships: bar.ships, hard: bar.hard, attribution: bar.attribution, perFixture: bar.perFixture }));
 }
