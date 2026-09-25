@@ -503,6 +503,20 @@ describe("Connection test", () => {
     expect(within(log()).queryByRole("button", { name: "Show more" })).not.toBeInTheDocument();
   });
 
+  it("starts a new conversation after confirming, keeping the draft and sending no history", async () => {
+    const { server, user, input, log, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+    await user.type(input(), "Draft");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
+    expect(input()).toHaveValue("Draft");
+    await user.type(input(), "{Enter}");
+    expect(server.bodyOf(1)).toEqual({ message: "Draft", history: [] });
+  });
+
   it("shows HTML in a reply as literal text", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();

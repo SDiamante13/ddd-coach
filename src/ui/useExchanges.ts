@@ -35,5 +35,5 @@ export function useExchanges({ onRefused }: ExchangeCallbacks = {}) {
     void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt });
   }
 
-  return { exchanges, send, retry: retryFailed };
+  return { exchanges, send, retry: retryFailed, clear: () => setExchanges([]) };
 }

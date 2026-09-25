@@ -190,6 +190,20 @@ form .row {
   font-size: var(--text-xs);
 }
 
+.formfoot button {
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  font-weight: 500;
+}
+
+.formfoot .confirm {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-ink);
+}
+
 .count {
   margin-left: auto;
   font-family: var(--font-label);

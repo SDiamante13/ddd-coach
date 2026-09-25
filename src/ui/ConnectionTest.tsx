@@ -4,11 +4,12 @@ import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { MessageForm } from "./MessageForm.tsx";
+import { NewConversation } from "./NewConversation.tsx";
 import { useExchanges } from "./useExchanges.ts";
 
 export function ConnectionTest() {
   const [draft, setDraft] = useState("");
-  const { exchanges, send, retry } = useExchanges({
+  const { exchanges, send, retry, clear } = useExchanges({
     onRefused: (prompt) => setDraft((current) => restoredDraft(current, prompt)),
   });
   const busy = isBusy(exchanges);
@@ -26,7 +27,9 @@ export function ConnectionTest() {
           />
         ))}
       </ol>
-      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} />
+      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send}>
+        {exchanges.length > 0 && <NewConversation onClear={clear} />}
+      </MessageForm>
     </>
   );
 }
