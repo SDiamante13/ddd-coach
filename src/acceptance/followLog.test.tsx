@@ -91,7 +91,7 @@ describe("Following the log", () => {
 
     await user.click(screen.getByRole("button", { name: "New reply ↓" }));
 
-    expect(lastRevealed()).toBe(within(log()).getByText("Hi there"));
+    expect(lastRevealed()).toBe(within(log()).getByText("Hi there").closest(".reply"));
   });
 
   it("drops New reply ↓ once the visitor is back at the newest entry", async () => {

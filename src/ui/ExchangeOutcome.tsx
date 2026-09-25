@@ -1,6 +1,7 @@
 import { isRefused, type Exchange, type FailedExchange } from "../domain/exchange.ts";
 import { COACH_TOO_LONG, COACH_UNVERIFIED } from "../shared/chatContract.ts";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
+import { ReplyView } from "./ReplyView.tsx";
 
 const FIXED_BY_A_NEW_CONVERSATION: readonly string[] = [COACH_TOO_LONG, COACH_UNVERIFIED];
 
@@ -17,7 +18,7 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
     case "pending":
       return <p>Coach is thinking…</p>;
     case "replied":
-      return <p>{exchange.reply}</p>;
+      return <ReplyView reply={exchange.reply} />;
     case "failed":
       return (
         <>
