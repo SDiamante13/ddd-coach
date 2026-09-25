@@ -406,6 +406,40 @@ No quote carries a speaker's name. The 18 non-thread replies are unchanged in ki
 |---|---|---|
 | New gating hard checks. **`citations verbatim`** (every fixture): each `Source: Evans, Domain-Driven Design Reference (2015), "<title>"` line names one of the Reference's 54 Contents titles, word for word, and any other `Source:` line fails. **`cites the reference`** (fixtures with `expect.cites`): at least one citation names an expected title. **`admits not covered`** (fixtures with `expect.notCovered`): the reply says "The sources I have don't cover this" (or "the reference doesn't cover") and has no Source line. New non-thread fixtures: `ddd-bounded-context` ("What's a bounded context?", cites "Bounded Context") and `not-covered` ("How do I run an Event Storming workshop?", which the Reference never mentions) | Ship: yes (unchanged) | No recorded reply has a Source line, so nothing moves. The new fixtures aren't in the v10/v11 run. They're the v12 A/B's target |
 
+## v12 against v11 under the ship rule, n=6 (2026-09-25, #58): no ship
+
+**The fixture set changed at v12.** Two non-thread fixtures joined `FIXTURE_NAMES`: `ddd-bounded-context` and `not-covered`, for 9 fixtures in all. From v12 on, A/B totals and counts cover 9 fixtures (108 calls), not 7 (84). Per-fixture rows stay comparable.
+
+v12 = v11 plus the whole DDD Reference in the system prompt (`systemPrompt()` = `coachInstructions(DDD_REFERENCE)`; the v12 snapshot is 88k chars) and a "General DDD questions" rule. It cites `Source: Evans, Domain-Driven Design Reference (2015), "<title>"`, or says "The sources I have don't cover this."
+
+The command: `OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run eval -- --ab 12 --live 11 --target "ddd-bounded-context:cites the reference,not-covered:admits not covered"` ([md](ab-2026-09-25-openai-gpt-5-6-terra-v11-v12.md), [data](ab-2026-09-25-openai-gpt-5-6-terra-v11-v12.json)). The JSON records system sha256s v11 `c858c50a…` and v12 `b4fcac47…`, 108 calls, all `stop`, and no aborts.
+
+**Ship: no.** The target goes from 0/12 to 6/12:
+- bounded context cites "Bounded Context" in 6/6 runs;
+- not-covered admits it in 0/6.
+
+Two gating drops:
+- **"what is DDD?" citations verbatim, 6/6 → 2/6.** It cites `"Domain-Driven Design"`, which isn't a Contents title. The verbatim check caught an invented title, as designed.
+- **F3 holders, 6/6 → 4/6:** "Customer-facing team unclear means…" and "Customer D sees… which means…".
+
+**Not covered, read:** all six v12 replies explain Event Storming (orange stickies, past-tense events) from general knowledge. None says the Reference doesn't cover it.
+
+**Cost and latency:**
+
+| | Live v11 | Candidate v12 |
+|---|---|---|
+| Cost | $0.1852 | $0.3996 |
+| Median latency | 3.0 s | 3.9 s |
+| Max latency | 6.2 s | 6.4 s |
+| Input cached | 100% | 97% |
+
+- Total $0.5849.
+- Prefix caching works: candidate calls show about 17.5k cached tokens.
+- The single uncached F1 candidate call (20k paste plus the KB) took 5.7 s.
+- Also up: F1 under 400 words, 3/6 → 6/6 (reported only).
+
+v11 stays live and main keeps v11. The v12 snapshot and result are kept as the record.
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.
