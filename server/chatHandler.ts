@@ -1,5 +1,6 @@
 import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
 import { isChatRequestBody, type ChatResponseBody } from "../src/shared/chatContract.ts";
+import { readJson } from "../src/shared/json.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
 
@@ -33,14 +34,6 @@ function badRequest(): Response {
 async function readPrompt(request: Request): Promise<Prompt | null> {
   const body = await readJson(request);
   return isChatRequestBody(body) ? parsePrompt(body.message) : null;
-}
-
-async function readJson(request: Request): Promise<unknown> {
-  try {
-    return await request.json();
-  } catch {
-    return null;
-  }
 }
 
 async function replyFrom(coach: Coach, prompt: Prompt): Promise<Response> {

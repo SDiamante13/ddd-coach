@@ -1,4 +1,5 @@
 import type { ChatRequestBody } from "../shared/chatContract.ts";
+import { readJson } from "../shared/json.ts";
 
 export type AskResult = { ok: true; reply: string } | { ok: false; error: string };
 
@@ -32,14 +33,6 @@ async function readResult(response: Response): Promise<AskResult> {
 function errorFrom(body: unknown): AskResult {
   const error = stringField(body, "error");
   return error === undefined ? UNEXPECTED : { ok: false, error };
-}
-
-async function readJson(response: Response): Promise<unknown> {
-  try {
-    return await response.json();
-  } catch {
-    return null;
-  }
 }
 
 function stringField(body: unknown, key: string): string | undefined {
