@@ -33,6 +33,19 @@ describe("New conversation", () => {
     expect(screen.getByRole("button", { name: "New conversation" })).toHaveFocus();
   });
 
+  it("copies the conversation from the question before clearing it", async () => {
+    const { user, log, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+    const question = screen.getByRole("group", { name: "Clear this conversation?" });
+    await user.click(within(question).getByRole("button", { name: "Copy first" }));
+
+    expect(await navigator.clipboard.readText()).toBe("You: A\nCoach: R1");
+    expect(within(question).getByRole("button", { name: "Copied" })).toBeInTheDocument();
+    expect(within(log()).getAllByRole("listitem")).toHaveLength(1);
+  });
+
   it("lets the conversation be cleared only once no reply is pending", async () => {
     const { server, user, send, sendAndReply } = startConversation();
     await sendAndReply("A", "R1", "sig-A");

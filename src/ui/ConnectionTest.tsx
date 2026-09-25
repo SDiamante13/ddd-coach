@@ -14,6 +14,7 @@ export function ConnectionTest() {
     onRefused: (prompt) => setDraft((current) => restoredDraft(current, prompt)),
   });
   const busy = isBusy(exchanges);
+  const conversation = () => conversationText(exchanges);
 
   return (
     <>
@@ -24,13 +25,13 @@ export function ConnectionTest() {
               exchange={exchange}
               busy={busy}
               onRetry={retry}
-              conversation={() => conversationText(exchanges)}
+              conversation={conversation}
             />
           </ExchangeEntry>
         ))}
       </ol>
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send}>
-        {exchanges.length > 0 && <NewConversation busy={busy} onClear={clear} />}
+        {exchanges.length > 0 && <NewConversation busy={busy} onClear={clear} conversation={conversation} />}
       </MessageForm>
     </>
   );

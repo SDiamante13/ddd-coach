@@ -4,13 +4,14 @@ const COPIED_MS = 2000;
 
 type CopyState = "ready" | "copied" | "failed";
 
-const LABELS: Record<CopyState, string> = {
-  ready: "Copy the conversation",
+const LABELS: Record<Exclude<CopyState, "ready">, string> = {
   copied: "Copied",
   failed: "Couldn't copy. Select the text in the log instead.",
 };
 
-export function CopyConversationButton({ text }: { text: () => string }) {
+type CopyConversationButtonProps = { text: () => string; label?: string };
+
+export function CopyConversationButton({ text, label = "Copy the conversation" }: CopyConversationButtonProps) {
   const [state, setState] = useState<CopyState>("ready");
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export function CopyConversationButton({ text }: { text: () => string }) {
   return (
     <>
       <button type="button" className="copy" onClick={() => void copy()}>
-        {LABELS[state]}
+        {state === "ready" ? label : LABELS[state]}
       </button>
       <span role="status" className="visually-hidden">
         {state === "ready" ? "" : LABELS[state]}

@@ -1,8 +1,11 @@
 import { useId, useState, type MouseEvent } from "react";
+import { CopyConversationButton } from "./CopyConversationButton.tsx";
 
 type Step = "offered" | "confirming" | "kept";
 
-export function NewConversation({ busy, onClear }: { busy: boolean; onClear: () => void }) {
+type NewConversationProps = { busy: boolean; onClear: () => void; conversation: () => string };
+
+export function NewConversation({ busy, onClear, conversation }: NewConversationProps) {
   const questionId = useId();
   const [step, setStep] = useState<Step>("offered");
 
@@ -22,6 +25,7 @@ export function NewConversation({ busy, onClear }: { busy: boolean; onClear: () 
   return (
     <span className="confirm" role="group" aria-labelledby={questionId}>
       <span id={questionId}>Clear this conversation?</span>
+      <CopyConversationButton text={conversation} label="Copy first" />
       <button type="button" disabled={busy} onClick={clear}>
         Clear
       </button>
