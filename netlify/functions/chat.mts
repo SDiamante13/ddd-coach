@@ -11,6 +11,7 @@ export default (request: Request): Promise<Response> =>
     createCoach: createOpenRouterCoach,
     deadlineMs: readTimeoutMs(process.env),
     log: logCoachFailure,
+    signingKey: process.env.COACH_SIGNING_KEY ?? "",
   })(request);
 
 export const config: Config = {

@@ -7,6 +7,7 @@ import type { CoachConfig, ConfigResult } from "./config.ts";
 import { MAX_MESSAGE_CHARS } from "./chatRequest.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 
+const TEST_SIGNING_KEY = "test-signing-key-0123456789abcdefghijklmnop";
 const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key", model: "test/model" } };
 
 type HandlerOverrides = {
@@ -14,6 +15,7 @@ type HandlerOverrides = {
   createCoach?: (config: CoachConfig) => Coach;
   deadlineMs?: number;
   log?: CoachFailureLog;
+  signingKey?: string;
 };
 
 function handler(overrides: HandlerOverrides = {}) {
@@ -22,6 +24,7 @@ function handler(overrides: HandlerOverrides = {}) {
     createCoach: echoCoach,
     deadlineMs: 1_000,
     log: () => {},
+    signingKey: TEST_SIGNING_KEY,
     ...overrides,
   });
 }
@@ -47,13 +50,25 @@ function bodyPaddedWith(pad: string): string {
 }
 
 describe("chat handler", () => {
-  it("replies with the coach's answer to a posted message", async () => {
+  it("replies with the coach's answer to a posted message, signed", async () => {
     const handle = handler();
 
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ reply: "Echo: Hello coach" });
+    expect(await response.json()).toEqual({
+      reply: "Echo: Hello coach",
+      signature: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+    });
+  });
+
+  it("signs replies to different messages differently", async () => {
+    const handle = handler();
+
+    const first = await (await handle(postMessage("A"))).json();
+    const second = await (await handle(postMessage("B"))).json();
+
+    expect(first.signature).not.toBe(second.signature);
   });
 
   it("hands the coach the posted history with the new prompt", async () => {

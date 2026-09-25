@@ -11,18 +11,21 @@ import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
 import { MAX_BODY_BYTES, readJsonWithin } from "./requestBody.ts";
+import { createTurnSigner, type TurnSigner } from "./turnSignature.ts";
 
 export type CoachFailure = { name: string; statusCode: number | undefined };
 export type CoachFailureLog = (failure: CoachFailure) => void;
 
-type ReplyDeps = { deadlineMs: number; log: CoachFailureLog };
+type ReplyDeps = { deadlineMs: number; log: CoachFailureLog; signer: TurnSigner };
 
-type ChatHandlerDeps = ReplyDeps & {
+type ChatHandlerDeps = Omit<ReplyDeps, "signer"> & {
   config: ConfigResult;
   createCoach: (config: CoachConfig) => Coach;
+  signingKey: string;
 };
 
-export function createChatHandler({ config, createCoach, ...replyDeps }: ChatHandlerDeps) {
+export function createChatHandler({ config, createCoach, signingKey, ...deps }: ChatHandlerDeps) {
+  const replyDeps: ReplyDeps = { ...deps, signer: createTurnSigner(signingKey) };
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
@@ -56,10 +59,10 @@ function rejected(reason: RejectionReason): Response {
 async function replyFrom(
   coach: Coach,
   conversation: Conversation,
-  { deadlineMs, log }: ReplyDeps,
+  { deadlineMs, log, signer }: ReplyDeps,
 ): Promise<Response> {
   try {
-    return replied(await withDeadline(coach.reply(conversation), deadlineMs));
+    return replied(await withDeadline(coach.reply(conversation), deadlineMs), conversation.prompt, signer);
   } catch (error) {
     log(failureOf(error));
     return coachUnavailable();
@@ -76,10 +79,10 @@ function statusCodeOf(error: unknown): number | undefined {
   return typeof error.statusCode === "number" ? error.statusCode : undefined;
 }
 
-function replied(reply: string | typeof TIMED_OUT): Response {
+function replied(reply: string | typeof TIMED_OUT, prompt: string, signer: TurnSigner): Response {
   if (reply === TIMED_OUT) return coachTooSlow();
   if (reply.trim() === "") return emptyReply();
-  return respond({ reply });
+  return respond({ reply, signature: signer.sign({ prompt, reply }) });
 }
 
 function coachTooSlow(): Response {
