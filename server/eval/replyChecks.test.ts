@@ -44,7 +44,7 @@ const GOOD_REPLY = [
   "- From thread: Ops (view A) means a date change with the same carrier is AMENDED.",
   "- From thread: Ops (view B) means every change is REBOOKED.",
   "",
-  "Question for the ops lead and the finance controller, at the 27 Oct review: If a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?",
+  "Question for the ops lead and the finance controller, at the 27 Oct review: For load 48213, if a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?",
 ].join("\n");
 
 const SIX_EVENTS = ["3.", "4.", "5.", "6."].map((n) => `${n} Guess: Ops calls the customer.`).join("\n") + "\n2. Guess:";
@@ -92,7 +92,7 @@ const bookingSplit: Fixture = {
 };
 
 function askedAs(question: string): string {
-  return GOOD_REPLY.replace("If a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?", question);
+  return GOOD_REPLY.replace("if a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?", question);
 }
 
 function withWord(block: string): string {
@@ -172,8 +172,8 @@ describe("hard checks", () => {
     expect(failedHardChecks(reply, "stop", fixture)).toEqual([]);
   });
 
-  it("fail holders and same meaning not split for the interview 06 reply", () => {
-    expect(failedHardChecks(INTERVIEW_06_REPLY, "stop", bookingSplit)).toEqual(["holders", "same meaning not split"]);
+  it("fail holders, same meaning not split and question names a case for the interview 06 reply", () => {
+    expect(failedHardChecks(INTERVIEW_06_REPLY, "stop", bookingSplit)).toEqual(["holders", "same meaning not split", "question names a case"]);
   });
 
   it("leave a split same-meaning word out of stable views", () => {
@@ -194,6 +194,12 @@ describe("hard checks", () => {
     ["a choice after a condition", "For a date-only change at night, which should Ops do: create a new booking or record an AMENDED change?"],
   ])("pass question asks for %s", (_case, question) => {
     expect(failedHardChecks(askedAs(question), "stop", fixture)).toEqual([]);
+  });
+
+  it("fail question names a case for a question with no load, customer or message time (#77)", () => {
+    const noCase = GOOD_REPLY.replace("For load 48213, if a booking", "If a booking");
+
+    expect(failedHardChecks(noCase, "stop", fixture)).toEqual(["question names a case"]);
   });
 
   it("fail code guess for a Code line stated as fact when no code was shown", () => {

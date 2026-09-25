@@ -13,3 +13,9 @@ function isOpen(question: string): boolean {
   const lastClause = question.split(",").at(-1) ?? "";
   return OPEN_WORD.test(question) || lastClause.includes(" or ");
 }
+
+const CONCRETE_CASE = /\b\d{3,}\b|\bCustomer [A-Z]\b|\b\d{1,2}:\d{2}\b/;
+
+export function namesACase(question: string): boolean {
+  return CONCRETE_CASE.test(question);
+}

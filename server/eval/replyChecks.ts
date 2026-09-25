@@ -1,5 +1,5 @@
 import { endsSentence } from "../replyEnding.ts";
-import { asksOpenly } from "./questionChecks.ts";
+import { asksOpenly, namesACase } from "./questionChecks.ts";
 import {
   hasCleanSplitLabels,
   hasKnownHolders,
@@ -69,6 +69,7 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "stable views": ({ words, fixture }) => hasStableViews(words, fixture.key),
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
+  "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
 };
 
 const NON_THREAD_CHECKS: Record<string, HardCheck> = {
