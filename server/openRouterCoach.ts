@@ -1,6 +1,6 @@
 import { OpenRouter } from "@openrouter/sdk";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
-import type { ChatContentItems, ChatMessages } from "@openrouter/sdk/models";
+import type { ChatAssistantMessage, ChatContentItems, ChatMessages } from "@openrouter/sdk/models";
 import type {
   SendChatCompletionRequestRequest,
   SendChatCompletionRequestResponse,
@@ -8,6 +8,7 @@ import type {
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
+import { endOnCompleteLine } from "./replyEnding.ts";
 
 export type ChatClient = {
   send(
@@ -16,7 +17,7 @@ export type ChatClient = {
   ): Promise<SendChatCompletionRequestResponse>;
 };
 
-const MAX_COMPLETION_TOKENS = 600;
+const MAX_COMPLETION_TOKENS = 1_000;
 const WITHOUT_RETRIES: RequestOptions = { retries: { strategy: "none" } };
 
 export function createOpenRouterCoach(
@@ -26,7 +27,7 @@ export function createOpenRouterCoach(
 ): Coach {
   return {
     reply: async (conversation: Conversation) =>
-      extractText(await chat.send(chatRequest(config, instructions, conversation), WITHOUT_RETRIES)),
+      replyText(await chat.send(chatRequest(config, instructions, conversation), WITHOUT_RETRIES)),
   };
 }
 
@@ -57,8 +58,13 @@ function messagesOfTurn({ prompt, reply }: Turn): ChatMessages[] {
   ];
 }
 
-function extractText(response: SendChatCompletionRequestResponse): string {
-  const content = "choices" in response ? response.choices[0]?.message.content : undefined;
+function replyText(response: SendChatCompletionRequestResponse): string {
+  const choice = "choices" in response ? response.choices[0] : undefined;
+  const text = extractText(choice?.message.content);
+  return choice?.finishReason === "length" ? endOnCompleteLine(text) : text;
+}
+
+function extractText(content: ChatAssistantMessage["content"] | undefined): string {
   if (typeof content === "string") return content;
   return (content ?? []).map(textOf).join("");
 }

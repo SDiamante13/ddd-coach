@@ -4,7 +4,7 @@ import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
-import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
@@ -134,6 +134,17 @@ describe("chat handler", () => {
 
     const response = await handle(postMessage("D", [second, first]));
 
+    expect(response.status).toBe(200);
+  });
+
+  it("signs a reply cut short with its note, so it verifies as history in the next request", async () => {
+    const cutShort = `Events, in order\n1. From thread: Customer submits.\n\n${CUT_SHORT_NOTE}`;
+    const handle = handler({ createCoach: () => ({ reply: async () => cutShort }) });
+    const { reply, signature } = await (await handle(postMessage("A"))).json();
+
+    const response = await handle(postMessage("continue", [{ prompt: "A", reply, signature }]));
+
+    expect(reply).toBe(cutShort);
     expect(response.status).toBe(200);
   });
 
