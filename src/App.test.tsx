@@ -82,6 +82,14 @@ describe("Connection test", () => {
     );
   });
 
+  it("leaves the Enter key hint out with a touch pointer, where Enter adds a line", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const { input } = renderApp();
+
+    expect(input()).toHaveAccessibleDescription(`Up to ${formatCount(MAX_MESSAGE_CHARS)} characters.`);
+    expect(screen.queryByText(/Enter sends/)).not.toBeInTheDocument();
+  });
+
   it("starts with the message input focused and an empty log", () => {
     const { input, log } = renderApp();
 

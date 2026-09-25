@@ -1,6 +1,7 @@
 import { useId, type FormEvent, type KeyboardEvent } from "react";
 import { parsePrompt, type Prompt } from "../domain/exchange.ts";
 import { DraftFoot } from "./DraftFoot.tsx";
+import { hasTouchPointer } from "./pointer.ts";
 import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
 const SAFARI_COMPOSITION_KEY_CODE = 229;
@@ -14,6 +15,7 @@ type MessageFormProps = {
 
 export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormProps) {
   const id = useId();
+  const keyHint = !hasTouchPointer();
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -38,7 +40,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
           autoFocus
           rows={2}
           placeholder={PASTE_EXAMPLE}
-          aria-describedby={`${id}-hint ${id}-limit`}
+          aria-describedby={keyHint ? `${id}-hint ${id}-limit` : `${id}-limit`}
           value={draft}
           onChange={(e) => onDraftChange(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -47,7 +49,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
           Send
         </button>
       </div>
-      <DraftFoot hintId={`${id}-hint`} limitId={`${id}-limit`} />
+      <DraftFoot keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`} />
     </form>
   );
 }
@@ -58,8 +60,4 @@ function sendsOnEnter(event: KeyboardEvent): boolean {
 
 function isComposing(event: KeyboardEvent): boolean {
   return event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSITION_KEY_CODE;
-}
-
-function hasTouchPointer(): boolean {
-  return window.matchMedia?.("(pointer: coarse)").matches ?? false;
 }

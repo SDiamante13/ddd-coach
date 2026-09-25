@@ -257,7 +257,7 @@ button:disabled {
     max-height: 30vh;
   }
 
-  .formfoot > span:first-child {
+  .keyhint {
     display: none;
   }
 }

@@ -3,12 +3,16 @@ import { formatCount } from "./draftLimit.ts";
 
 const KEY_HINT = "Enter sends · Shift+Enter adds a line";
 
-type DraftFootProps = { hintId: string; limitId: string };
+type DraftFootProps = { keyHint: boolean; hintId: string; limitId: string };
 
-export function DraftFoot({ hintId, limitId }: DraftFootProps) {
+export function DraftFoot({ keyHint, hintId, limitId }: DraftFootProps) {
   return (
     <div className="formfoot">
-      <span id={hintId}>{KEY_HINT}</span>
+      {keyHint && (
+        <span id={hintId} className="keyhint">
+          {KEY_HINT}
+        </span>
+      )}
       <span id={limitId} className="visually-hidden">
         Up to {formatCount(MAX_MESSAGE_CHARS)} characters.
       </span>
