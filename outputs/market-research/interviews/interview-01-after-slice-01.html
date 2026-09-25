@@ -1,0 +1,508 @@
+<title>Priya Raman Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">DDD Coach · Synthetic ICP interview 01 · after slice 1</div>
+      <h1>“It never asked me anything.” <em>Priya</em> on what a DDD coach should do.</h1>
+      <p class="dek">We showed a tech lead the slice 1 text box and described the voice-and-board vision. She was unimpressed by the box, cautiously interested in the stickies, and very clear about what would make her quit.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 13 questions</span>
+        <span class="chip">Slice 2 code landed, not demoed</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Split “Booking” out of a Rails monolith by Q1</dd></div>
+        <div><dt>DDD</dt><dd>Read Khononov, half the Blue Book, one EventStorming that fizzled</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“Paste in the messy thread and get back <strong>the terms people use differently</strong>, a short list of events in order, and <strong>the questions I should ask Dana</strong>. As text I can paste into Confluence. No board, no voice.”</blockquote>
+      <cite class="label">Priya, Q12. “That alone would have saved me a week in July.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-event">
+        <span class="n">01</span>
+        <span><b>Questions beat answers.</b> She kept the AI's event list and threw away its bounded contexts. It never asked her anything.</span>
+        <div class="tags"><span>strong</span><span>slice 3 · B05</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">02</span>
+        <span><b>Her input is a paste</b>, not a question. Slack threads, enum dumps, notes.</span>
+        <div class="tags"><span>strong</span><span>B01 · B02</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">03</span>
+        <span><b>Losing work on reload kills trust.</b> Her work spans weeks, between hour-long calls with the domain expert.</span>
+        <div class="tags"><span>strong</span><span>B12 parked</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">04</span>
+        <span><b>Output must leave the tool.</b> A board that lives only in the app is a dead end at her company.</span>
+        <div class="tags"><span>strong</span><span>slice 13</span></div>
+      </div>
+      <div class="sticky s-hotspot weak">
+        <span class="n">05</span>
+        <span><b>Voice at a desk is doubtful.</b> Open-plan office. Then again: “walking the dog I might.”</span>
+        <div class="tags"><span>weak</span><span>slice 12</span></div>
+      </div>
+      <div class="sticky s-neutral">
+        <span class="n">06</span>
+        <span><b>First use is solo prep</b> for the expert session. She won't risk Dana's one hour on an untested tool.</span>
+        <div class="tags"><span>strong</span><span>reframes vision</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">07</span>
+        <span><b>Where does my text go?</b> Company policy is “approved vendors only.” OpenRouter routing is opaque to her.</span>
+        <div class="tags"><span>strong</span><span>no roadmap item</span></div>
+      </div>
+      <div class="sticky s-neutral weak">
+        <span class="n">08</span>
+        <span><b>Willingness to pay is thin.</b> About $10/mo personally, and she compares it to Miro plus Claude seats her company already pays for.</span>
+        <div class="tags"><span>weak</span><span>neutral</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Past behavior</a>
+      <a href="#part-b">B · Today's screen</a>
+      <a href="#part-c">C · The vision</a>
+      <a href="#part-d">D · Close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Past behavior</h3><span class="aside">no product talk yet</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Tell me about the last time you tried to figure out the boundaries or vocabulary of a messy part of your system. What happened, step by step?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That was July, so about ten weeks ago. Our VP asked for a rough plan to pull Booking out of the Rails monolith by Q1. I started where I always start, in the code. <code>Booking</code> is a Rails model with something like 140 columns and a <code>status</code> enum with 23 values, and three of those values are commented "DO NOT USE." I wrote a Confluence page called "What is a Booking?" and pinged ops, finance and the carrier-integrations team in Slack. The thread got to about 60 messages. <mark>Ops thinks a booking exists once the customer submits. Finance thinks it exists once it's invoiceable. The carrier team calls the tender a booking.</mark> Then it died, because everyone had real work. The Confluence page still has a table with three columns that don't agree.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>What did you use during that? What did it cost you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Confluence, Slack, the Rails console, and a lot of <code>git blame</code>. Maybe fifteen hours of my own time over three weeks, mostly reading code and chasing people. Two 45-minute calls with Dana, our ex-ops lead, and one of those went to her explaining rebooking versus amendment, which honestly was the most useful hour of the whole thing. The reputation cost is what bugs me. In planning I said "bounded context" once and Marcus, our staff engineer, said <mark>"so, a folder?"</mark> and people laughed. After that I stopped using the words and just said "the part that ops owns."</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>When you used an AI chat for DDD help, what was the last concrete thing you asked and what did you do with the answer?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>In August I pasted a sanitized version of the status enum and a few model callbacks into Claude and asked it to "propose bounded contexts for booking." It gave me Booking, Carrier Management, Billing and Customer Portal, which you could guess from our org chart. I kept one thing. It had listed the status transitions as past-tense events, like "Booking Tendered" and "Tender Rejected," and I pasted that list into the Confluence page. Everything about the contexts I threw away. <mark>It never asked me anything.</mark> It didn't know rebooking exists, and it never would have, because it doesn't ask.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q4</span><span>What happened after the fizzled EventStorming session? Did anything come out of it that you still use?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That was March, on Miro. A consultant friend of our director ran it for free as a favor, which tells you the level of commitment. We had orange stickies everywhere for about an hour, then an argument about whether "Quote Accepted" is part of booking, and then people's cameras went off. Nobody owned the board afterwards. <mark>What I still use is honestly just the pink "hotspot" stickies.</mark> Three of them are still true and still unresolved. I screenshot that corner of the board into docs when I want to make a point. The rest is soup.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>How do you currently know if a model or boundary you drew is any good?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I don't, really. That's the honest answer. My proxies: does Dana nod or frown when I explain it back to her? And when I look at the last ten Jira tickets that touched booking, would they have stayed inside one boundary? I did that exercise once with a spreadsheet and <mark>it was the most convincing thing I showed Marcus.</mark> Otherwise you find out in production, eighteen months later.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Reaction to today's screen</h3></div>
+        <p class="stage">Shown the slice 1 screenshots. Told that slice 2 adds same-session memory and a reload forgets it.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q6</span><span>First honest reaction to this screen. Would you use it over just opening ChatGPT or Claude?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's a text box and a Send button with Times New Roman, so <mark>right now it's ChatGPT with fewer features.</mark> No, I wouldn't use it over Claude today. Claude already remembers the conversation, lets me attach files, and keeps my history, and this forgets on reload. The only reason I'd switch is if it behaves differently, meaning it asks me questions instead of handing me four contexts. I can't tell that from this screen. The question in the screenshot ("what is a domain event at Eazy Freight") is something I'd never type. I'd paste the Slack thread.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>What would have to be true in the next 2–3 releases for you to try it on the Booking split for real?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Three things. First, I paste something messy, like that Slack thread or the enum, and it tells me where people disagree and asks me the question I should take to Dana. Second, <mark>I don't lose it.</mark> If I close the tab on Tuesday and come back Thursday after my hour with Dana, my stuff is still there. Third, one sentence telling me where my text goes. If it runs through some router to a model I've never heard of, I'm not pasting our carrier rules into it. And no account, or I bounce.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Reaction to the vision</h3><span class="aside">voice plus an auto-built board</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q8</span><span>The coach talks with you and builds stickies and a timeline as you speak. Where does this help, and where does it annoy or worry you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The sticky part is the first thing you've said that ChatGPT doesn't do. If I say "the carrier can reject it" and a sticky shows up in the right place, that's great, because the output from the chat was always the part I had to rebuild in Miro by hand. Voice at my desk, though? We're in an open-plan office three days a week. I'm not narrating our booking flow out loud next to the sales team. At home, maybe. Actually, walking the dog I might, so I don't know, don't take the "no" too literally.</p><p>The bigger worry: if it adds a sticky that's slightly wrong, I'll spend the session correcting the AI instead of thinking about the domain. And <mark>it has to get into Miro or Confluence.</mark> If the board lives only in your app, it's a dead end, because nobody at my company will open another tool.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>Who else would need to be in the session? Would you bring the domain expert into it? What would make them trust it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The real session is me and Dana. Maybe the PM, never Marcus, not in the first one. But I wouldn't bring Dana in first. I get one hour a week from her, and <mark>if the tool embarrasses me in front of her I've burned it.</mark> I'd use it solo to prep: figure out what I don't know and what to ask her.</p><p>If Dana ever did join, the stickies would have to use her words. She says "rebook," not "BookingReassigned." She'd also have to be able to say "no, that's wrong" and see it change right away. And the tool shouldn't lecture her about methodology. Oh, and it can't talk over her. If it asks Dana a question that I should be asking, that's weird.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>What would make you stop using it after the first session?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Four things. It tells me "you should have a Booking aggregate" in the first five minutes. I lose the board. The board gets bigger than what we actually agreed on, and it looks finished when it isn't. <mark>That's worse than the soup, because I'd take a wrong-but-tidy picture into planning.</mark> Or it makes me do its method in its order. I already tried Context Mapper and quit over the ceremony.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>Would you pay? Who pays, how much, and what would you compare it against?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>For this text box, no. For the board version that exports and remembers, I might pay ten bucks a month personally for a couple of months while I'm doing the split, then cancel. Company money above twenty a seat goes through my manager, and she'd ask <mark>why not Miro plus our existing Claude seats.</mark> Those are the real comparison, and they're already paid for. The other comparison is a consultant, around $2k a day, and we've never gotten budget for that either. Honestly? I'd probably use the free tier until it ran out and then decide. I'm not sure I'd upgrade.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q12</span><span>If you could only have one thing from this product in the next month, what is it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Paste in the messy thread and get back three things: the terms people use differently, marked by who uses which meaning; a short list of events in order; and the questions I should ask Dana. As text I can paste into Confluence. No board, no voice. <mark>That alone would have saved me a week in July.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>Anything I should have asked but didn't?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>What happens after the session. The model isn't the deliverable. What I need is a design doc and a set of tickets, plus something that convinces Marcus. You also didn't ask about <mark>the week between my calls with Dana, which is where everything falls apart.</mark> And ask me what our AI policy says. We have one as of June, and "approved vendors only" is going to matter for your router thing.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Voice is the final surface, so the text composer goes away</h3><div class="ref">slice 12 · backlog product direction</div></div>
+        <p>She types and pastes, and she works in an open office. Keep text and paste as first-class input.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The board is the primary interface</h3><div class="ref">generative-coach-direction.md</div></div>
+        <p>She values the board only if it exports. Getting it out matters more than how good it looks inside the app.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Saved sessions wait until repeat visits need prior context</h3><div class="ref">B12</div></div>
+        <p>Her workflow is repeat visits by nature: prep, an hour with Dana, then a week before the next session.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Pairing with a domain expert is the headline story</h3><div class="ref">slice 4 notes · B14</div></div>
+        <p>Solo prep fits the current single-person slices. Adoption starts there, not in the session with the expert.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Hosting publicly needs no data-flow statement</h3><div class="ref">slice 2a</div></div>
+        <p>Pasting proprietary workflows is the main use, and it's blocked until she knows where her text goes.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The starting input is a typed question</h3><div class="ref">slice 1 demo prompt · slice 2 cap · B38</div></div>
+        <p>A realistic first input is a 1–5k character paste. That hits the 24k history cap and makes B38 matter sooner.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Keep</span><div><h3>Keep the session across reload</h3><div class="where">before 2a · smallest part of B12</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The log and history survive a reload in the same browser, stored in the browser only. A “New session” control clears them.</dd></div>
+          <div><dt>Check</dt><dd>Send 3 turns and reload. All 3 show, and the 4th reply uses a detail from turn 1. “New session” leaves the log empty and the next request has no history.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Disclose</span><div><h3>Show where text goes</h3><div class="where">part of 2a</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>One line near the input: “Your text goes to OpenRouter and the &lt;model&gt; provider; this app stores nothing on its server.”</dd></div>
+          <div><dt>Check</dt><dd>Visible on first load without scrolling, with the model name from server config. A grep of <code>server/</code> confirms nothing persists or logs request bodies.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Paste</span><div><h3>Start from pasted notes</h3><div class="where">changes the slice 3 check · or a B02 variant</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>A pasted block gets back up to 5 events in order, the terms people use with conflicting meanings (and who uses which), and one question for the domain expert.</dd></div>
+          <div><dt>Check</dt><dd>Paste an Eazy Freight thread where ops and finance mean different things by “booking.” The reply names both meanings and who holds each, proposes no aggregates, and ends with exactly one question.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Export</span><div><h3>Copy the board as Markdown</h3><div class="where">new B-ID after 4d, before slice 5</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>“Copy as Markdown” puts the timeline's events and the open questions on the clipboard.</dd></div>
+          <div><dt>Check</dt><dd>After the 4a–4d demo, paste into Confluence. Event order matches the board, questions are labeled, and nothing is missing or duplicated.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 02 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>Walk me through the last time you prepared for a meeting with a domain expert. What did you bring in and leave with?</li>
+      <li>What did the last design doc for a service split contain? Where did the diagram actually end up?</li>
+      <li>What does your company's AI policy let you paste, and into which tools?</li>
+      <li>When did you last talk to a tool out loud at work? Where were you?</li>
+      <li>Between two sessions a week apart, what did you lose or forget?</li>
+      <li>Experienced facilitator: would you ever let a tool place stickies for you? What would it have to get right?</li>
+      <li>The skeptic (a Marcus): what artifact would convince you a boundary is right?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>

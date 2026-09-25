@@ -1,0 +1,657 @@
+<title>Priya Raman Interview 02</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">DDD Coach · Synthetic ICP interview 02 · after slice 2</div>
+      <h1>“The tool turned my notes into her quote.” <em>Priya</em> on slice 2 and the Untangle concept.</h1>
+      <p class="dek">We showed the tech lead the slice 2 demo, then five stills from Design Exploration 01. The demo didn't move her. The concept did, right up until it quoted her domain expert and got the answer wrong.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 26 questions</span>
+        <span class="chip">Slice 2 demoed</span>
+        <span class="chip">Exploration 01 · concept, not built</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC, due end of October</dd></div>
+        <div><dt>Since 01</dt><dd>One more hour with Dana: 3 of 7 questions answered</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“Paste in, get <strong>the words that don't match</strong> and three questions for Dana as text, <strong>and it's still there when I come back with her answers.</strong>”</blockquote>
+      <cite class="label">Priya, Q24. “Give me plain text that's there Thursday.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>Persistence is still the gate.</b> In-tab memory is “table stakes.” The demo shows a reload forgetting everything.</span>
+        <div class="tags"><span>strong</span><span>B12 · slice 13</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>Her AI policy blocks OpenRouter.</b> Approved vendors: Claude Enterprise and Copilot. A review takes about six weeks.</span>
+        <div class="tags"><span>strong</span><span>2a · operator config</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">03</span>
+        <span><b>The 2a notice only unlocks sanitized text.</b> Right placement. Missing: the processing company, provider retention, training, a link for security.</span>
+        <div class="tags"><span>strong</span><span>slice 2a</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">04</span>
+        <span><b>Export = a table and numbered lists</b>, pasted as rich text. Terms first. No Mermaid, no image. Raw Markdown tables arrive as pipes.</span>
+        <div class="tags"><span>strong</span><span>slice 4 · slice 13</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">05</span>
+        <span><b>“Dana said” is dangerous.</b> A paraphrase became a quote and then a wrong conclusion. The real answer was a TONU fee.</span>
+        <div class="tags"><span>strong</span><span>B22 · still 5</span></div>
+      </div>
+      <div class="sticky s-neutral">
+        <span class="n">06</span>
+        <span><b>Tentative labels don't survive export.</b> A dashed border disappears in a screenshot. One wrong source label spreads distrust.</span>
+        <div class="tags"><span>strong</span><span>no roadmap item</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">07</span>
+        <span><b>Expert questions need concrete cases.</b> At most three. No engineering decisions handed to the expert.</span>
+        <div class="tags"><span>strong</span><span>slice 3 · B22</span></div>
+      </div>
+      <div class="sticky s-hotspot weak">
+        <span class="n">08</span>
+        <span><b>Voice for the debrief, not the modeling.</b> She'd dictate Dana's answers right after the call. She's never done it.</span>
+        <div class="tags"><span>weak</span><span>slice 12 · slice 7</span></div>
+      </div>
+      
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-h">
+    <div class="section-head">
+      <h2 id="verdict-h">Exploration 01 verdict</h2>
+      <span class="label">“Untangle a thread” · stills 1–5</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">7 items</span></div>
+        <ul>
+          <li><b>Paste-first start screen</b><q>OK, that's basically my Slack thread. Someone listened.</q></li>
+          <li><b>Term map as the lead artifact, with the plain label</b><q>That's my three-column table, but readable.</q></li>
+          <li><b>Questions ranked by what they unblock</b><q>Dana gave me 55 minutes on Zoom and we got through three.</q></li>
+          <li><b>A copy action on the prep sheet</b><q>Markdown, mostly. Lists and bold come through.</q></li>
+          <li><b>Lock line visible, never a dialog</b><q>It's a good notice: short, visible, no dialog to click through.</q></li>
+          <li><b>Welcome back with the saved board</b><q>This is the screen I asked for last time.</q></li>
+          <li><b>Coach offers to test with an example</b><q>It should ask that before it decides anything is a bug.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">9 items</span></div>
+        <ul>
+          <li><b>Teams, not people's names</b><q>I'm not putting Tom's name in a doc next to the definition everyone thinks is wrong.</q></li>
+          <li><b>“Dana said” → “my notes from Dana · date · unconfirmed”</b><q>The tool turned my paraphrase into her quote.</q></li>
+          <li><b>Source label at the front of the text</b><q>If it's a guess, put “guess” at the front of the text.</q></li>
+          <li><b>Fix “Coach's idea” on the invoiceable event</b><q>Tom said “invoiceable” in the thread.</q></li>
+          <li><b>Show Rebook on the board too</b><q>The rebook one is the one that caused the incidents.</q></li>
+          <li><b>Prep sheet: questions only, max 3, each with a real case</b><q>She answers those in ten seconds.</q></li>
+          <li><b>Add answers by pasting shorthand</b><q>If it's a form with one box per question, I won't fill it in.</q></li>
+          <li><b>Copy rich text: terms table, then questions, then events</b><q>Raw Markdown tables arrive as pipes in our Confluence.</q></li>
+          <li><b>Lock line names the company, retention, training, operator, link</b><q>“Nothing is stored on our server” says nothing about OpenRouter's logs or Anthropic's.</q></li>
+          <li><b>Welcome back as a banner</b><q>This should be a banner, not a modal I have to click through every time.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>“A bug, not a rule”</b><q>The conclusion is wrong.</q></li>
+          <li><b>Question 3, “which moment should booking mean”</b><q>It's an engineering decision dressed up as a domain question.</q></li>
+          <li><b>Copy as image for Miro</b><q>They cut Miro seats to ten in August and I lost mine.</q></li>
+          <li><b>Export title and coach commentary</b><q>I'd delete the “prep for Dana, Thu” title … and any line where the coach explains itself.</q></li>
+          <li><b>The Talk toggle, for now</b><q>Not for this. Paste is the job here.</q></li>
+          <li><b>“Come back Thursday” button</b><q>I don't need a button to leave, just keep my stuff.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since last time</a>
+      <a href="#part-b">B · Slice 2</a>
+      <a href="#part-c">C · Exploration 01</a>
+      <a href="#part-d">D · Close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since last time</h3><span class="aside">no product talk yet</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Last time the Booking split had a Q1 target and a Confluence page with three columns that didn't agree. What's happened since?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It got real. Our VP turned "rough plan by Q1" into "RFC by end of October," so now there's a date with my name on it. The three-column table is still there, but I've added a fourth column for Dana, and it has more question marks than answers. Nobody else touched the Slack thread. The one new thing is that finance got pulled in, because two of our P2 incidents this year were double invoices after a rebook. So the rebook question isn't academic any more.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>Walk me through the last time you prepared for a meeting with Dana. What did you bring in, and what did you leave with?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That was Tuesday, two days ago. Monday night I spent about two hours re-reading the Slack thread and my Confluence page and wrote seven questions in a draft page. Dana gave me 55 minutes on Zoom and we got through three. The first one ate twenty minutes, because she shared her screen and showed me an Excel sheet she made in 2019 mapping every status to what ops actually does. <mark>That sheet is the only real documentation of the enum, and nobody knew it existed.</mark> I left with answers to three questions, two new questions, a new term (TONU, "truck ordered not used") and a promise that she'd send the sheet. It arrived this morning.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>What did you take notes in, and what did those notes look like afterwards?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>A plain text file, typing while she talked. It's shorthand, like <code>RB = same bkg unless lane/date chg → AMEND</code> and <code>2nd inv sometimes legit, TONU</code>. Wednesday morning I could still read it. By Thursday I'd have lost half of it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Between two Dana sessions, what did you lose or forget?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Mostly the "why." I had "AMENDED??" in my questions list and couldn't remember why I'd flagged it, so I burned two minutes of Dana's time finding out myself. I also lost track of which question came from whom: was the tender one from Ravi or from me reading the EDI code? And I'd used our company Claude to turn my notes from the first Dana call into a clean list, and I couldn't find that chat again among forty others called "Booking notes" or "Untitled." <mark>So the loss isn't the notes. It's the thread between the notes and the questions.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>What did the last design doc for a service split contain? Where did the diagrams end up?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The last one was the Quotes extraction in 2024. It used our RFC template: context, goals and non-goals, proposed architecture, a data-ownership table, a strangler migration plan, rollout and open questions. There was a box diagram in the draw.io plugin in Confluence, and a sequence diagram someone pasted as a PNG. Nobody updated either after review, and the PNG's source is gone. The glossary section said "TBD" and still does. <mark>If I'm honest, the glossary is the section that would have prevented the incidents, and it's the one we skipped.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>What's the last thing you actually pasted into a Confluence design doc? What did you have to fix by hand?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Last week, into the Booking RFC draft. First, my seven questions for Dana, copied from a Claude chat. That came through fine, because Claude's copy button gives rich text. Second, a table of the 23 statuses I'd kept as raw Markdown in a text file. Confluence pasted it as pipes and dashes, and I rebuilt it by hand with the table button, which took about twenty minutes. The Quotes data-ownership table came from a Google Sheet, which pastes as a real table. I've never pasted a diagram as anything but a screenshot. <mark>What survives in our Confluence is tables and numbered lists. Everything else gets retyped or screenshotted.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>What does your AI policy let you paste, and into which tools?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Approved vendors are our Claude Enterprise workspace and GitHub Copilot. Code and internal docs are fine there. Customer names, rates and anything from a customer contract go nowhere, even there. Anything else needs a vendor review with security, and the last one I heard of took six weeks. <mark>OpenRouter isn't on the list, and "the text goes to OpenRouter and the model provider" is exactly the sentence that triggers a review.</mark> So realistically I'd use your tool with a sanitized thread, like I did in August, or at home with a made-up version.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q8</span><span>When you sanitize, what do you actually change?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Customer names become "Customer A," and I strip rates and lane details. I leave colleagues' first names in, which, now that I say it out loud, is probably not great either. It takes ten or fifteen minutes for a long thread. That's annoying, but I do it.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Slice 2 as shipped</h3></div>
+        <p class="stage">Shown the slice 2 demo and screenshot: turn 1 names Maersk, turn 2 recalls it. A reload forgets everything. Replies are capped at about 600 tokens, and the conversation at 24k characters.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q9</span><span>Honest reaction. Did this move toward “I'd use it”?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It remembered Maersk. Claude has done that since before I had this job, so it's table stakes, not a reason to switch. I asked for three things last time: tell me where people disagree, don't lose my stuff, and tell me where my text goes. This does none of them, and <mark>the demo literally shows the reload forgetting, which is the one I said was non-negotiable.</mark> To be fair, the error handling looks honest. "The coach took too long" is better than a spinner forever. But no, it didn't move me.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>What about the limits: replies cut off at about 600 tokens, and a 24k-character conversation cap?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Short replies are fine. I want short. Cut off mid-sentence is not fine. If I paste the thread and the third question to Dana stops halfway, I don't trust the first two. The cap worries me more. My Slack export was about 18,000 characters before I trimmed it. Paste that, go back and forth three times, and you hit the wall. Then the message says "reload to start a new one," which means throw away the work. <mark>That's the reload problem again, just triggered by the tool instead of by me.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Exploration 01</h3><span class="aside">“Untangle a thread” · a concept, not built</span></div>
+        <p class="stage">Shown stills 1 to 5 in order: paste, untangled board, prep sheet, welcome back, answered.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q11</span><span>Still 1, the paste screen. First reaction?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>OK, that's basically my Slack thread. Someone listened. "Paste the thread nobody could settle" is a bit cute, but it tells me what to do in one line. The lock line at the top is better than nothing. But "the model provider": which one? And <mark>my policy doesn't care whether you're honest about OpenRouter. It cares whether OpenRouter is approved.</mark> Also, look: I just pasted Maya, Tom and Ravi's real names into it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>That lock line is part of the concept. Here's the exact notice planned for the first hosted version: “Your text is sent to OpenRouter and anthropic/claude-sonnet-4. Nothing is stored on our server.” It's always visible on the main screen, with no dialog, and it doesn't block the first reply. Given that, would you paste real work material?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. It's a good notice: short, visible, no dialog to click through. I'd rather have that than a consent pop-up. But it answers “where does it go,” and my question is “is that allowed.” The answer is no, because OpenRouter isn't on our list. <mark>No wording turns an unapproved vendor into an approved one.</mark> With this notice I'd paste the sanitized thread, which is what I already do with ChatGPT at home.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>What exactly would you check, or need to see, before you pasted anything?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Four things, in this order. First, who actually processes it. “anthropic/claude-sonnet-4” is a model name, not a company, and I've read that OpenRouter can serve the same model through more than one cloud, so name the company. Second, retention on their side. <mark>“Nothing is stored on our server” says nothing about OpenRouter's logs or Anthropic's.</mark> Third, one line saying whether it's used for training, linked to the policy that says so. Fourth, a link to one page I can forward to security, because that's how anything gets approved here.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q14</span><span>What wording would make you paste real material, and what wording keeps you at sanitized text?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Real material takes security's yes, or the words “your company's Claude workspace.” Nothing on your screen gets me there on its own. For sanitized text, something like “Sent through OpenRouter to Anthropic. Not used for training. Retention: [link]. This app stores nothing.” If the link holds up, I'd paste sanitized text without the guilt, and I'd have something to forward to security. Add one line telling me what not to paste, like customer names and rates. <mark>A tool that tells me what not to paste feels like it's read a policy like mine.</mark> And “our server”: whose? There's no company name. From a link on Bluesky, that's a promise from a stranger.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q15</span><span>Still 2. Is the term map, “words that don't match” with who holds each meaning, the thing you'd screenshot into Confluence?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Yes. The top half, anyway. <mark>That's my three-column table, but readable, and it would go straight into the empty glossary section of the RFC.</mark> Two problems, though. It says "FINANCE · TOM." I'm not putting Tom's name in a doc next to the definition everyone thinks is wrong. Use the team, not the person. And the prep sheet in still 3 lists "Rebook" as a second word that doesn't match, but the board only shows "Booking." The rebook one is the one that caused the incidents, so it's the one I'd want on the screenshot.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>The last event is labeled “Coach's idea” with a dashed border. Does that read as clearly tentative?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>On this screen, yes. Dashed and paler reads as "maybe." But two things. First, it's mislabeled: "Booking became invoiceable" isn't the coach's idea. Tom said "invoiceable" in the thread. <mark>If one label about where a sticky came from is wrong, I stop trusting all the "THREAD" labels too.</mark> Second, tentative doesn't survive the trip. In a screenshot the dashed border is just another sticky, and in the Markdown it's an italic bracket at the end of a line that nobody reads. If it's a guess, put "guess" at the front of the text.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q17</span><span>Last time you doubted voice at your desk. There's a “Talk” toggle up there. Once paste exists, would you still want voice?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Not for this. Paste is the job here, and I'm not reading a Slack thread out loud. But here's where I'd actually talk. Tuesday, right after the Zoom with Dana, <mark>I'd have happily dictated what she said while it was fresh, instead of decoding "RB = same bkg unless lane/date chg" two days later.</mark> So maybe voice for the debrief, not for the modeling. I'm guessing, though. I've never actually done that with any tool. I use voice memos for groceries.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>Still 3, the prep sheet. Would it survive Dana's first read?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Dana would skip to the questions and ignore the rest. Question 2, REBOOKED versus AMENDED, she'd love, because she wrote those statuses. Question 3, "which moment should booking mean across teams," she'd bounce straight back at me: "that's your call, not mine." <mark>It's an engineering decision dressed up as a domain question.</mark></p><p>What works with Dana is a concrete case. "Load 48213 got rejected Tuesday and we rebooked with another carrier. Same booking?" She answers those in ten seconds. Abstract ones take ten minutes. So: three questions max, each with a real example, and her words, not ours.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q19</span><span>And the copy options: Markdown for Confluence, image for Miro?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Markdown, mostly. Lists and bold come through when I paste into Confluence. Tables are where it breaks, and I'll get to that. Cut the Miro one for me. <mark>They cut Miro seats to ten in August and I lost mine</mark>, so the Confluence page is where everything lands now. That's a change from what I told you last time.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>Say you paste the export into the RFC. What's the minimum format that survives: plain Markdown, a table, headings, Mermaid, an image? Which sections, in what order, and what would you delete by hand?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Rich text on the clipboard, with Markdown as the fallback, because raw Markdown tables arrive as pipes in our Confluence. Three sections, in this order. First, “Words that don't match” as a table with columns for term, team and what they mean, for the glossary. Second, the open questions as a numbered list, each marked open, my notes or confirmed by Dana. Last, the events as a numbered list. No Mermaid, because we don't have the plugin and it would show up as code. No image either, because I can take a screenshot myself, and an image can't be edited when Dana corrects something. By hand, I'd delete the “prep for Dana, Thu” title, the guesses, people's names and any line where the coach explains itself. <mark>If I have to delete more than three things, I'll just retype it, and then the export didn't help.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q21</span><span>Still 4, “Welcome back, Thursday. Did you get to ask Dana?”</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>This is the screen I asked for last time. My board from Tuesday, with counts, and it's still there. But "Yes, add her answers": how? If it's a form with one box per question, I won't fill it in. <mark>If I can paste my messy shorthand and it matches the bits to the questions, that's the best thing in the whole concept.</mark> Also, this should be a banner, not a modal I have to click through every time.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>Still 5. Her answer shows as “Dana said: Same booking, new carrier. Finance's second invoice is a bug.” Does “Dana said” feel right as a source? Would it make Dana nervous about being quoted?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>This one worries me the most. What Dana actually told me on Tuesday is that the second invoice is sometimes legitimate: a TONU fee, when the first carrier had already sent a truck. So <mark>the tool turned my paraphrase into her quote, then turned the quote into a conclusion, "a bug, not a rule," and the conclusion is wrong.</mark> That's my wrong-but-tidy picture from last time, in green.</p><p>And yes, Dana would be nervous. If "Dana said finance's invoice is a bug" lands in Confluence, the finance director messages her, and I never get another hour. Call it "my notes from Dana, 22 Sep, unconfirmed," and give me a way to send her the three answers and ask "did I get this right?" The coach's last line, "want to test it with an example?", is actually the right move. It should ask that before it decides anything is a bug.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q23</span><span>What's missing, what's wrong, and what would you cut?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Missing: the enum. I have 23 statuses and Dana's Excel sheet, and <mark>I want each status matched to a term or flagged "nobody knows."</mark> Also, I want to click "THREAD" on a sticky and see the line it came from. Wrong: people's names instead of teams, "Dana said," the invoice conclusion, and "Rebook" missing from the board. Cut the Talk toggle for now, the "Come back Thursday" button (I don't need a button to leave, just keep my stuff), the Miro image, and question 3. The coach caption covering the question sticky is also annoying, but that's polish.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q24</span><span>If you could only have one thing in the next month, what is it now?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Same as last time plus one: paste in, get the words that don't match and three questions for Dana as text, <mark>and it's still there when I come back with her answers.</mark> That's two things, I know. But the second one isn't optional, because the prep is worthless if I can't close the loop after the call. If I had to choose between the pretty board and it being there Thursday, give me plain text that's there Thursday. Dana's out for three weeks from mid-October, so I have maybe two more sessions before the RFC is due.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q25</span><span>What would make Marcus take it seriously?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Not a diagram. Marcus respects incidents. If the term map said "these two P2s were ops-booking versus finance-booking confusion" and linked the tickets, he'd read it. The last-ten-tickets spreadsheet worked on him for the same reason. And keep the DDD words out of anything he sees. <mark>He'll read "words that don't match." He will never read "ubiquitous language."</mark> The labels in this concept are right on that.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q26</span><span>Anything we should have asked but didn't?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Ask about Aisha, our PM. She does half the stakeholder chasing and preps her own questions for finance, so <mark>she might be the second user before any engineer is.</mark> Ask who at my company would have to approve this, because that decides whether I use it at work or only at home. And ask what happens after Dana confirms something. Where does the answer go so it doesn't die in my text file again?</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Saved sessions wait for evidence of repeat visits</h3><div class="ref">B12 · slice 13 “no persistent history”</div></div>
+        <p>Second interview in a row where persistence is the gate. The slice 2 demo shows the gap on video.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>OpenRouter is the operator's concern, with no provider choice for visitors</h3><div class="ref">backlog product direction · slice 2a</div></div>
+        <p>With an approved-vendor list, a hosted OpenRouter app is blocked for real work, however clear the notice. Aim at sanitized or home use and say so, or find a path through an approved vendor.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>One sentence settles data flow</h3><div class="ref">slice 2a notice</div></div>
+        <p>The placement is right. The content names a model, not a company. It says nothing about retention at OpenRouter or the provider, or about training, and “our” names no operator. Without a link she can't forward it to security.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Export can wait, or plain Markdown is enough</h3><div class="ref">slice 13 · interview-01 suggestion 4</div></div>
+        <p>Her Confluence turns raw Markdown tables into pipes. The minimum export is a rich-text table plus numbered lists, with the term map first.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Public GitHub links are leading context candidates</h3><div class="ref">B17 · B18 · B19</div></div>
+        <p>Her monolith is private. Her real second source is a pasted enum and an Excel sheet. Paste beats GitHub for this ICP.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The board starts with events</h3><div class="ref">slice 4 · 4a–4d</div></div>
+        <p>The artifact she'd actually screenshot is the term map. An events-only board delays the part she values most.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The 600-token cap is safe because replies stay short</h3><div class="ref">slice 1b · B35</div></div>
+        <p>A cut-off untangle (terms, events, questions) costs trust. The reply needs a shape that fits, or a visible “cut short” marker.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The 24k cap is an edge case</h3><div class="ref">B38 · B40 · B41</div></div>
+        <p>One real 18k-character paste plus a few turns reaches it. Then the “reload” copy discards the work.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Disagreement is attributed per source</h3><div class="ref">B05</div></div>
+        <p>Attributing by person is socially risky. Attribute by team, and treat the expert's answers as unconfirmed notes.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Voice replaces the composer</h3><div class="ref">slice 12</div></div>
+        <p>Voice may have a job in the debrief, alongside text and paste, not instead of them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Keep</span><div><h3>Keep the session across reload</h3><div class="where">before 2a · smallest part of B12 · carried from interview 01</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The log and history survive a reload in the same browser. A “New session” control clears them.</dd></div>
+          <div><dt>Check</dt><dd>Send 3 turns, close the tab, reopen. All 3 show, and the 4th reply uses a turn-1 detail. “New session” empties the log and the next request has <code>history: []</code>. Nothing is stored server-side.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Disclose</span><div><h3>A notice that names the processor</h3><div class="where">replaces the planned 2a wording</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>An always-visible line with no dialog: “Sent through OpenRouter to &lt;provider company&gt; (&lt;model&gt;). Training: &lt;per policy&gt;. Retention: &lt;link&gt;. Run by &lt;operator&gt;; this app stores nothing. Don't paste customer names or rates.” The link opens one page she can forward to security.</dd></div>
+          <div><dt>Check</dt><dd>Visible without scrolling at 400px and 1280px, and the first reply isn't blocked. The company comes from server config, and provider routing is pinned so no other company can serve the request. Every training or retention claim links to that vendor's own policy. A grep of <code>server/</code> finds no persistence or logging of bodies.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Untangle</span><div><h3>Untangle a paste and copy it as a table</h3><div class="where">slice 3 variant · B05 by team</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>“Words that don't match” (term, team, meaning), up to 3 expert questions each with a concrete case, then up to 5 events prefixed “From thread:” or “Guess:”. Copy puts rich text plus a Markdown fallback on the clipboard, with no title and no coach commentary.</dd></div>
+          <div><dt>Check</dt><dd>Paste the Exploration 01 thread. “Booking” and “Rebook” both appear, holders are teams, and “invoiceable” is “From thread.” No aggregates, no system-wide definition asked of the expert, and a complete ending within 600 tokens. Pasting into Confluence Cloud gives a real 3-column table and two numbered lists, with nothing to delete.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Confirm</span><div><h3>Paste notes back as unconfirmed answers</h3><div class="where">after “Untangle” · needs “Keep”</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Pasted shorthand is matched to the questions and labeled “Your notes from &lt;expert&gt;, unconfirmed.” The coach asks for one example before drawing any conclusion.</dd></div>
+          <div><dt>Check</dt><dd>Paste <code>RB = same bkg unless lane/date chg → AMEND; 2nd inv sometimes legit, TONU</code>. Both notes attach to the right questions, the word “unconfirmed” appears, the second invoice isn't called a bug, and there's one example question.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 03 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>Last time an expert corrected your notes, what did you do with the correction? Where does it live now?</li>
+      <li>Who approves a new AI vendor at your company, and what happened the last time someone asked?</li>
+      <li>A real security reviewer: here's the data-flow page. What would you ask before approving sanitized use? And real use?</li>
+      <li>After your next paste into the RFC, what did you delete or retype by hand?</li>
+      <li>Walk me through how the double-invoice P2 was found, written up, and linked to a cause.</li>
+      <li>The PM (an Aisha): what did you prepare before your last finance meeting? What did you bring back?</li>
+      <li>A real domain expert (a Dana): here's a prep sheet. Which question would you answer first, and which would you send back?</li>
+      <li>The last time you recorded a voice memo about work, what happened to it afterwards?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Exploration 01 is a design concept, not shipped software. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>
