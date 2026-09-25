@@ -11,15 +11,23 @@ type ChatHandlerDeps = {
 export function createChatHandler({ config, createCoach }: ChatHandlerDeps) {
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
-    if (!config.ok) return respond({ error: config.error }, { status: 500 });
+    if (!config.ok) return misconfigured(config.error);
     const prompt = await readPrompt(request);
-    if (prompt === null) return respond({ error: "Send a message." }, { status: 400 });
+    if (prompt === null) return badRequest();
     return replyFrom(createCoach(config.config), prompt);
   };
 }
 
 function methodNotAllowed(): Response {
   return respond({ error: "Use POST." }, { status: 405, headers: { Allow: "POST" } });
+}
+
+function misconfigured(error: string): Response {
+  return respond({ error }, { status: 500 });
+}
+
+function badRequest(): Response {
+  return respond({ error: "Send a message." }, { status: 400 });
 }
 
 async function readPrompt(request: Request): Promise<Prompt | null> {
@@ -39,8 +47,12 @@ async function replyFrom(coach: Coach, prompt: Prompt): Promise<Response> {
   try {
     return respond({ reply: await coach.reply(prompt) });
   } catch {
-    return respond({ error: "The coach is unavailable. Try again." }, { status: 502 });
+    return coachUnavailable();
   }
+}
+
+function coachUnavailable(): Response {
+  return respond({ error: "The coach is unavailable. Try again." }, { status: 502 });
 }
 
 function respond(body: ChatResponseBody, init?: ResponseInit): Response {
