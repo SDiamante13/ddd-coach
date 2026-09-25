@@ -3,7 +3,7 @@ import type { ChatClient } from "../openRouterCoach.ts";
 import { verifiedConversationOf } from "../test/conversations.ts";
 import { FIXTURE_NAMES, loadFixture } from "./fixtures.ts";
 import { measure, repeat, type Measured } from "./measure.ts";
-import { failedHardChecks, softScores, type Fixture } from "./replyChecks.ts";
+import { scoreReply, type Fixture } from "./replyChecks.ts";
 import { shipBar, type ScoredRun } from "./shipBar.ts";
 
 export type EvalRun = Measured & ScoredRun;
@@ -19,6 +19,5 @@ export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: n
 
 async function scoredRun(config: CoachConfig, chat: ChatClient, name: string, fixture: Fixture, index: number): Promise<EvalRun> {
   const measured = await measure(config, chat, `${name} ${index}`, verifiedConversationOf(fixture.thread.trim()));
-  const hardFailures = failedHardChecks(measured.reply, measured.finishReason, fixture);
-  return { ...measured, fixture: name, hardFailures, soft: softScores(measured.reply, fixture) };
+  return { ...measured, fixture: name, ...scoreReply(measured.reply, measured.finishReason, fixture) };
 }

@@ -81,6 +81,12 @@ export function failedHardChecks(reply: string, finishReason: string | null, fix
     .map(([name]) => name);
 }
 
+export type ReplyScore = { hardFailures: string[]; soft: SoftScores };
+
+export function scoreReply(reply: string, finishReason: string | null, fixture: Fixture): ReplyScore {
+  return { hardFailures: failedHardChecks(reply, finishReason, fixture), soft: softScores(reply, fixture) };
+}
+
 export type SoftScores = Record<
   | "attribution"
   | "split"
