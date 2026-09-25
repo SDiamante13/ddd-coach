@@ -59,6 +59,7 @@ Slice 1b ([plan](slice-01b-plan.md)) landed in 6ea0482 without its own demo; the
 | B35 | Streaming replies | Tokens stream to the entry, so long replies don't hit sync function limits. Promote before or at 2a. |
 | B36 | Log deadline timeouts | A 504 deadline hit logs `{name:"Timeout"}` server-side; today only thrown errors are logged. |
 | B37 | Cancel provider call on 504 | The in-flight OpenRouter fetch is aborted when the deadline fires. |
+| B38 | Trim or summarise long conversations | At the slice 2 limit (50 turns / 24k chars), older turns are summarised or dropped instead of a 413 dead end until reload. |
 
 ## Development tooling candidate
 
