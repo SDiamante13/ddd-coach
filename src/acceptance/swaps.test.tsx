@@ -1,7 +1,8 @@
 import { cleanup, screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { COACH_MESSAGE_TOO_LONG, MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
+import { composerOf, formatCount, startConversation } from "../test/appDriver.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -174,5 +175,52 @@ describe("Swapping sensitive words", () => {
 
     expect(screen.getByText("Your swaps (1)")).toBeInTheDocument();
     expect(screen.getByText("ACME → Customer B")).toBeVisible();
+  });
+
+  it("replays the sent text as history, so a follow-up verifies", async () => {
+    const { user, server, send, sendAndReply } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+    await sendAndReply("Acme is late", "Ask Customer A why.", "sig-1");
+
+    await send("Acme says the carrier");
+
+    expect(server.bodyOf(1)).toEqual({
+      message: "Customer A says the carrier",
+      history: [{ prompt: "Customer A is late", reply: "Ask Customer A why.", signature: "sig-1" }],
+    });
+  });
+
+  it("retries with the sent text", async () => {
+    const { user, server, log, sendAndFail } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+    await sendAndFail("Acme is late");
+
+    await user.click(within(log()).getByRole("button", { name: "Retry" }));
+
+    expect(server.bodyOf(1)).toEqual(server.bodyOf(0));
+    expect(server.bodyOf(1)).toEqual({ message: "Customer A is late", history: [] });
+  });
+
+  it("puts the sent text back into the empty box when a message is refused", async () => {
+    const { user, server, input, log, send } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+
+    server.reply(await send("Acme is late"), 413, { error: COACH_MESSAGE_TOO_LONG });
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent(COACH_MESSAGE_TOO_LONG);
+    expect(input()).toHaveValue("Customer A is late");
+  });
+
+  it("counts the sent text against the limit, so a swap can tip a draft over", async () => {
+    const { user, input, sendButton } = await startConversation();
+    await addSwap(user, "Acme", "Customer A");
+
+    await user.click(input());
+    await user.paste(`Acme ${"M".repeat(MAX_MESSAGE_CHARS - 10)}`);
+
+    expect(within(composerOf(input())).getByRole("alert")).toHaveTextContent(
+      `1 character over the ${formatCount(MAX_MESSAGE_CHARS)} limit.`,
+    );
+    expect(sendButton()).toBeDisabled();
   });
 });
