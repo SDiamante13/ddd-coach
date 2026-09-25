@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
 import { stubFetch } from "./test/fetchStub.ts";
+import { DATA_FLOW_NOTICE } from "./ui/DataFlowNotice.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -42,6 +43,12 @@ function startConversation() {
 }
 
 describe("Connection test", () => {
+  it("tells the user on load where their messages are sent", () => {
+    renderApp();
+
+    expect(screen.getByText(DATA_FLOW_NOTICE)).toBeVisible();
+  });
+
   it("starts with the message input focused and an empty log", () => {
     const { input, log } = renderApp();
 
