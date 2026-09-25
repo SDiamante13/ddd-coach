@@ -6,6 +6,7 @@ import type {
   SendChatCompletionRequestResponse,
 } from "@openrouter/sdk/models/operations";
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
+import { field, stringField } from "../src/shared/json.ts";
 import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
 import { endOnCompleteLine } from "./replyEnding.ts";
@@ -32,10 +33,28 @@ export function createOpenRouterCoach(
 }
 
 const PAYMENT_REQUIRED = 402;
+const SPENT_BUDGET_SOURCES: readonly (string | undefined)[] = ["openrouter_key_limit", "openrouter_credits"];
 
 function asCoachError(error: unknown): never {
-  if (isPaymentRequired(error)) throw new CoachOutOfCredit();
+  if (isBudgetSpent(error)) throw new CoachOutOfCredit();
   throw error;
+}
+
+function isBudgetSpent(error: unknown): boolean {
+  return isPaymentRequired(error) && SPENT_BUDGET_SOURCES.includes(limitSourceOf(error));
+}
+
+function limitSourceOf(error: unknown): string | undefined {
+  const body = parsedOrNull(stringField(error, "body"));
+  return stringField(field(field(body, "error"), "metadata"), "limit_source");
+}
+
+function parsedOrNull(text: string | undefined): unknown {
+  try {
+    return text === undefined ? null : JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 function isPaymentRequired(error: unknown): boolean {

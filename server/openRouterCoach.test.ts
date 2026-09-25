@@ -39,9 +39,11 @@ const PROVIDER_TEXT = "Insufficient credits for key sk-or-test-key";
 type ErrorBody = { code: number; message: string; metadata?: Record<string, string> };
 
 function httpMetaOf(error: ErrorBody) {
-  const body = JSON.stringify({ error });
-  const response = new Response(body, { status: error.code });
-  return { response, request: new Request("https://openrouter.ai/api/v1/chat"), body };
+  return rawHttpMetaOf(error.code, JSON.stringify({ error }));
+}
+
+function rawHttpMetaOf(status: number, body: string) {
+  return { response: new Response(body, { status }), request: new Request("https://openrouter.ai/api/v1/chat"), body };
 }
 
 function paymentRequiredBody(limitSource: string): ErrorBody {
@@ -133,11 +135,21 @@ describe("OpenRouter coach", () => {
   it.each([
     ["a typed payment-required error", paymentRequired(paymentRequiredBody("openrouter_key_limit"))],
     ["an untyped 402", new OpenRouterDefaultError(PROVIDER_TEXT, httpMetaOf(paymentRequiredBody("openrouter_key_limit")))],
+    ["a balance that cannot cover the request", paymentRequired(paymentRequiredBody("openrouter_credits"))],
   ])("reports a spent usage budget, without the provider's text, for %s", async (_case, error) => {
     const failure = await coachOn(failingChat(error)).reply(verifiedConversationOf("Hello coach")).catch((e: unknown) => e);
 
     expect(failure).toBeInstanceOf(CoachOutOfCredit);
     expect(String((failure as Error).message)).not.toContain(PROVIDER_TEXT);
+  });
+
+  it.each([
+    ["a briefly exhausted in-flight budget", paymentRequired(paymentRequiredBody("openrouter_in_flight_budget"))],
+    ["an unknown limit source", paymentRequired(paymentRequiredBody("openrouter_new_limit"))],
+    ["no limit source", paymentRequired({ code: 402, message: PROVIDER_TEXT })],
+    ["a body that is not JSON", new OpenRouterDefaultError(PROVIDER_TEXT, rawHttpMetaOf(402, "<html>Payment Required</html>"))],
+  ])("passes a 402 for %s through as a failure worth retrying", async (_case, error) => {
+    await expect(coachOn(failingChat(error)).reply(verifiedConversationOf("Hello coach"))).rejects.toBe(error);
   });
 
   it("passes any other provider failure through unchanged", async () => {
