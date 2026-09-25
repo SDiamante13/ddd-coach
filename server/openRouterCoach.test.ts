@@ -3,8 +3,7 @@ import type { ChatContentItems, ChatResult } from "@openrouter/sdk/models";
 import type { SendChatCompletionRequestRequest } from "@openrouter/sdk/models/operations";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
 import { describe, expect, it } from "vitest";
-import type { Conversation } from "../src/domain/conversation.ts";
-import type { Prompt } from "../src/domain/exchange.ts";
+import { conversationOf } from "../src/test/conversations.ts";
 import { createOpenRouterCoach } from "./openRouterCoach.ts";
 
 const config = { apiKey: "sk-or-test-key", model: "test/model" };
@@ -29,20 +28,13 @@ function fakeChat(content: string | ChatContentItems[] | null) {
   return { chat: { send }, requests };
 }
 
-function conversationOf(prompt: string): Conversation {
-  return { history: [], prompt: prompt as Prompt };
-}
-
 describe("OpenRouter coach", () => {
   it("sends the history as alternating turns before the prompt, capped and without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
-    const conversation: Conversation = {
-      history: [
-        { prompt: "A" as Prompt, reply: "R1" },
-        { prompt: "B" as Prompt, reply: "R2" },
-      ],
-      prompt: "C" as Prompt,
-    };
+    const conversation = conversationOf("C", [
+      { prompt: "A", reply: "R1" },
+      { prompt: "B", reply: "R2" },
+    ]);
 
     const reply = await createOpenRouterCoach(config, chat).reply(conversation);
 

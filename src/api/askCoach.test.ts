@@ -1,10 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { Conversation } from "../domain/conversation.ts";
-import type { Prompt } from "../domain/exchange.ts";
+import { conversationOf } from "../test/conversations.ts";
 import { jsonResponse } from "../test/fetchStub.ts";
 import { askCoach } from "./askCoach.ts";
 
-const conversation: Conversation = { history: [], prompt: "Hello coach" as Prompt };
+const conversation = conversationOf("Hello coach");
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -17,10 +16,7 @@ function respondWith(response: Response | Promise<Response>) {
 describe("askCoach", () => {
   it("posts the message with its history and returns the reply", async () => {
     const fetchMock = respondWith(jsonResponse(200, { reply: "Hi there" }));
-    const followUp: Conversation = {
-      history: [{ prompt: "A" as Prompt, reply: "R1" }],
-      prompt: "B" as Prompt,
-    };
+    const followUp = conversationOf("B", [{ prompt: "A", reply: "R1" }]);
 
     expect(await askCoach(followUp)).toEqual({ ok: true, reply: "Hi there" });
     expect(fetchMock).toHaveBeenCalledWith("/api/chat", expect.objectContaining({

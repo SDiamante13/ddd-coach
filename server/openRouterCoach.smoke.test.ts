@@ -1,15 +1,10 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import type { Conversation } from "../src/domain/conversation.ts";
-import type { Prompt } from "../src/domain/exchange.ts";
+import { conversationOf } from "../src/test/conversations.ts";
 import { readConfig } from "./config.ts";
 import { createOpenRouterCoach } from "./openRouterCoach.ts";
 
 const config = readConfig(process.env);
-
-function conversationOf(prompt: string): Conversation {
-  return { history: [], prompt: prompt as Prompt };
-}
 
 describe.runIf(config.ok)("OpenRouter coach against the real provider", () => {
   it("returns a non-empty reply", async () => {
@@ -22,10 +17,9 @@ describe.runIf(config.ok)("OpenRouter coach against the real provider", () => {
 
   it("uses a detail from an earlier turn", async () => {
     if (!config.ok) throw new Error(config.error);
-    const conversation: Conversation = {
-      history: [{ prompt: "Remember the code word: PELICAN. Reply only OK." as Prompt, reply: "OK" }],
-      prompt: "What was the code word? Answer in one word." as Prompt,
-    };
+    const conversation = conversationOf("What was the code word? Answer in one word.", [
+      { prompt: "Remember the code word: PELICAN. Reply only OK.", reply: "OK" },
+    ]);
 
     const reply = await createOpenRouterCoach(config.config).reply(conversation);
 
