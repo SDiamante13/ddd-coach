@@ -523,7 +523,8 @@ describe("Connection test", () => {
     await sendAndReply("A", "R1", "sig-A");
 
     await user.click(screen.getByRole("button", { name: "New conversation" }));
-    expect(screen.getByRole("button", { name: "Keep" })).toHaveFocus();
+    const question = screen.getByRole("group", { name: "Clear this conversation?" });
+    expect(within(question).getByRole("button", { name: "Keep" })).toHaveFocus();
     await user.keyboard("{Enter}");
 
     expect(within(log()).getAllByRole("listitem")).toHaveLength(1);

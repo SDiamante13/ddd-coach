@@ -1,8 +1,9 @@
-import { useState, type MouseEvent } from "react";
+import { useId, useState, type MouseEvent } from "react";
 
 type Step = "offered" | "confirming" | "kept";
 
 export function NewConversation({ busy, onClear }: { busy: boolean; onClear: () => void }) {
+  const questionId = useId();
   const [step, setStep] = useState<Step>("offered");
 
   function clear(event: MouseEvent<HTMLButtonElement>) {
@@ -19,8 +20,8 @@ export function NewConversation({ busy, onClear }: { busy: boolean; onClear: () 
   }
 
   return (
-    <span className="confirm">
-      Clear this conversation?
+    <span className="confirm" role="group" aria-labelledby={questionId}>
+      <span id={questionId}>Clear this conversation?</span>
       <button type="button" disabled={busy} onClick={clear}>
         Clear
       </button>
