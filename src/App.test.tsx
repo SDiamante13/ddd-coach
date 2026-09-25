@@ -103,6 +103,18 @@ describe("Connection test", () => {
     expect(server.bodyOf(0)).toEqual({ message: thread, history: [] });
   });
 
+  it("adds a line with Shift+Enter and sends both lines with Enter", async () => {
+    const server = stubFetch();
+    const { user, input } = renderApp();
+
+    await user.type(input(), "A{Shift>}{Enter}{/Shift}B");
+    expect(server.fetchMock).not.toHaveBeenCalled();
+    expect(input()).toHaveValue("A\nB");
+
+    await user.keyboard("{Enter}");
+    expect(server.bodyOf(0)).toEqual({ message: "A\nB", history: [] });
+  });
+
   it("sends with the Send button, clears the input and disables Send while pending", async () => {
     stubFetch();
     const { user, input, log, sendButton } = renderApp();
