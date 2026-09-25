@@ -1,0 +1,586 @@
+#booking-split (export, sanitized: customers are Customer A to F, rates removed)
+
+Monday
+
+Jordan Lee  8:30 AM
+morning. renamed this channel from #booking-v2 to #booking-split since that's what we keep talking about in here
+
+Ben Carter  8:34 AM
+nice
+
+Aisha Khan  8:41 AM
+is the regression suite on the new runners yet or still the old ones
+
+Ben Carter  8:43 AM
+new ones since friday. should be about 40% faster
+
+Aisha Khan  8:44 AM
+it was 38 minutes this morning 😐
+
+Ben Carter  8:46 AM
+that's with the cold cache, second run should be better
+
+Sam Kowalski  8:52 AM
+dependabot opened 14 PRs over the weekend, I'll batch them this afternoon
+
+Jordan Lee  9:05 AM
+standup notes: Ben on the timezone fix, Sam on dependabot + booking service handover, Aisha on the release checklist, Priya starting the booking-split RFC
+
+Priya Raman  9:06 AM
+👍 I'll start a thread tomorrow once I've read the old docs
+
+Ben Carter  9:40 AM
+anyone know why the staging portal logs you out every time you switch tabs
+
+Sam Kowalski  9:42 AM
+session cookie is still on the old domain. ticket's in the backlog somewhere
+
+Ben Carter  9:43 AM
+cool cool
+
+Aisha Khan  10:15 AM
+Customer C reported a pickup window showing 3am yesterday. that's the timezone bug right?
+
+Ben Carter  10:17 AM
+yep. fix goes out with 4.18
+
+Jordan Lee  10:30 AM
+reminder, all-hands at 3, there's cake for Rachel's last day
+
+Aisha Khan  10:31 AM
+🍰
+
+Sam Kowalski  11:02 AM
+merged 9 of the 14 dependabot PRs. the other 5 need the node bump first
+
+Ben Carter  11:05 AM
+I can do the node bump tomorrow
+
+Jordan Lee  11:40 AM
+does anyone have the link to the old booking lifecycle doc from 2021? Priya's asking
+
+Sam Kowalski  11:44 AM
+it's in the old confluence space, I think it was archived. it only had the happy path anyway
+
+Priya Raman  11:46 AM
+found it. it has six statuses, the enum has 23. going to ignore it
+
+Aisha Khan  1:20 PM
+release checklist is updated, added a step to check portal refs after any booking migration
+
+Ben Carter  1:35 PM
+is the coffee machine on 3 fixed
+
+Jordan Lee  1:36 PM
+no. use the one on 2
+
+Ben Carter  1:36 PM
+😩
+
+Sam Kowalski  2:10 PM
+fyi the booking service on-call rotation moves to our team from next week. I'll put the schedule in the channel topic
+
+Aisha Khan  2:12 PM
+who's first
+
+Sam Kowalski  2:12 PM
+me, then Ben, then Priya
+
+Priya Raman  2:13 PM
+noted
+
+Jordan Lee  3:55 PM
+thanks for coming to Rachel's send-off everyone. she says the carrier desk runbook is in the shared drive if anyone needs it
+
+Luis Ortega  4:02 PM
+I have it, it's mostly still right
+
+Ben Carter  4:30 PM
+CI is green again after the runner change, second run was 21 min
+
+Aisha Khan  4:31 PM
+much better
+
+Ben Carter  5:10 PM
+heading out, night all
+
+Tuesday
+
+Priya Raman  9:02 AM
+morning all. starting the booking-split RFC this week and I want to stop guessing. quick one to kick it off: when does a booking actually exist? I keep reading three different answers in the code comments
+
+Jordan Lee  9:03 AM
+following
+
+Aisha Khan  9:03 AM
++1 following, this bites QA every release
+
+Dana Whitfield  9:07 AM
+from the ops desk side it's simple. the customer hits submit on the portal, that's a booking. we start working it right then: we look for a carrier, we check the lane, we promise a pickup window. if the customer calls ten minutes later I pull it up by the booking ref, so it exists
+
+Ben Carter  9:08 AM
+anyone else getting the VPN prompt every 20 min today or just me
+
+Aisha Khan  9:08 AM
+just you i think
+
+Tom Brennan  9:12 AM
+I'll give the finance answer since I close the month on these. For us a booking is only real once it's invoiceable. Submitted-but-not-tendered stuff isn't revenue, it isn't a receivable, and it shouldn't be in the booking count I send to the CFO. Half of what gets submitted on a Friday is gone by Monday.
+
+Dana Whitfield  9:14 AM
+sure but that's revenue, not bookings. my team works it the second it's submitted
+
+Tom Brennan  9:15 AM
+And that's how we ended up with two double-invoice incidents this year. The invoice job picks up anything with a booking row. If a booking exists on submit, it gets billed on submit.
+
+Priya Raman  9:16 AM
+ok so that's the first split. ops: exists on submit. finance: exists once invoiceable. writing that down
+
+Jordan Lee  9:17 AM
+can we keep this thread to the definition stuff? I'll start a separate one for the invoice incidents
+
+Tom Brennan  9:18 AM
+Fine, but they're the same problem.
+
+Maya Okafor  9:31 AM
+catching up. I run night dispatch so I'm usually the one fixing these at 2am. the definition question that actually hurts us isn't create, it's rebook
+
+Priya Raman  9:32 AM
+say more?
+
+Maya Okafor  9:36 AM
+customer changes the pickup date, or the carrier drops the load, or the lane changes because the consignee moved the delivery to the other DC. every one of those, we rebook. click Rebook, the status goes to REBOOKED, a new ref gets issued. that's how night dispatch has done it for two years
+
+Dana Whitfield  9:39 AM
+that's not how I trained the desk though. a date change with the same carrier is AMENDED. same booking, same ref, the customer never sees a new number. you only rebook when the carrier changes. my 2019 sheet has it, row 12
+
+Maya Okafor  9:41 AM
+the 2019 sheet also says to fax the carrier, Dana 🙂 we rebook everything now because Amend doesn't push the new date to the carrier portal. REBOOKED is the only thing that reliably reaches them
+
+Dana Whitfield  9:43 AM
+then the button is broken, not the definition. an amended booking is still the same booking
+
+Luis Ortega  9:47 AM
+carrier desk here. from our side it matters a lot which one you pick. when you rebook, the carrier sees the original load cancelled and a new tender. if the truck was already dispatched they file a TONU against the original load. that's a real charge
+
+Priya Raman  9:48 AM
+TONU = truck ordered not used, right?
+
+Luis Ortega  9:48 AM
+yes. load 48213 last month is the textbook case. date moved one day, same carrier, night shift rebooked it, carrier billed a TONU on the original and then hauled the new one. we ate the TONU
+
+Maya Okafor  9:52 AM
+because Amend wouldn't have reached them in time! the date change came in at 1am
+
+Luis Ortega  9:53 AM
+not blaming anyone, just saying rebook = cancel + new tender for the carrier. amend = same tender, new date. the carrier contract treats them differently
+
+Tom Brennan  9:55 AM
+From finance's point of view a rebook is a new booking. It gets its own invoice, and the old one is voided. If the customer calls and says "it's the same shipment", that's nice, but it's two invoice lines and a void.
+
+Dana Whitfield  9:57 AM
+and that is exactly why customers call us confused. they moved a date and now their paperwork has two numbers
+
+Jordan Lee  10:02 AM
+lunch order going in at 11:30, reply in the lunch thread not here pls
+
+Ben Carter  10:04 AM
+🌮
+
+Priya Raman  10:10 AM
+ok so for rebook I now have: Dana, a date change with the same carrier is AMENDED and stays the same booking. Maya, everything gets REBOOKED. Tom, a rebook is a new booking with a new invoice. Luis, rebook means cancel + new tender, and it can trigger a TONU. does anyone know what the code actually does?
+
+Sam Kowalski  10:22 AM
+I own the booking service now, so I went and read it. pasting my notes from the code, not the code itself:
+
+Sam Kowalski  10:23 AM
+Booking#rebook!:
+- sets the old booking row's status to REBOOKED
+- inserts a NEW booking row with a new ref, rebooked_from_id pointing at the old row
+- copies lane, dates, customer, commodity; the carrier assignment is cleared
+- the invoice job treats the new row as a separate billable booking
+Booking#amend!:
+- updates the date fields in place, status AMENDED, same row, same ref
+- does not call the carrier portal sync (that's the bug Maya means)
+the customer portal shows the ref of the ORIGINAL booking for both, it follows rebooked_from_id back
+
+Tom Brennan  10:25 AM
+So the database agrees with finance. A rebook is a new booking.
+
+Dana Whitfield  10:26 AM
+and the screen agrees with ops. the customer sees one booking
+
+Sam Kowalski  10:27 AM
+yeah, it's both, depending on where you look. which is kind of the problem
+
+Aisha Khan  10:29 AM
+this explains the flaky test where the portal ref doesn't match the invoice ref. filing it
+
+Priya Raman  10:31 AM
+this is gold, thanks Sam. so REBOOKED in the database always means a new row, even when ops would call it the same booking
+
+Maya Okafor  10:34 AM
+fwiw if Amend pushed to the carrier portal I'd use it for same-carrier date changes. I don't care about the word, I care that the carrier gets the new date before the truck rolls
+
+Dana Whitfield  10:36 AM
+that's fair. then the rule is still: same carrier, date change, AMENDED. we just need the button to work
+
+Luis Ortega  10:38 AM
+and lane changes? because a lane change with the same carrier is still a new tender for them, the rate is per lane
+
+Dana Whitfield  10:41 AM
+a lane change is always a new booking. different lane, different rate, different booking. that part of my sheet I'd defend
+
+Maya Okafor  10:43 AM
+we agree on that one at least
+
+Tom Brennan  10:45 AM
+For the record, I don't care what ops calls it as long as a thing isn't invoiced twice. Invoiceable is the line for us.
+
+Ben Carter  10:51 AM
+heads up, deploying booking-service 4.18 to staging in 10. nothing in it touches rebook, it's the timezone fix for pickup windows
+
+Aisha Khan  10:52 AM
+👍 I'll smoke it after
+
+Jordan Lee  10:55 AM
+reminder the sprint review got moved to thursday 2pm, calendar invite updated
+
+Ben Carter  11:06 AM
+staging is up. 4.18
+
+Aisha Khan  11:14 AM
+smoke passed on staging except the known flaky portal ref test
+
+Ben Carter  11:15 AM
+cool, prod after lunch then
+
+Priya Raman  11:20 AM
+one more question while people are here. when Tom says "booking count" for the CFO, which rows is that counting today? all rows, or not REBOOKED, or only invoiced?
+
+Sam Kowalski  11:26 AM
+the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one
+
+Tom Brennan  11:28 AM
+Which is why I don't use the dashboard. I count invoiceable bookings from the ledger export.
+
+Dana Whitfield  11:30 AM
+and ops uses the dashboard every morning for the shift plan, so our "bookings today" number is higher than finance's every single day
+
+Jordan Lee  11:31 AM
+ok that explains the monday meeting argument
+
+Maya Okafor  11:33 AM
+we just subtract the rebooks in our heads at night. nobody wrote that down anywhere
+
+Priya Raman  11:35 AM
+adding "booking count" to my list. same word, three numbers
+
+Ben Carter  11:48 AM
+anyone want to split a pizza, the lunch thread is dead
+
+Aisha Khan  11:49 AM
+in
+
+Jordan Lee  11:49 AM
+in, no olives
+
+Ben Carter  11:50 AM
+ok ordering. olives on half
+
+Luis Ortega  12:40 PM
+back from the carrier call. two of our bigger carriers asked us to stop rebooking date-only changes. they said they'll waive the TONU if we amend and call them, but they won't waive it on a cancel + new tender
+
+Maya Okafor  12:44 PM
+so if Amend reached the carrier portal we'd save the TONU and the phone call
+
+Luis Ortega  12:45 PM
+right. right now night shift has to call them anyway, because the portal doesn't show the amended date
+
+Dana Whitfield  12:47 PM
+which is what I've been saying since march. amend is the right action, the sync is the bug
+
+Sam Kowalski  12:52 PM
+I can look at wiring amend! to the portal sync. rough guess a couple of days, but I'd want someone to tell me the rule first. is it "same carrier + date change only"? what about pickup window changes on the same day?
+
+Dana Whitfield  12:55 PM
+same carrier, same lane, date or window change: AMENDED. carrier change or lane change: new booking
+
+Maya Okafor  12:58 PM
+and when the carrier drops the load? that's a carrier change but it's not us changing anything. night shift calls that a rebook too
+
+Luis Ortega  1:01 PM
+carrier dropping it is a carrier-side cancel. no TONU for us in that case, they owe us the reliability hit on the scorecard
+
+Tom Brennan  1:04 PM
+Whatever you call it, if the first carrier never picked it up, the first booking was never invoiceable, so for finance there's only one booking.
+
+Priya Raman  1:06 PM
+wait, so a carrier drop is a new booking for the database, a rebook for night dispatch, and still one booking for finance?
+
+Tom Brennan  1:07 PM
+Yes.
+
+Sam Kowalski  1:08 PM
+yes, the code does rebook! for carrier drops too. new row, old row REBOOKED
+
+Priya Raman  1:10 PM
+😅 ok
+
+Ben Carter  1:30 PM
+prod deploy of 4.18 starting
+
+Ben Carter  1:42 PM
+4.18 is live. pickup windows now show in the shipper's timezone. shout if anything looks off
+
+Aisha Khan  1:44 PM
+checked three bookings in prod, windows look right
+
+Jordan Lee  1:50 PM
+thanks both
+
+Priya Raman  2:05 PM
+ok, trying to pin the sequence down so I get the order right in the RFC. correct me:
+1. customer submits on the portal
+2. ops works it (finds a carrier, sets the window)
+3. we tender to the carrier
+4. carrier accepts
+5. pickup happens
+6. it becomes invoiceable at pickup?
+
+Tom Brennan  2:09 PM
+Invoiceable at delivery, not pickup. Proof of delivery closes it. Pickup alone isn't enough, loads get refused at the dock.
+
+Luis Ortega  2:10 PM
+from carrier side the accept is step 4, yes. and a TONU can only happen between 4 and 5
+
+Dana Whitfield  2:12 PM
+step 2 happens before 3 but sometimes the customer changes the date between 3 and 4, that's where most amends come from
+
+Maya Okafor  2:14 PM
+at night it's mostly between 4 and 5. truck already dispatched, customer calls, date moves
+
+Priya Raman  2:16 PM
+thanks. so invoiceable = proof of delivery. updating
+
+Aisha Khan  2:20 PM
+random but the staging DB still has the old status enum without AMENDED in the lookup table, if anyone tests amend on staging it'll show a blank status
+
+Sam Kowalski  2:22 PM
+ugh. I'll add the migration. thanks Aisha
+
+Ben Carter  2:31 PM
+does anyone know who owns the parking validation stickers now that Rachel left
+
+Jordan Lee  2:32 PM
+front desk has them
+
+Ben Carter  2:32 PM
+ty
+
+Jordan Lee  2:40 PM
+Priya, is the RFC going to propose a fix for the dashboard count or just the definitions?
+
+Priya Raman  2:43 PM
+definitions first. if we don't agree on what a booking is, any fix for the count is just picking a side
+
+Jordan Lee  2:44 PM
+fair
+
+Tom Brennan  2:50 PM
+If it helps: finance is fine with ops having its own word for "something we're working on". We just need "booking" in the count to mean invoiceable.
+
+Dana Whitfield  2:53 PM
+ops has used "booking" for the customer's request for fifteen years. every SOP says booking. I'd rather finance picked a new word
+
+Maya Okafor  2:54 PM
+not getting into that one 🙂
+
+Luis Ortega  2:55 PM
+carriers call it a load or a tender, never a booking, if that helps anyone
+
+Priya Raman  2:56 PM
+it helps, it means there's a third word for the same thing
+
+Aisha Khan  3:10 PM
+filed QA-2291 for the portal ref vs invoice ref mismatch, linked it here
+
+Sam Kowalski  3:12 PM
+thanks, that one is the rebooked_from_id thing, I'll take it
+
+Jordan Lee  3:30 PM
+heads up I'm out friday, Ben is covering standup
+
+Ben Carter  3:31 PM
+👍
+
+Maya Okafor  3:45 PM
+one more thing for Priya's list since she's collecting. at night we also use "hold" for a booking that's waiting on the customer, and finance uses "hold" for a credit hold on the account. those get mixed up in the handover notes every week
+
+Tom Brennan  3:48 PM
+Credit hold is the only hold. If a customer is on credit hold, nothing ships, full stop.
+
+Maya Okafor  3:49 PM
+see, that's the mixup
+
+Dana Whitfield  3:50 PM
+day desk says "waiting on customer", not hold. night shift started saying hold
+
+Priya Raman  3:52 PM
+noted, "hold" goes on the list too
+
+Ben Carter  4:05 PM
+someone left a laptop charger in the big meeting room, it's at the front desk
+
+Aisha Khan  4:06 PM
+mine, thanks!
+
+Sam Kowalski  4:20 PM
+Priya, small thing for the RFC: the status column has 23 values now. REBOOKED and AMENDED are two of them. I can dump the list if useful
+
+Priya Raman  4:21 PM
+yes please, tomorrow is fine
+
+Sam Kowalski  4:22 PM
+will do
+
+Jordan Lee  4:40 PM
+calling it a day. good thread everyone, first time I've understood the rebook fight
+
+Dana Whitfield  4:42 PM
+it's not a fight, it's two correct answers to two different questions 🙂
+
+Maya Okafor  4:44 PM
+and one broken button
+
+Luis Ortega  4:45 PM
+and one TONU we paid for
+
+Tom Brennan  4:47 PM
+And two invoices.
+
+Priya Raman  4:50 PM
+ha. thanks all, I'll post the draft glossary here before I bring it to Dana
+
+Wednesday
+
+Ben Carter  8:45 AM
+node bump PR is up, the remaining dependabot PRs rebase cleanly on it
+
+Sam Kowalski  8:50 AM
+reviewing
+
+Aisha Khan  9:02 AM
+morning. the flaky portal ref test failed twice overnight, QA-2291 is linked on both runs
+
+Jordan Lee  9:10 AM
+standup notes: Ben node bump, Sam amend sync spike + status dump, Aisha release checklist sign-off, Priya drafting the glossary
+
+Sam Kowalski  9:40 AM
+status dump as promised, only listing what came up yesterday, the rest are in the RFC appendix:
+SUBMITTED, TENDERED, CARRIER_ACK, AMENDED, REBOOKED, PICKED_UP, DELIVERED, CANCELLED
+
+Priya Raman  9:42 AM
+thanks. CARRIER_ACK is the carrier accept, right?
+
+Luis Ortega  9:44 AM
+yes, when the carrier accepts the tender in their portal
+
+Dana Whitfield  9:45 AM
+ops never looks at CARRIER_ACK fwiw. we look at whether a truck is assigned
+
+Ben Carter  10:02 AM
+node bump merged. rebasing the rest now
+
+Aisha Khan  10:30 AM
+staging migration for AMENDED is in, blank status is gone
+
+Sam Kowalski  10:31 AM
+nice, thanks for catching it
+
+Jordan Lee  11:00 AM
+lunch thread is up. it's thursday's menu by mistake, ignore the fish
+
+Ben Carter  11:02 AM
+🐟
+
+Sam Kowalski  11:45 AM
+spike notes on amend + portal sync: doable. amend! just needs to enqueue the same sync job rebook! does. I won't touch the rule until Priya's RFC says what it is
+
+Maya Okafor  11:52 AM
+if that ships, night shift will switch to amend for same-carrier date changes. happy to say that in the RFC review
+
+Luis Ortega  11:55 AM
+carriers will like that
+
+Aisha Khan  1:15 PM
+release checklist signed off for 4.19
+
+Ben Carter  1:20 PM
+all dependabot PRs merged, we're down to zero open
+
+Jordan Lee  1:22 PM
+🎉
+
+Ben Carter  2:40 PM
+is anyone else's calendar showing the sprint review twice
+
+Jordan Lee  2:41 PM
+my fault, deleting the old one
+
+Aisha Khan  3:30 PM
+heads up I'm at the dentist tomorrow morning, back by 11
+
+Jordan Lee  3:31 PM
+np
+
+Ben Carter  3:50 PM
+the big meeting room screen is broken again, use the small one for the 4pm
+
+Sam Kowalski  3:52 PM
+it's the HDMI cable, there's a spare in the drawer
+
+Customer desk bot  4:00 PM
+Daily digest: 212 new portal submissions, 9 date-change requests, 3 carrier drops, 1 credit hold review
+
+Jordan Lee  4:05 PM
+the digest bot is back, nice. it was off for the migration
+
+Aisha Khan  4:10 PM
+can the digest go to #ops-digest instead, it's noisy in here
+
+Jordan Lee  4:11 PM
+I'll move it tomorrow
+
+Priya Raman  4:30 PM
+glossary draft is about half done. I'll bring the rebook rows to Dana tomorrow before anything goes in the RFC
+
+Dana Whitfield  4:34 PM
+send me the questions in slack first, yes/no if you can
+
+Priya Raman  4:35 PM
+will do
+
+Ben Carter  4:50 PM
+closing the office windows on 3, it's going to rain
+
+Aisha Khan  4:51 PM
+thank you
+
+Sam Kowalski  5:05 PM
+on-call handover doc is in the channel topic now. first shift is mine from monday
+
+Ben Carter  5:06 PM
+👍
+
+Jordan Lee  5:15 PM
+night all. thanks for keeping this thread useful
+
+Maya Okafor  11:40 PM
+night shift here. two date changes on Customer B tonight, same carrier both times. used Rebook because Amend still doesn't reach the carrier portal. flagging it so nobody is surprised by the new refs in the morning
+
+Luis Ortega  11:52 PM
+saw them come through. called the carrier on the first one, they had not dispatched yet so no TONU
+
+Maya Okafor  11:55 PM
+thanks. second one was already rolling, might be one TONU on that load. I'll put both in the handover notes for the day desk first thing.
