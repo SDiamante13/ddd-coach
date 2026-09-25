@@ -104,7 +104,7 @@ describe("Sending a message", () => {
   it.each([
     ["whitespace-only", "   {Enter}"],
     ["newline-only", "{Shift>}{Enter}{Enter}{/Shift}{Enter}"],
-  ])("ignores a %s message", async (_kind, keys) => {
+  ])("sends nothing for a %s message and clears it", async (_kind, keys) => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
@@ -112,6 +112,7 @@ describe("Sending a message", () => {
 
     expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
     expect(server.fetchMock).not.toHaveBeenCalled();
+    expect(input()).toHaveValue("");
   });
 
   it("ignores another submit while a reply is pending and keeps the draft", async () => {

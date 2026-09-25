@@ -25,9 +25,9 @@ export function MessageForm({ busy, draft, onDraftChange, onSend, children, boxR
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const prompt = parsePrompt(draft);
-    if (busy || over || prompt === null) return;
+    if (busy || over) return;
     onDraftChange("");
-    onSend(prompt);
+    if (prompt !== null) onSend(prompt);
   }
 
   return (
