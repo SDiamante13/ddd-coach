@@ -34,5 +34,5 @@ Video: [slice-42.mp4](slice-42.mp4), 27.5 s, 1280×578, h264 yuv420p. Send → p
 
 ## Findings
 
-1. **Netlify badge covers part of Send on phone** ([slice-42-phone.png](slice-42-phone.png)). The fixed "Powered by Netlify" badge overlaps the bottom of the Send button at 390 px. Same badge as slice 2a fresh-eyes 4; turning it off in site settings fixes both.
+1. **Netlify badge covers part of Send on phone** ([slice-42-phone.png](slice-42-phone.png)). The fixed "Powered by Netlify" badge overlaps the bottom of the Send button at 390 px. Same badge as slice 2a fresh-eyes 4; turning it off in site settings fixes both. **Resolved by #52:** `built_with_badge_enabled: false` set via `netlify api updateSite` (no redeploy).
 2. **The sticky composer can cover Retry.** In a 1280×577 viewport, scrolling Retry into view left it under the docked composer, and an automated click landed on the composer. Scrolling to the bottom first fixed it. A user who scrolls up far enough to put Retry at the viewport bottom hits the same overlap.
