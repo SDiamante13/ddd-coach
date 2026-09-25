@@ -17,7 +17,7 @@ export function App() {
 }
 
 function AccessView() {
-  const { access, unlock, recheck } = useAccess();
+  const { access, justUnlocked, unlock, recheck } = useAccess();
   switch (access) {
     case "checking":
       return <p role="status">Checking access…</p>;
@@ -26,6 +26,6 @@ function AccessView() {
     case "locked":
       return <AccessGate onUnlock={unlock} />;
     case "open":
-      return <ConnectionTest unlock={unlock} />;
+      return <ConnectionTest unlock={unlock} justUnlocked={justUnlocked} />;
   }
 }

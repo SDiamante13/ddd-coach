@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { isBusy } from "../domain/exchange.ts";
+import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { AccessGate } from "./AccessGate.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
 import { conversationText } from "./conversationText.ts";
@@ -12,7 +13,9 @@ import { useAccessRecovery } from "./useAccessRecovery.ts";
 import { useClearConfirmation } from "./useClearConfirmation.ts";
 import { useExchanges } from "./useExchanges.ts";
 
-export function ConnectionTest({ unlock }: { unlock: Unlock }) {
+type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
+
+export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const [draft, setDraft] = useState("");
   const boxRef = useRef<HTMLTextAreaElement>(null);
   const { accessLost, loseAccess, unlockAgain } = useAccessRecovery(unlock, () => boxRef.current?.focus());
@@ -43,6 +46,11 @@ export function ConnectionTest({ unlock }: { unlock: Unlock }) {
         ))}
       </ol>
       {accessLost && <AccessGate onUnlock={unlockAgain} />}
+      {justUnlocked && (
+        <p role="status" className="unlocked">
+          {UNLOCKED_FOR}
+        </p>
+      )}
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} boxRef={boxRef}>
         <ComposerActions
           started={exchanges.length > 0}

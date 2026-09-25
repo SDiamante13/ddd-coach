@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TOO_MANY_TRIES } from "../api/access.ts";
-import { ACCESS_REQUIRED, ACCESS_WRONG_PASSWORD } from "../shared/accessContract.ts";
+import { ACCESS_REQUIRED, ACCESS_WRONG_PASSWORD, UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { App } from "../App.tsx";
 import { openGate, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
@@ -34,6 +34,7 @@ describe("Access gate", () => {
     server.reply(0, 401, { error: ACCESS_WRONG_PASSWORD });
 
     expect(await screen.findByRole("alert")).toHaveTextContent(ACCESS_WRONG_PASSWORD);
+    expect(ACCESS_WRONG_PASSWORD).not.toMatch(/slide/i);
     expect(field()).toHaveValue("nope");
     expect(field()).toHaveAttribute("aria-invalid", "true");
     expect(field()).toHaveAccessibleDescription(ACCESS_WRONG_PASSWORD);
@@ -56,6 +57,22 @@ describe("Access gate", () => {
 
     expect(await screen.findByRole("textbox", { name: "Message" })).toHaveFocus();
     expect(screen.queryByLabelText("Conference password")).not.toBeInTheDocument();
+  });
+
+  it("says the browser stays unlocked for 90 days after the right password", async () => {
+    const { user, server, field } = await openGate();
+
+    await user.type(field(), "local-coach-dev{Enter}");
+    server.replyNoContent(0);
+
+    expect(await screen.findByRole("status")).toHaveTextContent(UNLOCKED_FOR);
+    expect(UNLOCKED_FOR).toBe("This browser stays unlocked for 90 days.");
+  });
+
+  it("doesn't mention the 90 days when the browser is already unlocked on load", async () => {
+    await startConversation();
+
+    expect(screen.queryByText(UNLOCKED_FOR)).not.toBeInTheDocument();
   });
 
   it("asks to wait a minute when the network has made too many tries", async () => {
@@ -90,6 +107,7 @@ describe("Access gate", () => {
     server.replyNoContent(1);
 
     await waitFor(() => expect(screen.queryByLabelText("Conference password")).not.toBeInTheDocument());
+    expect(screen.getByText(UNLOCKED_FOR)).toHaveAttribute("role", "status");
     expect(input()).toHaveFocus();
     expect(input()).toHaveValue("Hello coach");
     expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
