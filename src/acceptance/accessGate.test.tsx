@@ -1,8 +1,12 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TOO_MANY_TRIES } from "../api/access.ts";
 import { ACCESS_REQUIRED, ACCESS_WRONG_PASSWORD } from "../shared/accessContract.ts";
+import { App } from "../App.tsx";
 import { openGate, startConversation } from "../test/appDriver.tsx";
+import { stubFetch } from "../test/fetchStub.ts";
+import { ACCESS_UNREACHABLE } from "../ui/AccessUnreachable.tsx";
 import { DATA_FLOW_NOTICE } from "../ui/DataFlowNotice.tsx";
 import { PURPOSE_LINE } from "../ui/PurposeLine.tsx";
 
@@ -89,5 +93,17 @@ describe("Access gate", () => {
     expect(input()).toHaveFocus();
     expect(input()).toHaveValue("Hello coach");
     expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
+  });
+
+  it("says it can't reach the coach when the access check fails offline, and tries again", async () => {
+    stubFetch({ session: ["offline", 204] });
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(ACCESS_UNREACHABLE);
+    expect(screen.queryByLabelText("Conference password")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+
+    expect(await screen.findByRole("textbox", { name: "Message" })).toBeVisible();
   });
 });

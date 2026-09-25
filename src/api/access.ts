@@ -1,6 +1,6 @@
 import { readJson, stringField } from "../shared/json.ts";
 
-export type Access = "open" | "locked";
+export type Access = "open" | "locked" | "unreachable";
 export type UnlockResult = { ok: true } | { ok: false; error: string };
 
 export const TOO_MANY_TRIES = "Too many tries from this network. Wait a minute, then try again.";
@@ -16,7 +16,7 @@ export async function checkAccess(): Promise<Access> {
     const response = await fetch("/api/session");
     return response.status === NO_CONTENT ? "open" : "locked";
   } catch {
-    return "locked";
+    return "unreachable";
   }
 }
 

@@ -22,11 +22,16 @@ describe("checkAccess", () => {
   it.each([
     ["answers 401", () => Promise.resolve(new Response(null, { status: 401 }))],
     ["answers 500", () => Promise.resolve(new Response(null, { status: 500 }))],
-    ["throws", () => Promise.reject(new TypeError("Failed to fetch"))],
   ])("is locked when the session check %s", async (_case, respond) => {
     vi.stubGlobal("fetch", vi.fn(respond));
 
     expect(await checkAccess()).toBe("locked");
+  });
+
+  it("is unreachable when the session check cannot reach the server", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.reject(new TypeError("Failed to fetch"))));
+
+    expect(await checkAccess()).toBe("unreachable");
   });
 });
 

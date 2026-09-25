@@ -6,13 +6,15 @@ type PendingCall = {
   reject: (reason: unknown) => void;
 };
 
-type StubOptions = { session?: number };
+type SessionAnswer = number | "offline";
+type StubOptions = { session?: SessionAnswer | readonly SessionAnswer[] };
 
 const SESSION_URL = "/api/session";
 const NO_CONTENT = 204;
 
 export function stubFetch({ session = NO_CONTENT }: StubOptions = {}) {
   const calls: PendingCall[] = [];
+  const nextSession = sessionAnswers(session);
   const fetchMock = vi.fn(
     (_url: string, init?: RequestInit) =>
       new Promise<Response>((resolve, reject) => {
@@ -22,7 +24,7 @@ export function stubFetch({ session = NO_CONTENT }: StubOptions = {}) {
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string, init?: RequestInit) =>
-      url === SESSION_URL ? Promise.resolve(new Response(null, { status: session })) : fetchMock(url, init),
+      url === SESSION_URL ? sessionResponse(nextSession()) : fetchMock(url, init),
     ),
   );
   return {
@@ -36,6 +38,16 @@ export function stubFetch({ session = NO_CONTENT }: StubOptions = {}) {
     replyNoContent: (index: number) => callAt(calls, index).resolve(new Response(null, { status: NO_CONTENT })),
     fail: (index: number) => callAt(calls, index).reject(new TypeError("Failed to fetch")),
   };
+}
+
+function sessionAnswers(session: SessionAnswer | readonly SessionAnswer[]): () => SessionAnswer {
+  const answers = typeof session === "object" ? [...session] : [session];
+  return () => (answers.length > 1 ? answers.shift() : answers[0]) ?? NO_CONTENT;
+}
+
+function sessionResponse(answer: SessionAnswer): Promise<Response> {
+  if (answer === "offline") return Promise.reject(new TypeError("Failed to fetch"));
+  return Promise.resolve(new Response(null, { status: answer }));
 }
 
 function jsonBodyOf(init?: RequestInit): unknown {
