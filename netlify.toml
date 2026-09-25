@@ -5,5 +5,5 @@
 [dev]
   framework = "#custom"
   command = "npm run dev:vite"
-  targetPort = 5173
+  targetPort = 5180
   port = 8888

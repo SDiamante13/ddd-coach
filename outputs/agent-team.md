@@ -4,7 +4,7 @@ Candidates for `.claude/agents/*.md` definitions. Not yet installed.
 
 ## Slice loop
 
-pathfinder plan → builder test + code → `feat` commit → sweeper ACN refactor commits → verifier check + demo recording → **stop: demo + status report** → user approval → next slice.
+pathfinder plan → builder test + code → committer `feat` commit → sweeper ACN refactors (each via committer) → verifier check + demo recording → **stop: demo + status report** → user approval → next slice.
 
 One working tree; agents run sequentially so builder and sweeper never edit concurrently.
 
@@ -15,6 +15,7 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 | navigator | Orchestrator (main session) | Slice sequencing, handoffs, commits, status report: where now / where next / why / goal fit | all | always |
 | pathfinder | Slice planner, read-only | Acceptance criteria, test list, out-of-scope list, DDD-proportionality check (no invented aggregates or services) | `story-planner`, `split`, `review-plan` | before each slice |
 | builder | TDD implementer | Outside-in red-green, hardcode-first, one failure per turn, `feat` commit | `tdd`, `commit` | every slice |
+| committer | Commit gatekeeper | Owns every `git commit`: inspects the staged diff, stages non-secrets, flags issues with ❗️, runs test/typecheck/build, single-sentence message, no Claude co-author; other agents stop at green and hand off | `commit` | each commit point |
 | sweeper | Refactorer | Smell report, then provable behavior-preserving refactors as ACN micro commits, green bar throughout | `sweep`, `tidy` | after each `feat` commit |
 | verifier | Independent checker + demo recorder | Tests, real-app browser checks, mutation-verify key tests, fresh-eyes pass, record slice demo | `agent-browser`, `test-feature`, `retroactive-test-check`, `tw-fresh-eyes-blunder-pass` | after sweep |
 | domain-steward | DDD / Eazy Freight expert | Ubiquitous language, coaching prompt, Eazy Freight briefing, dev-only analysis sensor | `outputs/ddd-*.md` | slice 3+ |
