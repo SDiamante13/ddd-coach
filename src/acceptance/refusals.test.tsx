@@ -1,4 +1,4 @@
-import { within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_MESSAGE_TOO_LONG, COACH_TOO_LONG, COACH_UNAVAILABLE, COACH_UNVERIFIED } from "../shared/chatContract.ts";
 import { renderApp, startConversation } from "../test/appDriver.tsx";
@@ -83,6 +83,26 @@ describe("Refusals", () => {
     expect(await navigator.clipboard.readText()).toBe("You: A\nCoach: R1\n\nYou: B");
     expect(within(log()).getByRole("button", { name: "Copied" })).toBeInTheDocument();
     expect(within(log()).getByRole("status")).toHaveTextContent("Copied");
+  });
+
+  it("asks to clear the conversation from an unverifiable refusal, with focus on Keep", async () => {
+    const { server, user, log, send } = startConversation();
+    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
+
+    await user.click(await within(log()).findByRole("button", { name: "Start a new one" }));
+
+    const question = screen.getByRole("group", { name: "Clear this conversation?" });
+    expect(within(question).getByRole("button", { name: "Keep" })).toHaveFocus();
+  });
+
+  it("moves focus to Keep from an unverifiable refusal even when the question is already open", async () => {
+    const { server, user, log, send } = startConversation();
+    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
+    await user.click(await screen.findByRole("button", { name: "New conversation" }));
+
+    await user.click(within(log()).getByRole("button", { name: "Start a new one" }));
+
+    expect(screen.getByRole("button", { name: "Keep" })).toHaveFocus();
   });
 
   it("says when the conversation couldn't be copied", async () => {

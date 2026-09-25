@@ -6,7 +6,7 @@ type NewConversationProps = { busy: boolean; confirmation: ClearConfirmation; co
 
 export function NewConversation({ busy, confirmation, conversation }: NewConversationProps) {
   const questionId = useId();
-  const { step, ask, keep } = confirmation;
+  const { step, askCount, ask, keep } = confirmation;
 
   function clear(event: MouseEvent<HTMLButtonElement>) {
     event.currentTarget.form?.querySelector("textarea")?.focus();
@@ -22,7 +22,7 @@ export function NewConversation({ busy, confirmation, conversation }: NewConvers
   }
 
   return (
-    <span className="confirm" role="group" aria-labelledby={questionId} aria-describedby={`${questionId}-effect`}>
+    <span key={askCount} className="confirm" role="group" aria-labelledby={questionId} aria-describedby={`${questionId}-effect`}>
       <span>
         <span id={questionId}>Clear this conversation?</span>{" "}
         <span id={`${questionId}-effect`}>The log and history go; your draft stays.</span>

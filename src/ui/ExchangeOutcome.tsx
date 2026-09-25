@@ -6,9 +6,10 @@ type ExchangeOutcomeProps = {
   busy: boolean;
   onRetry: (failed: FailedExchange) => void;
   conversation: () => string;
+  onStartNew: () => void;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation }: ExchangeOutcomeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
@@ -19,7 +20,14 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation }: Excha
         <>
           <p role="alert">
             {exchange.error}
-            {!exchange.retryable && <CopyConversationButton text={conversation} />}
+            {!exchange.retryable && (
+              <span className="refusal-actions">
+                <CopyConversationButton text={conversation} />
+                <button type="button" onClick={onStartNew}>
+                  Start a new one
+                </button>
+              </span>
+            )}
           </p>
           {exchange.retryable && (
             <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>

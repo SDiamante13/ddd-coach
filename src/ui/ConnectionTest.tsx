@@ -28,6 +28,7 @@ export function ConnectionTest() {
               busy={busy}
               onRetry={retry}
               conversation={conversation}
+              onStartNew={confirmation.ask}
             />
           </ExchangeEntry>
         ))}
