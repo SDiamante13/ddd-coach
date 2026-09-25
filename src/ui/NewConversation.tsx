@@ -1,22 +1,21 @@
-import { useId, useState, type MouseEvent } from "react";
+import { useId, type MouseEvent } from "react";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
+import type { ClearConfirmation } from "./useClearConfirmation.ts";
 
-type Step = "offered" | "confirming" | "kept";
+type NewConversationProps = { busy: boolean; confirmation: ClearConfirmation; conversation: () => string };
 
-type NewConversationProps = { busy: boolean; onClear: () => void; conversation: () => string };
-
-export function NewConversation({ busy, onClear, conversation }: NewConversationProps) {
+export function NewConversation({ busy, confirmation, conversation }: NewConversationProps) {
   const questionId = useId();
-  const [step, setStep] = useState<Step>("offered");
+  const { step, ask, keep } = confirmation;
 
   function clear(event: MouseEvent<HTMLButtonElement>) {
     event.currentTarget.form?.querySelector("textarea")?.focus();
-    onClear();
+    confirmation.clear();
   }
 
   if (step !== "confirming") {
     return (
-      <button type="button" className="new" autoFocus={step === "kept"} onClick={() => setStep("confirming")}>
+      <button type="button" className="new" autoFocus={step === "kept"} onClick={ask}>
         New conversation
       </button>
     );
@@ -32,7 +31,7 @@ export function NewConversation({ busy, onClear, conversation }: NewConversation
       <button type="button" className="clear" disabled={busy} onClick={clear}>
         Clear
       </button>
-      <button type="button" autoFocus onClick={() => setStep("kept")}>
+      <button type="button" autoFocus onClick={keep}>
         Keep
       </button>
     </span>

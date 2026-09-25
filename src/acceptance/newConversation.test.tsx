@@ -20,6 +20,18 @@ describe("New conversation", () => {
     expect(server.bodyOf(1)).toEqual({ message: "Draft", history: [] });
   });
 
+  it("offers a new conversation again, without asking, once the cleared conversation restarts", async () => {
+    const { user, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    await sendAndReply("B", "R2", "sig-B");
+
+    expect(screen.getByRole("button", { name: "New conversation" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Clear this conversation?" })).not.toBeInTheDocument();
+  });
+
   it("asks with focus on Keep, and keeps the conversation with focus back on New conversation", async () => {
     const { user, log, sendAndReply } = startConversation();
     await sendAndReply("A", "R1", "sig-A");
