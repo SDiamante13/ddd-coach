@@ -281,6 +281,7 @@ Each check change re-scores `ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.json` with
 | `jointRoles` holds on non-thread fixtures, which ask no question | Ship: yes (unchanged) | the three always-0/6 non-thread jointRoles rows leave the reported-only table |
 | `question asks` fails a clause that opens with "should" ("…, should the working item remain one booking … or become…"); "which count should include…" still passes. This reverses #73's acceptance of "should X or Y?" as a choice | **Ship: no** (flips) | question asks: F1 v6 5/6 → v8 1/6 (−4), example-thread 5/6 → 3/6 (−2), F2 6/6 → 5/6. v8 turns the question into a ruling far more often than v6 (interview 07's run 2). v8 stays live (U5); v9 targets it |
 | New hard check `question names a case`: the question text names a load ID (3+ digits), a "Customer X" or a message time (H:MM). Thread fixtures only | Ship: no (unchanged) | 48/48 thread questions name one (Customer B/D, Load 48213, 7731), so it's a guard that v9 keeps the case. The interview 06 reply ("the load in the thread") fails it |
+| New hard check `at most 600 words` on every fixture: a runaway ceiling (PO decision; `under400Words` stays reported only, with no 300-word gate) | Ship: no (unchanged) | no runaways. Longest replies: v8 F1 400–438 words, v6 F1 361–419; every other fixture is under 330 |
 
 ## Limits
 

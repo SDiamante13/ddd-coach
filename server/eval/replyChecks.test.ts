@@ -202,6 +202,12 @@ describe("hard checks", () => {
     expect(failedHardChecks(noCase, "stop", fixture)).toEqual(["question names a case"]);
   });
 
+  it("fail at most 600 words for a runaway reply", () => {
+    const runaway = withWord(`"rebook"\n- From thread: Ops means ${"a date change the desk works overnight ".repeat(80)}.`);
+
+    expect(failedHardChecks(runaway, "stop", fixture)).toEqual(["at most 600 words"]);
+  });
+
   it("fail code guess for a Code line stated as fact when no code was shown", () => {
     const noCode = { ...fixture, key: { ...fixture.key, expect: { ...fixture.key.expect, codeShown: false } } };
     const reply = GOOD_REPLY.replace("- Guess: Code", "- From thread: Code");
@@ -295,6 +301,12 @@ describe("soft scores", () => {
 
 describe("hard checks on a message that isn't a thread", () => {
   const greeting: Fixture = { thread: "hi", key: { people: [], teams: [], attributions: [], expect: { nonThread: true } } };
+
+  it("fail at most 600 words for a runaway answer", () => {
+    const runaway = `${"Domain-Driven Design shapes software around the business. ".repeat(100)}Paste a thread when you have one.`;
+
+    expect(failedHardChecks(runaway, "stop", greeting)).toEqual(["at most 600 words"]);
+  });
 
   it("hold jointRoles, since a reply that asks no question has no roles to join", () => {
     expect(softScores("Hi! Paste a thread when you have one.", greeting)).toMatchObject({ jointRoles: true });

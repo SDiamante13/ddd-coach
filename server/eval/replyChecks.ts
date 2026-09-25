@@ -70,6 +70,7 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
   "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
+  "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
 
 const NON_THREAD_CHECKS: Record<string, HardCheck> = {
@@ -78,7 +79,12 @@ const NON_THREAD_CHECKS: Record<string, HardCheck> = {
   "complete ending": ({ finishReason }) => finishReason === "stop",
   "no markdown": noMarkdown,
   "invites a thread": ({ text }) => INVITES_A_THREAD.test(text),
+  "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
+
+const RUNAWAY_WORDS = 600;
+
+const wordCount = (text: string): number => text.split(/\s+/).filter(Boolean).length;
 
 const isReplyPart = (line: string): boolean => line === EVENTS_HEADING || line === WORDS_HEADING || isQuestion(line);
 
@@ -172,7 +178,7 @@ export function softScores(reply: string, fixture: Fixture): SoftScores {
     codeLine: !fixture.key.expect.codeLine || meanings.some((meaning) => meaning.startsWith("Code ")),
     noStaleMeaning: !meanings.some((meaning) => matches(fixture.key.expect.stalePattern, meaning)),
     quotedWordsInThread: layout.quotedWords.every((word) => includesIgnoringCase(fixture.thread, word)),
-    under400Words: reply.split(/\s+/).filter(Boolean).length < 400,
+    under400Words: wordCount(reply) < 400,
     questionSpansThread: spansThread(question?.text ?? "", fixture.key.expect.questionEvidence),
     jointRoles: fixture.key.expect.nonThread === true || / (and|with) /.test(question?.roles ?? ""),
     forum: namesForum(question, fixture.key.expect.forum),
