@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
-import type { CoachConfig, ConfigResult } from "./config.ts";
+import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { MAX_MESSAGE_CHARS } from "./chatRequest.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
@@ -16,7 +16,7 @@ type HandlerOverrides = {
   createCoach?: (config: CoachConfig) => Coach;
   deadlineMs?: number;
   log?: CoachFailureLog;
-  signingKey?: string;
+  signingKey?: SigningKeyResult;
 };
 
 function handler(overrides: HandlerOverrides = {}) {
@@ -25,7 +25,7 @@ function handler(overrides: HandlerOverrides = {}) {
     createCoach: echoCoach,
     deadlineMs: 1_000,
     log: () => {},
-    signingKey: TEST_SIGNING_KEY,
+    signingKey: { ok: true, key: TEST_SIGNING_KEY },
     ...overrides,
   });
 }
@@ -139,6 +139,18 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({ error: "OPENROUTER_API_KEY is not set." });
+    expect(createCoach).not.toHaveBeenCalled();
+  });
+
+  it("fails naming the missing signing key without creating a coach", async () => {
+    const createCoach = vi.fn(echoCoach);
+    const signingKey: SigningKeyResult = { ok: false, error: "COACH_SIGNING_KEY is not set." };
+    const handle = handler({ signingKey, createCoach });
+
+    const response = await handle(postMessage("Hello coach"));
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: "COACH_SIGNING_KEY is not set." });
     expect(createCoach).not.toHaveBeenCalled();
   });
 

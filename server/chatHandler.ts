@@ -8,7 +8,7 @@ import {
 } from "../src/shared/chatContract.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
 import type { Coach } from "./coach.ts";
-import type { CoachConfig, ConfigResult } from "./config.ts";
+import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
 import { MAX_BODY_BYTES, readJsonWithin } from "./requestBody.ts";
 import {
@@ -26,21 +26,22 @@ type ReplyDeps = { deadlineMs: number; log: CoachFailureLog; signer: TurnSigner 
 type ChatHandlerDeps = Omit<ReplyDeps, "signer"> & {
   config: ConfigResult;
   createCoach: (config: CoachConfig) => Coach;
-  signingKey: string;
+  signingKey: SigningKeyResult;
 };
 
 export function createChatHandler({ config, createCoach, signingKey, ...deps }: ChatHandlerDeps) {
-  const replyDeps: ReplyDeps = { ...deps, signer: createTurnSigner(signingKey) };
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
+    if (!signingKey.ok) return misconfigured(signingKey.error);
+    const signer = createTurnSigner(signingKey.key);
     const received = await readJsonWithin(request, MAX_BODY_BYTES);
     if (!received.ok) return rejected("messageTooLong");
     const parsed = parseChatRequest(received.body);
     if (!parsed.ok) return rejected(parsed.reason);
-    const conversation = verifyConversation(replyDeps.signer, parsed.conversation);
+    const conversation = verifyConversation(signer, parsed.conversation);
     if (conversation === null) return rejected("unverified");
-    return replyFrom(createCoach(config.config), conversation, replyDeps);
+    return replyFrom(createCoach(config.config), conversation, { ...deps, signer });
   };
 }
 

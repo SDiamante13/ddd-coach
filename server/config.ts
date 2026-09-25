@@ -3,6 +3,7 @@ import { ChatRequestEffort } from "@openrouter/sdk/models";
 export type ReasoningEffort = (typeof ChatRequestEffort)[keyof typeof ChatRequestEffort];
 export type CoachConfig = { apiKey: string; model: string; reasoningEffort?: ReasoningEffort };
 export type ConfigResult = { ok: true; config: CoachConfig } | { ok: false; error: string };
+export type SigningKeyResult = { ok: true; key: string } | { ok: false; error: string };
 
 export type Env = Readonly<Record<string, string | undefined>>;
 
