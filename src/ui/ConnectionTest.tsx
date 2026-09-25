@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isBusy } from "../domain/exchange.ts";
+import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { MessageForm } from "./MessageForm.tsx";
@@ -16,7 +17,13 @@ export function ConnectionTest() {
     <>
       <ol role="log">
         {exchanges.map((exchange) => (
-          <ExchangeEntry key={exchange.id} exchange={exchange} busy={busy} onRetry={retry} />
+          <ExchangeEntry
+            key={exchange.id}
+            exchange={exchange}
+            busy={busy}
+            onRetry={retry}
+            conversation={() => conversationText(exchanges)}
+          />
         ))}
       </ol>
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} />

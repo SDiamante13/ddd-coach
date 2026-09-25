@@ -111,7 +111,8 @@ ol[role="log"] > li > p:nth-child(2):not([role="alert"])::before {
   color: var(--color-coach);
 }
 
-ol[role="log"] .more {
+ol[role="log"] .more,
+ol[role="log"] .copy {
   display: block;
   min-height: 32px;
   margin-top: var(--space-2);

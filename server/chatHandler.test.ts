@@ -112,8 +112,8 @@ describe("chat handler", () => {
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({
       error:
-        "That message couldn't be checked, so it was skipped. " +
-        "Send it again, or reload to start fresh if it keeps happening.",
+        "That message couldn't be checked, so it was skipped. Send it again. " +
+        "If it keeps happening, copy the conversation so you don't lose it.",
     });
     expect(coach.reply).not.toHaveBeenCalled();
   });

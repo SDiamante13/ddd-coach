@@ -8,6 +8,6 @@ export const COACH_UNAVAILABLE = "The coach is unavailable. Try again.";
 export const COACH_TIMED_OUT = "The coach took too long. Try a shorter question or Retry.";
 export const COACH_TOO_LONG = "This conversation is too long for the coach. Reload the page to start a new one.";
 export const COACH_UNVERIFIED =
-  "That message couldn't be checked, so it was skipped. " +
-  "Send it again, or reload to start fresh if it keeps happening.";
+  "That message couldn't be checked, so it was skipped. Send it again. " +
+  "If it keeps happening, copy the conversation so you don't lose it.";
 export const COACH_MESSAGE_TOO_LONG = "This message is too long for the coach. Shorten it and send it again.";

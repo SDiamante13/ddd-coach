@@ -316,7 +316,8 @@ describe("Connection test", () => {
     server.reply(0, 400, { error: COACH_UNVERIFIED });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
-      "That message couldn't be checked, so it was skipped. Send it again, or reload to start fresh if it keeps happening.",
+      "That message couldn't be checked, so it was skipped. Send it again. " +
+        "If it keeps happening, copy the conversation so you don't lose it.",
     );
     expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
   });
@@ -358,6 +359,17 @@ describe("Connection test", () => {
 
     expect(await within(log()).findByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(input()).toHaveValue("");
+  });
+
+  it("copies the whole conversation as plain text from an unverifiable refusal", async () => {
+    const { server, user, log, send, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+    server.reply(await send("B"), 400, { error: COACH_UNVERIFIED });
+
+    await user.click(await within(log()).findByRole("button", { name: "Copy the conversation" }));
+
+    expect(await navigator.clipboard.readText()).toBe("You: A\nCoach: R1\n\nYou: B");
+    expect(within(log()).getByRole("button", { name: "Copied" })).toBeInTheDocument();
   });
 
   it("retries the same message without duplicating it in the log", async () => {

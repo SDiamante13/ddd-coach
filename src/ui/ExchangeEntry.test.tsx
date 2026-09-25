@@ -13,7 +13,7 @@ describe("ExchangeEntry", () => {
   ])("exposes the $status exchange status on its log item", (exchange) => {
     render(
       <ol>
-        <ExchangeEntry exchange={exchange} busy={false} onRetry={() => {}} />
+        <ExchangeEntry exchange={exchange} busy={false} onRetry={() => {}} conversation={() => ""} />
       </ol>,
     );
 
@@ -24,7 +24,7 @@ describe("ExchangeEntry", () => {
     const refused = fail(pending, { error: "That message couldn't be checked.", retryable: false });
     render(
       <ol>
-        <ExchangeEntry exchange={refused} busy={false} onRetry={() => {}} />
+        <ExchangeEntry exchange={refused} busy={false} onRetry={() => {}} conversation={() => ""} />
       </ol>,
     );
 
