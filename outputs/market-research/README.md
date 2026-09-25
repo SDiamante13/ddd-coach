@@ -20,7 +20,7 @@ Last interviewed demos: `slice-02a.md`, `slice-42.md`
 
 ## Queued for interview 04
 
-Split it like 03: **04a** covers the built paste-box slice with Exploration 04 and the Sunday replay. **04b** covers Explorations 03 and 02b. The trigger is the paste-box slice demo.
+Split it like 03: **04a** covers the built paste-box slice with Exploration 04 and the Sunday replay. **04b** covers Explorations 03 and 02b, #58 and the Marcus claims; it is concept-only, so it ran early on the slice 37 demo. **04a** still waits for the paste-box demo.
 
 - The "questions for interview 04" sections in 03a and 03b.
 - **Design Exploration 03, "Leave with a table"** (`outputs/design/explore-03/`: stills t1-what-leaves → t2-table → t3-next-step → t4-in-rfc, `explore-03-2.5x.mp4`, `table.html`). Probes:
