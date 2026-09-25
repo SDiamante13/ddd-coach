@@ -273,9 +273,23 @@ describe("chat handler", () => {
     expect(coach.reply).not.toHaveBeenCalled();
   });
 
-  it("accepts the longest allowed conversation written in 3-byte characters", async () => {
+  it("accepts five more turns after a 20,000-character paste and its reply", async () => {
     const handle = handler();
-    const { history, message } = longestConversationOf("€");
+    const followUps = Array.from({ length: 5 }, () => signedTurn("F".repeat(500), "R".repeat(4_000)));
+    const history = [signedTurn("P".repeat(20_000), "R".repeat(4_000)), ...followUps];
+
+    const response = await handle(postMessage("M".repeat(500), history));
+
+    expect(response.status).toBe(200);
+  });
+
+  it.each([
+    ["3-byte characters", "€"],
+    ["3-byte CJK characters", "文"],
+    ["control characters escaped to 6 bytes", "\u0001"],
+  ])("accepts the longest allowed conversation written in %s", async (_case, character) => {
+    const handle = handler();
+    const { history, message } = longestConversationOf(character);
 
     const response = await handle(postMessage(message, history));
 

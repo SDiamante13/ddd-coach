@@ -1,4 +1,9 @@
-export const MAX_BODY_BYTES = 128 * 1024;
+import { MAX_CONVERSATION_CHARS } from "./chatRequest.ts";
+
+const WORST_CASE_BYTES_PER_CHAR = 6;
+const STRUCTURE_BYTES = 16 * 1024;
+
+export const MAX_BODY_BYTES = WORST_CASE_BYTES_PER_CHAR * MAX_CONVERSATION_CHARS + STRUCTURE_BYTES;
 
 export type BodyResult = { ok: true; body: unknown } | { ok: false };
 

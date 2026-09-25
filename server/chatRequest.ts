@@ -7,7 +7,7 @@ export type RejectionReason = "malformed" | "tooLong" | "messageTooLong";
 export type ChatRequestResult = { ok: true; conversation: Conversation } | { ok: false; reason: RejectionReason };
 
 export const MAX_HISTORY_TURNS = 50;
-export const MAX_CONVERSATION_CHARS = 24_000;
+export const MAX_CONVERSATION_CHARS = 64_000;
 
 const MALFORMED: ChatRequestResult = { ok: false, reason: "malformed" };
 const TOO_LONG: ChatRequestResult = { ok: false, reason: "tooLong" };
