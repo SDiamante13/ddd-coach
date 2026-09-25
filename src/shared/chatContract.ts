@@ -2,7 +2,7 @@ export type ChatTurn = { prompt: string; reply: string; signature: string };
 export type ChatRequestBody = { message: string; history: readonly ChatTurn[] };
 export type ChatResponseBody = { reply: string; signature: string } | { error: string };
 
-export const MAX_MESSAGE_CHARS = 8_000;
+export const MAX_MESSAGE_CHARS = 24_000;
 
 export const COACH_UNAVAILABLE = "The coach is unavailable. Try again.";
 export const COACH_TIMED_OUT = "The coach took too long. Try a shorter question or Retry.";

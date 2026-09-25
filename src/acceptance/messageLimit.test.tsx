@@ -6,6 +6,11 @@ import { stubFetch } from "../test/fetchStub.ts";
 
 afterEach(() => vi.unstubAllGlobals());
 
+function threadOf(chars: number, lines: number): string {
+  const line = (i: number) => `Speaker ${i}: `.padEnd(Math.ceil(chars / lines), "m");
+  return Array.from({ length: lines }, (_, i) => line(i)).join("\n").slice(0, chars);
+}
+
 describe("Message limit", () => {
   it("shows no character count below 80% of the limit, not counting surrounding whitespace", async () => {
     const { user, input } = renderApp();
@@ -67,5 +72,19 @@ describe("Message limit", () => {
     expect(server.fetchMock).not.toHaveBeenCalled();
     expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
     expect(input()).toHaveValue(tooLong);
+  });
+
+  it("sends a 20,000-character thread of 40 lines with its line breaks kept", async () => {
+    const server = stubFetch();
+    const { user, input, sendButton } = renderApp();
+    const thread = threadOf(20_000, 40);
+    await user.click(input());
+    await user.paste(thread);
+
+    expect(within(composerOf(input())).queryByRole("alert")).not.toBeInTheDocument();
+    expect(sendButton()).toBeEnabled();
+    await user.keyboard("{Enter}");
+
+    expect(server.bodyOf(0)).toEqual({ message: thread, history: [] });
   });
 });
