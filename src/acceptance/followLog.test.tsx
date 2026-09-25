@@ -7,15 +7,18 @@ const AT_NEWEST = COMPOSER_TOP;
 const READING_UP = COMPOSER_TOP + 300;
 const scrollIntoView = vi.fn();
 let newestEntryBottom = AT_NEWEST;
+let replyHeight = 100;
 
 beforeEach(() => {
   newestEntryBottom = AT_NEWEST;
+  replyHeight = 100;
   scrollIntoView.mockClear();
   vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(function (this: Element, options) {
     scrollIntoView(this, options);
   });
   vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
     if (this.tagName === "FORM") return new DOMRect(0, COMPOSER_TOP, 600, 150);
+    if (this.classList.contains("reply")) return new DOMRect(0, newestEntryBottom - replyHeight, 600, replyHeight);
     return new DOMRect(0, newestEntryBottom - 100, 600, 100);
   });
 });
@@ -121,5 +124,15 @@ describe("Following the log", () => {
     await within(log()).findByRole("alert");
 
     expect(lastRevealed()).toBe(within(log()).getByRole("button", { name: "Retry" }));
+  });
+
+  it("lands on a reply's start when it is taller than the space above the composer", async () => {
+    replyHeight = COMPOSER_TOP + 200;
+    const { log, sendAndReply } = await startConversation();
+
+    await sendAndReply("Hello coach", "Hi there", "sig-1");
+
+    expect(lastRevealed()).toBe(within(log()).getByText("Hi there").closest(".reply"));
+    expect(scrollIntoView.mock.lastCall?.[1]).toMatchObject({ block: "start" });
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Exchange, ExchangeId } from "../domain/exchange.ts";
-import { isFollowing, revealOptions } from "./logFollow.ts";
+import { fitsAbove, isFollowing, revealOptions } from "./logFollow.ts";
 import { prefersReducedMotion } from "./motion.ts";
 
 export function useLogFollow(newest: Exchange | undefined, composer: () => Element | null) {
@@ -19,7 +19,9 @@ export function useLogFollow(newest: Exchange | undefined, composer: () => Eleme
   );
 
   const revealNewest = () => {
-    newestOutcomeOf(logRef.current)?.scrollIntoView(revealOptions({ reducedMotion: prefersReducedMotion() }));
+    const outcome = newestOutcomeOf(logRef.current);
+    const fits = fitsAboveComposer(outcome, composer());
+    outcome?.scrollIntoView(revealOptions({ reducedMotion: prefersReducedMotion(), fits }));
     following.current = true;
     setNewReply(false);
   };
@@ -46,6 +48,11 @@ function followingNow(log: HTMLOListElement | null, composer: Element | null): b
     newestEntryBottom: newestEntry.getBoundingClientRect().bottom,
     composerTop: composer.getBoundingClientRect().top,
   });
+}
+
+function fitsAboveComposer(outcome: Element | null | undefined, composer: Element | null): boolean {
+  if (!outcome || !composer) return true;
+  return fitsAbove({ height: outcome.getBoundingClientRect().height, composerTop: composer.getBoundingClientRect().top });
 }
 
 function newestOutcomeOf(log: HTMLOListElement | null): Element | null | undefined {
