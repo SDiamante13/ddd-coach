@@ -23,7 +23,8 @@ function runsOf(arm: Arm, fixture: string, missing = 0, miss: Miss = {}): Summar
   return Array.from({ length: 6 }, (_, index) => {
     const missed = index < missing;
     const soft = { ...ALL_SOFT, ...(missed ? miss.soft : {}) };
-    return { arm, fixture, hardFailures: missed ? (miss.hardFailures ?? []) : [], soft, ms: 1_000 * (index + 1), cost: 0.01 };
+    const tokens = { promptTokens: 1_000, cachedTokens: index === 0 ? 0 : 900 };
+    return { arm, fixture, hardFailures: missed ? (miss.hardFailures ?? []) : [], soft, ms: 1_000 * (index + 1), cost: 0.01, ...tokens };
   });
 }
 
@@ -90,6 +91,14 @@ describe("abSummary", () => {
 
   it("says no calls finished instead of a budget when a run aborts on its first call", () => {
     expect(abSummary(reportOf([], { aborted: "UnauthorizedResponseError 401" }))).toContain("Budget: no calls finished.");
+  });
+
+  it("reports each arm's latency and cached share of input, since a grounded prompt is longer (#58)", () => {
+    const slower = shipping.map((run) => (run.arm === "candidate" ? { ...run, ms: run.ms * 2 } : run));
+
+    expect(abSummary(reportOf(slower))).toContain(
+      "Latency and cache: live median 3500 ms, max 6000 ms, 75% of input cached; candidate median 7000 ms, max 12000 ms, 75% of input cached.",
+    );
   });
 
   it("gives no verdict without a target", () => {

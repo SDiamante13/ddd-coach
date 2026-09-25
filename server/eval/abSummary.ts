@@ -2,7 +2,7 @@ import { abVerdict, drop, gatingRows, isRegression, reportedOnlyRows, type AbVer
 import { median } from "./latency.ts";
 import type { Tally } from "./shipBar.ts";
 
-export type SummaryArmRun = ArmRun & { ms: number; cost: number | null };
+export type SummaryArmRun = ArmRun & { ms: number; cost: number | null; promptTokens: number; cachedTokens: number };
 export type AbReport = {
   model: string;
   reasoningEffort: string;
@@ -18,7 +18,7 @@ const count = ({ passed, total }: Tally): string => `${passed}/${total}`;
 const signed = (delta: number): string => (delta > 0 ? `+${delta}` : `${delta}`);
 
 export function abSummary(report: AbReport): string {
-  return [headingOf(report), "", verdictLine(report), "", ...pairedTable(report), "", ...reportedOnlyTable(report), "", budgetLine(report), ""].join("\n");
+  return [headingOf(report), "", verdictLine(report), "", ...pairedTable(report), "", ...reportedOnlyTable(report), "", budgetLine(report), latencyLine(report), ""].join("\n");
 }
 
 function headingOf({ model, reasoningEffort, liveVersion, candidateVersion, n }: AbReport): string {
@@ -65,6 +65,21 @@ function budgetLine({ runs }: AbReport): string {
   const ms = runs.map((run) => run.ms);
   const spend = `live ${costOf("live")}, candidate ${costOf("candidate")}, total ${dollars(runs)} over ${runs.length} calls`;
   return `Budget: ${spend}; median ${median(ms)} ms, max ${Math.max(...ms)} ms.`;
+}
+
+function latencyLine({ runs }: AbReport): string {
+  const armLine = (arm: Arm) => {
+    const own = runs.filter((run) => run.arm === arm);
+    if (own.length === 0) return `${arm} no calls`;
+    const ms = own.map((run) => run.ms);
+    return `${arm} median ${median(ms)} ms, max ${Math.max(...ms)} ms, ${cachedShare(own)}% of input cached`;
+  };
+  return `Latency and cache: ${armLine("live")}; ${armLine("candidate")}.`;
+}
+
+function cachedShare(runs: readonly SummaryArmRun[]): number {
+  const prompt = runs.reduce((sum, run) => sum + run.promptTokens, 0);
+  return prompt === 0 ? 0 : Math.round((100 * runs.reduce((sum, run) => sum + run.cachedTokens, 0)) / prompt);
 }
 
 const dollars = (runs: readonly SummaryArmRun[]): string => `$${runs.reduce((sum, run) => sum + (run.cost ?? 0), 0).toFixed(4)}`;
