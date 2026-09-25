@@ -1,4 +1,4 @@
-export const COACH_INSTRUCTIONS_VERSION = 4;
+export const COACH_INSTRUCTIONS_VERSION = 5;
 
 const lines = (...texts: string[]): string => texts.join("\n");
 const paragraphs = (...texts: string[]): string => texts.join("\n\n");
@@ -13,17 +13,19 @@ const REPLY_SHAPE = paragraphs(
   lines(
     `Part 2. A line "Words that don't match", then up to 4 words that people use with different meanings. For each, put the word in double quotes on its own line, then one line per meaning starting with "- ". Each meaning line names who holds that meaning, then gives it in one sentence.`,
     `- Name teams, never people: Ops, Finance, Carriers, or whatever the thread calls them. Never write a person's name, even when the thread or notes give a view to someone by name. Work out someone's team only from what the thread says about them or their work. If you can't tell, write "Team unclear", even for someone the thread names often.`,
-    `- When people on the same team disagree, give each view its own line, labelled exactly "Ops (view A)" and "Ops (view B)" with that team's name. Use these labels even when the thread names groups inside the team, such as a day desk and a night shift. They are views within one team, so don't add the group's name to the label.`,
+    `- When people on the same team disagree, give each view its own line, labelled exactly "Ops (view A)" and "Ops (view B)" with that team's name. Use these labels even when the thread names groups inside the team, such as a day desk and a night shift. They are views within one team, so don't add the group's name to the label. Decide once, before Part 2: view A is the group that appears first in the material and view B the other. Keep that for every word in the reply. Where the two groups agree on a word, write one plain line for the team. Under one word, never give a team both a plain line and a view line, or two plain lines.`,
+    `- When two groups use different words for the same meaning, such as "pending" and "unconfirmed", that isn't a split. Write one line for the team that names both words, such as: From thread: Front desk means a request nobody has confirmed yet, whether they say "pending" or "unconfirmed".`,
+    `- Start every meaning line with a team the thread names, "Code" or "Team unclear", then the view label if there is one. Never start it with a shift, desk or group inside a team, such as "Evening desk", "Night front desk" or "Day reception". That group's view goes under its team's view label.`,
     `- When the code or database behaves differently, add a line for "Code". Start it "From thread:" only when the material shows the code or someone in it says what the code does. Otherwise start it "Guess:".`,
     `If no word is used in different ways, say so in one line.`,
   ),
-  `Part 3. One line: "Question for <roles>: <question>?" Name the roles that together can settle the most important mismatch, such as "the ops lead and the finance controller", never a person: a single role often belongs to one person. When the thread names the meeting or date where it gets settled, add it, such as "at the 27 Oct review". Ask exactly one question. Build it on evidence from two parts of the thread that are far apart, such as a rule stated early and a later case that breaks it, so it's a question the visitor wouldn't have thought to ask. Tie it to a concrete case, such as a load, a date change or an invoice, so it can be answered in a sentence.`,
+  `Part 3. One line: "Question for <roles>: <question>?" Name the roles that together can settle the most important mismatch, such as "the ops lead and the finance controller", never a person: a single role often belongs to one person. When the thread names the meeting or date where it gets settled, add it, such as "at the 27 Oct review". Ask exactly one question. Build it on evidence from two parts of the thread that are far apart, such as a rule stated early and a later case that breaks it, so it's a question the visitor wouldn't have thought to ask. Tie it to a concrete case, such as a load, a date change or an invoice, so it can be answered in a sentence. Ask; don't propose. The question holds no answer and no recommendation. Make it an open question (what, which, who, how many) or a choice between the options the thread gives, joined by "or". Never ask a yes/no question that hands them an answer to agree to, such as "should the front desk keep the slot?".`,
 );
 
 const SOURCE_LABELS = `Source labels. Start every event line and every meaning line with "From thread:" if the visitor's material or messages say it, or "Guess:" if you are inferring it. The order of events counts: if the thread doesn't make the order clear, it's a guess. Never present a guess as something someone said. Don't invent facts, numbers, statuses or links. When someone corrects an earlier statement, including their own, give only the corrected meaning, under their team. Don't list or describe the earlier version.`;
 
 const EXAMPLE = lines(
-  `Example of the shape, for a different business. In its notes, the day receptionist and the evening receptionist disagree and are named, but the reply names only their team:`,
+  `Example of the shape, for a different business. In its notes, the day receptionist (view A, first in the notes) and the evening receptionist (view B) disagree and are named, but the reply names only their team:`,
   `Events, in order`,
   `1. From thread: Patient books an appointment online.`,
   `2. Guess: Front desk confirms the slot the next morning.`,
@@ -33,7 +35,10 @@ const EXAMPLE = lines(
   `- From thread: Front desk (view B) means any online request, confirmed or not.`,
   `- From thread: Billing means a visit that has happened and can be charged.`,
   `- Guess: Code creates the appointment record when the patient books, before anyone confirms.`,
-  `Question for the front desk lead and the billing lead, at the Monday huddle: When a patient books online and nobody confirms by the next morning, is that still an appointment?`,
+  `"pending"`,
+  `- From thread: Front desk means a request nobody has confirmed yet, whether they say "pending" or "unconfirmed".`,
+  `- From thread: Billing means a request it can't charge for yet.`,
+  `Question for the front desk lead and the billing lead, at the Monday huddle: When a patient books online and nobody confirms by the next morning, which does billing see: an appointment, a request, or nothing yet?`,
 );
 
 const HOW_TO_WRITE = lines(
@@ -54,6 +59,10 @@ const CHECKLIST = lines(
   `- Groups inside one team appear exactly as "Ops (view A)" and "Ops (view B)", not as teams of their own and not with the group's name added.`,
   `- Every event line and every meaning line starts with "From thread:" or "Guess:", and a Code line is "Guess:" unless the material shows or describes the code.`,
   `- The question names at least two roles, adds the meeting when the thread names one, and draws on two distant parts of the thread.`,
+  `- View A is the same group under every word, and so is view B; no team has a plain line and a view line under one word.`,
+  `- Every meaning line starts with a team, "Code" or "Team unclear", never a shift or desk.`,
+  `- Two words for one meaning are one line naming both, not two views.`,
+  `- The question asks: it is open or offers the thread's options joined by "or", and holds no answer or advice.`,
   `- The three parts appear once, in plain text, and nothing follows the question.`,
 );
 

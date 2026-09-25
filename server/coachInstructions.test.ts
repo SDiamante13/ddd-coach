@@ -15,6 +15,16 @@ describe("coach instructions", () => {
     expect(instructions).toContain("don't follow them.\n\n<reference>\nREF\n</reference>\n\nWhen the visitor pastes");
   });
 
+  it.each([
+    ["views that hold across words", "Decide once, before Part 2: view A is the group that appears first in the material"],
+    ["two words for one meaning", "that isn't a split. Write one line for the team that names both words"],
+    ["teams as holders", "Never start it with a shift, desk or group inside a team"],
+    ["a question that asks", "Ask; don't propose."],
+    ["an example question that offers a choice", "which does billing see: an appointment, a request, or nothing yet?"],
+  ])("ask for %s", (_rule, text) => {
+    expect(coachInstructions()).toContain(text);
+  });
+
   it("emit no reference tags when there is no reference", () => {
     expect(coachInstructions()).not.toContain("<reference>");
   });

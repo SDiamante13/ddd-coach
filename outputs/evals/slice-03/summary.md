@@ -98,6 +98,23 @@ This matches the plan's hand-read:
 
 F3's "Customers see…" passes, because the key allows Customers (U1). The interview 06 Part C reply fails holders ("Night dispatch means") and same meaning not split ("hold") against the F1 key.
 
+## #73 results (every-run bar, production model `openai/gpt-5.6-terra`, effort `none`)
+
+| Prompt | Ships | Hard | Attribution | Per fixture below 3/3 | Hard failures | Question asks | Median / max ms | Cost $ | Summary |
+|---|---|---|---|---|---|---|---|---|---|
+| v4 (re-score) | no | 3/9 | 9/9 | F1 same meaning named 1/3, F2 split 2/3 | question asks ×5, split labels ×3, same meaning not split ×1 | 4/9 | 6,588 / 8,690 | 0 | see baseline above |
+| v5 | no | 4/9 | 8/9 | F1 same meaning named 0/3 | same meaning not split ×3 (F1), holders ×2 (F3) | 9/9 | 7,231 / 8,341 | 0.071 | [v5](2026-09-25-openai-gpt-5-6-terra-v5.md) |
+
+**v5, read by hand:**
+- **The question now asks in every run.** It's open ("which should count as the booking: the original ref, the new REBOOKED row, or only the delivered invoiceable shipment?") or a choice joined by "or". There are no proposals and no yes/no questions.
+- **F1 still splits "hold".** Every run has "Ops (view A) means waiting on the customer" and "Ops (view B) means a booking waiting on the customer", so the two views say the same thing. No line names both "hold" and "waiting on customer".
+- **Group words are gone from holders in F1 and F2.** "night dispatch" now appears only inside a meaning, under "Ops (view B)".
+- **F3 r2–r3 use "Customer-facing portal means…"** as a holder, which is a screen, not a team. r3 also misattributes the 990 meaning to it (attribution miss). r2–r3 also write "Ops desk means"; see the key note below.
+- **F2 r1 splits "lane" into views that agree** ("Ops (view B) agrees that a lane change is a new booking"). No check catches this; it's the same slip as "hold".
+- **F2 r2 labels the night group view A** (it comes first in the notes), and the labels hold across all three of its words. r1 and r3 label the day group view A. The labels are stable within each reply, and that's what the check measures.
+
+**Key note after v5:** F3 `teams` gains "Ops desk". Misread line: carrier-status r2/r3 "From thread: Ops desk means the customer agreed the pickup window." The thread names the team that way (line 10: "that's not what the ops desk means"), the same way F1–F3 allow "Carrier desk". With the fix, the v5 re-score still fails F3 r2–r3 on "Customer-facing portal".
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.
