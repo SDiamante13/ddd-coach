@@ -308,15 +308,15 @@ describe("Connection test", () => {
     expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
   });
 
-  it("shows a refusal of an unverifiable conversation inline, asking to reload, without Retry", async () => {
+  it("shows a refusal of an unverifiable message inline, saying it was skipped, without Retry", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
-    server.reply(0, 400, { error: "This conversation can't be verified. Reload the page to start a new one." });
+    server.reply(0, 400, { error: COACH_UNVERIFIED });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
-      "This conversation can't be verified. Reload the page to start a new one.",
+      "That message couldn't be checked, so it was skipped. Send it again, or reload to start fresh if it keeps happening.",
     );
     expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
   });

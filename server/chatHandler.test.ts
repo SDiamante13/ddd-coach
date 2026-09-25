@@ -111,7 +111,9 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({
-      error: "This conversation can't be verified. Reload the page to start a new one.",
+      error:
+        "That message couldn't be checked, so it was skipped. " +
+        "Send it again, or reload to start fresh if it keeps happening.",
     });
     expect(coach.reply).not.toHaveBeenCalled();
   });
