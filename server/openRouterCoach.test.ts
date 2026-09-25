@@ -36,9 +36,20 @@ function resultWith(content: Content, finishReason: ChatFinishReasonEnum): ChatR
 
 const PROVIDER_TEXT = "Insufficient credits for key sk-or-test-key";
 
-function httpMetaOf(status: number) {
-  const body = JSON.stringify({ error: { code: status, message: PROVIDER_TEXT } });
-  return { response: new Response(body, { status }), request: new Request("https://openrouter.ai/api/v1/chat"), body };
+type ErrorBody = { code: number; message: string; metadata?: Record<string, string> };
+
+function httpMetaOf(error: ErrorBody) {
+  const body = JSON.stringify({ error });
+  const response = new Response(body, { status: error.code });
+  return { response, request: new Request("https://openrouter.ai/api/v1/chat"), body };
+}
+
+function paymentRequiredBody(limitSource: string): ErrorBody {
+  return { code: 402, message: PROVIDER_TEXT, metadata: { limit_source: limitSource, remedy_hint: PROVIDER_TEXT } };
+}
+
+function paymentRequired(error: ErrorBody): PaymentRequiredResponseError {
+  return new PaymentRequiredResponseError({ error }, httpMetaOf(error));
 }
 
 function failingChat(error: Error): ChatClient {
@@ -120,8 +131,8 @@ describe("OpenRouter coach", () => {
   });
 
   it.each([
-    ["a typed payment-required error", new PaymentRequiredResponseError({ error: { code: 402, message: PROVIDER_TEXT } }, httpMetaOf(402))],
-    ["an untyped 402", new OpenRouterDefaultError(PROVIDER_TEXT, httpMetaOf(402))],
+    ["a typed payment-required error", paymentRequired(paymentRequiredBody("openrouter_key_limit"))],
+    ["an untyped 402", new OpenRouterDefaultError(PROVIDER_TEXT, httpMetaOf(paymentRequiredBody("openrouter_key_limit")))],
   ])("reports a spent usage budget, without the provider's text, for %s", async (_case, error) => {
     const failure = await coachOn(failingChat(error)).reply(verifiedConversationOf("Hello coach")).catch((e: unknown) => e);
 
@@ -130,7 +141,8 @@ describe("OpenRouter coach", () => {
   });
 
   it("passes any other provider failure through unchanged", async () => {
-    const badGateway = new BadGatewayResponseError({ error: { code: 502, message: PROVIDER_TEXT } }, httpMetaOf(502));
+    const error = { code: 502, message: PROVIDER_TEXT };
+    const badGateway = new BadGatewayResponseError({ error }, httpMetaOf(error));
 
     await expect(coachOn(failingChat(badGateway)).reply(verifiedConversationOf("Hello coach"))).rejects.toBe(badGateway);
   });
