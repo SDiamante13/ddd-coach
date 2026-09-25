@@ -150,7 +150,7 @@ describe("Connection test", () => {
     expect(server.fetchMock).not.toHaveBeenCalled();
   });
 
-  it("ignores another submit while a reply is pending", async () => {
+  it("ignores another submit while a reply is pending and keeps the draft", async () => {
     const server = stubFetch();
     const { user, input, log, sendButton } = renderApp();
 
@@ -160,6 +160,7 @@ describe("Connection test", () => {
 
     expect(within(log()).getAllByRole("listitem")).toHaveLength(1);
     expect(server.fetchMock).toHaveBeenCalledTimes(1);
+    expect(input()).toHaveValue("Again");
   });
 
   it("shows a server failure inline with Retry beside the message", async () => {
