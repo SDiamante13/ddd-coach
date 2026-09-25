@@ -13,7 +13,7 @@ describe("On load", () => {
     expect(
       screen.getByText(
         "Your messages are sent to OpenRouter, an AI model provider, to generate replies. " +
-          "Nothing is stored on our server. Don't paste customer names or rates.",
+          "Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms.",
       ),
     ).toBeVisible();
   });

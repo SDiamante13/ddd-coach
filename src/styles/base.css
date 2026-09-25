@@ -40,12 +40,14 @@ h1 {
 
 main > p {
   margin: 0;
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-line);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-line-strong);
+  border-left: 4px solid var(--color-coach);
   border-radius: var(--radius-md);
-  background: var(--color-surface-sunken);
-  color: var(--color-ink-muted);
-  font-size: var(--text-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  font-weight: 500;
 }
 
 main > p.purpose {
