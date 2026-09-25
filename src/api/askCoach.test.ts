@@ -28,13 +28,13 @@ describe("askCoach", () => {
   it("returns the server's error for a non-2xx response", async () => {
     respondWith(jsonResponse(502, { error: "The coach is unavailable." }));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: "The coach is unavailable." });
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: "The coach is unavailable.", retryable: true });
   });
 
   it("reports an unreachable coach when the request throws", async () => {
     respondWith(Promise.reject(new TypeError("Failed to fetch")));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Could not reach the coach." });
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Could not reach the coach.", retryable: true });
   });
 
   it("reports an unexpected response when a success body has no reply", async () => {
@@ -43,6 +43,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "Unexpected response from the coach.",
+      retryable: true,
     });
   });
 
@@ -52,6 +53,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "The coach took too long. Try a shorter question or Retry.",
+      retryable: true,
     });
   });
 
@@ -61,6 +63,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "The coach is unavailable. Try again.",
+      retryable: true,
     });
   });
 });

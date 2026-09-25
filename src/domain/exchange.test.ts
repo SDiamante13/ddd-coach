@@ -9,19 +9,22 @@ import {
   settle,
   submit,
   type ExchangeId,
+  type Failure,
   type Prompt,
 } from "./exchange.ts";
 
 const id = "exchange-1" as ExchangeId;
 const prompt = "Hello coach" as Prompt;
+const unavailable: Failure = { error: "Coach unavailable", retryable: true };
 
 describe("Exchange", () => {
   it("fails a pending exchange with the error", () => {
-    expect(fail(submit(id, prompt), "Coach unavailable")).toEqual({
+    expect(fail(submit(id, prompt), unavailable)).toEqual({
       id,
       prompt,
       status: "failed",
       error: "Coach unavailable",
+      retryable: true,
     });
   });
 
@@ -35,7 +38,7 @@ describe("Exchange", () => {
   });
 
   it("retries a failed exchange as pending with the same id and prompt", () => {
-    const failed = fail(submit(id, prompt), "Coach unavailable");
+    const failed = fail(submit(id, prompt), unavailable);
 
     expect(retry(failed)).toEqual({ id, prompt, status: "pending" });
   });
@@ -54,7 +57,7 @@ describe("Exchange", () => {
 
   it("is idle when no exchange is pending", () => {
     const replied = reply(submit(id, prompt), "Hi there");
-    const failed = fail(submit(id, prompt), "Coach unavailable");
+    const failed = fail(submit(id, prompt), unavailable);
 
     expect(isBusy([replied, failed])).toBe(false);
   });
@@ -73,21 +76,21 @@ describe("settle", () => {
   });
 
   it("fails the matching pending exchange with the error", () => {
-    expect(settle([submit(id, prompt)], id, { ok: false, error: "Coach unavailable" })).toEqual([
-      fail(submit(id, prompt), "Coach unavailable"),
+    expect(settle([submit(id, prompt)], id, { ok: false, ...unavailable })).toEqual([
+      fail(submit(id, prompt), unavailable),
     ]);
   });
 
   it("leaves a matching exchange that is no longer pending unchanged", () => {
     const replied = reply(submit(id, prompt), "Hi there");
 
-    expect(settle([replied], id, { ok: false, error: "Coach unavailable" })).toEqual([replied]);
+    expect(settle([replied], id, { ok: false, ...unavailable })).toEqual([replied]);
   });
 });
 
 describe("canRetry", () => {
   const otherId = "exchange-2" as ExchangeId;
-  const failed = fail(submit(id, prompt), "Coach unavailable");
+  const failed = fail(submit(id, prompt), unavailable);
 
   it("allows retrying a failed exchange while nothing is pending", () => {
     expect(canRetry([failed, reply(submit(otherId, prompt), "Hi there")], id)).toBe(true);

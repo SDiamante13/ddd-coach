@@ -3,10 +3,10 @@ import type { AskResult } from "../domain/exchange.ts";
 import { COACH_TIMED_OUT, COACH_UNAVAILABLE, type ChatRequestBody } from "../shared/chatContract.ts";
 import { readJson, stringField } from "../shared/json.ts";
 
-const UNREACHABLE: AskResult = { ok: false, error: "Could not reach the coach." };
-const UNEXPECTED: AskResult = { ok: false, error: "Unexpected response from the coach." };
-const UNAVAILABLE: AskResult = { ok: false, error: COACH_UNAVAILABLE };
-const TIMED_OUT: AskResult = { ok: false, error: COACH_TIMED_OUT };
+const UNREACHABLE: AskResult = { ok: false, error: "Could not reach the coach.", retryable: true };
+const UNEXPECTED: AskResult = { ok: false, error: "Unexpected response from the coach.", retryable: true };
+const UNAVAILABLE: AskResult = { ok: false, error: COACH_UNAVAILABLE, retryable: true };
+const TIMED_OUT: AskResult = { ok: false, error: COACH_TIMED_OUT, retryable: true };
 
 export async function askCoach(conversation: Conversation): Promise<AskResult> {
   try {
@@ -34,6 +34,6 @@ async function readResult(response: Response): Promise<AskResult> {
 
 function errorFrom(body: unknown, status: number): AskResult {
   const error = stringField(body, "error");
-  if (error !== undefined) return { ok: false, error };
+  if (error !== undefined) return { ok: false, error, retryable: true };
   return status === 504 ? TIMED_OUT : UNAVAILABLE;
 }

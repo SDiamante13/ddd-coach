@@ -11,7 +11,7 @@ function asPrompt(text: string): Prompt {
 }
 
 const repliedA = reply(submit(exchangeId(1), asPrompt("A")), "R1");
-const failedB = fail(submit(exchangeId(2), asPrompt("B")), "Coach unavailable");
+const failedB = fail(submit(exchangeId(2), asPrompt("B")), { error: "Coach unavailable", retryable: true });
 const repliedC = reply(submit(exchangeId(3), asPrompt("C")), "R3");
 const pendingD = submit(exchangeId(4), asPrompt("D"));
 

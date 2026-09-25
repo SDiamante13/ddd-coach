@@ -3,17 +3,18 @@ export type ExchangeId = string & { readonly __brand: "ExchangeId" };
 
 export type PendingExchange = { id: ExchangeId; prompt: Prompt; status: "pending" };
 export type RepliedExchange = { id: ExchangeId; prompt: Prompt; status: "replied"; reply: string };
-export type FailedExchange = { id: ExchangeId; prompt: Prompt; status: "failed"; error: string };
+export type Failure = { error: string; retryable: boolean };
+export type FailedExchange = { id: ExchangeId; prompt: Prompt; status: "failed" } & Failure;
 export type Exchange = PendingExchange | RepliedExchange | FailedExchange;
 
-export type AskResult = { ok: true; reply: string } | { ok: false; error: string };
+export type AskResult = { ok: true; reply: string } | ({ ok: false } & Failure);
 
 export function submit(id: ExchangeId, prompt: Prompt): PendingExchange {
   return { id, prompt, status: "pending" };
 }
 
-export function fail(exchange: PendingExchange, error: string): FailedExchange {
-  return { ...exchange, status: "failed", error };
+export function fail(exchange: PendingExchange, { error, retryable }: Failure): FailedExchange {
+  return { ...exchange, status: "failed", error, retryable };
 }
 
 export function reply(exchange: PendingExchange, text: string): RepliedExchange {
@@ -28,7 +29,7 @@ export function retry(exchange: Exchange): Exchange {
 export function settle(exchanges: readonly Exchange[], id: ExchangeId, result: AskResult): Exchange[] {
   return exchanges.map((exchange) => {
     if (exchange.id !== id || exchange.status !== "pending") return exchange;
-    return result.ok ? reply(exchange, result.reply) : fail(exchange, result.error);
+    return result.ok ? reply(exchange, result.reply) : fail(exchange, result);
   });
 }
 
