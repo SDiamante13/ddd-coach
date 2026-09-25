@@ -19,5 +19,5 @@ export function App() {
 function AccessView({ access, unlock }: { access: AccessState; unlock: Unlock }) {
   if (access === "checking") return <p role="status">Checking access…</p>;
   if (access === "locked") return <AccessGate onUnlock={unlock} />;
-  return <ConnectionTest />;
+  return <ConnectionTest unlock={unlock} />;
 }

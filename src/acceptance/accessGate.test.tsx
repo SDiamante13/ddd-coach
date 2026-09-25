@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TOO_MANY_TRIES } from "../api/access.ts";
 import { ACCESS_REQUIRED, ACCESS_WRONG_PASSWORD } from "../shared/accessContract.ts";
@@ -63,13 +63,31 @@ describe("Access gate", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(TOO_MANY_TRIES);
   });
 
-  it("says access has expired when the coach refuses the pass, without Retry, and puts the message back", async () => {
+  it("asks for the password again inline when access expires, keeping the log and the draft", async () => {
     const { server, send, input, log } = await startConversation();
 
     server.reply(await send("Hello coach"), 401, { error: ACCESS_REQUIRED });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(ACCESS_REQUIRED);
+    expect(ACCESS_REQUIRED).not.toMatch(/reload/i);
     expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Conference password")).toHaveFocus();
+    expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
     expect(input()).toHaveValue("Hello coach");
+  });
+
+  it("hides the inline password form once unlocked, back in the message box with the log kept", async () => {
+    const { user, server, send, input, log } = await startConversation();
+    server.reply(await send("Hello coach"), 401, { error: ACCESS_REQUIRED });
+    const field = await screen.findByLabelText("Conference password");
+
+    await user.type(field, "local-coach-dev{Enter}");
+    expect(server.bodyOf(1)).toEqual({ password: "local-coach-dev" });
+    server.replyNoContent(1);
+
+    await waitFor(() => expect(screen.queryByLabelText("Conference password")).not.toBeInTheDocument());
+    expect(input()).toHaveFocus();
+    expect(input()).toHaveValue("Hello coach");
+    expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
   });
 });

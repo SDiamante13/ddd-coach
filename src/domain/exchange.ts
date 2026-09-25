@@ -7,7 +7,9 @@ export type Failure = { error: string; retryable: boolean };
 export type FailedExchange = { id: ExchangeId; prompt: Prompt; status: "failed" } & Failure;
 export type Exchange = PendingExchange | RepliedExchange | FailedExchange;
 
-export type AskResult = { ok: true; reply: string; signature: string } | ({ ok: false } & Failure);
+export type AskResult =
+  | { ok: true; reply: string; signature: string }
+  | ({ ok: false; accessLost?: true } & Failure);
 
 export function submit(id: ExchangeId, prompt: Prompt): PendingExchange {
   return { id, prompt, status: "pending" };

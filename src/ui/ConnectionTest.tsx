@@ -1,20 +1,25 @@
 import { useRef, useState } from "react";
 import { isBusy } from "../domain/exchange.ts";
+import { AccessGate } from "./AccessGate.tsx";
 import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { ExchangeOutcome } from "./ExchangeOutcome.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { NewConversation } from "./NewConversation.tsx";
+import type { Unlock } from "./useAccess.ts";
+import { useAccessRecovery } from "./useAccessRecovery.ts";
 import { useClearConfirmation } from "./useClearConfirmation.ts";
 import { useExchanges } from "./useExchanges.ts";
 
-export function ConnectionTest() {
+export function ConnectionTest({ unlock }: { unlock: Unlock }) {
   const [draft, setDraft] = useState("");
+  const boxRef = useRef<HTMLTextAreaElement>(null);
+  const { accessLost, loseAccess, unlockAgain } = useAccessRecovery(unlock, () => boxRef.current?.focus());
   const { exchanges, send, retry, clear } = useExchanges({
     onRefused: (prompt) => setDraft((current) => restoredDraft(current, prompt)),
+    onAccessLost: loseAccess,
   });
-  const boxRef = useRef<HTMLTextAreaElement>(null);
   const confirmation = useClearConfirmation(() => {
     clear();
     boxRef.current?.focus();
@@ -37,6 +42,7 @@ export function ConnectionTest() {
           </ExchangeEntry>
         ))}
       </ol>
+      {accessLost && <AccessGate onUnlock={unlockAgain} />}
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} boxRef={boxRef}>
         {exchanges.length > 0 && <NewConversation busy={busy} confirmation={confirmation} conversation={conversation} />}
       </MessageForm>

@@ -13,15 +13,16 @@ import {
   type Prompt,
 } from "../domain/exchange.ts";
 
-type ExchangeCallbacks = { onRefused?: (prompt: Prompt) => void };
+type ExchangeCallbacks = { onRefused?: (prompt: Prompt) => void; onAccessLost?: () => void };
 
-export function useExchanges({ onRefused }: ExchangeCallbacks = {}) {
+export function useExchanges({ onRefused, onAccessLost }: ExchangeCallbacks = {}) {
   const [exchanges, setExchanges] = useState<readonly Exchange[]>([]);
 
   async function ask(id: ExchangeId, conversation: Conversation) {
     const result = await askCoach(conversation);
     setExchanges((current) => settle(current, id, result));
     if (isRefused(result)) onRefused?.(conversation.prompt);
+    if (!result.ok && result.accessLost) onAccessLost?.();
   }
 
   function send(prompt: Prompt) {

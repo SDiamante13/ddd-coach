@@ -52,10 +52,15 @@ describe("askCoach", () => {
     });
   });
 
-  it("marks a refusal for missing access as not worth retrying", async () => {
+  it("marks a refusal for missing access as access lost, not worth retrying", async () => {
     respondWith(jsonResponse(401, { error: ACCESS_REQUIRED }));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: ACCESS_REQUIRED, retryable: false });
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: ACCESS_REQUIRED,
+      retryable: false,
+      accessLost: true,
+    });
   });
 
   it("keeps a rate-limited request worth retrying", async () => {
