@@ -1,3 +1,4 @@
+import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import {
   COACH_MESSAGE_TOO_LONG,
   COACH_TIMED_OUT,
@@ -8,7 +9,8 @@ import {
 } from "../src/shared/chatContract.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
 import type { Coach } from "./coach.ts";
-import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
+import { createAccessPass } from "./accessPass.ts";
+import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
 import { MAX_BODY_BYTES, readJsonWithin } from "./requestBody.ts";
 import {
@@ -25,16 +27,21 @@ type CoachCallDeps = { deadlineMs: number; log: CoachFailureLog };
 type ReplyDeps = CoachCallDeps & { signer: TurnSigner };
 
 type ChatHandlerDeps = CoachCallDeps & {
+  access: AccessPasswordResult;
+  now: () => Date;
   config: ConfigResult;
   createCoach: (config: CoachConfig) => Coach;
   signingKey: SigningKeyResult;
 };
 
-export function createChatHandler({ config, createCoach, signingKey, ...deps }: ChatHandlerDeps) {
+export function createChatHandler({ access, now, config, createCoach, signingKey, ...deps }: ChatHandlerDeps) {
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
     if (!signingKey.ok) return misconfigured(signingKey.error);
+    if (!access.ok) return misconfigured(access.error);
+    const pass = createAccessPass(signingKey.key, access.password);
+    if (!pass.admits(request.headers.get("Cookie"), now())) return accessRequired();
     const signer = createTurnSigner(signingKey.key);
     const received = await readJsonWithin(request, MAX_BODY_BYTES);
     if (!received.ok) return rejected("messageTooLong");
@@ -48,6 +55,10 @@ export function createChatHandler({ config, createCoach, signingKey, ...deps }: 
 
 function methodNotAllowed(): Response {
   return respond({ error: "Use POST." }, { status: 405, headers: { Allow: "POST" } });
+}
+
+function accessRequired(): Response {
+  return respond({ error: ACCESS_REQUIRED }, { status: 401 });
 }
 
 function misconfigured(error: string): Response {
