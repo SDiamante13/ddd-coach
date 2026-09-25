@@ -1,0 +1,45 @@
+Rebook sync, Tue 22 Sep (notes: Priya; present: Dana, Maya, Tom, Sam)
+
+Context
+- RFC glossary needs "rebook" nailed before review
+- night shift + day desk disagree, finance sees double invoices, code does its own thing
+
+Defs as said in the room
+- bkg = customer request once submitted on portal (Dana)
+- RB = same bkg unless lane/date chg -> AMEND (Dana, from 2019 sheet row 12)
+  - i.e. lane or date change w/ same carrier = AMENDED, same ref
+  - carrier change = REBOOKED, new ref
+- Maya: nights RB everything. Amend doesn't push the date to carrier portal, so REBOOKED is the only safe option at 2am
+- Tom: RB = new invoice + void on old one. doesn't care about the word as long as nothing is invoiced twice
+- Sam: rebook! = old row REBOOKED + new row (rebooked_from_id -> old). amend! = update in place, AMENDED, no portal sync
+
+Load 48213
+- date moved +1 day, same carrier, rebooked at night
+- carrier billed TONU on orig load, then hauled the new one
+- we paid the TONU. carrier desk says amend + phone call would have avoided it
+
+Open qs
+- carrier drop (carrier cancels on us): new bkg or RB? nights call it RB, code does rebook!
+- pickup window chg same day: amend?
+- dashboard "bookings today" counts REBOOKED rows twice. who owns the fix?
+
+Actions
+- Sam: spike amend! -> portal sync (est 2d)
+- Priya: glossary draft, bring RB rows to Dana thurs
+- Maya: list of last month's night RBs that were date-only
+
+---- added after call, Thu 24 Sep ----
+
+Dana correction (read my notes back to her):
+- my line above is WRONG. lane change is ALWAYS a new booking, even with the same carrier. different lane = different rate = new tender = new booking
+- only a date (or window) change with the same carrier and same lane is AMENDED
+- she'd said "lane" on Tue meaning "the carrier's lane assignment", I wrote it down as the shipment lane. my mistake
+- so: same carrier + same lane + date chg = AMENDED. lane chg or carrier chg = new booking (code: REBOOKED + new row)
+
+Maya on the correction: agrees lane chg = new booking. still RBs date-only changes at night until amend! syncs to the carrier portal. "I don't care about the word, I care that the carrier gets the date"
+
+Tom: fine with it. finance only needs one invoice per shipment that actually moves
+
+Next
+- update glossary rows (rebook, amend) before RFC review
+- Dana out from the 15th, Maya reviews ops rows after that
