@@ -1,6 +1,7 @@
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import {
   COACH_MESSAGE_TOO_LONG,
+  COACH_OUT_OF_CREDIT,
   COACH_TIMED_OUT,
   COACH_TOO_LONG,
   COACH_UNAVAILABLE,
@@ -8,7 +9,7 @@ import {
   type ChatResponseBody,
 } from "../src/shared/chatContract.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
-import type { Coach } from "./coach.ts";
+import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import { createAccessPass } from "./accessPass.ts";
 import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
@@ -88,7 +89,7 @@ async function replyFrom(
     return replied(await withDeadline(coach.reply(conversation), deadlineMs), conversation.prompt, signer);
   } catch (error) {
     log(failureOf(error));
-    return coachUnavailable();
+    return error instanceof CoachOutOfCredit ? coachOutOfCredit() : coachUnavailable();
   }
 }
 
@@ -114,6 +115,10 @@ function coachTooSlow(): Response {
 
 function emptyReply(): Response {
   return respond({ error: "The coach sent an empty reply. Try again." }, { status: 502 });
+}
+
+function coachOutOfCredit(): Response {
+  return respond({ error: COACH_OUT_OF_CREDIT }, { status: 503 });
 }
 
 function coachUnavailable(): Response {

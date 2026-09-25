@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ACCESS_REQUIRED } from "../shared/accessContract.ts";
+import { COACH_OUT_OF_CREDIT } from "../shared/chatContract.ts";
 import { conversationOf } from "../test/conversations.ts";
 import { jsonResponse } from "../test/fetchStub.ts";
 import { askCoach } from "./askCoach.ts";
@@ -63,6 +64,12 @@ describe("askCoach", () => {
     });
   });
 
+  it("marks a coach paused for its spent usage budget as not worth retrying", async () => {
+    respondWith(jsonResponse(503, { error: COACH_OUT_OF_CREDIT }));
+
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: COACH_OUT_OF_CREDIT, retryable: false });
+  });
+
   it("keeps a rate-limited request worth retrying", async () => {
     respondWith(jsonResponse(429, { error: "Too many requests." }));
 
@@ -117,6 +124,16 @@ describe("askCoach", () => {
 
   it("reports an unavailable coach for any other error whose body is not JSON", async () => {
     respondWith(new Response("TimeoutError: task timed out", { status: 500 }));
+
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: "The coach is unavailable. Try again.",
+      retryable: true,
+    });
+  });
+
+  it("keeps a platform 503 whose body is not JSON worth retrying", async () => {
+    respondWith(new Response("Service Unavailable", { status: 503 }));
 
     expect(await askCoach(conversation)).toEqual({
       ok: false,

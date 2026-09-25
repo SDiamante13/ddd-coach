@@ -6,7 +6,7 @@ import type {
   SendChatCompletionRequestResponse,
 } from "@openrouter/sdk/models/operations";
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
-import type { Coach } from "./coach.ts";
+import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
 import { endOnCompleteLine } from "./replyEnding.ts";
 
@@ -27,8 +27,19 @@ export function createOpenRouterCoach(
 ): Coach {
   return {
     reply: async (conversation: Conversation) =>
-      replyText(await chat.send(chatRequest(config, instructions, conversation), WITHOUT_RETRIES)),
+      replyText(await chat.send(chatRequest(config, instructions, conversation), WITHOUT_RETRIES).catch(asCoachError)),
   };
+}
+
+const PAYMENT_REQUIRED = 402;
+
+function asCoachError(error: unknown): never {
+  if (isPaymentRequired(error)) throw new CoachOutOfCredit();
+  throw error;
+}
+
+function isPaymentRequired(error: unknown): boolean {
+  return typeof error === "object" && error !== null && "statusCode" in error && error.statusCode === PAYMENT_REQUIRED;
 }
 
 function chatRequest(

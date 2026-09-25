@@ -2,10 +2,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
-import type { Coach } from "./coach.ts";
+import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
-import { CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { COACH_OUT_OF_CREDIT, CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
 import { createAccessPass } from "./accessPass.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
@@ -223,6 +223,18 @@ describe("chat handler", () => {
 
     expect(log).toHaveBeenCalledWith({ name: "UnauthorizedResponseError", statusCode: 401 });
     expect(JSON.stringify(log.mock.calls)).not.toContain("sk-or-test-key");
+  });
+
+  it("says the coach is paused, with a 503, when its usage budget is spent, and logs why", async () => {
+    const brokeCoach = (): Coach => ({ reply: () => Promise.reject(new CoachOutOfCredit()) });
+    const log = vi.fn<CoachFailureLog>();
+    const handle = handler({ createCoach: brokeCoach, log });
+
+    const response = await handle(postMessage("Hello coach"));
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: COACH_OUT_OF_CREDIT });
+    expect(log).toHaveBeenCalledWith({ name: "CoachOutOfCredit", statusCode: 402 });
   });
 
   it("gives up with a 504 when the coach does not answer before the deadline", async () => {

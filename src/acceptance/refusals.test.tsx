@@ -1,6 +1,12 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { COACH_MESSAGE_TOO_LONG, COACH_TOO_LONG, COACH_UNAVAILABLE, COACH_UNVERIFIED } from "../shared/chatContract.ts";
+import {
+  COACH_MESSAGE_TOO_LONG,
+  COACH_OUT_OF_CREDIT,
+  COACH_TOO_LONG,
+  COACH_UNAVAILABLE,
+  COACH_UNVERIFIED,
+} from "../shared/chatContract.ts";
 import { renderApp, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
@@ -38,6 +44,7 @@ describe("Refusals", () => {
     [413, COACH_MESSAGE_TOO_LONG],
     [413, COACH_TOO_LONG],
     [400, COACH_UNVERIFIED],
+    [503, COACH_OUT_OF_CREDIT],
   ])("puts a message refused with %i back into the empty box: %s", async (status, error) => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();

@@ -5,6 +5,7 @@ export type ChatResponseBody = { reply: string; signature: string } | { error: s
 export const MAX_MESSAGE_CHARS = 24_000;
 
 export const COACH_UNAVAILABLE = "The coach is unavailable. Try again.";
+export const COACH_OUT_OF_CREDIT = "The coach is paused: its usage budget is used up. Tell the organizer.";
 export const COACH_TIMED_OUT = "The coach took too long. Try a shorter question or Retry.";
 export const COACH_TOO_LONG = "This conversation is too long for the coach. Copy the conversation, then start a new one.";
 export const COACH_UNVERIFIED =

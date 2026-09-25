@@ -2,8 +2,14 @@
 import type { ChatContentItems, ChatFinishReasonEnum, ChatResult } from "@openrouter/sdk/models";
 import type { SendChatCompletionRequestRequest } from "@openrouter/sdk/models/operations";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
+import {
+  BadGatewayResponseError,
+  OpenRouterDefaultError,
+  PaymentRequiredResponseError,
+} from "@openrouter/sdk/models/errors";
 import { describe, expect, it } from "vitest";
 import { CUT_SHORT_NOTE } from "../src/shared/chatContract.ts";
+import { CoachOutOfCredit } from "./coach.ts";
 import { verifiedConversationOf } from "./test/conversations.ts";
 import type { CoachConfig } from "./config.ts";
 import { createOpenRouterCoach, type ChatClient } from "./openRouterCoach.ts";
@@ -26,6 +32,17 @@ function resultWith(content: Content, finishReason: ChatFinishReasonEnum): ChatR
     systemFingerprint: null,
     choices: [{ index: 0, finishReason, message: { role: "assistant", content } }],
   };
+}
+
+const PROVIDER_TEXT = "Insufficient credits for key sk-or-test-key";
+
+function httpMetaOf(status: number) {
+  const body = JSON.stringify({ error: { code: status, message: PROVIDER_TEXT } });
+  return { response: new Response(body, { status }), request: new Request("https://openrouter.ai/api/v1/chat"), body };
+}
+
+function failingChat(error: Error): ChatClient {
+  return { send: () => Promise.reject(error) };
 }
 
 function fakeChat(content: Content, finishReason: ChatFinishReasonEnum = "stop") {
@@ -100,5 +117,21 @@ describe("OpenRouter coach", () => {
     const reply = await coachOn(chat).reply(verifiedConversationOf("Thread"));
 
     expect(reply).toBe(`Events, in order\n1. From thread: Customer submits.\n\n${CUT_SHORT_NOTE}`);
+  });
+
+  it.each([
+    ["a typed payment-required error", new PaymentRequiredResponseError({ error: { code: 402, message: PROVIDER_TEXT } }, httpMetaOf(402))],
+    ["an untyped 402", new OpenRouterDefaultError(PROVIDER_TEXT, httpMetaOf(402))],
+  ])("reports a spent usage budget, without the provider's text, for %s", async (_case, error) => {
+    const failure = await coachOn(failingChat(error)).reply(verifiedConversationOf("Hello coach")).catch((e: unknown) => e);
+
+    expect(failure).toBeInstanceOf(CoachOutOfCredit);
+    expect(String((failure as Error).message)).not.toContain(PROVIDER_TEXT);
+  });
+
+  it("passes any other provider failure through unchanged", async () => {
+    const badGateway = new BadGatewayResponseError({ error: { code: 502, message: PROVIDER_TEXT } }, httpMetaOf(502));
+
+    await expect(coachOn(failingChat(badGateway)).reply(verifiedConversationOf("Hello coach"))).rejects.toBe(badGateway);
   });
 });
