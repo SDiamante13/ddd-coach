@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
 import { stubFetch } from "./test/fetchStub.ts";
-import { PASTE_EXAMPLE, PURPOSE_LINE } from "./ui/PurposeLine.tsx";
+import { PASTE_EXAMPLE } from "./ui/PurposeLine.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -57,7 +57,12 @@ describe("Connection test", () => {
   it("says on load what the coach is for", () => {
     renderApp();
 
-    expect(screen.getByText(PURPOSE_LINE)).toBeVisible();
+    expect(
+      screen.getByText(
+        "Paste a messy thread or meeting notes about your domain, line breaks and all, " +
+          "and talk it through with a DDD coach.",
+      ),
+    ).toBeVisible();
   });
 
   it("shows an example of what to paste in the empty message box", () => {
