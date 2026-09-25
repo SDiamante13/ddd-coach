@@ -7,6 +7,7 @@ import {
   COACH_UNAVAILABLE,
   COACH_UNVERIFIED,
 } from "../shared/chatContract.ts";
+import { ACCESS_REQUIRED } from "../shared/accessContract.ts";
 import { renderApp, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
@@ -132,5 +133,26 @@ describe("Refusals", () => {
     expect(
       await within(log()).findByRole("button", { name: "Couldn't copy. Select the text in the log instead." }),
     ).toBeInTheDocument();
+  });
+
+  it.each([
+    [503, COACH_OUT_OF_CREDIT],
+    [401, ACCESS_REQUIRED],
+    [413, COACH_MESSAGE_TOO_LONG],
+  ])("offers only Copy after a %i refusal a new conversation can't fix: %s", async (status, error) => {
+    const { server, log, send } = await startConversation();
+    server.reply(await send("A"), status, { error });
+
+    await within(log()).findByRole("alert");
+
+    expect(within(log()).getByRole("button", { name: "Copy the conversation" })).toBeInTheDocument();
+    expect(within(log()).queryByRole("button", { name: "Start a new one" })).not.toBeInTheDocument();
+  });
+
+  it("offers to start a new one when the conversation itself is too long", async () => {
+    const { server, log, send } = await startConversation();
+    server.reply(await send("A"), 413, { error: COACH_TOO_LONG });
+
+    expect(await within(log()).findByRole("button", { name: "Start a new one" })).toBeInTheDocument();
   });
 });
