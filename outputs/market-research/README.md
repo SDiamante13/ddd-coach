@@ -21,8 +21,9 @@ Synthetic interviews generate hypotheses, not evidence. Promote an insight only 
 | 4a | 50 (paste box, #50/#51/#57/#61/#62) | [md](interviews/interview-04a-after-slice-50.md) · [html](interviews/interview-04a-after-slice-50.html) | Sunday replay: 5 fixed / 3 partly / 2 broken, all waiting on #4; nothing lost but the 8k cap picks which team the coach hears; reply 'a waiter, not a facilitator'; Clear kept the follow-up, not the thread; notice still 1.5/5 |
 | 5 | concepts: Explorations 03b, 02b, 05 + #58 citation toggle | [md](interviews/interview-05-concepts-03b-02b-05.md) · [html](interviews/interview-05-concepts-03b-02b-05.html) | 03b fixed columns, not stale cells; Copy table drops the settle-by line and open questions; learning check passed when prompted (weak); drop the citation toggle: citations always in replies, never in copies |
 | 5c | concept: Exploration 03c, before #6 | [md](interviews/interview-05c-explore-03c.md) · [html](interviews/interview-05c-explore-03c.html) | 6 ok / 7 stale / 5 missing; retyping ~7 min (from 8), but now hunting wrong content; split row → two credited rows with loads; one check must update the cell, the question and Dana's line |
+| 6 | 03 (#4 paste → disagreements) + Explorations 06, 05b | [md](interviews/interview-06-after-slice-03.md) · [html](interviews/interview-06-after-slice-03.html) | Win condition partly met: run 1 asked a question she'd missed, run 2 proposed an answer; tie with Claude broken for the question only ('one tab, one job'); reused the move unprompted but can't name it; view A/B unstable; notice still 1.5/5; #68 not fixed |
 
-Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`
+Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`, `slice-03.md`
 
 ## Queued for interview 04
 
@@ -59,13 +60,10 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   4. After using it, can she name or reuse one move herself? This is a light check that learning actually happened, not just a preference.
 - Tooling: `agent-browser` and headed Chrome screenshots hang on this machine. Use `npx -y playwright@1.63.0 screenshot --channel chrome …` (headless) over `python3 -m http.server`.
 
-## Queued for interview 06 (trigger: the slice 3 / #4 demo)
+## Queued for interview 07 (trigger: the #73 fixed-prompt demo)
 
-- **The win-condition test for #4:** she pastes her whole 12k thread (no trimming, once the cap is raised). Does the coach ask ONE question she wouldn't have thought of, drawn from the whole thread, with no "would you like me to…" offers? Compare directly with her company Claude's answer. Does the tie break?
-- #68: after starting over, is her last pasted thread restored?
-- #66: are the refusal buttons visible without scrolling?
-- The model changes to gpt-6-luna at this deploy. Note it, but judge the reply, not the model.
-- The "questions for interview 05" sections in 04a and 05.
-- **The learning metric (#26): "reuses a move unprompted".** Watch the transcript for her using a coaching move on her own, without being asked. Record yes or no with the quote.
-- **Design Exploration 06, "Structured reply"** (`outputs/design/explore-06/structured.html`, stills s1–s3; #64): slice 3's fixed reply layout shown as real lists and a table. A quick look alongside the #4 demo.
-- **Design Exploration 05b, "Why this question?" v2** (`outputs/design/explore-05b/why-v2.html` ?state=1..3, stills v1–v3, `explore-05b-steps.mp4`): each move shown once in a visible line, an always-visible source line on the coach's DDD claim, technique names only inside "why", no toggle, the hotspot paraphrase corrected. **Learning retest (delayed recall):** open by asking, without showing the line, whether she can name or apply "ask about one real case" from interview 05. Then check the corrected source line against her spot-check.
+- **#73 retest using REAL replies, not planted slips.** Take 3+ actual replies from the fixed prompt on her 12k thread, from the demo or evals. Check whether any view A/B flip or shift/desk holder remains. Planting slips tests Priya's detection, not the fix. Keep planting only as a control if the real replies are clean.
+- Win condition, re-run: across the 3 real replies, does every question ask rather than propose?
+- #68, if deployed: is her thread restored after starting over?
+- #66: are the refusal buttons visible without scrolling? Force a refusal if possible.
+- The "For the real practitioner (#70)" questions stay for the real session. Don't burn them on the synthetic persona.

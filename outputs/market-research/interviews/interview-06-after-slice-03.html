@@ -1,0 +1,857 @@
+<meta charset="utf-8">
+<title>Priya Raman Interview 06</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 06 · after slice 3 (#4)</div>
+      <h1>“The coach is worth the paste now. <em>The paste is the expensive part.</em>”</h1>
+      <p class="dek">The tech lead pasted her whole 12,040-character thread into the live coach, carriers included, and got a question she hadn't thought of, drawn from the part she cut last time. Company Claude, given the same file and prompt, gave her September's question. Then she ran the coach again and got advice dressed as a question. The tie broke for one job, on one run of two.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 31 questions</span>
+        <span class="chip">Slice 3 (#4) · shipped</span>
+        <span class="chip">#69 · shipped</span>
+        <span class="chip">Explorations 06 · 05b · concepts</span>
+        <span class="chip">Win-condition test · live site</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC: pre-read 22 Oct, finance review 27 Oct, due 30 Oct</dd></div>
+        <div><dt>Since 05c</dt><dd>Dana left 15 Oct (sent clause 7.3); Maya ops lead; two coach runs on Sun 18 Oct</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“<strong>The good question the first time.</strong> Not a better question. The same quality on every run, asking about a case and not handing me an answer.”</blockquote>
+      <cite class="label">Priya, Q30. “If I have to run it twice and pick, I'm the coach.” (In 04a it was “the whole thread in, one question back”. That half shipped.)</cite>
+    </div>
+  </section>
+
+  <section class="one-thing" aria-labelledby="win-label">
+    <div class="label" id="win-label">Win-condition verdict · GitHub #4</div>
+    <div>
+      <blockquote><strong>Partly met.</strong> Run 1 asked one question she wouldn't have thought of, from the whole thread, with no offers. Run 2, on the same file, proposed an answer she already knew.</blockquote>
+      <cite class="label">Tie-break: broken, for one job. The coach opens first on a new thread for the question; company Claude keeps events, drafting and history. “One tab, one job.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="win-h">
+    <div class="section-head">
+      <h2 id="win-h">The whole thread, twice</h2>
+      <span class="label">Sun 18 Oct · 12,040 / 24,000 · untrimmed · 11 s and 9 s</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Met</span><span class="count">run 1</span></div>
+        <ul>
+          <li><b>One question, no offers, and she wouldn't have thought of it</b><q>No. I've spent three weeks treating the carriers as the third meaning of a word.</q></li>
+          <li><b>Drawn from the whole thread: Tom's invoice line (early) and the carrier EDI message (late)</b><q>The question came out of the part I cut last time.</q></li>
+          <li><b>Asks about one load; true premise, and she can't answer it from the ledger</b><q>True premise, real gap, and I don't know the answer.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Tie-break</span><span class="count">vs company Claude</span></div>
+        <ul>
+          <li><b>Events: Claude wins (11 against 5)</b><q>My RFC has events already, so I don't care much.</q></li>
+          <li><b>Words: a tie; Claude's table keeps names she'd have to strip</b><q>“Tom (finance) says…”, “Dana says…”.</q></li>
+          <li><b>Question: the coach. Claude gave the canonical-definition question plus an offer</b><q>That's the question I'd have written in September.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Not met</span><span class="count">run 2</span></div>
+        <ul>
+          <li><b>“Should Ops keep one booking and send AMENDED so Finance issues one invoice?”</b><q>That's advice dressed as a question.</q></li>
+          <li><b>She now runs it twice and picks</b><q>A question I have to run twice to trust is half a question.</q></li>
+          <li><b>Run 1's roles were right, the room wrong: the carrier team isn't at the 27th</b><q>Right question, wrong room.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="one-thing" aria-labelledby="learn-label">
+    <div class="label" id="learn-label">Learning retest · #26 · delayed recall, 4 days</div>
+    <div>
+      <blockquote>“<strong>Load 47356 changed carrier on the same lane and shows REBOOKED. Load 46771 changed pickup date and shows AMENDED.</strong> Finance: which of these should produce a second invoice, and who voids the first?”</blockquote>
+      <cite class="label">Unprompted reuse: YES [supports learning goal], and again in a Friday PR comment. Named: NO, “put a load on it” [challenges learning goal]. The move predates the coach (Dana), and 05's new move decayed: “Last week I asked what made the difference. This week I asked them to pick a winner.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="watch-73">
+    <div class="section-head">
+      <h2 id="watch-73">Watch item #73: view labels</h2>
+      <span class="label">Planted from the demo's findings · not pointed out first · impact high</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Caught</span><span class="count">unprompted</span></div>
+        <ul>
+          <li><b>“Night dispatch” as a holder under “booking”. She folded it into Ops, current practice</b><q>It's the only line in the reply with a shift instead of a team, so it jumped out.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Missed</span><span class="count">noticed when asked</span></div>
+        <ul>
+          <li><b>View A = contract reading under “rebook”, night handover notes under “hold”. Found in about a minute once asked</b><q>View A changed teams between two words, and I didn't see it, and I read every line.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Impact</span><span class="count">would mislead finance</span></div>
+        <ul>
+          <li><b>Her pre-read draft already had “Ops, Dana's 2019 sheet: hold means waiting on the customer”. Dana's sheet doesn't mention hold. The eval checks the split on “rebook” only</b><q>The flip I missed because it looked right.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-event">
+        <span class="n">01</span>
+        <span><b>The whole thread made the question.</b> The tender-ID question joins lines the 8k cap forced her to cut in 04a. The cap raise was half the win.</span>
+        <div class="tags"><span>strong</span><span>#4</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>The question isn't stable across runs.</b> Run 2 proposed the answer to the fight she already knew. The eval checks that it spans the thread, not that it asks.</span>
+        <div class="tags"><span>strong</span><span>#4 ship bar</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">03</span>
+        <span><b>The tie broke on the question, and only there.</b> Same file, same prompt: Claude won events, tied words, lost the question. Coach first, Claude for the rest.</span>
+        <div class="tags"><span>strong</span><span>#4</span></div>
+      </div>
+      <div class="sticky s-event weak">
+        <span class="n">04</span>
+        <span><b>Real-case move reused unprompted, unnamed.</b> In the pre-read and a PR comment. But she had it before the coach, and 05's new move turned into a ruling question.</span>
+        <div class="tags"><span>medium</span><span>#26</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">05</span>
+        <span><b>The view flip got past her, into the RFC draft.</b> She caught “Night dispatch” unprompted, missed view A swapping teams, and wrote a “hold” row crediting Dana's sheet. “The flip I missed because it looked right.”</span>
+        <div class="tags"><span>strong</span><span>#73 · #4</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">06</span>
+        <span><b>#69 fixed the weight, not the content.</b> Read without meaning to, still 1.5/5. “Large print of the same small print.” The model changed; the notice didn't say.</span>
+        <div class="tags"><span>strong</span><span>#55 · #69</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">07</span>
+        <span><b>The paste is now the cost.</b> About 15 minutes of sanitizing per thread decides whether a thread gets the coach at all.</span>
+        <div class="tags"><span>medium</span><span>#34</span></div>
+      </div>
+      <div class="sticky s-neutral">
+        <span class="n">08</span>
+        <span><b>Structure changes reading, not copying.</b> She copied one question and one word block. The mock drops view labels and joint roles.</span>
+        <div class="tags"><span>medium</span><span>#64 · #6 frozen</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="checklist">
+    <div class="section-head">
+      <h2 id="checklist">Notice checklist</h2>
+      <span class="label">Her 5 items vs the live #69 notice, 19 Oct · 1.5 / 5 · weight fixed</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Met</span><span class="count">0 of 5 · +2 extra</span></div>
+        <ul>
+          <li><b>(Not on her list) visual weight: ink, body size, border, blue edge</b><q>It's not small print any more.</q></li>
+          <li><b>(Not on her list) the named list, “rates, lanes or contract terms”, now live</b><q>That's the one that caught my lanes in 04a.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Half</span><span class="count">1 of 5</span></div>
+        <ul>
+          <li><b>Company: OpenRouter named, “an AI model provider” still wrong, OpenAI unnamed. 05b's “routes it to OpenAI” would fix it</b><q>It changed twice and the notice noticed neither time.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Missing</span><span class="count">4 of 5</span></div>
+        <ul>
+          <li><b>Retention at OpenRouter and the provider</b><q>Retention is only “our server”.</q></li>
+          <li><b>Training use, with a link</b><q>There's no training line and no link.</q></li>
+          <li><b>A page to forward to security</b><q>For our security review it's still zero.</q></li>
+          <li><b>Operator named</b><q>No operator.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="checks-h">
+    <div class="section-head">
+      <h2 id="checks-h">Deploy checks</h2>
+      <span class="label">#68 · #66 · what's live vs what's open</span>
+    </div>
+    <div class="verdict">
+      <div class="col cut">
+        <div class="col-head"><span class="tag">#68 · No</span><span class="count">verified by her run</span></div>
+        <ul>
+          <li><b>New conversation → Clear left an empty box. She re-pasted from her file to re-run the coach.</b><q>It should make the second run one click, not a hunt for the file.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">#66 · Unknown</span><span class="count">not verifiable</span></div>
+        <ul>
+          <li><b>No refusal: 12k plus three follow-ups is far under the 64k cap. The demo shows none. The issue is still open.</b><q>I never saw them.</q></li>
+        </ul>
+      </div>
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Model</span><span class="count">terra, not luna</span></div>
+        <ul>
+          <li><b>Production runs gpt-5.6-terra; the queue expected gpt-6-luna. Judged the reply, not the model.</b><q>The notice noticed neither time.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-06">
+    <div class="section-head">
+      <h2 id="verdict-06">Exploration 06: structured reply</h2>
+      <span class="label">#64 · stills s1–s3 · concept, not built</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">3 items</span></div>
+        <ul>
+          <li><b>The question in its own box</b><q>The question in its own box is easier to select.</q></li>
+          <li><b>Stray markup stays plain text; the cut note</b><q>I've stopped seeing asterisks because there aren't any.</q></li>
+          <li><b>Guess styled apart from From thread</b><q>When a line doesn't say it, I should look.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">3 items</span></div>
+        <ul>
+          <li><b>Keep “(view A)/(view B)” in the Team cell. Today's parser drops it into Meaning</b><q>It looks like a typo, not a split.</q></li>
+          <li><b>Keep joint roles and the forum in the question box</b><q>Don't lose that to make the box tidy.</q></li>
+          <li><b>Chip only for Guess, not in every row</b><q>The “From thread” problem in a different font.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Defer</span><span class="count">1 item</span></div>
+        <ul>
+          <li><b>#64 as a whole, behind the question's stability</b><q>It changes how it reads, not what I take.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-05b">
+    <div class="section-head">
+      <h2 id="verdict-05b">Exploration 05b: why this question, v2</h2>
+      <span class="label">Stills v1–v3 · visible move lines · source line · concept, not built</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">4 items</span></div>
+        <ul>
+          <li><b>One visible move line per question</b><q>One line per question is fine; I'd read it the way I read a code-review comment.</q></li>
+          <li><b>No toggle; technique names inside “why”</b><q>That's the fix I asked for.</q></li>
+          <li><b>The corrected hotspot line</b><q>“To come back to”, that's how Brandolini says it in the talks.</q></li>
+          <li><b>A notice naming OpenAI and the model</b><q>So that's two out of five on paper.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">3 items</span></div>
+        <ul>
+          <li><b>Put the Evans source after the half it backs (#58)</b><q>Half the sentence passes. The half that tells me what to do is yours.</q></li>
+          <li><b>Copy obeys the move: “check it yourself” never lands on the expert list</b><q>The why is right and the copy still ignores it.</q></li>
+          <li><b>Refresh the fixture: Dana left on 15 Oct</b><q>A concept nobody's reread.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">1 item</span></div>
+        <ul>
+          <li><b>“Your 30-minute slot” with Dana, and every “for Dana” label</b><q>Four days after she's gone.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Learning retest</a>
+      <a href="#part-b">B · Since last time</a>
+      <a href="#part-c">C · Whole thread vs Claude</a>
+      <a href="#part-d">D · The notice</a>
+      <a href="#part-e">E · #68 · #66</a>
+      <a href="#part-f">F · Exploration 06</a>
+      <a href="#part-g">G · Exploration 05b</a>
+      <a href="#part-h">H · Close</a>
+    </nav>
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Learning retest</h3><span class="aside">before anything is shown</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Before I show you anything. Write the question you'll put in the pre-read for the 27 Oct finance review, the one you most need answered in the room.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“Load 47356 changed carrier on the same lane and shows REBOOKED. Load 46771 changed pickup date and shows AMENDED. Finance: which of these should produce a second invoice, and who voids the first?” That's what goes in the pre-read. I wrote “is a rebook one booking or two?” first and deleted it before I finished the line, because finance will spend twenty minutes on that and leave with nothing.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>Why that shape?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Because Maya answered the three-load version in one line on Thursday, and the abstract version had been going round since July. A load number stops people arguing about what the word should mean and makes them say what happened. <mark>Put a load on it, or you get a philosophy seminar.</mark> Finance likes loads anyway, because loads have invoices.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>Is that a move you learned somewhere? Can you name it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“Put a load on it” is what I call it. You'll want me to say the phrase from your screen last week and I can't; something about one real example. And honestly, Dana did this to me in September before your tool did. The other one you showed me, the “what made them different” one, I thought I'd used here. Reading it back, I haven't. <mark>Last week I asked what made the difference. This week I asked them to pick a winner.</mark> “Which should produce a second invoice” is a ruling, and finance will rule for finance. I'd change it to “what's different about 47356 that made it a second invoice”, except I don't know that it did. I'd have to check first.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Since Thursday, have you asked anyone a question that way without thinking about it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Friday, a PR review. Ravi's change to the carrier-drop handler, and my first comment was going to be “does this handle lane changes?”. I wrote “what happens to 47356 with this change?” instead, and he ran it and found it created a second tender. I didn't notice I'd done it until you asked. That counts for more than the pre-read question, because nobody was watching me write the PR comment.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Since last time</h3><span class="aside">Thu 15 → Mon 19 October</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Four days since 05c. What's moved?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Dana left on Thursday, and she answered my contract question at noon. Maya's one-line answer went into the RFC as the “Ops, current practice” row. The pre-read goes out this Thursday, the 22nd; finance review is still the 27th, due the 30th. On Thursday evening I did the small run on the old coach, Maya's comments and the two rows. It asked whether I'd like a table of the terms. I said that would be the last run, and then you sent the link on Friday.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>What did Dana's answer say?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Clause 7.3 of our standard carrier agreement: “a change of carrier or lane constitutes a new tender.” Tender, not booking. <mark>So Dana's side of the split is the carriers' word in an ops mouth.</mark> The row now says “Dana's 2019 sheet, reading clause 7.3 (new tender)”. I haven't decided whether that settles the split or makes it worse.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>Has Marcus opened the RFC?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Friday night. One comment, on the Code row: “which commit?” Exactly what he said he'd ask. I added the hash. He hasn't said anything about the rest, which from Marcus is approval.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>The whole thread, and company Claude</h3><span class="aside">Sunday 18 October · the live site · #4</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q8</span><span>You said in 04a you'd re-run the whole thread, carriers included, if the coaching prompt shipped. Walk me through Sunday.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Same laptop, same file: 12,040 characters, sanitized, lanes taken out last time. I didn't trim anything, not even the “+1”s. The counter said “12,040 / 24,000”, no red box, and I sent it. <mark>First Sunday in three where I didn't choose which team to leave out.</mark> The carrier side-thread about the EDI tender was in.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>How long did the reply take, and did the wait bother you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>About eleven seconds, “Coach is thinking…” and then the whole thing at once. The second run was nine. Company Claude takes longer on the same thread, and I watch it type, which isn't faster, it just feels busier. Eleven seconds for something I'd otherwise spend twenty minutes on is not the problem. If it were thirty I'd open another tab and forget it.</p></div></div>
+          </div>
+          <p class="stage">The reply, as she read it back from her notes (about 330 words, no names, no offers): five events, the fourth “From thread: The carrier team's EDI job cancels the first tender and sends a new tender with a new tender ID.” Four words: “booking” (Ops, Finance, Carriers, and once “Night dispatch”), “rebook” (Ops (view A) the contract reading, Ops (view B) the night desk's practice, Finance, Code), “tender” (Carriers, Ops), “hold” (Ops (view A) “a load waiting on the customer”, which is the night handover notes' meaning, Ops (view B), Finance's credit hold). The view swap and the sub-team holder are planted from the demo's findings (#73) and were not pointed out to her. Then: “Question for the finance controller and the carrier team lead, at the 27 Oct RFC review: For the load in the thread that got two carrier invoices after a rebook, was the second invoice matched to the original booking ref or to the new tender ID?”</p>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>First read. What did you notice?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That it was short enough to read, and I did, all of it, in about three minutes. In 04a I told you I wanted three lines and a question. This is thirty lines and a question and I didn't mind, because every line was about my thread and none of it was advice. <mark>No “consider”, no “recommendations”, no bounded contexts. First time.</mark> Then I went straight to the bottom, because the question is what I came for.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>The question. Would you have thought of it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. I've spent three weeks treating the carriers as the third meaning of a word. It treated them as where the second invoice comes from. Tom's line about matching invoices is near the top, and the EDI message about the new tender ID is two-thirds of the way down, in the part I cut in 04a. <mark>The question came out of the part I cut last time.</mark> And it asks about one load, not about what a booking is. So it did the thing I did to Maya, to me.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>Did you check it before believing it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Of course. I searched the thread for “tender id” and found the carrier team's message, and Tom's “we match carrier invoices to the booking” is there too, so the premise is real. Then I opened the ledger export this morning to answer it myself before asking anyone. It has no tender ID column, so I can't. That's the best kind of question: true premise, real gap, and I don't know the answer. But the carrier team lead isn't at the 27th, it's a finance review. <mark>Right question, wrong room.</mark> It goes to Ravi today, and only the answer goes in the pre-read.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>Now company Claude. What did you ask it, and what came back?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>To be fair to it, I pasted the same file and typed your purpose line as the prompt. It gave me eleven events, which is better than five, and a proper rendered table of words, about as good as yours. It kept names: “Tom (finance) says…”, “Dana says…”. Its question was “What is the canonical definition of a booking that both Ops and Finance can agree on?” <mark>That's the question I'd have written in September.</mark> Then “Would you like me to draft a proposal for a unified booking lifecycle?” I pushed it once: “Give me one question I wouldn't have thought of, from the whole thread.” It came back with “Who owns the booking record after handoff from ops to finance?”, which could be about any company. I could probably write a prompt that gets Claude there. That's an evening I don't have, and I didn't know what to ask for until I'd seen yours.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q14</span><span>So side by side: did the tie break?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>For the question, yes. Events: Claude wins, and my RFC has events already. Words: a tie, except Claude's has names I'd have to strip. <mark>The question: yours, and it isn't close.</mark> Next thread, I open your tab first, get the question, then take everything else to Claude, because Claude has my history and drafts the invite. One tab, one job.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q15</span><span>You said you ran it twice.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Because I don't trust anything that surprises me once. New conversation, Clear, same file again. The second question was “For a same-lane carrier change, should Ops keep one booking and send AMENDED so Finance issues one invoice?”, at “the 27 oct booking-split RFC review”, lowercase. <mark>That's advice dressed as a question.</mark> It proposes the answer, and it's the fight I already knew about. If that had been my first run, we'd be having the 04a conversation again. So now I'd run it twice every time and pick, which means I'm the facilitator again. <mark>A question I have to run twice to trust is half a question.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>Every line starts “From thread:”. Useful, or noise?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Noise after the third line, useful as a promise. Eighteen lines that all say “From thread” tell me nothing line by line. What it tells me is that when a line doesn't say it, I should look, and there were no “Guess” lines on Sunday, so I never saw the contrast. When I checked the question I searched the thread myself; a message time would have saved me two minutes. And when I copied the rebook block into my notes I deleted “From thread: ” four times by hand. In the reply, never in the copy.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q17</span><span>Is there anything in the reply you'd correct before you used it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Two things. “Code” is Ravi reading the EDI job in Slack, not code; “From thread” is literally true, but “Code” as the holder sounds like someone pasted code. And “Night dispatch” turns up once under “booking” as if it were a team. It's a shift in Maya's team, and the only line with a shift instead of a team, so it jumped out. <mark>I'd fold it into Ops, current practice, and I did.</mark> Missing: nothing I'd blame it for; Dana's sheet and clause 7.3 aren't in the thread, so it didn't make them up. The two blocks I used were “rebook” and “hold”. “Hold” went into the RFC draft this morning, because finance's credit hold next to our “hold” is exactly the collision the review is for. View A is Dana's sheet, view B is current practice, same as in the rebook block.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>Under “rebook”, view A is the contract reading. Under “hold”, whose line is “waiting on the customer”? Check it against the thread.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's the night handover notes. That's Maya's night desk, which is view B under “rebook”. <mark>View A changed teams between two words, and I didn't see it, and I read every line.</mark> So the row I wrote this morning says “Ops, Dana's 2019 sheet: hold means waiting on the customer”, and Dana's sheet doesn't mention hold at all. That was going out in Thursday's pre-read. Finance would have asked who owns it, and the answer on that row is someone who left last Thursday. That's the P2 again: a disagreement with the wrong owner. <mark>Night dispatch I caught because it looked wrong. The flip I missed because it looked right.</mark> Letters are only safe if they mean the same group all the way down. Otherwise give me the names from the thread and I'll rename them myself.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>The notice</h3><span class="aside">#69 shipped · vs 05b's notice</span></div>
+        <p class="stage">Shown the live first screen: the notice in ink at body size in a bordered box with a blue left edge. Then 05b's notice: “OpenRouter routes it to OpenAI (openai/gpt-5.6-terra).”</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q19</span><span>Does the notice still read as small print?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. It's the same size as the purpose line, it's dark, and it has a box with an edge, so I read it on Sunday without meaning to. And the named list is there: “rates, lanes or contract terms”. <mark>It's not small print any more. It's large print of the same small print.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>Your checklist, then: the processing company, retention, training with a link, a page to forward, the operator named.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>One and a half, same as before. OpenRouter is named and “an AI model provider” is still wrong, because OpenRouter routes it to someone else and that someone isn't named. You told me in 04a it had moved to luna; your own concept's notice says terra. So it changed twice and the notice noticed neither time. Retention is only “our server”, no training line, no link, no page to forward, no operator. Your 05b concept gets the company right, so that's two out of five on paper. <mark>For our security review it's still zero, because there's nothing to forward.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>Starting over, refusals</h3><span class="aside">#68 · #66 · both still open</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q21</span><span>When you pressed New conversation for the second run, what was in the box after you cleared?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Nothing. My draft was empty, so the box was empty, and the thread was gone with the log. I pasted it again from the file. <mark>It's the 04a thing, only this time I cleared on purpose, to check the coach, and it still made me re-paste.</mark> If the tool wants me to trust its question, it should make the second run one click, not a hunt for the file.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>Did you hit a refusal this time? Were the buttons visible?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No refusal. Twelve thousand and three follow-ups didn't come near it. So I can't tell you about the buttons; I never saw them. In 04a I had to scroll to find them. If that's not fixed, it's not fixed, I just didn't get there.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Exploration 06</h3><span class="aside">structured reply · s1–s3 · concept</span></div>
+        <p class="stage">Shown s1: a numbered list with FROM THREAD / GUESS chips, a Word · Team · Meaning · Source table, and the question in its own box. Then s2 (cut at the limit) and s3 (stray markup stays plain). Told the table layout itself is not up for redesign.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q23</span><span>Would this change what you copy out of a reply?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Not much. On Sunday I copied two things: the question, and the “rebook” block into my notes. The question in its own box is easier to select, so that's a small win. The rest I read here and retype in the RFC, because the RFC's rows have load numbers and practice names the coach can't know. <mark>It changes how it reads, not what I take.</mark> Raw text was fine on Sunday.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q24</span><span>Anything in the stills that worries you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Your mock-up has “Ops” once per word. My reply has “Ops (view A)” and “Ops (view B)”. Where does that go in a Team column? If it turns into two rows both saying “Ops” with different meanings, it looks like a typo, not a split. And the box says “Question for the ops lead”. Since 12 October that's one person; Sunday's reply named two roles and a meeting. Don't lose that to make the box tidy. The chip in every Source cell is the “From thread” problem in a different font.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-g">
+        <div class="part-head"><span class="tab">G</span><h3>Exploration 05b</h3><span class="aside">why this question, v2 · v1–v3 · concept</span></div>
+        <p class="stage">Shown v1: three questions, each with a visible MOVE line and “Why ask it this way?”, and a source line under the opening claim: “Evans, Domain-Driven Design Reference (2015), ‘Ubiquitous Language’ and ‘Bounded Context’.” Then v2, the opened why with the hotspot line, and v3, “Copy the questions for my Dana prep”.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q25</span><span>The first move line reads “Ask about one real case, not the general rule”. Is that your “put a load on it”?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That's the phrase I couldn't find this morning. Yes, same move. <mark>I'd kept the move and lost the words, and seeing the words didn't add anything to the move.</mark> Useful for Ravi, maybe, who doesn't have the move yet.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q26</span><span>Do the visible move lines teach, or are they noise?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>One line per question is fine; I'd read it the way I read a code-review comment. Question 1's line is noise for me. Question 2's, “Ask what made the difference, not what the words mean”, is the one I skipped in 05 because it was folded, and now I can't miss it. That's the fix I asked for. It's also the one I just failed to use in my pre-read question. <mark>A visible line got me to read it, twice now. It didn't get me to do it on my own, yet.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q27</span><span>Spot-check the source line on the opening claim.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I have the DDD Reference PDF, it's free. The Bounded Context section backs the second half: the same word meaning different things in different parts of a big system is normal. “Settle what the word means before splitting the code” is your advice, not Evans's, and the source line sits under both halves as if he said both. <mark>Half the sentence passes. The half that tells me what to do is yours.</mark> The hotspot one is right now, “to come back to”, that's how Brandolini says it in the talks. I don't own the book, so that source I'd take on trust.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q28</span><span>And the copy in v3?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It still copies question 3, “had the first carrier already sent a truck”, onto the list for Dana. Its own move line says “check it yourself first”. I told you that in 05. <mark>The why is right and the copy still ignores it.</mark> And Dana left on Thursday. A concept that says “your 30-minute slot” with Dana four days after she's gone is a concept nobody's reread.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-h">
+        <div class="part-head"><span class="tab">H</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q29</span><span>Would you use it this week for real prep? For what?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Yes, Wednesday evening, once. Finance's pre-read comments come in tomorrow; I'll sanitize them with Maya's thread, about four thousand characters, and take its question to the review if it passes the same check: true premise, and I don't know the answer. Sanitizing takes me fifteen minutes each time, and that's now the real cost. <mark>The coach is worth the paste now. The paste is the expensive part.</mark> I'll run it twice. I'd rather not have to.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q30</span><span>If you could have only one thing in the next month?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The good question the first time. Not a better question: Sunday's first one was good enough. The same quality on every run, asking about a case and not handing me an answer. <mark>If I have to run it twice and pick, I'm the coach.</mark> After that, I'd want to paste the thread unsanitized at work, and I know that's a different conversation.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q31</span><span>Anything we should have asked and didn't?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Ask Ravi what he makes of the tender-ID question when I send it today. If he says “obviously the new tender ID, everyone knows that”, then it was a question only I wouldn't have thought of, and that's a smaller win than it felt like on Sunday.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges · #7 = B38</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The ship bar means a non-obvious question</h3><div class="ref">#4</div></div>
+        <p>Run 1 passed; run 2 proposed the answer. The eval checks that the question spans the thread, not that it asks. The view split is checked only on “rebook”, so view A changing teams under “hold” passes.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>View labels are a cosmetic slip</h3><div class="ref">#73 · #4</div></div>
+        <p>The flip reached her RFC draft and would have misled finance on Thursday; the sub-team she caught. Errors that look consistent are the dangerous ones. Fix #73 before replies get pasted into docs, with an eval check across every word.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The cap raise is plumbing; the prompt is the product</h3><div class="ref">#4</div></div>
+        <p>The winning question came from lines the 8k cap made her cut in 04a. The raise was half the win.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Learning happens through the “why”</h3><div class="ref">#26</div></div>
+        <p>The reused move predates the coach; the move the coach taught decayed in four days. The metric needs a novelty qualifier: a move she didn't have before.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Sanitized-only is a one-time cost</h3><div class="ref">#34</div></div>
+        <p>It's about 15 minutes per thread, and now that the reply is worth having, it decides use. Her next unsanitized thread still goes to company Claude.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Visual weight fixes the notice</h3><div class="ref">#55 · #69</div></div>
+        <p>It fixed reading, not trust: 1.5 of 5. The model changed again and the notice didn't say. A forwardable page is what her security review needs.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A source line makes a claim checkable</h3><div class="ref">#58</div></div>
+        <p>Only if it sits on the part the source backs. 05b's Evans line also covers the coach's own advice.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Structure makes replies more useful</h3><div class="ref">#64 · #6</div></div>
+        <p>It changes reading, not copy-out, and the mock's parser loses the view labels and joint roles the prompt fought for. #6 stays frozen: she copied one question and one block, and stripped the labels by hand.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Starting over is for refusals</h3><div class="ref">#68 · #66 · #7 B38</div></div>
+        <p>She started over to re-run and check the coach. Variance makes #68 more valuable. With 24k/64k caps she didn't reach a refusal, so #66 and #7 lose urgency for her.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Synthetic interviews can judge the question</h3><div class="ref">#70</div></div>
+        <p>Whether the tender-ID question is non-obvious depends on what Ravi already knows. Only a real team can say.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Ask</span><div><h3>The question asks, never proposes</h3><div class="where">#4 eval</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>A soft check fails when the question contains “should … instead of”, “so Finance/Ops …”, or offers the answer with a reason. Add it to the ship bar at 3/3 per fixture.</dd></div>
+          <div><dt>Check</dt><dd>The demo's run 3 question fails; the video question and F2's pass; a terra v4 re-run scores 3/3 on F1.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Views</span><div><h3>View labels keep their group</h3><div class="where">#73 · #4 prompt + eval</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>One prompt line: view A and view B keep the same group for every word. The split check covers every word block, not just “rebook”.</dd></div>
+          <div><dt>Check</dt><dd>On F1, every “Ops (view A)” line across all words matches the day-desk key and every “(view B)” the night key, in 3/3 runs, and 0 holders are a shift or desk name.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Again</span><div><h3>Run it again with the same paste</h3><div class="where">#68 · narrow cut</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>After Clear, if the log had a first message, the box offers “Paste your last thread again” and fills the first prompt exactly.</dd></div>
+          <div><dt>Check</dt><dd>Paste 12,040 chars, get a reply, New conversation → Clear → choose it: the box holds the first prompt byte for byte, count 12,040 / 24,000, 0 log entries, one click.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Parse</span><div><h3>Exploration 06 keeps views and roles</h3><div class="where">#64 · before it's built</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The parser reads “Team[ (view X)] means meaning” and the question's full role string.</dd></div>
+          <div><dt>Check</dt><dd>Parsing the demo's F1 reply gives Team “Ops (view A)” and “Ops (view B)”; 0 Meaning cells start with “(view” or “Means”; the box reads “Question for the ops lead and the finance controller, at …”.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">For the real practitioner (#70)</h2>
+      <span class="label">What this synthetic series can't settle</span>
+    </div>
+    <ul class="next">
+      <li>Paste your own messy thread twice. Is the question the same both times? Which would you take to a meeting?</li>
+      <li>Show the question to a colleague who knows the system. Is it non-obvious to them, or only to you?</li>
+      <li>Ask your approved AI tool the same thing with the same prompt. Which answer would you act on first, and why?</li>
+      <li>Four days later, without the tool, write the question for your next review. Which move did you use? Did you have it before the coach?</li>
+      <li>What would you strip from your thread before pasting it here, and how long does that take?</li>
+      <li>Read the “Ops (view A)/(view B)” lines across two words. Who are A and B in each? Would you catch a swap before copying a row into a doc? (#73)</li>
+      <li>Would your security team accept this notice? What would they ask for?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Slice 3 (#4) and #69 are live on gpt-5.6-terra; her Sunday runs are synthetic, with the reply adapted from the slice 3 demo and eval. Explorations 06 and 05b are design concepts, not shipped software. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>
