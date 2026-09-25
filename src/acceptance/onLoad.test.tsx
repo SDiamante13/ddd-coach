@@ -2,7 +2,7 @@ import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
 import { formatCount, renderApp } from "../test/appDriver.tsx";
-import { PASTE_EXAMPLE } from "../ui/PurposeLine.tsx";
+import { PASTE_EXAMPLE } from "../ui/MessageBox.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 

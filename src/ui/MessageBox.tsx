@@ -1,8 +1,11 @@
 import type { KeyboardEvent } from "react";
 import { hasTouchPointer } from "./pointer.ts";
-import { PASTE_EXAMPLE } from "./PurposeLine.tsx";
 
 const SAFARI_COMPOSITION_KEY_CODE = 229;
+
+export const PASTE_EXAMPLE =
+  "e.g. Ops: a booking exists the moment the customer submits\n" +
+  "Finance: not for us, it's a booking once it's invoiceable";
 
 type MessageBoxProps = {
   id: string;
