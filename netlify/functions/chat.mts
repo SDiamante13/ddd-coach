@@ -19,5 +19,5 @@ export default (request: Request): Promise<Response> =>
 
 export const config: Config = {
   path: "/api/chat",
-  rateLimit: { windowLimit: 20, windowSize: 60, aggregateBy: ["ip", "domain"] },
+  rateLimit: { windowLimit: 300, windowSize: 60, aggregateBy: ["ip", "domain"] },
 };
