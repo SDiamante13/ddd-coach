@@ -150,6 +150,12 @@ p[role="alert"] {
   font-size: var(--text-sm);
 }
 
+li[data-status="refused"] > p[role="alert"] {
+  border-color: var(--color-warn);
+  background: var(--color-warn-tint);
+  color: var(--color-ink);
+}
+
 form {
   position: sticky;
   bottom: var(--space-4);

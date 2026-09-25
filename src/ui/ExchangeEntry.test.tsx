@@ -19,4 +19,15 @@ describe("ExchangeEntry", () => {
 
     expect(screen.getByRole("listitem")).toHaveAttribute("data-status", exchange.status);
   });
+
+  it("marks a refused exchange, which Retry can't help, apart from a failed one", () => {
+    const refused = fail(pending, { error: "That message couldn't be checked.", retryable: false });
+    render(
+      <ol>
+        <ExchangeEntry exchange={refused} busy={false} onRetry={() => {}} />
+      </ol>,
+    );
+
+    expect(screen.getByRole("listitem")).toHaveAttribute("data-status", "refused");
+  });
 });
