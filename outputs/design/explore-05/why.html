@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDD Coach</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../../src/styles/base.css">
+<style>
+body{overflow:hidden}
+main{height:100dvh;min-height:0;padding-top:var(--space-6)}
+ol[role="log"]{overflow-y:auto;min-height:0;padding-bottom:var(--space-4)}
+.lockline{font-size:var(--text-sm);padding:var(--space-2) var(--space-4);border:1px solid var(--color-line-strong);border-radius:var(--radius-md);background:var(--color-surface)}
+.coachbox{padding:var(--space-4) var(--space-5);border-radius:var(--radius-md);background:var(--color-coach-tint)}
+.coachbox .who{margin-bottom:var(--space-1);font:500 var(--text-base)/1 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-coach)}
+.qs{margin:var(--space-3) 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--space-3)}
+.qs > li{padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:var(--color-surface);border:1px solid #C5D0EC}
+.qs .q{font-weight:500}
+.why{margin-top:var(--space-2)}
+.why summary{cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:32px;font-size:var(--text-sm);font-weight:500;color:var(--color-coach);list-style:none}
+.why summary::-webkit-details-marker{display:none}
+.why summary::before{content:"?";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:9px;border:1.5px solid currentColor;font:600 11px/1 var(--font-body)}
+.why[open] summary{color:var(--color-ink)}
+.why .body{margin-top:var(--space-2);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-line);font-size:var(--text-sm);line-height:1.5;display:flex;flex-direction:column;gap:var(--space-2)}
+.why .lab{font:500 var(--text-sm)/1 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-ink-muted)}
+.tech{display:none}
+body.names .tech{display:block}
+.src{color:var(--color-ink-muted);font-size:var(--text-xs)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);font-size:var(--text-sm);color:var(--color-ink-muted)}
+.switch{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.switch input{width:18px;height:18px;accent-color:var(--color-coach)}
+.steps{position:fixed;left:16px;bottom:12px;display:flex;gap:6px}
+.steps span{font:500 11px/1 var(--font-label);letter-spacing:.06em;padding:7px 10px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink-muted)}
+.steps span.on{background:var(--color-coach);border-color:var(--color-coach);color:#fff}
+</style>
+</head>
+<body><div id="root"><main>
+<h1>DDD Coach</h1>
+<div class="lockline"><strong style="font-weight:600">Where your text goes:</strong> OpenRouter routes it to OpenAI (openai/gpt-5.6-terra). Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms.</div>
+<div class="bar"><span>Explanations stay here. They never go into your copied table.</span><label class="switch"><input type="checkbox" id="names"> Show technique names</label></div>
+<ol role="log" id="log">
+<li data-status="replied"><p>What should I ask Dana next?</p><div class="coachbox"><div class="who">Coach</div>Three questions for your 30-minute slot, each on one real load.
+<ul class="qs">
+<li><div class="q">1. Load 48213 was rebooked with another carrier after a rejection. Same booking, or a new one?</div>
+<details class="why" id="w1"><summary>Why ask it this way?</summary><div class="body">
+<div><span class="lab">The move</span><br>Ask about one real case instead of the general rule. Experts answer a concrete case in seconds and argue about an abstract one for minutes.</div>
+<div><span class="lab">What it unblocks</span><br>Half of your table: if the answer is “same booking”, finance's “cancel plus a new booking” becomes the thing to change.</div>
+<div class="tech"><span class="lab">Technique</span><br>Example Mapping: test a rule with a concrete example. <span class="src">Source: Cucumber, “Example Mapping” guide.</span></div>
+</div></details></li>
+<li><div class="q">2. Load 47990 shows AMENDED. What made it AMENDED rather than REBOOKED?</div>
+<details class="why" id="w2"><summary>Why ask it this way?</summary><div class="body">
+<div><span class="lab">The move</span><br>Ask what made the difference, not what the words mean. The difference is where the rule hides.</div>
+<div><span class="lab">What it unblocks</span><br>Your notes and the code disagree here. Her answer tells you which one to believe.</div>
+<div class="tech"><span class="lab">Technique</span><br>EventStorming hotspot: mark where two sources disagree and resolve it with the person who knows. <span class="src">Source: Brandolini, Introducing EventStorming.</span></div>
+</div></details></li>
+<li><div class="q">3. Load 48102 got two invoices. Had the first carrier already sent a truck?</div>
+<details class="why" id="w3"><summary>Why ask it this way?</summary><div class="body">
+<div><span class="lab">The move</span><br>You may not need Dana for this. Check the load yourself first and save her time for questions only she can answer.</div>
+<div><span class="lab">What it unblocks</span><br>Whether TONU explains the second invoice, or whether it's the bug finance fears.</div>
+<div class="tech"><span class="lab">Technique</span><br>Collaborative modeling: bring evidence, not opinions, to the expert. <span class="src">Source: van Kelle, Verschatse, Baas-Schwegler, Collaborative Software Design.</span></div>
+</div></details></li>
+</ul></div></li>
+</ol>
+<form><label for="msg">Message</label><div style="display:flex;gap:var(--space-2);align-items:flex-end"><textarea id="msg" rows="2" style="flex-grow:1"></textarea><button type="submit">Send</button></div></form>
+</main></div>
+<div class="steps" aria-hidden="true"><span id="s1" class="on">1 Three questions</span><span id="s2">2 Why this way?</span><span id="s3">3 Technique names</span><span id="s4">4 Copy stays clean</span></div>
+<script>
+const $ = (id) => document.getElementById(id);
+const step = (n) => [1, 2, 3, 4].forEach((i) => $("s" + i).classList.toggle("on", i === n));
+$("names").addEventListener("change", (e) => document.body.classList.toggle("names", e.target.checked));
+window.runTo = (n) => {
+  if (n >= 2) { step(2); $("w1").open = true; }
+  if (n >= 3) { step(3); $("w2").open = true; $("names").checked = true; document.body.classList.add("names"); $("log").scrollTop = 200; }
+  if (n >= 4) {
+    step(4); $("w1").open = false; $("w2").open = false; $("names").checked = false; document.body.classList.remove("names");
+    $("log").insertAdjacentHTML("beforeend", `<li data-status="replied"><p>Copy the questions for my Dana prep</p><p>Copied as plain questions. The explanations and technique names stay here:\n\n1. Load 48213 was rebooked with another carrier after a rejection. Same booking, or a new one?\n2. Load 47990 shows AMENDED. What made it AMENDED rather than REBOOKED?\n3. Load 48102 got two invoices. Had the first carrier already sent a truck?</p></li>`);
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+};
+const demoState = +new URLSearchParams(location.search).get("state") || 0;
+if (demoState) runTo(demoState);
+</script>
+</body></html>
