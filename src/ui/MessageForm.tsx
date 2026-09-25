@@ -19,7 +19,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) return;
+    if (!sendsOnEnter(event)) return;
     event.preventDefault();
     event.currentTarget.form?.requestSubmit();
   }
@@ -42,4 +42,12 @@ export function MessageForm({ busy, draft, onDraftChange, onSend }: MessageFormP
       </button>
     </form>
   );
+}
+
+function sendsOnEnter(event: KeyboardEvent): boolean {
+  return event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing && !hasTouchPointer();
+}
+
+function hasTouchPointer(): boolean {
+  return window.matchMedia?.("(pointer: coarse)").matches ?? false;
 }

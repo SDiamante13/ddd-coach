@@ -147,6 +147,19 @@ describe("Connection test", () => {
     expect(server.fetchMock).not.toHaveBeenCalled();
   });
 
+  it("adds a line on Enter with a touch pointer and sends with the Send button", async () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const server = stubFetch();
+    const { user, input, sendButton } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    expect(server.fetchMock).not.toHaveBeenCalled();
+    expect(input()).toHaveValue("Hello coach\n");
+
+    await user.click(sendButton());
+    expect(server.bodyOf(0)).toEqual({ message: "Hello coach", history: [] });
+  });
+
   it.each([
     ["whitespace-only", "   {Enter}"],
     ["newline-only", "{Shift>}{Enter}{Enter}{/Shift}{Enter}"],
