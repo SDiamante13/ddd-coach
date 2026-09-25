@@ -7,8 +7,7 @@ import { AccessGate } from "./AccessGate.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
 import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
-import { ExchangeEntry } from "./ExchangeEntry.tsx";
-import { ExchangeOutcome } from "./ExchangeOutcome.tsx";
+import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import type { Unlock } from "./useAccess.ts";
 import { useAccessRecovery } from "./useAccessRecovery.ts";
@@ -42,19 +41,13 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
 
   return (
     <>
-      <ol role="log">
-        {exchanges.map((exchange) => (
-          <ExchangeEntry key={exchange.id} exchange={exchange}>
-            <ExchangeOutcome
-              exchange={exchange}
-              busy={busy}
-              onRetry={retry}
-              conversation={conversation}
-              onStartNew={confirmation.ask}
-            />
-          </ExchangeEntry>
-        ))}
-      </ol>
+      <ExchangeLog
+        exchanges={exchanges}
+        busy={busy}
+        onRetry={retry}
+        conversation={conversation}
+        onStartNew={confirmation.ask}
+      />
       {accessLost && <AccessGate onUnlock={unlockAgain} />}
       {justUnlocked && (
         <p role="status" className="unlocked">
