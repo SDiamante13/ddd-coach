@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
-import { parseChatRequest } from "./chatRequest.ts";
+import { MAX_CONVERSATION_CHARS, parseChatRequest } from "./chatRequest.ts";
 
 function turns(count: number) {
   return Array.from({ length: count }, () => ({ prompt: "A", reply: "R" }));
@@ -29,14 +29,14 @@ describe("parseChatRequest", () => {
     expect(parseChatRequest({ message: "B", history })).toEqual({ ok: false, reason: "tooLong" });
   });
 
-  it("refuses more than 24,000 characters across the history and message as too long", () => {
-    const history = [turnOfLength(23_999)];
+  it("refuses more characters than the conversation cap across the history and message as too long", () => {
+    const history = [turnOfLength(MAX_CONVERSATION_CHARS - 1)];
 
     expect(parseChatRequest({ message: "BC", history })).toEqual({ ok: false, reason: "tooLong" });
   });
 
-  it("accepts 50 turns and 24,000 characters exactly", () => {
-    const history = [...turns(49), turnOfLength(24_000 - 49 * 2 - 1)];
+  it("accepts 50 turns at the conversation cap exactly", () => {
+    const history = [...turns(49), turnOfLength(MAX_CONVERSATION_CHARS - 49 * 2 - 1)];
 
     expect(parseChatRequest({ message: "B", history }).ok).toBe(true);
   });
