@@ -128,11 +128,23 @@ describe("Connection test", () => {
     expect(sendButton()).toBeDisabled();
   });
 
-  it("ignores blank or whitespace-only messages", async () => {
+  it("sends with Ctrl+Enter", async () => {
+    const server = stubFetch();
+    const { user, input } = renderApp();
+
+    await user.type(input(), "Hello coach{Control>}{Enter}{/Control}");
+
+    expect(server.bodyOf(0)).toEqual({ message: "Hello coach", history: [] });
+  });
+
+  it.each([
+    ["whitespace-only", "   {Enter}"],
+    ["newline-only", "{Shift>}{Enter}{Enter}{/Shift}{Enter}"],
+  ])("ignores a %s message", async (_kind, keys) => {
     const server = stubFetch();
     const { user, input, log } = renderApp();
 
-    await user.type(input(), "   {Enter}");
+    await user.type(input(), keys);
 
     expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
     expect(server.fetchMock).not.toHaveBeenCalled();
