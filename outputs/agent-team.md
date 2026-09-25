@@ -40,7 +40,6 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 - `click` doesn't check what's covering the target. A button under the sticky composer (e.g. a new entry's refusal actions) gets its click on the composer instead. Use `focus <selector>` + `press Enter`, which also exercises the scroll padding, or scroll first.
 - Run a rate-limit burst truly last. Afterwards every POST returns 429 for about 60 s, even oversized ones.
 - Put any fetch-spy panel in a right-hand column (about 300 px wide, `pointer-events:none`): a bottom panel covers the form. In zsh, wrap `agent-browser --session x` in a shell function, since `$AB` doesn't word-split.
-- Small GIFs: `palettegen=stats_mode=diff:max_colors=96` plus `paletteuse=dither=bayer`, trimmed to the key steps, kept a 68 s clip at about 2.9 MB.
 
 ## Slice screenshot
 
