@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { COACH_INSTRUCTIONS_VERSION, coachInstructions } from "../coachInstructions.ts";
 
-export const LIVE_INSTRUCTIONS_VERSION = 10;
+export const LIVE_INSTRUCTIONS_VERSION = 11;
 
 export type SnapshotReader = (version: number) => string | undefined;
 

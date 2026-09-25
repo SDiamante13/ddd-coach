@@ -1,6 +1,6 @@
 # Slice 3 eval summary (#4)
 
-**Decided: prompt v10 ships on `openai/gpt-5.6-terra` at effort `none`** (#77's paired A/B against v8 at n=6, 2026-09-25, see "v10 against v8"). It replaces v8, which was confirmed by #78's A/B against v6. v10 goes live when it's deployed. Before v8, v6 shipped under #73's every-run bar and v4 under the 2/3 bar. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
+**Decided: prompt v11 ships on `openai/gpt-5.6-terra` at effort `none`** (#85's paired A/B against v10 at n=6, 2026-09-25, see "v11 against v10"). **It's held from deploy until #64's question card renders its source lines.** Production runs v10 (deploy 6ab6caf7), which shipped under #77's A/B against v8. Before that: v8 (confirmed by #78 against v6), v6 (#73's every-run bar) and v4 (the 2/3 bar). The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
 
 ## How it's measured
 
@@ -362,6 +362,43 @@ Reported only, v10 against v8:
 |---|---|---|
 | New gating hard check `question sources` (thread fixtures). Exactly two `From thread: "…"` lines follow the question, and nothing else does. Each quote is a distinct 3–30-word excerpt that appears verbatim in the paste, after normalizing curly quotes, apostrophes and whitespace. `complete ending` now judges the question rather than a source line | Ship: yes (unchanged) | `question sources` 0/6 on every thread fixture in both arms, since no recorded reply quotes its sources. No drop, and `complete ending` is unchanged. This is the v11 A/B's target |
 | New hard check `no merged split`, **reported only for now** (in the shared `REPORTED_ONLY_HARD`). A plain line for a team fails when it mentions one of the named groups the reply gives that team elsewhere, e.g. "Ops means the dashboard count…, although night shift subtracts rebooks". A plain line where the groups agree still passes (the prompt allows it). Came from the team-lead's v10 hosted demo finding, option A | Ship: yes (unchanged) | v10 F1 1/6 flagged (r2, a real merge); 0/24 v9 thread replies flagged; letter-view replies (v8) can't be judged. Precision 1/1, but recall is partial: F1 r6 "with rebooks mentally subtracted" merges the split without naming the group |
+
+## v11 against v10 under the ship rule, n=6 (2026-09-25, #85): ships, deploy held
+
+v11 = v10 plus two `From thread: "<exact words>"` lines under the question: a short stretch copied exactly from each of the two far-apart thread lines the question joins, without the speaker's name, with nothing after them.
+
+The command: `OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run eval -- --ab 11 --live 10 --target "booking-split:question sources,rebook-notes:question sources,carrier-status:question sources,example-thread:question sources"` ([md](ab-2026-09-25-openai-gpt-5-6-terra-v10-v11.md), [data](ab-2026-09-25-openai-gpt-5-6-terra-v10-v11.json)).
+- The JSON records model terra, effort none, n=6, and system sha256s v10 `a8c3a8e3…` and v11 `c858c50a…`.
+- 84 calls, all `stop`, no aborts.
+- One latency outlier: 17.6 s, max.
+
+**Ship: yes.** The target goes from 0/24 to 24/24 (+24): every v11 thread reply quotes two verbatim lines. No gating check drops by more than one run (total drop 2):
+- F2 `no names` 6/6 → 5/6. r1's event line "Maya still RBs…" is the known occasional slip, not a quote.
+- F2 `split labels` 6/6 → 5/6.
+
+Also up:
+- F1 split labels 5/6 → 6/6, attribution 5/6 → 6/6, question spans the thread 5/6 → 6/6;
+- F2 code guess 5/6 → 6/6;
+- F3 attribution 3/6 → 5/6.
+
+Reported only:
+- F1 under 400 words 3/6 → 5/6 (max 401 words);
+- sameMeaningNamed 1/6 → 2/6;
+- `no merged split` 4/6 → 6/6 (re-score).
+
+**Hand-read of the 24 quote pairs:** each pair is the two lines its question joins.
+- F1: the dashboard double-count, plus the rolling Customer B rebook or the invoiceable-at-delivery rule.
+- F2: "carrier billed TONU on orig load, then hauled the new one", plus "finance only needs one invoice per shipment that actually moves".
+- F3: Ops' "confirmed" (the customer agreed the window), plus the portal's "it's literally the 990".
+- Example: the contract's delivery-appointment rule, plus 7731's early delivery or its service credit.
+
+No quote carries a speaker's name. The 18 non-thread replies are unchanged in kind.
+
+**Answer-key guard:** `rescore` of the JSON gives the same verdict, and "Keys changed since this run: none".
+
+**Spend:** v10 $0.1701, v11 $0.1798, total **$0.3500**, within #85's $1.00 cap.
+
+`LIVE_INSTRUCTIONS_VERSION` becomes 11 in this commit (the A/B baseline). The deploy waits for #64's card (team-lead).
 
 ## Limits
 
