@@ -60,7 +60,7 @@ form button[type="submit"]:disabled{opacity:.5}
 <form id="form">
   <label for="msg">Message</label>
   <div class="warn hide" id="warn" role="alert"><span id="warntext"></span><span class="row"><button type="button" id="sendAnyway">Send anyway</button><button type="button" id="copyFirst">Copy everything first</button></span></div>
-  <div style="display:flex;gap:var(--space-2);align-items:flex-end"><input type="text" id="msg" value=""><button type="submit" id="send">Send</button></div>
+  <div style="display:flex;gap:var(--space-2);align-items:flex-end"><textarea id="msg" rows="2" style="flex-grow:1"></textarea><button type="submit" id="send">Send</button></div>
 </form>
 </main></div>
 <div class="toast" id="toast"></div>
@@ -105,7 +105,7 @@ $("copyFirst").onclick = () => toast("Copied the whole conversation. Paste it so
 $("form").onsubmit = (e) => {
   e.preventDefault(); const t = $("msg").value.trim(); if (!t) return;
   if (t === PASTE) { if (!checkPaste()) send(PASTE, PASTE_LEN); return; }
-  if (used + t.length > CAP - 500) { step(3); $("form").classList.add("hide"); $("full").classList.remove("hide"); return; }
+  if (used + t.length + 2000 > CAP) { step(3); $("form").classList.add("hide"); $("full").classList.remove("hide"); return; }
   send(t, t.length);
 };
 $("copyall").onclick = () => toast("Copied the whole conversation, word for word.");
@@ -113,12 +113,12 @@ $("fresh").onclick = () => {
   step(4); oldLog = log.innerHTML;
   log.innerHTML = `<li data-status="replied"><div class="carry"><div class="k">Carried over word for word from your last conversation · edit anything wrong</div>
 <table><thead><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Source</th></tr></thead><tbody>
-<tr><td>Booking</td><td>Ops</td><td>The customer submitted a request</td><td>From thread</td></tr>
-<tr><td></td><td>Finance</td><td>Carrier confirmed and rate locked</td><td>From thread</td></tr>
-<tr><td></td><td>Carriers</td><td>The tender sent to a carrier</td><td>From thread</td></tr>
-<tr><td>Rebook</td><td>Ops</td><td>Same booking, new carrier</td><td>My notes from Dana · unconfirmed</td></tr>
-<tr><td></td><td>Finance</td><td>Cancel plus a new booking</td><td>From thread</td></tr>
-<tr><td>TONU</td><td>Ops</td><td>A fee when the first carrier already sent a truck</td><td>My notes from Dana · unconfirmed</td></tr>
+<tr><td>Booking</td><td>Ops</td><td>The customer submitted a request</td><td>Slack #booking-split, Tue</td></tr>
+<tr><td></td><td>Finance</td><td>Carrier confirmed and rate locked</td><td>Slack #booking-split, Tue</td></tr>
+<tr><td></td><td>Carriers</td><td>The tender sent to a carrier</td><td>Slack #booking-split, Tue</td></tr>
+<tr><td>Rebook</td><td>Ops</td><td>Same booking, new carrier</td><td>My notes from Dana 22 Sep, unconfirmed</td></tr>
+<tr><td></td><td>Finance</td><td>Cancel plus a new booking</td><td>Slack #booking-split, Tue</td></tr>
+<tr><td>TONU</td><td>Ops</td><td>A fee when the first carrier already sent a truck</td><td>My notes from Dana 22 Sep, unconfirmed</td></tr>
 </tbody></table>
 <div class="k">Statuses matched by name (7 of 23)</div><div style="font-size:var(--text-sm)">REQUESTED, TENDERED, REJECTED, REBOOKED, AMENDED, CONFIRMED, INVOICED</div>
 <div class="k">Open questions</div><ul><li>Load 48213: same booking or a new one? · for Dana</li><li>Load 47990: what made it AMENDED rather than REBOOKED? · for Dana</li><li>Load 48102: had the first carrier already sent a truck (TONU)? · for you to check</li><li>AMENDED: Dana's sheet vs the code · for you to check</li></ul></div></li>`;
@@ -126,5 +126,17 @@ $("fresh").onclick = () => {
 };
 $("openPrev").onclick = () => { const fresh = log.innerHTML; log.dataset.fresh = fresh; log.innerHTML = oldLog; $("form").classList.add("hide"); $("prev").classList.add("hide"); $("ro").classList.remove("hide"); log.scrollTop = 0; };
 $("backNew").onclick = () => { log.innerHTML = log.dataset.fresh; $("ro").classList.add("hide"); $("form").classList.remove("hide"); $("prev").classList.remove("hide"); };
+
+window.runTo = async (n) => {
+  const click = (id) => document.getElementById(id).click();
+  if (n >= 2) { click("continue"); }
+  if (n >= 3) { pasteEnum(); }
+  if (n >= 4) { await send(PASTE, PASTE_LEN); click("send"); }
+  if (n >= 5) { click("copyall"); }
+  if (n >= 6) { click("fresh"); }
+  if (n >= 7) { click("openPrev"); }
+};
+const demoState = +new URLSearchParams(location.search).get("state") || 0;
+if (demoState) runTo(demoState);
 </script>
 </body></html>
