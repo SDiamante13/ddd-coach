@@ -1,9 +1,125 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
+import { stubFetch } from "./test/fetchStub.ts";
 
-describe("App", () => {
-  it("renders the heading", () => {
-    render(<App />);
-    expect(screen.getByRole("heading", { name: "DDD Coach" })).toBeInTheDocument();
+afterEach(() => vi.unstubAllGlobals());
+
+function renderApp() {
+  const user = userEvent.setup();
+  render(<App />);
+  return {
+    user,
+    input: () => screen.getByRole("textbox", { name: "Message" }),
+    log: () => screen.getByRole("log"),
+    sendButton: () => screen.getByRole("button", { name: "Send" }),
+  };
+}
+
+describe("Connection test", () => {
+  it("starts with the message input focused and an empty log", () => {
+    const { input, log } = renderApp();
+
+    expect(input()).toHaveFocus();
+    expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
+  });
+
+  it("shows a message sent with Enter as pending, then exactly one reply", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
+    expect(within(log()).getByText("Coach is thinking…")).toBeInTheDocument();
+
+    server.reply(0, 200, { reply: "Hi there" });
+    expect(await within(log()).findAllByText("Hi there")).toHaveLength(1);
+    expect(within(log()).queryByText("Coach is thinking…")).not.toBeInTheDocument();
+  });
+
+  it("sends with the Send button, clears the input and disables Send while pending", async () => {
+    stubFetch();
+    const { user, input, log, sendButton } = renderApp();
+
+    await user.type(input(), "Hello coach");
+    await user.click(sendButton());
+
+    expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
+    expect(within(log()).getByText("Coach is thinking…")).toBeInTheDocument();
+    expect(input()).toHaveValue("");
+    expect(sendButton()).toBeDisabled();
+  });
+
+  it("ignores blank or whitespace-only messages", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "   {Enter}");
+
+    expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
+    expect(server.fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("ignores another submit while a reply is pending", async () => {
+    const server = stubFetch();
+    const { user, input, log, sendButton } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    await user.type(input(), "Again{Enter}");
+    await user.click(sendButton());
+
+    expect(within(log()).getAllByRole("listitem")).toHaveLength(1);
+    expect(server.fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows a server failure inline with Retry beside the message", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    server.reply(0, 502, { error: "The coach is unavailable." });
+
+    const entry = await within(log()).findByRole("listitem");
+    expect(await within(entry).findByRole("alert")).toHaveTextContent("The coach is unavailable.");
+    expect(within(entry).getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
+  });
+
+  it("retries the same message without duplicating it in the log", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    server.reply(0, 502, { error: "The coach is unavailable." });
+    await user.click(await within(log()).findByRole("button", { name: "Retry" }));
+
+    expect(within(log()).getByText("Coach is thinking…")).toBeInTheDocument();
+    expect(server.bodyOf(1)).toEqual(server.bodyOf(0));
+    server.reply(1, 200, { reply: "Hi there" });
+    expect(await within(log()).findAllByText("Hi there")).toHaveLength(1);
+    expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
+    expect(within(log()).queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("shows a network failure inline with Retry", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    server.fail(0);
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent("Could not reach the coach.");
+    expect(within(log()).getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+
+  it("shows HTML in a reply as literal text", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    server.reply(0, 200, { reply: "<b>x</b>" });
+
+    expect(await within(log()).findByText("<b>x</b>")).toBeInTheDocument();
   });
 });
