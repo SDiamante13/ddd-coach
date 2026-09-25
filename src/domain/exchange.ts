@@ -25,6 +25,13 @@ export function retry(exchange: Exchange): Exchange {
   return submit(exchange.id, exchange.prompt);
 }
 
+export function settle(exchanges: readonly Exchange[], id: ExchangeId, result: AskResult): Exchange[] {
+  return exchanges.map((exchange) => {
+    if (exchange.id !== id || exchange.status !== "pending") return exchange;
+    return result.ok ? reply(exchange, result.reply) : fail(exchange, result.error);
+  });
+}
+
 export function isBusy(exchanges: readonly Exchange[]): boolean {
   return exchanges.some((exchange) => exchange.status === "pending");
 }

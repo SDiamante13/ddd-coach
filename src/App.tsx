@@ -1,13 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { askCoach } from "./api/askCoach.ts";
 import {
-  fail,
   isBusy,
   parsePrompt,
-  reply,
   retry,
+  settle,
   submit,
-  type AskResult,
   type Exchange,
   type ExchangeId,
   type FailedExchange,
@@ -65,13 +63,6 @@ function ConnectionTest() {
       </form>
     </>
   );
-}
-
-function settle(exchanges: readonly Exchange[], id: ExchangeId, result: AskResult) {
-  return exchanges.map((exchange) => {
-    if (exchange.id !== id || exchange.status !== "pending") return exchange;
-    return result.ok ? reply(exchange, result.reply) : fail(exchange, result.error);
-  });
 }
 
 type EntryProps = { exchange: Exchange; onRetry: (failed: FailedExchange) => void };
