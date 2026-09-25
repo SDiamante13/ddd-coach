@@ -23,8 +23,8 @@ describe("On load", () => {
 
     expect(
       screen.getByText(
-        "Paste a messy thread or meeting notes about your domain, line breaks and all, " +
-          "and talk it through with a DDD coach.",
+        "Paste a messy thread or meeting notes. The coach puts the events in order, " +
+          "shows which words each team uses differently, and gives you one question for your expert.",
       ),
     ).toBeVisible();
   });
