@@ -1,0 +1,783 @@
+<meta charset="utf-8">
+<title>Priya Raman Interview 05</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+<main class="page">
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 05 · explorations 03b, 02b, 05</div>
+      <h1>“Every verdict about the columns, <em>none about the cells.</em>”</h1>
+      <p class="dek">We showed the tech lead the revised table, a quick check of the revised limits, and a new “Why this question?” panel, the first test of the coach's learning goal. The table's columns now pass her review, but its cells don't. When prompted, she wrote her own question for the new ops lead using a move she had just learned, from a panel she says she'd never have opened.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 27 questions</span>
+        <span class="chip">Exploration 03b · concept, not built</span>
+        <span class="chip">Exploration 02b · concept, not built</span>
+        <span class="chip">Exploration 05 · concept, not built</span>
+        <span class="chip">Paste box + Sunday replay → 04a</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC: finance review 27 Oct, due 30 Oct</dd></div>
+        <div><dt>Since 04b</dt><dd>Maya reviewing; Dana out from 15 Oct; Source links added by hand</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“<strong>The table with the cells right, before the 27th.</strong> Everything in ‘why’ is for after the review.”</blockquote>
+      <cite class="label">Priya, Q26. “It's the first thing you've shown me that's for me and not for the RFC.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>Columns fixed, cells not.</b> 5 of 5 structural verdicts landed. The cells still say “Checked with Dana 29 Sep”, “Tue” and “(ops is split…)”. Retyping drops only from about 10 to 8 minutes.</span>
+        <div class="tags"><span>strong</span><span>#6 · #4</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>Copy table drops the date line and the open questions.</b> The mock RFC shows “Settle by 27 Oct”, but the clipboard held only the table.</span>
+        <div class="tags"><span>strong</span><span>#6</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">03</span>
+        <span><b>It re-asks what it says is checked.</b> The yes/no line asks Dana to confirm a row sourced “Checked with Dana”, and never asks about lane changes.</span>
+        <div class="tags"><span>strong</span><span>#4 · B22</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">04</span>
+        <span><b>A role with one person in it is a name.</b> “Ops lead” means Maya since Monday. Use joint roles plus the forum: “ops lead and finance controller, at the 27 Oct review”.</span>
+        <div class="tags"><span>medium</span><span>#6</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">05</span>
+        <span><b>A correct row with no source is worse than a wrong one.</b> The Code row is right, but no code was sent. Without “Guess”, she stops checking.</span>
+        <div class="tags"><span>strong</span><span>#4 · #58</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">06</span>
+        <span><b>02b: nothing missing, “nothing stale” untested.</b> All questions carried, TONU included. The stale note vanished because the fixture rewrote her note.</span>
+        <div class="tags"><span>strong</span><span>#7 · B38</span></div>
+      </div>
+      <div class="sticky s-event weak">
+        <span class="n">07</span>
+        <span><b>She learned a move, from a “why” she'd have skipped.</b> When prompted, she caught her own abstract draft and rewrote it on her own loads. She kept the move and lost the name.</span>
+        <div class="tags"><span>weak</span><span>learning goal · #26</span></div>
+      </div>
+      <div class="sticky s-hotspot weak">
+        <span class="n">08</span>
+        <span><b>Citations back claims; names label moves.</b> Citations stay visible for her spot checks. Drop the toggle. The hotspot paraphrase failed her check.</span>
+        <div class="tags"><span>medium</span><span>#58 · #59</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="one-thing" aria-labelledby="learning-label">
+    <div class="label" id="learning-label">Learning check · prompted · supports learning goal (weak)</div>
+    <div>
+      <blockquote>“Load 48213 went to a new carrier on the same lane and shows REBOOKED. Load 46771's pickup date moved in August and it shows AMENDED. <strong>When the lane changes, which one does your team use, and what decides it?</strong>”</blockquote>
+      <cite class="label">Priya, Q21, her second draft for Maya, typed with the concept closed. She named the move as “two loads that went different ways, ask what made the difference” but couldn't recall a technique name.</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="learning-detail">
+    <div class="section-head">
+      <h2 id="learning-detail">How the check went</h2>
+      <span class="label">Prompted, reused well, name not retained · recall within minutes</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Draft 1</span><div><h3>“When does your team use REBOOKED vs AMENDED?”</h3><div class="where">the abstract version · what she'd have sent last week</div></div></header>
+        <dl>
+          <div><dt>What happened</dt><dd>She caught it herself within seconds, with no prompt from the interviewer: “That's asking what the words mean. It's the one it just told me not to ask.”</dd></div>
+          <div><dt>Signal</dt><dd>The move changed her judgment of her own draft. <mark>This is the strongest evidence of learning in the interview.</mark></dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Draft 2</span><div><h3>Two real loads, then the difference</h3><div class="where">her own data (46771), not the demo's 47990</div></div></header>
+        <dl>
+          <div><dt>What happened</dt><dd>She spotted that the last clause was still abstract and planned a console lookup for a real lane-change load. That's a second move, applied unasked.</dd></div>
+          <div><dt>Caveats</dt><dd>Prompted, not spontaneous. Only 1 of 3 moves was new to her. <mark>She would not have opened the “why” that taught it.</mark> Retention is untested.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-03b">
+    <div class="section-head">
+      <h2 id="verdict-03b">Exploration 03b verdict</h2>
+      <span class="label">“Leave with a table” v2 · c1–c5 + table-v2.html · pasted into Confluence</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>Source column, plain-text references, no URLs</b><q>That's five for five on structure.</q></li>
+          <li><b>“Code” as a Team value</b><q>It's also the row Marcus opens first.</q></li>
+          <li><b>One settle-by date above the table</b><q>Source is there, “Code” is a Team value, one date sits above the table.</q></li>
+          <li><b>The next step marked for her, with its reason</b><q>“Without spending Dana's time” is the right reason.</q></li>
+          <li><b>“I checked” replacing the cell</b><q>That's the mechanism I asked for. It works on one cell.</q></li>
+          <li><b>Copy as a real rich-text table</b><q>Pasted into a blank Confluence page, it arrived as a table.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">7 items</span></div>
+        <ul>
+          <li><b>Split → two rows credited to a practice or document</b><q>Two rows credit a practice. A bracket credits a complaint.</q></li>
+          <li><b>Code row says “from code you pasted” or “Guess:”</b><q>A correct guess with no “Guess” label is worse than a wrong one.</q></li>
+          <li><b>No relative days in Source</b><q>It's copied from “rejected tue” in the thread.</q></li>
+          <li><b>Yes/no lines skip checked rows, ask the open one</b><q>It asks Dana to confirm the one thing it says she already confirmed.</q></li>
+          <li><b>Joint roles plus the forum</b><q>A role with one person in it is a name.</q></li>
+          <li><b>“I checked” gets a “no” path</b><q>What if the answer's no? Then it's the bug finance is afraid of.</q></li>
+          <li><b>Copy carries the date line and open questions</b><q>The clipboard only had the table, so I'd type both.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">2 items</span></div>
+        <ul>
+          <li><b>“(ops is split …)” in brackets in the exported cell</b><q>That's the exact thing I flagged last time.</q></li>
+          <li><b>“Checked by you · Dana to confirm” in exported cells</b><q>In a doc, “you” is whoever's reading it.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-02b">
+    <div class="section-head">
+      <h2 id="verdict-02b">Exploration 02b verdict</h2>
+      <span class="label">“Honest limits” v2, revised after 04b · quick check · b1, b5–b7</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">3 items</span></div>
+        <ul>
+          <li><b>Every open question carried, TONU marked for her</b><q>Three questions went in and three came out, plus a fourth.</q></li>
+          <li><b>The notice in plain view again</b><q>Better than “show.”</q></li>
+          <li><b>“Edit anything wrong” and the read-only old conversation</b><q>Carried from 04b; no new complaints.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">3 items</span></div>
+        <ul>
+          <li><b>Put a real correction in the fixture</b><q>It's gone because you took it out of my notes, not because the carry-over dropped it.</q></li>
+          <li><b>One notice text across concepts</b><q>If two screens say two different things, I believe neither.</q></li>
+          <li><b>Reassign “for Dana” without retyping</b><q>“For Dana” on two questions goes stale tomorrow.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">1 item</span></div>
+        <ul>
+          <li><b>“Word for word” in the full box and the carried header</b><q>Say “the latest version of each row,” and mean it.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-05">
+    <div class="section-head">
+      <h2 id="verdict-05">Exploration 05 verdict</h2>
+      <span class="label">“Why this question?” · w1–w4 + why.html · first test of the learning goal</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">3 items</span></div>
+        <ul>
+          <li><b>“Why ask it this way?”: the move, plus what it unblocks</b><q>That one's new to me. I thought she was just being Dana.</q></li>
+          <li><b>Explanations never go into the copy</b><q>Neither goes into anything I copy.</q></li>
+          <li><b>Moves tied to her own mess</b><q>What stuck came on my problem, on the day I needed it, in two lines.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">4 items</span></div>
+        <ul>
+          <li><b>Copy obeys the move: “check it yourself” stays off Dana's list</b><q>The why was right and the copy ignored it.</q></li>
+          <li><b>Show the move once, visibly, the first time</b><q>The one I learned from is the one I'd have skipped.</q></li>
+          <li><b>Technique names inside “why”, checked against sources</b><q>So that was one of my two spot checks, and it failed.</q></li>
+          <li><b>“Your 30-minute slot” and “for Dana” follow who's available</b><q>From Thursday, anything marked “for Dana” is a question for nobody.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">2 items</span></div>
+        <ul>
+          <li><b>The “Show technique names” checkbox</b><q>The toggle solves a problem I don't have.</q></li>
+          <li><b>“Collaborative modeling” as a technique label</b><q>Advice with a book title on it.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="citations-h">
+    <div class="section-head">
+      <h2 id="citations-h">#58 citation toggle</h2>
+      <span class="label">Recommendation · no toggle</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Citations for DDD claims always show in replies</h3><div class="ref">#58</div></div>
+        <p>They guard against August-style rules, and she only spot-checks what she can see. They never go into anything copied. “If it's behind an off-by-default box, I never do my two spot checks.”</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Technique names live inside the opened “why”</h3><div class="ref">Exploration 05</div></div>
+        <p>Opening “why” is the opt-in. “If I opened ‘why’, I asked. Don't make me ask twice.” Show the move line visibly the first time it's used, then fold it. That's “teach once” from 04b, applied to moves.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A technique source is a citation too</h3><div class="ref">#58 · #59</div></div>
+        <p>Each named technique and its definition must match text in the corpus, or the name is dropped. “Hotspot … resolve it with the person who knows” fails. <mark>The hotspot line has to pass the same test as Evans.</mark></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since last time</a>
+      <a href="#part-b">B · Exploration 03b</a>
+      <a href="#part-c">C · Exploration 02b</a>
+      <a href="#part-d">D · Exploration 05</a>
+      <a href="#part-e">E · Citations (#58)</a>
+      <a href="#part-f">F · Close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since last time</h3><span class="aside">Wednesday 14 October · no product talk yet</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>It's been five days. What's moved on the RFC?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Maya joined the reviewers on Monday, as planned. On Saturday I renamed Status to Source in my own table by hand and added links. That took eleven minutes, not five, because Slack search for a July thread is bad. The glossary has nine rows now, with the two ops rows and the Code row. Marcus still hasn't opened it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>What did Maya do with the two ops rows?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>She changed one thing. “Ops, current practice” became “Ops, current practice (since the 2024 portal change).” She left “Dana's 2019 sheet” alone and didn't mention Dana at all. <mark>She corrected a date, not the framing. That's the best review comment I've had on this RFC.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>And Dana?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Her last day is tomorrow. On Monday I sent her three yes/no lines, including the TONU one on 48213, and she answered all three by lunch. So from Thursday, anything marked “for Dana” is a question for nobody. Ops questions go to Maya, and Maya answers the rebook question the other way.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Exploration 03b</h3><span class="aside">“Leave with a table” v2 · concept, not built</span></div>
+        <p class="stage">Shown c1 swaps → c2 preview → c3 table → c4 next step and yes/no lines → c5 pasted into the RFC. She clicked through table-v2.html, pressed Copy table, and pasted into a blank Confluence page.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Last time you gave us a list of verdicts on the table. Did 03b apply them?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It applied every verdict about the columns and none about the cells. Source is there, “Code” is a Team value, one date sits above the table, there are no URLs anywhere, and there's no DDD word in it. That's five for five on structure, and in September I'd have taken that. Then I read the rows.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Run your own test on c3 and c4: nothing missing, nothing stale.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Stale first. The first yes/no line for Dana is “A rebook to a new carrier keeps the same booking.” Your own table says that row was “Checked with Dana 29 Sep.” <mark>So the tool asks Dana to confirm the one thing it says she already confirmed, and it doesn't ask the thing that's open, which is lane changes.</mark> Then every “Slack #booking-split, Tue” goes stale next week. It's copied from “rejected tue” in the thread, so it's a relative day. Missing: the second ops row. The split is still a red chip under one row, not two rows.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>Last time you said the red split chip was fine in the tool.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>In the tool, yes. Look at c5. In the doc it landed as “(ops is split on lane changes)”, lowercase, in brackets, after the meaning. That's the exact thing I flagged last time. Maya would read it on Monday as “Priya thinks my team is wrong.” <mark>Two rows credit a practice. A bracket credits a complaint.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>The Code row. Is it right?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's right, and that's what bothers me. “The screen keeps the booking; the database writes a new one” is what I found in <code>rebook!</code> last Tuesday. But look at what c2 says was sent: five lines of Slack and no code. So where did “booking.rb” come from? <mark>If I didn't paste it, it's a guess, and a correct guess with no “Guess” label is worse than a wrong one, because I stop checking.</mark> It's also the row Marcus opens first.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q8</span><span>You pasted Copy table into Confluence. Would c5 survive the 27 Oct review as it is? What would you retype?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. Two things didn't come with the paste at all: the “Settle by 27 Oct” line and the open questions. The mock RFC in c5 shows the date line, but the clipboard only had the table, so I'd type both. Then the four “Tue” cells become real dates, the Rebook ops row becomes two rows with “Checked with Dana, 8 Oct”, and I'd fix the TONU source. About eight minutes, against ten last time. <mark>The minutes are in the cells now, and 03b didn't touch the cells.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>What's wrong with the TONU source?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>After I click “I checked”, it says “Load 48213, checked by you · Dana to confirm.” In a doc, “you” is whoever's reading it. And Dana is out from tomorrow, so that's a name on a job nobody will do. I'd write “Load 48213, invoice lines, checked 2 Oct.” What I liked is that clicking “I checked” replaced the cell. <mark>That's the mechanism I asked for. It works on one cell. Do it for everything I type.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>The open questions now say who settles each one, as a role. Is that what you asked for?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's what I said, and it turns out I was wrong about why it would work. “Is a rebook the same booking? · Ops lead.” Since Monday, the ops lead is Maya. <mark>A role with one person in it is a name.</mark> It hands Maya the definition, which is the thing I was trying to avoid. The third question gets it right with “Engineering, with finance.” The first two need the same shape: “Ops lead and finance controller, at the 27 Oct review.”</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>Anything about the next-step card or the swaps?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The card is marked for me, not Dana, which is what I asked for, and “without spending Dana's time” is the right reason. But there's one button, “I checked: yes, a truck was sent.” What if the answer's no? Then it's the bug finance is afraid of, which is the more important answer. And the swap chip “Maya → Ops” now wipes out the only difference the table needs. I'd make it “Maya → Ops, current practice” myself, so that's fine.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Exploration 02b</h3><span class="aside">“Honest limits” v2 · quick check</span></div>
+        <p class="stage">Shown b1 the cut with Continue, b5 “This conversation is full”, b6 the carried board, b7 the previous conversation, read-only. Told it was revised after 04b.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q12</span><span>Quick check on b6. Did the carried board keep everything?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Three questions went in and three came out, plus a fourth from the enum paste, “AMENDED: Dana's sheet vs the code.” The 48102 one is there, marked “for you to check,” which is right. And the AMENDED note is gone. <mark>But it's gone because you took it out of my notes, not because the carry-over dropped it.</mark> In b7 my old note now reads “RB = same bkg, new carrier.” I never wrote that on the 22nd. The concept never has a correction replace a note, so it can't pass or fail that test.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>Anything else?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The “full” box on b5 still says the board carries over “word for word,” and the carried header says it again. That's the promise I told you was the wrong test. Say “the latest version of each row,” and mean it. The notice is back in plain view, which is better than “show.” But this one says “Nothing is stored on our server” and the 03b one says “Kept in this browser only.” <mark>If two screens say two different things, I believe neither.</mark> And “for Dana” on two questions goes stale tomorrow. I'd want to change who a question is for without retyping it.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Exploration 05</h3><span class="aside">“Why this question?” · the learning goal</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q14</span><span>Before the screens: when did you last learn a technique in the middle of real work, and from what?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Last year our DBA left a comment on one of my migrations: “Use a partial index here, only 3% of rows are active,” with a link to the Postgres docs. One line of what and one line of why, on my own code. I've used partial indexes four times since. The one that didn't stick was a half-day BDD workshop in 2022 with coloured index cards. I remember the colours and nothing else, because the example was a coffee shop. <mark>What stuck came on my problem, on the day I needed it, in two lines.</mark></p></div></div>
+          </div>
+        </div>
+        <p class="stage" style="margin-top: 30px;">Shown w1: “Three questions for your 30-minute slot, each on one real load,” each with a “Why ask it this way?” link, and a “Show technique names” checkbox, off. Asked to use it the way she would.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q15</span><span>Here are three questions for Dana. Would you open “why” at all?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Not on the first one. “Load 48213, same booking or a new one”: I know why, I've asked questions like that since September, and Dana answered it on the 29th. I'd open the third, because it surprised me. Why is “had the first carrier already sent a truck” a question for Dana? I checked that myself. So I'd open “why” when something surprises me, and only then.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>What did the “why” on question 3 say?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“You may not need Dana for this. Check the load yourself first.” That's right. Then I pressed copy on w4, and it copied question 3 into my Dana prep anyway. <mark>The why was right and the copy ignored it.</mark> If the move says it's for me, it can't be on Dana's list.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q17</span><span>Open the “why” on question 2 and read it out.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“Ask what made the difference, not what the words mean. The difference is where the rule hides.” Okay. That one's new to me. My note on the 22nd was a rule, “lane or date change means AMEND,” and it was wrong for a week. Dana fixed it with two loads, not with a definition. I didn't know that was a move. I thought she was just being Dana.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>Would you have opened that one on your own?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. It looked like a normal question, so I'd have copied it and moved on. <mark>The one I learned from is the one I'd have skipped.</mark> That's a problem for you, not for me.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q19</span><span>Turn on technique names (w3). What do you see?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Question 1 says “Example Mapping.” Oh. That's the coffee shop workshop with the coloured cards. I hadn't connected them until now, so the name did one useful thing: it tied a move I already use to something I half-learned and dropped. Question 2 says “EventStorming hotspot: mark where two sources disagree and resolve it with the person who knows.” That's not how Brandolini describes it in the talks I watched. A hotspot parks the argument so the session keeps moving; you don't resolve it on the spot.</p><p><mark>So that was one of my two spot checks, and it failed.</mark> Question 3, “Collaborative modeling: bring evidence, not opinions,” is advice with a book title on it. I can't check it, so to me it's noise.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>Would you show technique names when you're alone and hide them when Marcus might see your screen?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Marcus never sees my screen. He sees Confluence, the night before the review. The only time anyone sees this tool is if I show the team after it's worked for me once, and by then I'd want the names showing, because the names are what they can search. <mark>The toggle solves a problem I don't have.</mark> If I opened “why,” I asked. Don't make me ask twice.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q21</span><span>Dana's out from tomorrow, and Maya answers ops questions now. Without the coach, write the next question you'd send Maya. Use one of the moves you just saw, if one fits.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p class="stage" style="margin-bottom: 12px;">She typed into a Slack draft on her own screen, with the concept closed. It took about two minutes. The interviewer said nothing between drafts.</p><p>First try: “When does your team use REBOOKED vs AMENDED?” No. That's asking what the words mean. It's the one it just told me not to ask, and it's exactly what I'd have sent last week.</p><p>Second try: <mark>“Load 48213 went to a new carrier on the same lane and shows REBOOKED. Load 46771's pickup date moved in August and it shows AMENDED. When the lane changes, which one does your team use, and what decides it?”</mark> The last sentence is still half abstract. I need a third load where the lane actually changed, and I'd look one up in the console before I send it. That's ten minutes.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>Which move did you use? Can you name it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Take two loads that went different ways and ask what made the difference. Plus “look it up yourself first” for the third load. The technique name? Hotspot? No, that's the one I said was wrong. I don't know. <mark>I kept the move and lost the name within five minutes, and I'm fine with that.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q23</span><span>Would you have written it that way last month?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Last month I'd have sent the first draft. The real-load part I already had. You've been showing me that since interview 02, and Dana taught it to me before you did. The “what made the difference” part is new. I'll know whether it worked if Maya answers in one line instead of a paragraph, so ask me next time.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>Citations and the toggle</h3><span class="aside">#58 vs Exploration 05</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q24</span><span>#58 puts Evans citations in the coach's replies. Exploration 05 hides technique names and their sources behind a toggle that's off by default. Should citations follow the same toggle?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No. They do different jobs. A citation backs a claim. If the coach states a rule, the source is how I catch August again, the “you should have a Booking aggregate” thing. <mark>If it's behind an off-by-default box, I never do my two spot checks, and the protection is gone.</mark> A technique name is a label on a move, and that can live inside “why.”</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q25</span><span>Is a toggle one setting too many? What should the default be?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Yes, drop it. It doesn't break “no settings before the first reply,” because it's not in front of the first reply. But I'd never touch it, so it's just one more thing that can be in the wrong state. Put the name inside “why,” with its source, and show the move in one visible line the first time it comes up, then keep it folded. Citations show in replies whenever the coach states a DDD rule. Neither goes into anything I copy. <mark>And the source on a technique is a citation too. The hotspot line has to pass the same test as Evans.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q26</span><span>If you could have only one thing in the next month, what is it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The table with the cells right, before the 27th. My corrections replace old rows, dates are real dates instead of “Tue,” the split is two ops rows, and the date line and open questions come with the table on the clipboard. Everything in “why” is for after the review. <mark>It's the first thing you've shown me that's for me and not for the RFC, and I'd use it on the next one.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q27</span><span>Anything we should have asked but didn't?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Ask Maya whether she'd answer a yes/no line that she knows came from a tool. Dana would, because she's known me for four years. Maya has known me as a reviewer for four days.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The right columns make the table pasteable</h3><div class="ref">#6</div></div>
+        <p>The columns pass now. The cells and the clipboard don't: relative dates, stale checks, a bracketed split, and no date line or open questions on the clipboard. Acceptance should test cell freshness and clipboard contents, not headers.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A Source records where a line came from</h3><div class="ref">#4 · slice 3</div></div>
+        <p>It copied “Tue” from the thread and gave the Code row a file name when no code was pasted. Sources need absolute dates or a blank, plus “from code you pasted” or “Guess:”. Yes/no lines must not re-ask checked rows.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>02b now carries the board without loss</h3><div class="ref">#7 · B38</div></div>
+        <p>“Nothing missing” passes. “Nothing stale” is untested because the fixture edited her note. The “word for word” copy still contradicts her test.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Disagreement is between teams</h3><div class="ref">#10 · B05</div></div>
+        <p>The live split is inside ops, a practice against a document. Default team-level swaps (“Maya → Ops”) erase it.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>An Example Map is the thing to ship</h3><div class="ref">#19 · B22</div></div>
+        <p>The name “Example Mapping” reconnected her to a workshop that didn't stick. What she kept was the move inside a real question. Consider shipping B22 as a move in the questions before a separate map view.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Citations can be optional</h3><div class="ref">#58</div></div>
+        <p>She can't check a citation she can't see. Technique sources are citations too, and the hotspot paraphrase failed her first check.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Knowledge-base sources are only an Evans question</h3><div class="ref">#59</div></div>
+        <p>Exploration 05 cites a Cucumber guide, Brandolini's book and <em>Collaborative Software Design</em>. If they aren't in the corpus, the coach is citing from memory, the exact phantom-citation risk #58 exists to stop. Either #59 admits them, or our own notes define the moves and the names go.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A disclosure is enough to teach</h3><div class="ref">#26 · learning goal</div></div>
+        <p>She learned one new move on real work, which supports the early-practice target. But the “why” she needed was the one she'd skip, so a disclosure-only design undercuts learning for exactly this user.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>One accurate notice</h3><div class="ref">#55</div></div>
+        <p>02b and 03b describe data handling differently. “If two screens say two different things, I believe neither.”</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Copy</span><div><h3>Copy table carries the date line and open questions</h3><div class="where">#6</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Copy table puts the “Settle by” line, the table and the open-questions list on the clipboard, in both formats.</dd></div>
+          <div><dt>Check</dt><dd>The <code>text/html</code> and <code>text/plain</code> payloads each contain “Settle by 27 Oct” and all 3 open questions. The <code>text/html</code> payload has exactly 1 <code>&lt;table&gt;</code>.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Fresh</span><div><h3>No relative dates, no stale questions</h3><div class="where">#4 · #6</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>A Source never holds a relative day. It holds a date she typed, or “date?” for her to fill in. A yes/no line is never drafted for a row whose Source starts with “Checked”.</dd></div>
+          <div><dt>Check</dt><dd>From a thread containing “tue”, no Source cell matches a weekday or “yesterday”. With Rebook ops sourced “Checked with Dana, 8 Oct”, 0 drafted lines restate it, and 1 asks about lane changes.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Move</span><div><h3>Copy obeys the move</h3><div class="where">Exploration 05</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Questions whose move is “check it yourself first” go to her own list, not the expert copy.</dd></div>
+          <div><dt>Check</dt><dd>In the w4 state, “Copy the questions for my Dana prep” yields 2 lines, and 0 lines contain “48102”.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Once</span><div><h3>No technique toggle; the move shows once</h3><div class="where">Exploration 05 · #58</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>No checkbox. The first question that uses a move shows its one-line move visibly. Later uses fold it under “why”, with the technique name and source inside.</dd></div>
+          <div><dt>Check</dt><dd>0 checkboxes on the page. The move line is visible on first use and hidden on repeats. Every technique source string exists in the corpus, or no name is shown.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 06 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>Did Maya answer the two-loads question in one line or in a paragraph? Did it settle the lane-change case?</li>
+      <li>Since today, have you used “what made the difference” again without being asked? Where?</li>
+      <li>After the 27 Oct review: what did finance change in the table? Did people argue about facts or about the word?</li>
+      <li>Did anyone click a Source link? Which one?</li>
+      <li>When the coach cited a section in a reply, did you check it? What did you find?</li>
+      <li>A real ops lead: would you answer a yes/no line you knew came from a tool?</li>
+      <li>A real early-practice practitioner: would you open “why” on a question that looks ordinary?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Explorations 03b, 02b and 05 are design concepts, not shipped software, and their rows come from a demo thread. The learning check was prompted and measured recall within minutes, not retention. Every point here is a hypothesis until a real practitioner confirms it.
+  </footer>
+
+</main>

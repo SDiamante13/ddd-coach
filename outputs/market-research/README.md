@@ -16,8 +16,10 @@ Synthetic interviews generate hypotheses, not evidence. Promote an insight only 
 | 3b | 02a (hosted) + #42 restyle | [md](interviews/interview-03b-after-slice-02a.md) · [html](interviews/interview-03b-after-slice-02a.html) | Notice meets 1.5/5 checklist items; 8k cap + one-line box break her first paste; BYO key impossible (chat-only Enterprise, keys in Vault); restyle makes notice look like cookie small print; fit paste + table beat persistence this month |
 | M1 | stakeholder (influencer/blocker, not ICP) | [md](interviews/interview-m01-marcus-influencer.md) · [html](interviews/interview-m01-marcus-influencer.html) | Wants checkable sources per row (ticket/load/permalink); doubt labels are credible if owned + dated; Evans backs definitions only; rejects 'ubiquitous language', 'context map' |
 | 4b | 37 + Explorations 03, 02b, #58, Marcus claims | [md](interviews/interview-04b-after-slice-37.md) · [html](interviews/interview-04b-after-slice-37.html) | Table cuts fix-up time from ~25 to ~10 min; rename Status → Source; a stale correction resurfaces; carried board dropped TONU again; 'Reload to start a new one' error would make her throw away her work; no books in the export |
+| 4a | 50 (paste box, #50/#51/#57/#61/#62) | [md](interviews/interview-04a-after-slice-50.md) · [html](interviews/interview-04a-after-slice-50.html) | Sunday replay: 5 fixed / 3 partly / 2 broken, all waiting on #4; nothing lost but the 8k cap picks which team the coach hears; reply 'a waiter, not a facilitator'; Clear kept the follow-up, not the thread; notice still 1.5/5 |
+| 5 | concepts: Explorations 03b, 02b, 05 + #58 citation toggle | [md](interviews/interview-05-concepts-03b-02b-05.md) · [html](interviews/interview-05-concepts-03b-02b-05.html) | 03b fixed columns, not stale cells; Copy table drops the settle-by line and open questions; learning check passed when prompted (weak); drop the citation toggle: citations always in replies, never in copies |
 
-Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`
+Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`, `slice-50.md`
 
 ## Queued for interview 04
 
@@ -53,3 +55,12 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   3. Would she show technique names when working alone and hide them when Marcus might see her screen?
   4. After using it, can she name or reuse one move herself? This is a light check that learning actually happened, not just a preference.
 - Tooling: `agent-browser` and headed Chrome screenshots hang on this machine. Use `npx -y playwright@1.63.0 screenshot --channel chrome …` (headless) over `python3 -m http.server`.
+
+## Queued for interview 06 (trigger: the slice 3 / #4 demo)
+
+- **The win-condition test for #4:** she pastes her whole 12k thread (no trimming, once the cap is raised). Does the coach ask ONE question she wouldn't have thought of, drawn from the whole thread, with no "would you like me to…" offers? Compare directly with her company Claude's answer. Does the tie break?
+- #68: after starting over, is her last pasted thread restored?
+- #66: are the refusal buttons visible without scrolling?
+- The model changes to gpt-6-luna at this deploy. Note it, but judge the reply, not the model.
+- The "questions for interview 05" sections in 04a and 05.
+- **The learning metric (#26): "reuses a move unprompted".** Watch the transcript for her using a coaching move on her own, without being asked. Record yes or no with the quote.
