@@ -54,6 +54,21 @@ Part A of the plan's script (blank key) was dropped because the key is set. Crit
 3. **The server is blind to provider failures.** `chatHandler.ts:42` swallows the error without logging. A bad model id or quota error shows only as a generic 502, with nothing in the function log to diagnose it. Safe for key leakage, but hard to operate.
 4. **The busy guard lives in HTML semantics.** `MessageForm.handleSubmit` doesn't check `busy`. It relies on the browser skipping implicit submission when the default button is disabled. Verified OK in Chromium, and the test passes, but it's fragile if the button markup changes.
 
+## Known issue: `netlify dev` 30s function timeout
+
+The demo avoids this by keeping prompts short (one-sentence answers, each reply in a few seconds). The timeout was reproduced off-video with `curl` and a long-essay prompt:
+
+- `HTTP 500` after 30.12s, with no `Content-Type`
+- Plain-text body: `TimeoutError: Task timed out after 30.00 seconds` followed by a stack trace from `node_modules/lambda-local/...`, which includes absolute local paths
+- Client: the body isn't JSON, so `askCoach` returns "Unexpected response from the coach." with Retry. Retrying the same long prompt times out again.
+
+Not fixed. Candidates for a later slice:
+- a response length cap (`max_tokens`)
+- a faster model
+- streaming (out of scope for slice 1)
+
+The stack trace leaking in the response is a local-dev issue in `netlify dev`. Production timeout behaviour is unverified.
+
 ## Known quirks
 
 - After clicking Send, focus stays on the (now disabled) Send button, not the input. Keyboard users must refocus.
