@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { askCoach, type AskResult } from "./api/askCoach.ts";
+import { askCoach } from "./api/askCoach.ts";
 import {
   fail,
   isBusy,
@@ -7,6 +7,7 @@ import {
   reply,
   retry,
   submit,
+  type AskResult,
   type Exchange,
   type ExchangeId,
   type FailedExchange,

@@ -1,7 +1,6 @@
+import type { AskResult } from "../domain/exchange.ts";
 import type { ChatRequestBody } from "../shared/chatContract.ts";
 import { readJson, stringField } from "../shared/json.ts";
-
-export type AskResult = { ok: true; reply: string } | { ok: false; error: string };
 
 const UNREACHABLE: AskResult = { ok: false, error: "Could not reach the coach." };
 const UNEXPECTED: AskResult = { ok: false, error: "Unexpected response from the coach." };

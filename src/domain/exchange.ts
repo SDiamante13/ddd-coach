@@ -6,6 +6,8 @@ export type RepliedExchange = { id: ExchangeId; prompt: Prompt; status: "replied
 export type FailedExchange = { id: ExchangeId; prompt: Prompt; status: "failed"; error: string };
 export type Exchange = PendingExchange | RepliedExchange | FailedExchange;
 
+export type AskResult = { ok: true; reply: string } | { ok: false; error: string };
+
 export function submit(id: ExchangeId, prompt: Prompt): PendingExchange {
   return { id, prompt, status: "pending" };
 }
