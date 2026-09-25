@@ -11,6 +11,7 @@ import {
   type FailedExchange,
   type Prompt,
 } from "./domain/exchange.ts";
+import { ExchangeOutcome, type ExchangeProps } from "./ui/ExchangeOutcome.tsx";
 
 export function App() {
   return (
@@ -65,31 +66,11 @@ function ConnectionTest() {
   );
 }
 
-type EntryProps = { exchange: Exchange; onRetry: (failed: FailedExchange) => void };
-
-function ExchangeEntry({ exchange, onRetry }: EntryProps) {
+function ExchangeEntry({ exchange, onRetry }: ExchangeProps) {
   return (
     <li>
       <p>{exchange.prompt}</p>
       <ExchangeOutcome exchange={exchange} onRetry={onRetry} />
     </li>
   );
-}
-
-function ExchangeOutcome({ exchange, onRetry }: EntryProps) {
-  switch (exchange.status) {
-    case "pending":
-      return <p>Coach is thinking…</p>;
-    case "replied":
-      return <p>{exchange.reply}</p>;
-    case "failed":
-      return (
-        <>
-          <p role="alert">{exchange.error}</p>
-          <button type="button" onClick={() => onRetry(exchange)}>
-            Retry
-          </button>
-        </>
-      );
-  }
 }
