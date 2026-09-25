@@ -25,7 +25,7 @@ Acceptance check from the plan: "Verify a real two-turn exchange and failure/ret
 - `git status -sb`: `main...origin/main`, with nothing ahead.
 
 **Netlify docs** (docs.netlify.com/build/functions/configuration):
-- Synchronous function limit: **60 s**, not configurable.
+- Synchronous function limit: **60 s**, not configurable. **Measured on this site: 30.4 s** (see Hosted timeout).
 - Buffered request/response payload: **6 MB**.
 - Function Node version: the build's Node version, falling back to Node 24.
 
@@ -152,7 +152,7 @@ Expect: key set, model set, probe absent. The final proof comes after deploy: a 
 - **Scopes:** omit `--scope`. The Free plan has no scopes feature (`env_var_scopes: false`), so values apply to every scope, including functions. For secrets, the CLI removes post-processing itself.
 - **Context:** `production` only. Secrets can't use `all` or `dev`, and deploy previews and drafts don't need the key (see the timeout probe below).
   - Side effect of linking: `netlify dev` now also pulls site env for the `dev` context. That's empty, so local dev keeps using `.env`.
-- **`COACH_TIMEOUT_MS`** is optional. Don't set it; the 25 s default stays well under the 60 s platform limit.
+- **`COACH_TIMEOUT_MS`** is optional. Don't set it; the 25 s default stays under the measured 30.4 s platform cut-off (5 s margin).
 - **Recommended: a credit limit on the key** in the OpenRouter dashboard (user; for example $5). If the user makes a dedicated hosting key, they put it in a separate env file, the deployer reruns Step B with `--env-file=<that file>`, and then redeploys (env changes need a redeploy).
 - **Agents never** run `env:get`, `env:import`, `env:list` with `--plain` or an unfiltered `--json`, or `env:set` with `--json`. They never print `.env`; `node --env-file` in Step B is its only use.
 
@@ -170,7 +170,7 @@ export const config = { path: "/api/slow" };
 
 ```bash
 npm run build
-npx netlify deploy --no-build --dir dist --functions work/timeout-probe --message "timeout probe" --json   # draft, not --prod
+npx netlify deploy --no-build --skip-functions-cache --dir dist --functions work/timeout-probe --message "timeout probe" --json   # draft, not --prod
 curl -s -o work/probe-body.txt -w "%{http_code} %{time_total}s %{content_type}\n" -X POST <draft_url>/api/slow
 head -c 300 work/probe-body.txt
 ```
@@ -178,6 +178,9 @@ head -c 300 work/probe-body.txt
 Record the status, elapsed time, content type, and whether the body is JSON or plain text, and whether it contains a stack trace or paths. Then delete the probe and body file, and the draft: `npx netlify api deleteDeploy --data '{"deploy_id":"<id>"}'`.
 
 Expected: about 60 s, with some non-2xx status. Whatever the status, `askCoach` maps it to a clean message. If the body leaks a stack trace, that's a finding, not a blocker.
+
+- **`--skip-functions-cache` is required.** Without it, `--no-build` reuses the cached `.netlify/functions` (from the last build) and ignores `--functions`: the draft ships only `chat`, and `/api/slow` returns 400 "Bad request, missing form".
+- **Measured (2026-09-24, deploy-preview draft): 504 after 30.4 s, `text/html`, a Netlify "Inactivity Timeout" page.** No stack trace or paths. That's about half the documented 60 s, so `COACH_TIMEOUT_MS` must stay under about 28 s. A longer deadline (e.g. the ~45 s the model-eval proposal suggests for reasoning models) needs streaming (B35); "inactivity" suggests early bytes keep the connection alive (unverified).
 
 ### B39 body cap: **in** (small, TDD'd)
 
@@ -241,7 +244,7 @@ export const config: Config = {
 
 ### Streaming (B35): **out**
 
-Replies are capped at 600 tokens, the deadline is 25 s, and the platform limit is 60 s. There's no hard reason to stream now. It stays in the backlog until the probe or real use shows 504s.
+Replies are capped at 600 tokens, the deadline is 25 s, and the platform cut-off measured 30.4 s. There's no hard reason to stream now. It stays in the backlog until the probe or real use shows 504s.
 
 ## Acceptance criteria
 
@@ -300,7 +303,7 @@ Let `U=https://ddd-coach.netlify.app`.
 | Headers | `curl -sI $U/` | nosniff, Referrer-Policy, CSP frame-ancestors, `strict-transport-security` |
 | Headers on the function (record only) | `curl -si $U/api/chat` | 405 JSON `{"error":"Use POST."}`. Note whether the toml headers apply to function responses |
 | Validation | the slice 2 off-video curls (role-shaped 400, 51-turn 413 reload), an 8,001-char message → 413 shorten, a 129 KiB body → 413 | as stated |
-| Server 504 is JSON | draft deploy `npx netlify deploy --env COACH_TIMEOUT_MS=1 --json` (not `--prod`), then POST a real message to `<draft_url>/api/chat` | 504 `application/json` with `COACH_TIMED_OUT`. If it returns 500 "OPENROUTER_API_KEY is not set." instead, drafts don't get the production secret: record that and use the fallback in Risks |
+| Server 504 is JSON | draft deploy `npx netlify deploy --env COACH_TIMEOUT_MS=1 --json` (not `--prod`), then POST a real message to `<draft_url>/api/chat` | 504 `application/json` with `COACH_TIMED_OUT`. If it returns 500 "OPENROUTER_API_KEY is not set." instead, drafts don't get the production secret: record that and use the fallback in Risks. **Measured: drafts get 500 "OPENROUTER_API_KEY is not set." Not re-run on prod; the JSON 504 path was demoed locally in slice 2** |
 | Platform timeout | the probe (above) | recorded |
 | Rate limit (last: it blocks your IP for up to 60 s) | `for i in $(seq 25); do curl -s -o /dev/null -w "%{http_code} " -X POST -d '{}' $U/api/chat; done` | 400 × 20, then 429s. Malformed bodies never call OpenRouter |
 
@@ -346,7 +349,7 @@ Delete the probe and `COACH_TIMEOUT_MS` drafts afterwards.
     - (3) watch usage.
   - Netlify itself can't bill: the legacy Free plan suspends instead.
   - If abuse shows up, rotate the key. Auth or a shared passphrase is a later backlog item.
-- **Drafts may lack the production secret.** Fallback for the hosted 504 check: `npx netlify deploy --prod --env COACH_TIMEOUT_MS=1`, run the check, then redeploy `--prod` without it. Production is broken for about 2 minutes, which is acceptable with no users. Avoid putting the key in the `deploy-preview` context.
+- **Drafts lack the production secret (confirmed 2026-09-24).** CLI drafts run in the `deploy-preview` context, and the key is `production` only, so any draft `/api/chat` returns 500 "OPENROUTER_API_KEY is not set.". Fallback for the hosted 504 check: `npx netlify deploy --prod --env COACH_TIMEOUT_MS=1`, run the check, then redeploy `--prod` without it. Production is broken for about 2 minutes, which is acceptable with no users. Avoid putting the key in the `deploy-preview` context.
 - **The name `ddd-coach` may be taken** globally. Fallback: `ddd-coach-sd`.
 - **Local build, not a clean clone.** The pre-flight blocks uncommitted tracked changes. Untracked files under `outputs/` don't affect `dist`.
 - **Headers in `netlify dev`.** The chosen headers avoid `script-src`. Builder confirms local dev still loads.
