@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDD Coach</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../../src/styles/base.css">
+<style>
+body{overflow:hidden}
+main{height:100dvh;min-height:0;padding-top:var(--space-6)}
+ol[role="log"]{overflow-y:auto;min-height:0;padding-bottom:var(--space-4)}
+.lockline{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-ink);padding:var(--space-2) var(--space-4);border:1px solid var(--color-line-strong);border-radius:var(--radius-md);background:var(--color-surface)}
+.lockline a{color:var(--color-coach);font-weight:500}
+.cont{display:inline}
+.cont::before{content:"continued";display:inline-block;margin:0 6px 0 4px;padding:1px 6px;border-radius:6px;background:var(--color-surface);border:1px solid var(--color-line);font:500 var(--text-sm)/1.2 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-ink-muted);vertical-align:1px}
+.cut{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);margin-top:var(--space-3);padding:var(--space-2) var(--space-2) var(--space-2) var(--space-4);border:1px dashed var(--color-line-strong);border-radius:var(--radius-md);background:var(--color-surface);font-size:var(--text-sm);color:var(--color-ink-muted)}
+.cut button,.warn button,.full button{min-height:36px;padding:0 var(--space-4)}
+.cut button{border-color:var(--color-coach);color:var(--color-coach)}
+.warn{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-3) var(--space-3) var(--space-3) var(--space-4);border:1px solid #e6c98f;border-radius:var(--radius-md);background:var(--color-warn-tint);color:var(--color-warn);font-size:var(--text-sm)}
+.warn .row,.full .row{display:flex;gap:var(--space-2);flex-shrink:0}
+.full{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);border:1px solid var(--color-line-strong);border-radius:var(--radius-lg);background:var(--color-surface)}
+.full h2{margin:0;font:700 var(--text-lg)/1.15 var(--font-display);letter-spacing:-.02em}
+.full p{margin:0;padding:0;border:0;background:none;color:var(--color-ink-muted);font-size:var(--text-sm)}
+.primary{background:var(--color-coach)!important;border-color:var(--color-coach)!important;color:var(--color-on-coach)!important}
+.carry{display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4) var(--space-5);border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-surface)}
+.carry .k{font:500 var(--text-sm)/1 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-coach)}
+.carry table{border-collapse:collapse;font-size:var(--text-sm);width:100%}
+.carry td,.carry th{text-align:left;padding:4px 8px;border-bottom:1px solid var(--color-line);vertical-align:top}
+.carry th{font:500 var(--text-sm)/1 var(--font-label);font-variant-caps:all-small-caps;letter-spacing:var(--tracking-label);color:var(--color-ink-muted)}
+.carry ul{margin:0;padding-left:1.1em;font-size:var(--text-sm)}
+.readonly{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-2) var(--space-4);border-radius:var(--radius-md);background:var(--color-surface-sunken);border:1px solid var(--color-line);font-size:var(--text-sm);color:var(--color-ink-muted)}
+.readonly button{min-height:36px;padding:0 var(--space-4)}
+.prev{display:flex;align-items:center;justify-content:space-between;font-size:var(--text-sm);color:var(--color-ink-muted)}
+.prev button{min-height:36px;padding:0 var(--space-4);font-weight:500}
+form button[type="submit"]:disabled{opacity:.5}
+.toast{position:fixed;left:50%;top:24px;transform:translateX(-50%);padding:10px 18px;border-radius:22px;background:var(--color-ink);color:var(--color-surface);font-size:14px;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+.hide{display:none!important}
+.steps{position:fixed;left:16px;bottom:12px;display:flex;gap:6px}
+.steps span{font:500 11px/1 var(--font-label);letter-spacing:.06em;padding:7px 10px;border-radius:12px;background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink-muted)}
+.steps span.on{background:var(--color-coach);border-color:var(--color-coach);color:#fff}
+</style>
+</head>
+<body><div id="root"><main>
+<h1>DDD Coach</h1>
+<div class="lockline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><strong style="font-weight:600">Where your text goes</strong><a href="#" onclick="return false">show</a></div>
+<div class="prev hide" id="prev"><span>Started fresh with your board.</span><button type="button" id="openPrev">Previous conversation (read-only)</button></div>
+<ol role="log" id="log">
+<li data-status="replied"><p>Paste: #booking-split thread (sanitized)</p><p>Two words don't match. “Booking”: ops means the request, finance means confirmed and rate locked, carriers mean the tender. “Rebook”: ops keeps the booking, finance cancels and re-creates it.</p></li>
+<li data-status="replied"><p>My notes from Dana: RB = same bkg unless lane/date chg → AMEND. 2nd inv sometimes legit, TONU.</p><p>Matched to your questions and kept as unconfirmed. TONU is its own term now: a fee when the first carrier already sent a truck.</p></li>
+<li data-status="replied" id="cutli"><p>What should I ask Dana next?</p><p id="cutp"><span id="before">Three questions, each on a different load. 1. Load 48213 was rebooked with another carrier after a rejection: same booking, or a new one? 2. Load 47990 shows AMENDED after a date change: is that the rule for every lane or date change? 3. Load 48102 got two invoices. Was the</span></p><div class="cut" id="cut"><span>Cut short at the reply length limit.</span><button type="button" id="continue">Continue</button></div></li>
+</ol>
+<div class="full hide" id="full">
+  <h2>This conversation is full</h2>
+  <p>The coach can only read so much at once. Copy everything to keep it safe, then start fresh with your board carried over: terms, labels and open questions, word for word. This conversation stays readable.</p>
+  <div class="row"><button type="button" class="primary" id="copyall">Copy everything</button><button type="button" id="fresh">Start fresh with the board</button></div>
+</div>
+<div class="readonly hide" id="ro"><span>Read-only. Continue in the new conversation.</span><button type="button" id="backNew">Back to new conversation</button></div>
+<form id="form">
+  <label for="msg">Message</label>
+  <div class="warn hide" id="warn" role="alert"><span id="warntext"></span><span class="row"><button type="button" id="sendAnyway">Send anyway</button><button type="button" id="copyFirst">Copy everything first</button></span></div>
+  <div style="display:flex;gap:var(--space-2);align-items:flex-end"><input type="text" id="msg" value=""><button type="submit" id="send">Send</button></div>
+</form>
+</main></div>
+<div class="toast" id="toast"></div>
+<div class="steps" aria-hidden="true"><span id="s1" class="on">1 Cut at the cut</span><span id="s2">2 Warn before paste</span><span id="s3">3 Full: copy first</span><span id="s4">4 Carry the board</span></div>
+<script>
+const CAP = 24000; let used = 12600;
+const $ = (id) => document.getElementById(id);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const step = (n) => [1, 2, 3, 4].forEach((i) => $("s" + i).classList.toggle("on", i === n));
+const fmt = (n) => n.toLocaleString("en-US");
+const toast = async (t) => { $("toast").textContent = t; $("toast").classList.add("show"); await wait(1500); $("toast").classList.remove("show"); };
+const log = $("log");
+const end = () => { log.scrollTop = log.scrollHeight; };
+let oldLog = "";
+end();
+$("continue").onclick = () => {
+  $("cut").remove();
+  $("cutp").insertAdjacentHTML("beforeend", `<span class="cont">first carrier's truck already on its way when the booking moved?</span>`);
+  used += 60; end();
+};
+const PASTE = "Status enum (23) with Dana's 2019 sheet, sanitized: REQUESTED … TENDERED … REBOOKED … AMENDED … (9,400 characters)";
+const PASTE_LEN = 9400;
+function checkPaste() {
+  const left = CAP - used; const len = $("msg").value === PASTE ? PASTE_LEN : $("msg").value.length;
+  const heavy = len > left * 0.6;
+  $("warn").classList.toggle("hide", !heavy);
+  if (heavy) $("warntext").textContent = `This paste would use ${fmt(len)} of the ${fmt(left)} characters left in this conversation. After it, there's room for about one short reply.`;
+  return heavy;
+}
+$("msg").addEventListener("input", checkPaste);
+window.pasteEnum = () => { step(2); $("msg").value = PASTE; checkPaste(); };
+async function send(text, len) {
+  $("warn").classList.add("hide"); $("msg").value = "";
+  const li = document.createElement("li"); li.dataset.status = "pending";
+  li.innerHTML = "<p></p><p>Coach is thinking…</p>"; li.firstChild.textContent = text; log.appendChild(li); end();
+  await wait(1200); used += len + 300; li.dataset.status = "replied";
+  li.lastChild.textContent = "Matched 7 of 23 statuses by name: REQUESTED, TENDERED, REJECTED, REBOOKED, AMENDED, CONFIRMED, INVOICED. The other 16 are still unknown. Dana's sheet disagrees with the code on AMENDED."; end();
+  $("msg").value = "Dana's sheet says ON_HOLD means waiting on customs";
+}
+$("sendAnyway").onclick = () => send(PASTE, PASTE_LEN);
+$("copyFirst").onclick = () => toast("Copied the whole conversation. Paste it somewhere safe.");
+$("form").onsubmit = (e) => {
+  e.preventDefault(); const t = $("msg").value.trim(); if (!t) return;
+  if (t === PASTE) { if (!checkPaste()) send(PASTE, PASTE_LEN); return; }
+  if (used + t.length > CAP - 500) { step(3); $("form").classList.add("hide"); $("full").classList.remove("hide"); return; }
+  send(t, t.length);
+};
+$("copyall").onclick = () => toast("Copied the whole conversation, word for word.");
+$("fresh").onclick = () => {
+  step(4); oldLog = log.innerHTML;
+  log.innerHTML = `<li data-status="replied"><div class="carry"><div class="k">Carried over word for word from your last conversation · edit anything wrong</div>
+<table><thead><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Status</th></tr></thead><tbody>
+<tr><td>Booking</td><td>Ops</td><td>The customer submitted a request</td><td>From thread</td></tr>
+<tr><td></td><td>Finance</td><td>Carrier confirmed and rate locked</td><td>From thread</td></tr>
+<tr><td></td><td>Carriers</td><td>The tender sent to a carrier</td><td>From thread</td></tr>
+<tr><td>Rebook</td><td>Ops</td><td>Same booking, new carrier, unless lane or date changes</td><td>My notes from Dana · unconfirmed</td></tr>
+<tr><td></td><td>Finance</td><td>Cancel plus a new booking</td><td>From thread</td></tr>
+<tr><td>TONU</td><td>Ops</td><td>A fee when the first carrier already sent a truck</td><td>My notes from Dana · unconfirmed</td></tr>
+</tbody></table>
+<div class="k">Statuses matched by name (7 of 23)</div><div style="font-size:var(--text-sm)">REQUESTED, TENDERED, REJECTED, REBOOKED, AMENDED, CONFIRMED, INVOICED</div>
+<div class="k">Open questions</div><ul><li>Load 48213: same booking or a new one? · for Dana</li><li>Load 47990: AMENDED for every lane or date change? · for Dana</li><li>AMENDED: Dana's sheet vs the code · for you to check</li></ul></div></li>`;
+  used = 1900; $("full").classList.add("hide"); $("form").classList.remove("hide"); $("prev").classList.remove("hide");
+};
+$("openPrev").onclick = () => { const fresh = log.innerHTML; log.dataset.fresh = fresh; log.innerHTML = oldLog; $("form").classList.add("hide"); $("prev").classList.add("hide"); $("ro").classList.remove("hide"); log.scrollTop = 0; };
+$("backNew").onclick = () => { log.innerHTML = log.dataset.fresh; $("ro").classList.add("hide"); $("form").classList.remove("hide"); $("prev").classList.remove("hide"); };
+</script>
+</body></html>
