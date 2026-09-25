@@ -1,14 +1,14 @@
 import type { Exchange, FailedExchange } from "../domain/exchange.ts";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 
-export type ExchangeProps = {
+type ExchangeOutcomeProps = {
   exchange: Exchange;
   busy: boolean;
   onRetry: (failed: FailedExchange) => void;
   conversation: () => string;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation }: ExchangeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
