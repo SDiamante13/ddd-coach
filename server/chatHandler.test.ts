@@ -13,11 +13,15 @@ function post(body: string): Request {
   return new Request("http://localhost/api/chat", { method: "POST", body });
 }
 
+function postMessage(message: unknown): Request {
+  return post(JSON.stringify({ message }));
+}
+
 describe("chat handler", () => {
   it("replies with the coach's answer to a posted message", async () => {
     const handle = createChatHandler({ config: validConfig, createCoach: echoCoach });
 
-    const response = await handle(post(JSON.stringify({ message: "Hello coach" })));
+    const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ reply: "Echo: Hello coach" });
@@ -28,7 +32,7 @@ describe("chat handler", () => {
     const config: ConfigResult = { ok: false, error: "OPENROUTER_API_KEY is not set." };
     const handle = createChatHandler({ config, createCoach });
 
-    const response = await handle(post(JSON.stringify({ message: "Hello coach" })));
+    const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({ error: "OPENROUTER_API_KEY is not set." });
@@ -41,7 +45,7 @@ describe("chat handler", () => {
     });
     const handle = createChatHandler({ config: validConfig, createCoach: failingCoach });
 
-    const response = await handle(post(JSON.stringify({ message: "Hello coach" })));
+    const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(502);
     const body = await response.text();
@@ -63,7 +67,7 @@ describe("chat handler", () => {
     const createCoach = vi.fn(echoCoach);
     const handle = createChatHandler({ config: validConfig, createCoach });
 
-    const response = await handle(post(JSON.stringify({ message: "   " })));
+    const response = await handle(postMessage("   "));
 
     expect(response.status).toBe(400);
     expect(createCoach).not.toHaveBeenCalled();
@@ -72,7 +76,7 @@ describe("chat handler", () => {
   it("rejects a body without a text message as a bad request", async () => {
     const handle = createChatHandler({ config: validConfig, createCoach: echoCoach });
 
-    const response = await handle(post(JSON.stringify({ message: 42 })));
+    const response = await handle(postMessage(42));
 
     expect(response.status).toBe(400);
   });
