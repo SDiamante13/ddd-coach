@@ -45,6 +45,8 @@ const GOOD_REPLY = [
   "- From thread: Ops (view B) means every change is REBOOKED.",
   "",
   "Question for the ops lead and the finance controller, at the 27 Oct review: For load 48213, if a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?",
+  'From thread: "a booking exists the moment the customer hits submit"',
+  'From thread: "for finance it\'s only a booking once it\'s invoiceable"',
 ].join("\n");
 
 const SIX_EVENTS = ["3.", "4.", "5.", "6."].map((n) => `${n} Guess: Ops calls the customer.`).join("\n") + "\n2. Guess:";
@@ -184,8 +186,8 @@ describe("hard checks", () => {
     expect(failedHardChecks(reply, "stop", fixture)).toEqual([]);
   });
 
-  it("fail holders, same meaning not split and question names a case for the interview 06 reply", () => {
-    expect(failedHardChecks(INTERVIEW_06_REPLY, "stop", bookingSplit)).toEqual(["holders", "same meaning not split", "question names a case"]);
+  it("fail holders, same meaning not split, question names a case and question sources for the interview 06 reply", () => {
+    expect(failedHardChecks(INTERVIEW_06_REPLY, "stop", bookingSplit)).toEqual(["holders", "same meaning not split", "question names a case", "question sources"]);
   });
 
   it("leave a split same-meaning word out of stable views", () => {
@@ -212,6 +214,51 @@ describe("hard checks", () => {
     const noCase = GOOD_REPLY.replace("For load 48213, if a booking", "If a booking");
 
     expect(failedHardChecks(noCase, "stop", fixture)).toEqual(["question names a case"]);
+  });
+
+  it("fail question sources for a question with no source lines under it (#85)", () => {
+    const noSources = GOOD_REPLY.split("\n").filter((line) => !line.startsWith('From thread: "')).join("\n");
+
+    expect(failedHardChecks(noSources, "stop", fixture)).toEqual(["question sources"]);
+  });
+
+  it("fail question sources for a quote the thread doesn't contain", () => {
+    const invented = GOOD_REPLY.replace("for finance it's only a booking once it's invoiceable", "finance only counts invoiced bookings");
+
+    expect(failedHardChecks(invented, "stop", fixture)).toEqual(["question sources"]);
+  });
+
+  it("fail question sources for the same line quoted twice", () => {
+    const twice = GOOD_REPLY.replace("for finance it's only a booking once it's invoiceable", "a booking exists the moment the customer hits submit");
+
+    expect(failedHardChecks(twice, "stop", fixture)).toEqual(["question sources"]);
+  });
+
+  it("pass question sources for a verbatim quote with curly apostrophes, curly quotes and doubled spaces", () => {
+    const typographic = GOOD_REPLY.replace(`"for finance it's only a booking once it's invoiceable"`, "“for finance it’s only a  booking once it’s invoiceable”");
+
+    expect(failedHardChecks(typographic, "stop", fixture)).toEqual([]);
+  });
+
+  it.each([
+    ["two words", "hits submit"],
+    ["31 words", "every change the night desk makes goes out as REBOOKED because the portal sync for amend never reaches the carrier before the truck leaves the yard at night so we rebook"],
+  ])("fail question sources for a quote of %s", (_case, quote) => {
+    const longLine = "Ops night desk: every change the night desk makes goes out as REBOOKED because the portal sync for amend never reaches the carrier before the truck leaves the yard at night so we rebook.";
+    const withLongLine = { ...fixture, thread: `${fixture.thread}\n${longLine}` };
+    const reply = GOOD_REPLY.replace("a booking exists the moment the customer hits submit", quote);
+
+    expect(failedHardChecks(reply, "stop", withLongLine)).toEqual(["question sources"]);
+  });
+
+  it("fail question sources when anything follows the two source lines", () => {
+    expect(failedHardChecks(`${GOOD_REPLY}\nHope this helps with the review.`, "stop", fixture)).toEqual(["question sources"]);
+  });
+
+  it("judge complete ending on the question, not on a verbatim source line under it (#85)", () => {
+    const withSource = `${GOOD_REPLY}\nFrom thread: "for finance it's only a booking once it's invoiceable"`;
+
+    expect(failedHardChecks(withSource, "stop", fixture)).not.toContain("complete ending");
   });
 
   it("fail at most 600 words for a runaway reply", () => {
@@ -245,7 +292,9 @@ describe("hard checks", () => {
     ["a curly apostrophe after a question mark", "Ops asks ‘same booking?’", []],
     ["a bracket with no full stop", "Ops calls it same booking (per the sheet)", ["complete ending"]],
   ])("check complete ending for a last line ending in %s", (_case, lastLine, failures) => {
-    expect(failedHardChecks(`${GOOD_REPLY}\n${lastLine}`, "stop", fixture)).toEqual(failures);
+    const failed = failedHardChecks(`${GOOD_REPLY}\n${lastLine}`, "stop", fixture);
+
+    expect(failed.filter((check) => check === "complete ending")).toEqual(failures);
   });
 
   it("pass code guess for a Code line the thread describes in words when no code was shown", () => {

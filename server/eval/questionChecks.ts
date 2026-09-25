@@ -1,3 +1,5 @@
+import { SOURCE_QUOTE } from "../../src/shared/replyLayout.ts";
+
 const OPEN_WORD = /\b(what|which|who|whose|whom|where|how|whether)\b/i;
 
 const PROPOSAL =
@@ -19,3 +21,21 @@ const CONCRETE_CASE = /\b\d{3,}\b|\bCustomer [A-Z]\b|\b\d{1,2}:\d{2}\b/;
 export function namesACase(question: string): boolean {
   return CONCRETE_CASE.test(question);
 }
+
+export function quotesTwoSources(afterQuestion: string[], thread: string): boolean {
+  const lines = afterQuestion.filter((line) => line !== "");
+  const quotes = lines.flatMap((line) => SOURCE_QUOTE.exec(line)?.[1] ?? []);
+  const pasted = normalized(thread);
+  const isShortVerbatim = (quote: string) => pasted.includes(normalized(quote)) && isShortQuote(quote);
+  return lines.length === 2 && new Set(quotes).size === 2 && quotes.every(isShortVerbatim);
+}
+
+const isShortQuote = (quote: string): boolean => {
+  const words = quote.split(/\s+/).filter(Boolean).length;
+  return words >= MIN_QUOTE_WORDS && words <= MAX_QUOTE_WORDS;
+};
+
+const MIN_QUOTE_WORDS = 3;
+const MAX_QUOTE_WORDS = 30;
+
+const normalized = (text: string): string => text.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ");

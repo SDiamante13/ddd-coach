@@ -356,6 +356,12 @@ Reported only, v10 against v8:
 
 `LIVE_INSTRUCTIONS_VERSION` becomes 10 in the commit that records this ship. Deployment and the hosted F2 check are the deployer's.
 
+## #85 check changes, re-scored on the v8/v10 A/B ($0)
+
+| Check change | Verdict | What moved |
+|---|---|---|
+| New gating hard check `question sources` (thread fixtures). Exactly two `From thread: "…"` lines follow the question, and nothing else does. Each quote is a distinct 3–30-word excerpt that appears verbatim in the paste, after normalizing curly quotes, apostrophes and whitespace. `complete ending` now judges the question rather than a source line | Ship: yes (unchanged) | `question sources` 0/6 on every thread fixture in both arms, since no recorded reply quotes its sources. No drop, and `complete ending` is unchanged. This is the v11 A/B's target |
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.

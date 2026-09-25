@@ -1,6 +1,7 @@
 export const EVENTS_HEADING = "Events, in order";
 export const WORDS_HEADING = "Words that don't match";
 export const QUESTION = /^Question for ([^:]+): (.+\?)$/;
+export const SOURCE_QUOTE = /^From thread: ["“](.+)["”]$/;
 
 const NUMBERED = /^\d+\. /;
 const MEANING = /^- /;
@@ -58,6 +59,7 @@ function wordsOf(wordLines: string[]): CoachReply["words"] {
 }
 
 export const isQuestion = (line: string): boolean => QUESTION.test(line);
+export const isSourceQuote = (line: string): boolean => SOURCE_QUOTE.test(line);
 export const isNumbered = (line: string): boolean => NUMBERED.test(line);
 export const hasSourceLabel = (claim: string): boolean => SOURCE_LABEL.test(claim);
 export const withoutSourceLabel = (claim: string): string => claim.replace(SOURCE_LABEL, "");

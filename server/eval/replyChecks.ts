@@ -1,5 +1,5 @@
 import { endsSentence } from "../replyEnding.ts";
-import { asksOpenly, namesACase } from "./questionChecks.ts";
+import { asksOpenly, namesACase, quotesTwoSources } from "./questionChecks.ts";
 import {
   hasCleanSplitLabels,
   hasKnownHolders,
@@ -13,6 +13,7 @@ import {
   hasSourceLabel,
   isNumbered,
   isQuestion,
+  isSourceQuote,
   parseCoachReply,
   parseLayout,
   withoutSourceLabel,
@@ -71,6 +72,7 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
   "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
+  "question sources": ({ layout, fixture }) => quotesTwoSources(afterQuestion(layout.lines), fixture.thread),
   "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
 
@@ -120,8 +122,13 @@ function codeClaims({ meaningClaims }: ReplyLayout): string[] {
   return meaningClaims.filter((claim) => withoutSourceLabel(claim).startsWith("Code "));
 }
 
+function afterQuestion(lines: string[]): string[] {
+  const question = lines.findIndex(isQuestion);
+  return question < 0 ? [] : lines.slice(question + 1);
+}
+
 function endsComplete(lines: string[]): boolean {
-  return endsSentence(lines.filter((line) => line !== "").at(-1) ?? "");
+  return endsSentence(lines.filter((line) => line !== "" && !isSourceQuote(line)).at(-1) ?? "");
 }
 
 function hasOneQuestion(lines: string[]): boolean {
