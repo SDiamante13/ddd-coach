@@ -2,22 +2,18 @@
 import { describe, expect, it } from "vitest";
 import { readConfig, readTimeoutMs } from "./config.ts";
 
+const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
+
 describe("readConfig", () => {
   it("reads the key and model", () => {
-    const env = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
-
-    expect(readConfig(env)).toEqual({
+    expect(readConfig(requiredEnv)).toEqual({
       ok: true,
       config: { apiKey: "sk-or-test-key", model: "test/model" },
     });
   });
 
   it("reads an optional reasoning effort", () => {
-    const env = {
-      OPENROUTER_API_KEY: "sk-or-test-key",
-      OPENROUTER_MODEL: "test/model",
-      OPENROUTER_REASONING_EFFORT: "low",
-    };
+    const env = { ...requiredEnv, OPENROUTER_REASONING_EFFORT: "low" };
 
     expect(readConfig(env)).toEqual({
       ok: true,
@@ -26,11 +22,7 @@ describe("readConfig", () => {
   });
 
   it("refuses an unknown reasoning effort, naming the allowed ones", () => {
-    const env = {
-      OPENROUTER_API_KEY: "sk-or-test-key",
-      OPENROUTER_MODEL: "test/model",
-      OPENROUTER_REASONING_EFFORT: "turbo",
-    };
+    const env = { ...requiredEnv, OPENROUTER_REASONING_EFFORT: "turbo" };
 
     expect(readConfig(env)).toEqual({
       ok: false,
