@@ -8,7 +8,7 @@ A map of where things live. Rules and guidelines live in the files it points to.
 - `outputs/generative-coach-direction.md` — shared modeling board and voice direction
 - `outputs/app-assessment.md` — seven-angle snapshot of the app, evidence limits, and proposed product test
 - Backlog: [GitHub Issues](https://github.com/SDiamante13/ddd-coach/issues), owned by the product-owner session; `outputs/ddd-coach-backlog.md` holds the pointer, product direction and promotion rule
-- `outputs/slice-01-plan.md`, `slice-01b-plan.md`, `slice-02-plan.md` — per-slice plans (acceptance criteria, test order, demo script)
+- `outputs/slice-*-plan.md` — per-slice plans (acceptance criteria, test order, demo script); issue-driven slices use the issue number, e.g. `slice-37-plan.md`
 
 ## Decisions
 - No ADR directory yet.
@@ -32,6 +32,7 @@ A map of where things live. Rules and guidelines live in the files it points to.
 - `src/api/` — `askCoach` browser client for `/api/chat`
 - `src/shared/` — chat contract and JSON helpers shared by client and server
 - `src/ui/` — React components and the `useExchanges` hook
+- `src/styles/` — live design tokens and base styles (source of truth; the copies in `outputs/design/` are the handoff record, so don't copy them back over)
 - `src/test/` — Vitest setup and fetch stub
 - `src/App.tsx`, `src/main.tsx` — app shell and entry
 - `server/` — chat handler, config, deadline, `Coach` port and OpenRouter adapter
