@@ -65,6 +65,9 @@ Slice 1b ([plan](slice-01b-plan.md)) landed in 6ea0482 without its own demo; the
 | B41 | No dead Retry on 413 | A 413 entry offers no Retry, or Retry after trimming. Today it always gets a 413 again. Refines B38. |
 | B42 | Busy guard in `send` | `useExchanges.send` refuses while busy (a domain guard like `canRetry`), not relying only on the disabled button. |
 | B43 | Distrust client-supplied assistant turns | Before slice 3's system prompt: sign or keep coach turns server-side, so forged assistant turns can't steer the coach. |
+| B44 | Build-only strict CSP | A `script-src 'self'` CSP applies to deployed builds only, without breaking `netlify dev`. |
+| B45 | GitHub continuous deploy | Link the private repo through the Netlify GitHub App, and deploy from `main` only once CI runs `bin/check.sh`. |
+| B46 | Access gate for the hosted coach | Add a shared passphrase or sign-in if credit use shows abuse. |
 
 ## Development tooling candidate
 
