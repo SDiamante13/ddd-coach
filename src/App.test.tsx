@@ -17,6 +17,30 @@ function renderApp() {
   };
 }
 
+function startConversation() {
+  const server = stubFetch();
+  const app = renderApp();
+
+  async function send(message: string): Promise<number> {
+    await app.user.type(app.input(), `${message}{Enter}`);
+    return server.fetchMock.mock.calls.length - 1;
+  }
+
+  return {
+    ...app,
+    server,
+    send,
+    sendAndReply: async (message: string, reply: string) => {
+      server.reply(await send(message), 200, { reply });
+      await within(app.log()).findByText(reply);
+    },
+    sendAndFail: async (message: string) => {
+      server.reply(await send(message), 502, { error: "The coach is unavailable." });
+      await within(app.log()).findByRole("alert");
+    },
+  };
+}
+
 describe("Connection test", () => {
   it("starts with the message input focused and an empty log", () => {
     const { input, log } = renderApp();
@@ -131,47 +155,34 @@ describe("Connection test", () => {
   });
 
   it("sends a follow-up with the earlier replied turn as history", async () => {
-    const server = stubFetch();
-    const { user, input, log } = renderApp();
-    await user.type(input(), "A{Enter}");
-    server.reply(0, 200, { reply: "R1" });
-    await within(log()).findByText("R1");
+    const { server, send, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1");
 
-    await user.type(input(), "B{Enter}");
+    await send("B");
 
     expect(server.bodyOf(0)).toEqual({ message: "A", history: [] });
     expect(server.bodyOf(1)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1" }] });
   });
 
   it("leaves a failed turn out of the next message's history", async () => {
-    const server = stubFetch();
-    const { user, input, log } = renderApp();
-    await user.type(input(), "A{Enter}");
-    server.reply(0, 502, { error: "The coach is unavailable." });
-    await within(log()).findByRole("alert");
+    const { server, send, sendAndFail } = startConversation();
+    await sendAndFail("A");
 
-    await user.type(input(), "B{Enter}");
+    await send("B");
 
     expect(server.bodyOf(1)).toEqual({ message: "B", history: [] });
   });
 
   it("retries with the turns before it, then keeps the retried turn at its log position", async () => {
-    const server = stubFetch();
-    const { user, input, log } = renderApp();
-    await user.type(input(), "A{Enter}");
-    server.reply(0, 200, { reply: "R1" });
-    await within(log()).findByText("R1");
-    await user.type(input(), "B{Enter}");
-    server.reply(1, 502, { error: "The coach is unavailable." });
-    await within(log()).findByRole("alert");
-    await user.type(input(), "C{Enter}");
-    server.reply(2, 200, { reply: "R3" });
-    await within(log()).findByText("R3");
+    const { server, user, log, send, sendAndReply, sendAndFail } = startConversation();
+    await sendAndReply("A", "R1");
+    await sendAndFail("B");
+    await sendAndReply("C", "R3");
 
     await user.click(within(log()).getByRole("button", { name: "Retry" }));
     server.reply(3, 200, { reply: "RB" });
     await within(log()).findByText("RB");
-    await user.type(input(), "D{Enter}");
+    await send("D");
 
     expect(server.bodyOf(3)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1" }] });
     expect(server.bodyOf(4)).toEqual({
