@@ -30,8 +30,8 @@ function startConversation() {
     ...app,
     server,
     send,
-    sendAndReply: async (message: string, reply: string) => {
-      server.reply(await send(message), 200, { reply });
+    sendAndReply: async (message: string, reply: string, signature = "") => {
+      server.reply(await send(message), 200, { reply, signature });
       await within(app.log()).findByText(reply);
     },
     sendAndFail: async (message: string) => {
@@ -178,14 +178,14 @@ describe("Connection test", () => {
     expect(within(log()).getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 
-  it("sends a follow-up with the earlier replied turn as history", async () => {
+  it("sends a follow-up with the earlier replied turn and its signature as history", async () => {
     const { server, send, sendAndReply } = startConversation();
-    await sendAndReply("A", "R1");
+    await sendAndReply("A", "R1", "sig-A");
 
     await send("B");
 
     expect(server.bodyOf(0)).toEqual({ message: "A", history: [] });
-    expect(server.bodyOf(1)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "" }] });
+    expect(server.bodyOf(1)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "sig-A" }] });
   });
 
   it("leaves a failed turn out of the next message's history", async () => {
