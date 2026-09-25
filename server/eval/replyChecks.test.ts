@@ -10,8 +10,16 @@ const fixture: Fixture = {
   ].join("\n"),
   key: {
     people: ["Dana", "Whitfield", "Tom", "Brennan", "Sam", "Kowalski"],
+    teams: ["Ops", "Finance"],
     attributions: [{ phrase: "invoiceable", teams: ["Finance"] }],
     expect: {
+      views: {
+        team: "Ops",
+        groups: [
+          { name: "day desk", markers: ["same carrier", "one row"] },
+          { name: "night shift", markers: ["every change"] },
+        ],
+      },
       splitTeam: "Ops",
       splitTerms: ["REBOOKED", "AMENDED"],
       codeLine: true,
@@ -46,6 +54,59 @@ const FIVE_WORDS = ["submit", "invoiceable", "REBOOKED", "AMENDED"]
   .concat('"booking"')
   .join("\n");
 
+const INTERVIEW_06_REPLY = [
+  "Events, in order",
+  "1. From thread: The customer submits a booking on the portal and Ops starts working it.",
+  "2. From thread: Ops tenders the load to a carrier, and the carrier accepts the tender.",
+  "3. From thread: The carrier drops the load or the lane changes, and Ops rebooks it.",
+  "4. From thread: The carrier team's EDI job cancels the first tender and sends a new tender with a new tender ID.",
+  "5. From thread: Finance invoices the load after proof of delivery.",
+  "",
+  "Words that don't match",
+  "\"booking\"",
+  "- From thread: Ops means the customer's portal submission that the desk starts working.",
+  "- From thread: Finance means an invoiceable load, after proof of delivery.",
+  "- From thread: Carriers mean a tender, not a booking.",
+  "- From thread: Night dispatch means a load once a carrier has accepted it, because that's when it shows on their board.",
+  "\"rebook\"",
+  "- From thread: Ops (view A) means a carrier or lane change creates a new booking under the carrier contract.",
+  "- From thread: Ops (view B) means REBOOKED whenever the carrier changes, lane or not, because AMENDED doesn't reach the carrier portal overnight.",
+  "- From thread: Finance means the old invoice is voided and a new one is raised.",
+  "- From thread: Code sends a cancel and a new tender with a new ID.",
+  "\"tender\"",
+  "- From thread: Carriers mean the offer they accept or reject, keyed by tender ID.",
+  "- From thread: Ops means the moment the desk sends the load out.",
+  "\"hold\"",
+  "- From thread: Ops (view A) means a load waiting on the customer.",
+  "- From thread: Ops (view B) means a load waiting on the carrier to accept.",
+  "- From thread: Finance means a credit hold on the account, so nothing ships.",
+  "",
+  "Question for the finance controller and the carrier team lead, at the 27 Oct RFC review: For the load in the thread that got two carrier invoices after a rebook, was the second invoice matched to the original booking ref or to the new tender ID?",
+].join("\n");
+
+const HOLD_IS_WAITING = [{ team: "Ops", words: [["hold"], ["waiting on customer", "waiting on the customer"]] }];
+
+const bookingSplit: Fixture = {
+  ...fixture,
+  key: { ...fixture.key, teams: ["Ops", "Finance", "Carriers"], expect: { ...fixture.key.expect, sameMeaning: HOLD_IS_WAITING } },
+};
+
+function askedAs(question: string): string {
+  return GOOD_REPLY.replace("If a booking exists on submit but counts only once invoiceable, which one does a same-carrier date change keep?", question);
+}
+
+function withWord(block: string): string {
+  return GOOD_REPLY.replace("\n\nQuestion for", `\n${block}\n\nQuestion for`);
+}
+
+const FLIPPED_VIEWS = withWord(
+  [
+    '"booking count"',
+    "- From thread: Ops (view A) means every change adds a row.",
+    "- From thread: Ops (view B) means a same carrier date change keeps one row.",
+  ].join("\n"),
+);
+
 function swap(first: string, second: string): string {
   return GOOD_REPLY.replace(first, "\u0000").replace(second, first).replace("\u0000", second);
 }
@@ -67,8 +128,70 @@ describe("hard checks", () => {
     ["no markdown", "bold emphasis", GOOD_REPLY.replace("Ops means", "**Ops** means")],
     ["no offers", "an offer to do more", GOOD_REPLY.replace("on every rebook.", "on every rebook. Would you like me to draft a glossary.")],
     ["at most 4 words", "five quoted words", GOOD_REPLY.replace('"booking"', FIVE_WORDS)],
+    ["holders", "a shift as the holder", GOOD_REPLY.replace("Ops (view B) means", "Night dispatch means")],
+    ["holders", "a shift inside a team as the holder", GOOD_REPLY.replace("Ops (view B) means", "Night Ops means")],
+    ["holders", "a shift after the team", GOOD_REPLY.replace("Ops (view B) means", "Ops night shift means")],
+    ["holders", "a shift as the view label", GOOD_REPLY.replace("Ops (view B) means", "Ops (night) means")],
+    ["holders", "a thing as the holder", GOOD_REPLY.replace("Finance means", "The dashboard counts")],
+    ["holders", "a party the thread doesn't give a view", GOOD_REPLY.replace("Finance means", "Customers see")],
+    ["split labels", "two plain lines for one team", GOOD_REPLY.replace("Finance means a shipment", "Ops means a shipment")],
+    ["split labels", "a plain line and a view line for one team", GOOD_REPLY.replace("Ops (view B) means", "Ops means")],
+    ["split labels", "the same view twice", GOOD_REPLY.replace("Ops (view B) means", "Ops (view A) means")],
+    ["stable views", "view A and view B swapping groups between words", FLIPPED_VIEWS],
+    ["question asks", "a yes/no question with the answer in it", askedAs("should Ops keep one booking and send AMENDED so Finance issues one invoice?")],
+    ["question asks", "a yes/no question about one option", askedAs("should the portal still show Confirmed?")],
+    ["question asks", "a long yes/no question", askedAs("should it remain one booking and one invoice after the carrier bills TONU on the original load?")],
+    ["question asks", "a short yes/no question", askedAs("is that still an appointment?")],
+    ["question asks", "a leading question", askedAs("Shouldn't Ops amend instead of rebook?")],
+    ["question asks", "an open question that proposes", askedAs("Why not amend instead of rebooking, which keeps one invoice?")],
   ])("fail %s for %s", (check, _case, reply) => {
     expect(failedHardChecks(reply, "stop", fixture)).toContain(check);
+  });
+
+  it("pass holders for the longest matching team and for an unclear team", () => {
+    const withDesk = { ...fixture, key: { ...fixture.key, teams: ["Ops", "Carrier", "Carrier desk"] } };
+    const reply = GOOD_REPLY.replace("Finance means", "Carrier desk means").replace("Ops means", "Team unclear means");
+
+    expect(failedHardChecks(reply, "stop", withDesk)).toEqual([]);
+  });
+
+  it("pass split labels for a lone view line under a word", () => {
+    const reply = GOOD_REPLY.replace("Ops means the request", "Ops (view A) means the request");
+
+    expect(failedHardChecks(reply, "stop", fixture)).toEqual([]);
+  });
+
+  it.each([
+    ["views that keep their groups across words", ["same carrier date change keeps one row", "every change adds a row"]],
+    ["a view line that hits both groups' markers", ["every change on the same carrier keeps one row", "every change adds a row"]],
+  ])("pass stable views for %s", (_case, [viewA, viewB]) => {
+    const reply = withWord(`"booking count"\n- From thread: Ops (view A) means ${viewA}.\n- From thread: Ops (view B) means ${viewB}.`);
+
+    expect(failedHardChecks(reply, "stop", fixture)).toEqual([]);
+  });
+
+  it("fail holders and same meaning not split for the interview 06 reply", () => {
+    expect(failedHardChecks(INTERVIEW_06_REPLY, "stop", bookingSplit)).toEqual(["holders", "same meaning not split"]);
+  });
+
+  it("leave a split same-meaning word out of stable views", () => {
+    const hold = ['"hold"', "- From thread: Ops (view A) means every change waits.", "- From thread: Ops (view B) means one row waits."];
+
+    expect(failedHardChecks(withWord(hold.join("\n")), "stop", bookingSplit)).toEqual(["same meaning not split"]);
+  });
+
+  it("pass same meaning not split for one plain line under the same-meaning word", () => {
+    const hold = '"hold"\n- From thread: Ops means a booking waiting on the customer, whether they say "hold" or "waiting on customer".';
+
+    expect(failedHardChecks(withWord(hold), "stop", bookingSplit)).toEqual([]);
+  });
+
+  it.each([
+    ["a choice joined by or", "was the second invoice matched to the original booking ref or to the new tender ID?"],
+    ["a choice with a fallback option", "should the portal show Confirmed or a different status?"],
+    ["a choice after a condition", "For a date-only change at night, should Ops create a new booking or record an AMENDED change?"],
+  ])("pass question asks for %s", (_case, question) => {
+    expect(failedHardChecks(askedAs(question), "stop", fixture)).toEqual([]);
   });
 
   it("fail code guess for a Code line stated as fact when no code was shown", () => {
@@ -79,15 +202,15 @@ describe("hard checks", () => {
   });
 
   it.each([
-    ["an accented name", "José", "José in Finance means", ["no names"]],
-    ["an accented name in decomposed form", "José", "José in Finance means".normalize("NFD"), ["no names"]],
-    ["initials with full stops", "C.J.", "Finance, per C.J. means", ["no names"]],
-    ["a short name inside a longer accented one", "Ana", "Finance, per Anaïs, means", []],
-    ["a name with an unclosed bracket the reply lacks", "Kev (nights", "Finance means", []],
-  ])("check names for %s", (_case, name, meaning, failures) => {
+    ["an accented name", "José", "José hits submit", ["no names"]],
+    ["an accented name in decomposed form", "José", "José hits submit".normalize("NFD"), ["no names"]],
+    ["initials with full stops", "C.J.", "C.J. hits submit", ["no names"]],
+    ["a short name inside a longer accented one", "Ana", "Anaïs hits submit", []],
+    ["a name with an unclosed bracket the reply lacks", "Kev (nights", "The customer hits submit", []],
+  ])("check names for %s", (_case, name, event, failures) => {
     const withName = { ...fixture, key: { ...fixture.key, people: [name] } };
 
-    expect(failedHardChecks(GOOD_REPLY.replace("Finance means", meaning), "stop", withName)).toEqual(failures);
+    expect(failedHardChecks(GOOD_REPLY.replace("The customer hits submit", event), "stop", withName)).toEqual(failures);
   });
 
   it.each([
@@ -116,6 +239,7 @@ describe("soft scores", () => {
       questionSpansThread: true,
       jointRoles: true,
       forum: true,
+      sameMeaningNamed: true,
     });
   });
 
@@ -132,5 +256,18 @@ describe("soft scores", () => {
     ["forum", "no forum when the thread names one", GOOD_REPLY.replace(", at the 27 Oct review", "")],
   ])("miss %s for %s", (score, _case, reply) => {
     expect(softScores(reply, fixture)).toMatchObject({ [score]: false });
+  });
+
+  it("miss sameMeaningNamed when the same-meaning word's line names only one of its words", () => {
+    const hold = withWord('"hold"\n- From thread: Ops means a booking waiting on the customer.');
+
+    expect(softScores(hold, bookingSplit)).toMatchObject({ sameMeaningNamed: false });
+  });
+
+  it.each([
+    ["one line names both words", withWord('"hold"\n- From thread: Ops means waiting on the customer, whether they say "hold" or "waiting on customer".')],
+    ["neither word is quoted", GOOD_REPLY],
+  ])("hold sameMeaningNamed when %s", (_case, reply) => {
+    expect(softScores(reply, bookingSplit)).toMatchObject({ sameMeaningNamed: true });
   });
 });

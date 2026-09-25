@@ -21,14 +21,19 @@ Each eval runs 3 fixtures × 3 repeats through the real `createOpenRouterCoach` 
 - at most 4 quoted words;
 - no markdown;
 - no "Would you like me to…" offers;
-- Code lines are "Guess:" when no code was shown.
+- Code lines are "Guess:" when no code was shown;
+- (#73) **holders:** every meaning line starts with a team from the key's `teams`, "Code" or "Team unclear", and never with a shift or desk ("Night dispatch", "Ops night shift");
+- (#73) **split labels:** under one word, a team never has both a plain line and a view line, two plain lines, or the same view twice;
+- (#73) **stable views:** "(view A)" and "(view B)" map to the same group of the team (by the key's markers) under every word;
+- (#73) **same meaning not split:** a word the key lists as another word for the same meaning ("hold" = "waiting on the customer") has no view lines;
+- (#73) **question asks:** the question is open (what, which, who, how, whether…) or offers options joined by "or", and holds no proposal ("shouldn't", "instead of", "recommend"…).
 
-**The ship bar:**
+**The ship bar** (tightened by #73 from 2/3 to every run):
 - hard checks 9/9;
 - attribution 9/9;
-- in each fixture, at least 2 of 3 runs for the "Ops (view A)/(view B)" split, the Code line, and a question drawing on two distant parts of the thread.
+- in each fixture, **3 of 3** runs for the "Ops (view A)/(view B)" split, the Code line, a question drawing on two distant parts of the thread, and (#73) a same-meaning word whose line names both words.
 
-Only F1 has a split and a question-evidence key, so those columns always pass for F2 and F3. Joint roles and the forum are reported but aren't in the bar.
+F1 and F2 have a split key; only F1 has question-evidence and same-meaning keys, so those columns always pass elsewhere. Joint roles and the forum are reported but aren't in the bar.
 
 ## Results
 
@@ -70,6 +75,28 @@ A v5 was an option: show the name-to-team swap in the worked example, and forbid
 - the median of an even count is now correct.
 
 Only the checker changed, so the recorded terra v4 replies were re-scored offline with `node server/eval/rescore.ts outputs/evals/slice-03/2026-09-25-openai-gpt-5-6-terra-v4.json`. Result: **ships, hard 9/9, attribution 9/9**, split, Code line and question 3/3 in every fixture. No gap, so the 9/9 claim holds under the fixed checks.
+
+## Baseline: terra v4 under the #73 checks and bar ($0)
+
+`node server/eval/rescore.ts outputs/evals/slice-03/2026-09-25-openai-gpt-5-6-terra-v4.json` with the #73 checks and keys. **Doesn't ship: hard 3/9**, attribution 9/9, F1 same meaning named 1/3, F2 split 2/3. As expected, this shows the checks bite:
+
+| Run | Hard failures | Soft misses |
+|---|---|---|
+| booking-split 1 | question asks | sameMeaningNamed |
+| booking-split 2 | none | sameMeaningNamed |
+| booking-split 3 | same meaning not split, question asks | none |
+| rebook-notes 1 | split labels | none |
+| rebook-notes 2 | split labels, question asks | split |
+| rebook-notes 3 | split labels, question asks | none |
+| carrier-status 1–2 | none | none |
+| carrier-status 3 | question asks | none |
+
+This matches the plan's hand-read:
+- closed yes/no questions in F1 r1 and r3, F2 r2 and r3, and F3 r3;
+- plain and view lines mixed, or two plain Ops lines, in F2;
+- F1 r3's "hold" split into view A and view B, the demo's finding 1.
+
+F3's "Customers see…" passes, because the key allows Customers (U1). The interview 06 Part C reply fails holders ("Night dispatch means") and same meaning not split ("hold") against the F1 key.
 
 ## Limits
 

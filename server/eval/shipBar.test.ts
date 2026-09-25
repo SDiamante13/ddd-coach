@@ -13,6 +13,7 @@ const ALL_SOFT: SoftScores = {
   questionSpansThread: true,
   jointRoles: true,
   forum: true,
+  sameMeaningNamed: true,
 };
 
 function run(fixture: string, overrides: Partial<ScoredRun> = {}): ScoredRun {
@@ -34,12 +35,11 @@ describe("shipBar", () => {
     expect(shipBar(passingRuns).ships).toBe(true);
   });
 
-  it("still ships when the split shows in 2 of 3 runs", () => {
-    expect(shipBar([...passingRuns.slice(1), run("booking-split", { soft: { ...ALL_SOFT, split: false } })]).ships).toBe(true);
-  });
 
   it.each([
     ["one hard check fails in one run", [run("carrier-status", { hardFailures: ["no names"] })]],
+    ["a fixture shows the split in only 2 of 3 runs", [run("booking-split", { soft: { ...ALL_SOFT, split: false } })]],
+    ["a fixture names both same-meaning words in only 2 of 3 runs", [run("booking-split", { soft: { ...ALL_SOFT, sameMeaningNamed: false } })]],
     ["one run misattributes", [run("carrier-status", { soft: { ...ALL_SOFT, attribution: false } })]],
     ["a fixture shows the split in only 1 of 3 runs", twoOf("booking-split", { split: false })],
     ["a fixture has a Code line in only 1 of 3 runs", twoOf("booking-split", { codeLine: false })],

@@ -11,15 +11,20 @@ export function evalSummary(heading: string, runs: readonly SummaryRun[], bar: S
     "",
     `**Ships: ${bar.ships ? "yes" : "no"}.** Hard checks ${count(bar.hard)}, attribution ${count(bar.attribution)}.`,
     "",
-    "| Fixture | Split (≥ 2/3) | Code line (≥ 2/3) | Question spans the thread (≥ 2/3) |",
-    "|---|---|---|---|",
-    ...bar.perFixture.map((f) => `| ${f.fixture} | ${count(f.split)} | ${count(f.codeLine)} | ${count(f.questionSpansThread)} |`),
+    "| Fixture | Split (3/3) | Code line (3/3) | Question spans the thread (3/3) | Same meaning named (3/3) |",
+    "|---|---|---|---|---|",
+    ...bar.perFixture.map(fixtureRow),
     "",
     "| Run | Hard failures | Soft misses | ms | Prompt tokens | Cached | Completion | finishReason | Cost $ |",
     "|---|---|---|---|---|---|---|---|---|",
     ...runs.map(runRow),
     "",
   ].join("\n");
+}
+
+function fixtureRow(f: ShipBar["perFixture"][number]): string {
+  const tallies = [f.split, f.codeLine, f.questionSpansThread, f.sameMeaningNamed].map(count);
+  return `| ${[f.fixture, ...tallies].join(" | ")} |`;
 }
 
 function runRow(run: SummaryRun): string {

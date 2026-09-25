@@ -1,4 +1,12 @@
 import { endsSentence } from "../replyEnding.ts";
+import { asksOpenly } from "./questionChecks.ts";
+import {
+  hasCleanSplitLabels,
+  hasKnownHolders,
+  hasStableViews,
+  keepsSameMeaningWhole,
+  namesSameMeaning,
+} from "./viewChecks.ts";
 import {
   hasSourceLabel,
   isNumbered,
@@ -11,10 +19,15 @@ import {
 } from "./replyLayout.ts";
 
 export type Attribution = { phrase: string; teams: string[] };
+export type ViewGroup = { name: string; markers: string[] };
+export type SameMeaning = { team: string; words: string[][] };
 export type FixtureKey = {
   people: string[];
+  teams: string[];
   attributions: Attribution[];
   expect: {
+    views?: { team: string; groups: ViewGroup[] };
+    sameMeaning?: SameMeaning[];
     splitTeam?: string;
     splitTerms?: string[];
     codeLine?: boolean;
@@ -26,7 +39,7 @@ export type FixtureKey = {
 };
 export type Fixture = { thread: string; key: FixtureKey };
 
-type Reply = { text: string; layout: ReplyLayout; finishReason: string | null; fixture: Fixture };
+type Reply = { text: string; layout: ReplyLayout; words: CoachReply["words"]; finishReason: string | null; fixture: Fixture };
 type HardCheck = (reply: Reply) => boolean;
 
 const HARD_CHECKS: Record<string, HardCheck> = {
@@ -42,6 +55,11 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "code guess": ({ layout, fixture }) => fixture.key.expect.codeShown !== false || codeClaims(layout).every(isGuess),
   "no jargon": ({ layout, fixture }) =>
     !layout.lines.some((line) => AVOIDED_JARGON.test(line)) && inventedNames(layout.lines, fixture.thread).length === 0,
+  holders: ({ words, fixture }) => hasKnownHolders(words, fixture.key),
+  "split labels": ({ words, fixture }) => hasCleanSplitLabels(words, fixture.key),
+  "stable views": ({ words, fixture }) => hasStableViews(words, fixture.key),
+  "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
+  "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
 };
 
 const MARKDOWN = /\*\*|__|`|^#{1,6} |^\s*[*•] /m;
@@ -83,7 +101,8 @@ const wholeWord = (word: string): RegExp => new RegExp(`(?<!${WORD_CHAR})${escap
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export function failedHardChecks(reply: string, finishReason: string | null, fixture: Fixture): string[] {
-  const checked: Reply = { text: reply, layout: parseLayout(reply), finishReason, fixture };
+  const words = parseCoachReply(reply)?.words ?? [];
+  const checked: Reply = { text: reply, layout: parseLayout(reply), words, finishReason, fixture };
   return Object.entries(HARD_CHECKS)
     .filter(([, check]) => !check(checked))
     .map(([name]) => name);
@@ -104,14 +123,16 @@ export type SoftScores = Record<
   | "under400Words"
   | "questionSpansThread"
   | "jointRoles"
-  | "forum",
+  | "forum"
+  | "sameMeaningNamed",
   boolean
 >;
 
 export function softScores(reply: string, fixture: Fixture): SoftScores {
   const layout = parseLayout(reply);
   const meanings = layout.meaningClaims.map(withoutSourceLabel);
-  const question = parseCoachReply(reply)?.question;
+  const parsed = parseCoachReply(reply);
+  const question = parsed?.question;
   return {
     attribution: fixture.key.attributions.every((attribution) => isAttributed(meanings, attribution)),
     split: hasSplit(meanings, reply, fixture.key.expect),
@@ -122,6 +143,7 @@ export function softScores(reply: string, fixture: Fixture): SoftScores {
     questionSpansThread: spansThread(question?.text ?? "", fixture.key.expect.questionEvidence),
     jointRoles: / (and|with) /.test(question?.roles ?? ""),
     forum: namesForum(question, fixture.key.expect.forum),
+    sameMeaningNamed: namesSameMeaning(parsed?.words ?? [], fixture.key),
   };
 }
 
