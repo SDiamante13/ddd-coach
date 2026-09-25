@@ -33,3 +33,7 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   1. Does the notice now read as content, not a banner? Which of her 5 checklist items does it meet?
   2. At "Your text stays here · 1,412 over": trim, or send in two parts? Does she trust that the coach waits for part 2 before replying, and that two parts don't use up the conversation cap?
   3. Is the example placeholder enough, or does she click "Try an example"?
+- **For 04b: the #58 DDD knowledge base, grounded in real sources.** The PO's probes:
+  - (a) Does a citation like "Evans, DDD Reference: Bounded Context" raise her trust, or is it noise? Anchor: the last time she cited a book in a doc or meeting. She said "bounded context" in planning and got "so, a folder?"
+  - (b) Which source would Marcus (the skeptical staff engineer) respect?
+  - (c) Should the coach teach DDD terms, or stay in her words? This is in tension with "no jargon." Does the answer change between her prep and the exported doc?
