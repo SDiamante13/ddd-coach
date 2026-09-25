@@ -1,6 +1,6 @@
 # Slice 3 eval summary (#4)
 
-**Ships on `openai/gpt-5.6-terra` at effort `none` with prompt v6 (`COACH_INSTRUCTIONS_VERSION = 6`), under #73's every-run bar.** The owner decided on 2026-09-25 to ship v6. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Before this, v4 shipped under the older 2/3 bar. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
+**Live: prompt v8 on `openai/gpt-5.6-terra` at effort `none`, confirmed by #78's paired A/B at n=6 per arm (2026-09-25, see "v8 under the ship rule, n=6").** v6 shipped before it under #73's every-run bar, and v4 before that under the 2/3 bar. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
 
 ## How it's measured
 
@@ -209,7 +209,7 @@ v8 doesn't regress the thread analysis. v6 doesn't hold its 9/9 on a rerun eithe
 - the paired A/B against live v6: the target (non-thread input) goes from 0/9 to 9/9;
 - no gating check drops by more than one run per fixture: thread hard 11/12 against 9/12, attribution 9/12 against 9/12.
 
-It's **below #78's n ≥ 6 per fixture per arm** (n=3 per arm), accepted because the budget was near its cap. The strict n=3 bar says no.
+It's **below #78's n ≥ 6 per fixture per arm** (n=3 per arm), accepted because the budget was near its cap. The strict n=3 bar says no. Re-judged at n=6 under the rule below: confirmed.
 
 **Conditions (#77):**
 - Prompt assembly matches production. Both `measure` and `netlify/functions/chat.mts` build the coach with `createOpenRouterCoach(config, coachInstructions())`, with no reference block.
@@ -240,6 +240,36 @@ OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none \
 ## Re-score after #78's check fixes (2026-09-25, $0)
 
 #78 fixes two false negatives from #63: `invites a thread` counts a non-negated "paste" alone, and share, drop, send or bring followed by "here", "below" or "in the box"; `mentionsNonce` also catches the nonce's clock time or date in the reply's own format, unless the thread contains it. `node server/eval/rescore.ts outputs/evals/slice-03/2026-09-25-openai-gpt-5-6-terra-v8.json` gives output identical to before the fixes: non-thread 9/9, thread failures unchanged (F1 r2 split labels, F2 r2 code guess, F3 r1 holders).
+
+## v8 under the ship rule, n=6 (2026-09-25, #78)
+
+The first A/B under the ship rule, re-judging the n=3 decision above: `OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run eval -- --ab 8 --live 6 --target greeting,ddd-question,one-line-note` ([md](ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.md), [data](ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.json)). The JSON records model `openai/gpt-5.6-terra`, effort `none`, n=6, and system sha256s equal to `coach-instructions.v6.txt` (`1fde8646…`) and `v8.txt` (`c5f6c6aa…`). No nonce, no aborted calls, every finishReason `stop`.
+
+**Ship: yes. v8 stays live, confirmed.** The target (non-thread input) goes from live 3/18 to candidate 18/18 (+15, needs +2). No gating check drops by more than one run.
+
+| Fixture | Check | v6 (live) | v8 (candidate) | Δ |
+|---|---|---|---|---|
+| greeting | no boilerplate | 1/6 | 6/6 | +5 |
+| ddd-question | invites a thread | 0/6 | 6/6 | +6 |
+| one-line-note | no boilerplate | 2/6 | 6/6 | +4 |
+| one-line-note | invites a thread | 2/6 | 6/6 | +4 |
+| booking-split | attribution | 4/6 | 5/6 | +1 |
+| rebook-notes | split labels | 5/6 | 4/6 | −1 |
+| carrier-status | holders | 5/6 | 4/6 | −1 |
+| carrier-status | attribution | 4/6 | 6/6 | +2 |
+| example-thread | holders | 3/6 | 5/6 | +2 |
+
+All other gating checks are 6/6 in both arms. The total drop across fixtures is 2 runs (F2 split labels, F3 holders, one run each).
+
+Reported only: F1 "same meaning not split" is 0/6 in both arms (#76). F1 sameMeaningNamed is 0/6 → 2/6. **F1 under 400 words is 4/6 → 0/6: every v8 F1 reply runs over 400 words.** That's a soft score, but the hosted check should watch reply length.
+
+**Hand-read of the 36 non-thread replies.** No warning passes as an invite. Three v6 replies pass `no boilerplate` while still introducing the coach: greeting r6 "I help you prepare for a business conversation…", and one-line-note r1 and r6 "I'm for unpacking…". That checker gap only flatters live, so the verdict stands. The fix belongs to a later check change.
+
+**#77 data (reported, not decided here).** F2 `split labels` without a nonce: v6 5/6 (fails r3), v8 4/6 (fails r4 and r6). So v8 slips on F2 split labels in about a third of un-nonce'd runs too. The hosted 0/2 wasn't only the nonce.
+
+**Answer-key guard.** `node server/eval/rescore.ts outputs/evals/slice-03/ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.json` reproduces the same verdict and table, and prints "Keys changed since this run: none".
+
+**Spend:** v6 $0.1739, v8 $0.1671, total **$0.3411** over 84 calls (estimate $0.34, cap $1.20). Median 4,112 ms, max 8,752 ms.
 
 ## Limits
 
