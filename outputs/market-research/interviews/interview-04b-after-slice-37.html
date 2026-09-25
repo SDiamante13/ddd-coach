@@ -1,0 +1,757 @@
+<meta charset="utf-8">
+<title>Priya Raman Interview 04b</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 04b · after slice 37 + explorations 03, 02b</div>
+      <h1>“A link on every row, yes. <em>A link your tool made up, never.</em>”</h1>
+      <p class="dek">We showed the tech lead the slice 37 refusal, the “Leave with a table” concept and the revised “Honest limits”, then tested a staff engineer's three claims with her. The table nearly survives her finance review, but its “Status” column collides with her RFC's status enum. Both concepts sent a note Dana had already corrected back into circulation. And the new error message tells her to press the one button that deletes her work.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">Mom Test script · 30 questions</span>
+        <span class="chip">Slice 37 · shipped</span>
+        <span class="chip">Exploration 03 · concept, not built</span>
+        <span class="chip">Exploration 02b · concept, not built</span>
+        <span class="chip">Paste box + Sunday replay → 04a</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking split RFC: finance review 27 Oct, due 30 Oct</dd></div>
+        <div><dt>Since 03</dt><dd>Dana's last session, 8 Oct; read the rebook code; Maya covers from the 15th</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing next month</div>
+    <div>
+      <blockquote>“<strong>The table, pasting clean, with a Source column I can link and a Code row.</strong> Before the 27th now, not the 30th.”</blockquote>
+      <cite class="label">Priya, Q29. “But fix the reload message before anyone sees it. That's an afternoon.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>“Status” collides with the status enum.</b> Retyping drops from about 25 to 10 minutes, but “Status: From thread” sits just below REBOOKED. Rename it “Source”.</span>
+        <div class="tags"><span>strong</span><span>#6 spec</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>Both concepts re-send a corrected note.</b> “Lane or date → AMENDED” shows up in 03's yes/no lines and in 02b's board and question 2. Dana corrected it twice.</span>
+        <div class="tags"><span>strong</span><span>#7 · #4 · #6</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">03</span>
+        <span><b>The carried board dropped the TONU question.</b> Three questions went in and two came out, the same loss as the Claude summary. Her test: nothing missing, nothing stale.</span>
+        <div class="tags"><span>strong</span><span>#7</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">04</span>
+        <span><b>The code row is the finding.</b> She read <code>rebook!</code> on Tuesday: the database agrees with finance, the screen with ops. “Code” as a Team value.</span>
+        <div class="tags"><span>strong</span><span>promote · #6 · #4</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">05</span>
+        <span><b>Links per source, supplied by her.</b> The tool only sees sanitized text. It keeps references like “load 48213”, and she links them in five minutes.</span>
+        <div class="tags"><span>strong</span><span>modify · #6</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">06</span>
+        <span><b>The slice 37 copy would delete her work.</b> “Reload” while #5 is unbuilt, and she'd obey it. She wants Copy first, then Start a new one.</span>
+        <div class="tags"><span>strong</span><span>#5 · slice 37</span></div>
+      </div>
+      <div class="sticky s-event weak">
+        <span class="n">07</span>
+        <span><b>Citations: trust in prep, none in the doc.</b> She goes further than Marcus: no Evans in the export, even for definitions. Teach a term once, then use her words.</span>
+        <div class="tags"><span>weak</span><span>#58 · #59</span></div>
+      </div>
+      <div class="sticky s-event weak">
+        <span class="n">08</span>
+        <span><b>Swaps save time, not policy.</b> Sanitizing goes from 15 to 5 minutes, and she might get lazy. Swapping load IDs would break “look up load 48213”.</span>
+        <div class="tags"><span>weak</span><span>#4 · #34</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-claims">
+    <div class="section-head">
+      <h2 id="verdict-claims">Reviewer claims</h2>
+      <span class="label">From M01 “Marcus” · judged by Priya only · for #6 and #4</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Promote</span><span class="count">1 claim</span></div>
+        <ul>
+          <li><b>A “what the code does” row → “Code” as a Team value, with a method link</b><q>Put “Code” in the Team column, with a link to the method, and it's the row I should have written in July.</q></li>
+          <li><b>Labeled by where it came from; pasted code counts as a holder in #4</b><q>If the coach fills it in, it has to say it came from code I pasted. If it's a guess, it has to say “Guess”.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Modify</span><span class="count">2 claims</span></div>
+        <ul>
+          <li><b>A clickable link on every row → one link per source, and she adds it</b><q>A link on every row, yes. A link your tool made up, never.</q></li>
+          <li><b>Who settles and by when → one date above the table, and the owner as a role in the open questions</b><q>Put a date on it, yes. Put a name on it, and I'm back to Tom's name next to the wrong definition.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Drop</span><span class="count">0 claims</span></div>
+        <ul>
+          <li><b>Nothing dropped outright. Nearest: a per-row “who settles” inside the glossary cell</b><q>Nobody's job is to break ties between ops and finance.</q></li>
+          <li><b>And the tool never guesses the owner</b><q>Your tool shouldn't guess it, because it doesn't know our org.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-03">
+    <div class="section-head">
+      <h2 id="verdict-03">Exploration 03 verdict</h2>
+      <span class="label">“Leave with a table” · stills t1–t4 + table.html</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>Copy table as a real rich-text table</b><q>It pastes as a table, which is the first time anything you've shown me does.</q></li>
+          <li><b>Swaps in the browser, plus “Show what's sent”</b><q>It answers my question from last time, “swapped where?”</q></li>
+          <li><b>The honest line under the swaps</b><q>Your own note says rates and lanes aren't caught.</q></li>
+          <li><b>One next step that costs Dana nothing</b><q>The one next step I said was facilitation.</q></li>
+          <li><b>Yes/no lines she sends herself</b><q>She answered four with a plain yes or no before we even talked.</q></li>
+          <li><b>The “split” chip, inside the tool</b><q>In the tool, the red “split” chip is fine.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">7 items</span></div>
+        <ul>
+          <li><b>“Status” → “Source”</b><q>Someone will think “From thread” is a status.</q></li>
+          <li><b>A split inside ops → two rows credited to a practice or a document</b><q>That credits a practice and a document, not a person.</q></li>
+          <li><b>Add “Code” as a Team value, with a link</b><q>The row I should have written in July.</q></li>
+          <li><b>Source cells keep a reference she can link</b><q>A link your tool made up, never.</q></li>
+          <li><b>Yes/no lines use the latest correction</b><q>Your concept would have sent my mistake back to her as a question.</q></li>
+          <li><b>Swap back in the replies</b><q>The swap breaks the one next step I said was facilitation.</q></li>
+          <li><b>No doubled team in the preview</b><q>“Ops (ops):” on every line, which looks broken.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">2 items</span></div>
+        <ul>
+          <li><b>“Ops is split” as an aside in the exported cell</b><q>It just can't be the thing that lands in the doc.</q></li>
+          <li><b>“Checked with Dana 29 Sep” frozen in a row</b><q>“Checked with Dana 29 Sep” is a week stale.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="verdict-02b">
+    <div class="section-head">
+      <h2 id="verdict-02b">Exploration 02b verdict</h2>
+      <span class="label">“Honest limits” v2 · limits-v2.html, 4 states</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">6 items</span></div>
+        <ul>
+          <li><b>The marker at the cut, visible without scrolling</b><q>I saw it without scrolling this time.</q></li>
+          <li><b>Continue only appends, after a “continued” tag</b><q>Didn't touch questions one and two.</q></li>
+          <li><b>“Copy everything” as the primary button</b><q>Copy everything is blue.</q></li>
+          <li><b>The board carried as a table, statuses named</b><q>A table and not a paragraph.</q></li>
+          <li><b>Previous conversation, read-only</b><q>The old conversation stays readable.</q></li>
+          <li><b>No always-on percentage; “room for about one short reply”</b><q>The sentence I'd actually read.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">5 items</span></div>
+        <ul>
+          <li><b>Carry every open question</b><q>The load 48102 one, about the two invoices, is gone.</q></li>
+          <li><b>Apply corrections before carrying</b><q>It carried my mistake word for word.</q></li>
+          <li><b>The warning leads with the sentence, not the counts</b><q>I'd skip “9,400 of 11,340”.</q></li>
+          <li><b>Fact questions she can check herself are marked for her</b><q>It's a question for me, not for Dana.</q></li>
+          <li><b>Question 2 must separate lane from date</b><q>Question 2 lumps “lane or date” together again.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Cut</span><span class="count">1 item</span></div>
+        <ul>
+          <li><b>The collapsed notice, “Where your text goes · show”</b><q>Now it's a cookie banner I have to open.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since last time</a>
+      <a href="#part-b">B · Slice 37</a>
+      <a href="#part-c">C · Exploration 03</a>
+      <a href="#part-d">D · Reviewer claims</a>
+      <a href="#part-e">E · Exploration 02b</a>
+      <a href="#part-f">F · Knowledge base</a>
+      <a href="#part-g">G · Close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since last time</h3><span class="aside">Friday 9 October · no product talk yet</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Last time Dana had one session left before her leave. Did it happen? Where's the RFC?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It happened yesterday, not on the 13th. Dana moved it up because she's handing over ops work before she goes on the 15th. From Monday, anything ops goes to Maya, who is now on the RFC's reviewer list. Finance booked the review for Tuesday the 27th, so my real deadline moved up three days. The glossary has seven rows. Marcus still hasn't opened it. He's a reviewer, so he'll open it the night before.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>What did you bring to Dana yesterday, and what did you do with her answers in the first 24 hours?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Yes/no lines, like I told you. I sent her five in Slack on Tuesday, a day before the call. She answered four with a plain yes or no before we even talked, which never happens with bullets. The fifth, “a lane change makes it a new booking,” got “depends, let's talk.” On the call it turned out Dana still says yes. But since she left ops, Maya's team has been rebooking lane changes as REBOOKED for two years. <mark>So the split isn't ops against finance any more. It's Dana against Maya, and both of them are ops.</mark> I fixed the text file and the Confluence table the same night. This time I deleted the old Claude chat instead of correcting it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>What's the last thing you put into the RFC table, and how?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>On Tuesday, finance left a comment on the glossary: “What does the system actually do today?” Fair question. So I read <code>Booking#rebook!</code> for the first time in a year. It sets the old row to REBOOKED and inserts a new booking row pointing back at the old one, and the customer portal keeps showing the old reference. <mark>So the database agrees with finance and the screen agrees with ops.</mark> I typed that in as two rows by hand and linked the method on GitHub. That took about fifteen minutes, and it's the third time I've built rows in that table by hand.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Slice 37</h3><span class="aside">the coach only trusts its own words · shipped</span></div>
+        <p class="stage">Shown slice-37.png: three turns, then a red box reading “This conversation can't be verified. Reload the page to start a new one.”, with no Retry. Told that every coach reply now comes back signed, and that an edited history is refused before the coach reads it. An honest user would mainly see this after a site update mid-session.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Does “the coach only trusts its own words” matter to you? Would it matter to someone like Marcus?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>To me, not really. I'm never going to edit what the coach said to trick it, and until today I didn't know anyone could. My worry has always gone the other way: the coach putting words in someone's mouth, like Sunday, when it gave Tom's line to ops. <mark>Signing its own words doesn't stop it misquoting mine.</mark> For Marcus, it's one line on a data page at most. His first question is where our Slack went, not whether someone tampered with a transcript. It's the right kind of security for me, though: I never see it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Say you do see it, because the site was updated mid-session. You read “Reload the page to start a new one.” What do you do?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I reload, because it tells me to. Then everything's gone, because you still don't keep anything across a reload. I told you in interview 02 that the reload line on the length cap was the same loss, and on Sunday the 413 cleared my box and cost me ten minutes. And “can't be verified” reads like I did something wrong, or our proxy mangled something. <mark>You've got a red box telling me to press the button that deletes my work, with no warning, and I'd press it.</mark> Since the re-image in March I copy everything before I reload anything. But I only do that when I'm expecting trouble. When a screen tells me exactly what to do, I just do it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>In the demo, the next message after that error worked fine.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Then it's telling me to throw away something that works. That's worse than a wrong answer. It's a wrong instruction.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>What should it say or do instead?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Say what happened in words I understand: “The coach was updated while this page was open, so it can't use your earlier replies.” Then two buttons, in the order you already got right in the limits concept: “Copy the conversation” first, then “Start a new one”, which says out loud that the old one goes. And if my next message would work anyway, don't mention reloading at all. <mark>Until you keep things across a reload, anything that says “reload” needs a copy button right next to it.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Exploration 03</h3><span class="aside">“Leave with a table” · a concept, not built</span></div>
+        <p class="stage">Shown t1–t4 in order: the swap chips with “Show what's sent”, the “Words that don't match” table with a Status column, the “One next step” card with yes/no lines for Dana, and the table pasted into an RFC's “4. Glossary”. Clicked through table.html once, including Copy table.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q8</span><span>Last time you pasted a table into the RFC, you rebuilt six rows. Would this one survive Dana's and finance's review as it is? What would you retype?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It pastes as a table, which is the first time anything you've shown me does. Finance would read it as is. I'd retype three things. First, the Rebook ops row. “Checked with Dana 29 Sep” is a week stale, and “ops is split on lane changes” came through as a lowercase aside in brackets, so it reads like a footnote. Second, every “From thread”, because finance will ask which thread. Third, not the table itself but it's on the same screen: the second Dana line says “A change of lane or date makes it AMENDED.” <mark>That's my wrong note from the 22nd, and Dana corrected it twice. Your concept would have sent my mistake back to her as a question.</mark> About ten minutes of fixing instead of twenty-five. That's the first time that number went down.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>What would finance do with it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Read their two rows and nothing else. They'll edit “rate locked” to their own word, because “locked” means something specific in their system. Which is fine. That's why it has to paste as text and not as an image.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>The last column is “Status”. Right name for the people reading the doc?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No, and it's worse in my RFC than in general. Section 3 of my RFC is the booking status enum, 23 values. <mark>Put “Status: From thread” two scrolls below REBOOKED and AMENDED and someone will think “From thread” is a status.</mark> What the column really says is where each meaning came from and whether anyone checked it. Call it “Source”. “Slack thread, July” is a source. “Checked with Dana, 8 Oct” is a source too. One column is enough.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>“Ops is split.” Does that feel safe in a doc Ops will read?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Safe to say, but not like that. Maya reviews from Monday, and she'll read “Ops is split” as “Priya thinks Maya's wrong.” In July the only real message she wrote in that thread was a correction of how I'd described ops, so I know she reads anything with “ops” in it. What's true is that there are two practices inside ops. So write two rows: “Ops, current practice: same booking, REBOOKED” and “Ops, Dana's 2019 sheet: new booking if the lane changes.” <mark>That credits a practice and a document, not a person.</mark> It's what Dana asked for with “put it in as ops, not as mine.” In the tool, the red “split” chip is fine. It just can't be the thing that lands in the doc.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>“Show what's sent” plus your own swap list. Does it change what you paste?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It answers my question from last time, “swapped where?”: in my browser, and I can see it. It changes how long sanitizing takes, maybe fifteen minutes down to five, since it's the same six customers every time. It doesn't change what I paste, because the vendor's still not approved and your own note says rates and lanes aren't caught. Honestly, the risk is it makes me lazy: I'd paste the raw export and trust the list, and the week a seventh customer shows up, it goes out.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q13</span><span>The preview still shows “load 48213”. Would you add it to your swaps?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>No, and this is a real conflict. If I swap 48213 to “Load 1”, the coach's best question, “look up load 48213 in your own system”, becomes “look up Load 1”, and I can't. <mark>The swap breaks the one next step I said was facilitation.</mark> Unless you swap it back in the replies I see. Also, the preview says “Ops (ops):” on every line, which looks broken. Swap the name and drop the duplicate.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Reviewer claims</h3><span class="aside">from “a reviewer like Marcus” · she may disagree</span></div>
+        <p class="stage">Told: “Three suggestions come from a staff engineer who reviews docs like yours. He's not the person we build for. Disagree freely.”</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q14</span><span>First claim: every row should have something he can open, like a ticket, a Slack permalink or a load. His words were that “From thread” with no link is “trust me with better formatting.”</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That's Marcus, whether or not it's him. And he's right about the idea: my ten-ticket spreadsheet had a Jira key on every row, and that's why it worked. But your tool can't give me those links. It only ever sees my sanitized paste, so it's never seen a Slack URL. <mark>A link on every row, yes. A link your tool made up, never.</mark> I'd add them myself in Confluence. The tool should keep the reference as plain text, like “thread, 14 Jul”, “load 48213” or “Dana's sheet, row 12”, so I know what to link.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q15</span><span>Could you give each “From thread” row a permalink today? How long would it take?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>About five minutes. It's one thread, so four rows get one link. Tom's message has its own permalink, and I'd use that for finance's row. That does put Tom's name one click from the definition everyone thinks is wrong. I've decided I'm fine with it: he said it in a public channel. <mark>The problem was his name on the page, not his name behind a link.</mark> The load goes to our admin page, which is fine in an internal doc.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>Second claim: the term map should have a row for “what the code does.”</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>He's right. I'll say that here, not to him before the review. I did exactly that on Tuesday by hand, because finance asked, and it's the most important row in the table: the code agrees with finance. It's missing from your concept because the table is about teams, and code isn't a team. <mark>Put “Code” in the Team column, with a link to the method, and it's the row I should have written in July.</mark> If the coach fills it in, it has to say it came from code I pasted. If it's a guess, it has to say “Guess”.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q17</span><span>Would you actually fill that row in, or is it a nice idea?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>I already did, on Tuesday. And it's the row Marcus will check first, because it's the one he can check in two minutes. So it'd better be right.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>Third claim: next to “split” or “unconfirmed”, say who settles it and by when.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“By when”, yes, but it's the same date for every row: the review on the 27th. So say it once, above the table. “Who” is the actual fight. Nobody's job is to break ties between ops and finance. If I write “Maya to settle”, I've just handed Maya the rebook definition, and finance will object in the comments. “Dana to confirm” was right until yesterday. Now it's stale, which proves his point about dates. <mark>Put a date on it, yes. Put a name on it, and I'm back to Tom's name next to the wrong definition.</mark> So it goes in the open questions list as a role, like “ops lead and finance controller, at the 27 Oct review”, and your tool shouldn't guess it, because it doesn't know our org.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>Exploration 02b</h3><span class="aside">“Honest limits” v2 · a concept, not built</span></div>
+        <p class="stage">Shown four screenshots of limits-v2.html: the reply cut mid-question with “Cut short at the reply length limit · Continue” right under the last word; after Continue, a “continued” tag and a warning over the message box (“This paste would use 9,400 of the 11,340 characters left… room for about one short reply”, with Send anyway / Copy everything first); “This conversation is full” with Copy everything in blue; and “Started fresh with your board”: the term table, statuses by name, open questions, and “Previous conversation (read-only)”.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q19</span><span>Did it fix what you flagged last time: the marker at the cut, Continue only appending, Copy first, carrying the board?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>All four, yes. The marker sits right at the cut, and I saw it without scrolling this time. Continue added text after a “continued” tag and didn't touch questions one and two. Copy everything is blue. It carries a table and not a paragraph, the statuses are listed by name, and the old conversation stays readable. The percentage is gone too. I went looking for what you missed again, and that part's clean.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>Look at the carried board. What would you check?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>What's missing and what's stale, and both happened. There were three questions before the cut, and the carried list has two. The load 48102 one, about the two invoices, is gone, replaced by a “for you to check” item. <mark>That's the TONU question, which is exactly what the Claude summary dropped in September.</mark> And the Rebook ops row carries “unless lane or date changes · unconfirmed”. That's my wrong note, word for word, after Dana corrected it. Word for word is what I asked for, and it carried my mistake word for word. So the test isn't “word for word”. It's nothing missing and nothing stale.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q21</span><span>The warning before a big paste. Is that the one you asked for?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Close. I'd skip “9,400 of 11,340”. “Room for about one short reply” is the sentence I'd actually read. What's missing is the button I'd press, “I'll cut it down”, but the paste stays in my box, so I can cut it myself. That's fine.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>Anything else wrong?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Two things. The notice is now “Where your text goes · show”. In 03b I said your notice looked like cookie small print. <mark>Now it's a cookie banner I have to open.</mark> On Sunday it was the only thing on the page I read, and I wouldn't have clicked “show”. Second, the finished question 3 now asks, “Was the first carrier's truck already on its way?” That's better than giving the answer. But it's a fact I can look up myself in fifteen minutes, so it's a question for me, not for Dana. And question 2 lumps “lane or date” together again.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Knowledge base</h3><span class="aside">#58 · a proposal, not built</span></div>
+        <p class="stage">Told: the coach may soon be grounded in real sources, starting with Evans's DDD Reference (free, CC BY), and may cite them by section, for example “Evans, DDD Reference: Bounded Context”.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q23</span><span>When did you last cite a book in a doc or a meeting? How did it go?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>In the Quotes RFC in 2024 I linked Fowler's strangler fig post in the migration section. Nobody commented, and I doubt anyone clicked. It was fine because everyone already knew the pattern. The “bounded context” moment in planning had no citation at all, and a citation wouldn't have saved me. <mark>Marcus wasn't asking what Evans meant. He was asking what it meant in our code.</mark> The laugh was about that.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q24</span><span>So does a citation like “Evans, DDD Reference: Bounded Context” raise your trust, or is it noise?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>In the coach's replies to me, it raises it. What burned me in August was “you should have a Booking aggregate”, said like a rule. If it had said where that came from, I'd have seen it was generic. <mark>I'd check the first two citations against the PDF, and if they're real I'd stop checking.</mark> That's honest, and it's also why one fake section would finish it for me. In the doc, it's noise at best.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q25</span><span>Which source would Marcus respect?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Incidents, then tickets, then the code. Not a book.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q26</span><span>That matches him closely. He said incident data, tickets, code, then Fowler's posts on the cost of splitting, and Evans only to define a word.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The Fowler part is funny: he linked “MonolithFirst” on my Quotes RFC. He respects the posts that agree with him. I'd disagree on Evans, though. I wouldn't give him Evans even for a definition, because he'll read it as me hiding behind a book. <mark>I'd define it in our own nouns: the rebook code, the booking rows, ops's screens.</mark> Then the only thing left to argue about is facts.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q27</span><span>Should the coach teach you DDD terms, or stay in your words? Is that different in your prep and in the exported doc?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Different, yes. In my prep, teach me. I read half the Blue Book, and I want to get better at this, which is the only reason I'd use a coach and not just Claude. But teach once, tied to my mess, like “what you're describing is what Evans calls a bounded context; here that's ops's booking versus finance's”, and then go back to my words. If Marcus asks me “is this a bounded context?”, I want to know the answer without being the first to say the word. <mark>In the export: zero DDD words, and never one I didn't type.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q28</span><span>That reviewer also said he'd want a coach that can conclude “don't split, rename three things.” Would you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Privately, yes. The VP asked for a split, so the RFC can't say “don't”. But if the ten tickets come back eight inside the line again, “split later, fix the words now” is a real option. <mark>A coach that only reads DDD books will always find contexts, so give it something from the other side.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-g">
+        <div class="part-head"><span class="tab">G</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q29</span><span>If you could have only one thing in the next month, what is it?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The table, pasting clean, with a Source column I can link and a Code row. Before the 27th now, not the 30th. Signing, citations and the limits work are for the next RFC. <mark>But fix the reload message before anyone sees it. That's an afternoon, and it's the only thing today that would actively lose my work.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q30</span><span>Anything we should have asked but didn't?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Ask me after the 27th whether finance argued about the facts or about the word, because that's how I'll know the table worked. And ask Maya. After Monday she's “Ops”, and she hasn't seen any of this.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>“Term | Team | Meaning | Status” is the right table</h3><div class="ref">#6</div></div>
+        <p>“Status” collides with the booking-status section. It should be “Source” and ready for a link, with “Code” as a Team value. A split inside a team becomes two rows credited to a practice or a document. The deadline she cares about is now 27 Oct.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A real link in every source cell</h3><div class="ref">#6 · pending M01 note</div></div>
+        <p>Resolved as Modify: she supplies the links, and the tool keeps plain-text references. A generated URL is a trust killer.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Carrying the board “word for word” preserves her work</h3><div class="ref">#7</div></div>
+        <p>02b dropped one of three questions (the TONU one) and carried a superseded note. The test should be nothing missing and nothing stale.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The term map is about teams only</h3><div class="ref">#4 · slice 3</div></div>
+        <p>Pasted code is a holder of a meaning too. Questions built on cases must not bring back notes she has corrected. Load-ID swaps conflict with “look up load 48213”.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Persistence can wait</h3><div class="ref">#5 · slice 37</div></div>
+        <p>Slice 37 adds a second place, after the 24k cap, where the tool itself tells her to reload, and a reload discards everything. In the demo, the conversation still worked after the refusal.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Swaps ease the policy problem</h3><div class="ref">#34</div></div>
+        <p>They cut sanitizing from about 15 to 5 minutes. They don't change the vendor answer, and they may make her careless. Sanitized-only stands.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The notice is getting more visual weight</h3><div class="ref">#55</div></div>
+        <p>02b collapses it behind “show”, the opposite direction. The #55 rule has to hold in every exploration.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The first visit says what the tool is for</h3><div class="ref">#57</div></div>
+        <p>Neither 03 nor 02b shows a purpose line. 03's header, “Eazy Freight · what is a booking?”, is the closest thing to one.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Evans may define words in the export</h3><div class="ref">#58 · M01</div></div>
+        <p>She disagrees with Marcus: no book in the doc, not even for definitions. Citations stay in replies, and she'll verify two before trusting the rest.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>CC BY sources plus our notes are enough</h3><div class="ref">#59</div></div>
+        <p>Only if our notes include a “when not to split” counterweight. “A coach that only reads DDD books will always find contexts.”</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="suggestions-h">
+    <div class="section-head">
+      <h2 id="suggestions-h">Suggested slices</h2>
+      <span class="label">Smallest result · acceptance check</span>
+    </div>
+    <div class="suggestions">
+      <article class="card">
+        <header><span class="cmd">Source</span><div><h3>Status becomes Source, with a reference she can link and a Code row</h3><div class="where">#6 · narrowest cut</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The columns are Term | Team | Meaning | Source. Source holds a plain-text reference (“Slack thread, 14 Jul”, “Checked with Dana, 8 Oct”, “load 48213”). “Code” is a valid Team value. No generated URL in either format.</dd></div>
+          <div><dt>Check</dt><dd>Paste into Confluence Cloud: the header reads “Source”, and no cell is labeled “Status”. A Code row survives. The <code>text/html</code> and <code>text/plain</code> payloads contain 0 <code>http</code> strings unless the user typed one.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Copy</span><div><h3>Refusal copy with Copy first</h3><div class="where">slice 37 follow-up · before #5</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>On <code>COACH_UNVERIFIED</code>: “The coach was updated while this page was open, so it can't use your earlier replies.” Two buttons: “Copy the conversation” (primary) and “Start a new one”, which clears the log. The words “reload” and “verified” don't appear.</dd></div>
+          <div><dt>Check</dt><dd>After a forged turn: exactly 2 buttons and no Retry. Copy puts every prior prompt and reply on the clipboard. “Start a new one” leaves 0 entries, and the next request has <code>history: []</code>.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Carry</span><div><h3>Carry nothing missing, nothing stale</h3><div class="where">#7</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>The carried board lists every open question from the conversation. A row she corrected shows the corrected meaning with its new source.</dd></div>
+          <div><dt>Check</dt><dd>With 3 open questions and one corrected Rebook note, the carried board has 3 questions (including load 48102 / TONU) and no text matching “lane or date”.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">Swap</span><div><h3>Swap back in replies</h3><div class="where">#4 · slice 3</div></div></header>
+        <dl>
+          <div><dt>Result</dt><dd>Swaps apply to the outgoing text and are reversed in the displayed reply, so “Load 1” shows as “load 48213” on her screen only.</dd></div>
+          <div><dt>Check</dt><dd>With <code>48213 → Load 1</code>, the <code>/api/chat</code> body contains no “48213”, and the displayed next step contains “48213”.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Ask next time</h2>
+      <span class="label">For interview 05 or a real practitioner</span>
+    </div>
+    <ul class="next">
+      <li>After the 27 Oct finance review: what did finance change in the table? Did people argue about facts or about the word?</li>
+      <li>When Maya reviewed the two ops rows, what did she say or change?</li>
+      <li>Did you add links to the Source cells? How many, and how long did it take? Did anyone click one?</li>
+      <li>If you saw “The coach was updated…” in real use, what did you do first?</li>
+      <li>The first time the coach cited a section, did you check it? What did you find?</li>
+      <li>After the coach introduced a DDD term once, did you use it yourself afterwards?</li>
+      <li>A real staff-engineer reviewer: shown the table with a Code row and Source links, what do you open first?</li>
+      <li>A real ops lead: “Ops, current practice” vs “Ops, Dana's 2019 sheet” in a doc. Comfortable?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Explorations 03 and 02b are design concepts, not shipped software; slice 37 is live. The reviewer claims come from the synthetic stakeholder interview M01 and are judged here by the ICP only. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>

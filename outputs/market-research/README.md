@@ -15,8 +15,9 @@ Synthetic interviews generate hypotheses, not evidence. Promote an insight only 
 | 3a | 02a + Explorations 01b, 02 | [md](interviews/interview-03a-design-explorations.md) · [html](interviews/interview-03a-design-explorations.html) | 01b fixed 13/15; rich-text table copy still missing; anonymising ≠ policy fix; carry the board, not a summary; team labels hide disagreement within a team |
 | 3b | 02a (hosted) + #42 restyle | [md](interviews/interview-03b-after-slice-02a.md) · [html](interviews/interview-03b-after-slice-02a.html) | Notice meets 1.5/5 checklist items; 8k cap + one-line box break her first paste; BYO key impossible (chat-only Enterprise, keys in Vault); restyle makes notice look like cookie small print; fit paste + table beat persistence this month |
 | M1 | stakeholder (influencer/blocker, not ICP) | [md](interviews/interview-m01-marcus-influencer.md) · [html](interviews/interview-m01-marcus-influencer.html) | Wants checkable sources per row (ticket/load/permalink); doubt labels are credible if owned + dated; Evans backs definitions only; rejects 'ubiquitous language', 'context map' |
+| 4b | 37 + Explorations 03, 02b, #58, Marcus claims | [md](interviews/interview-04b-after-slice-37.md) · [html](interviews/interview-04b-after-slice-37.html) | Table cuts fix-up time from ~25 to ~10 min; rename Status → Source; a stale correction resurfaces; carried board dropped TONU again; 'Reload to start a new one' error would make her throw away her work; no books in the export |
 
-Last interviewed demos: `slice-02a.md`, `slice-42.md`
+Last interviewed demos: `slice-02a.md`, `slice-42.md`, `slice-37.md`
 
 ## Queued for interview 04
 
@@ -29,6 +30,7 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   3. Does "Ops is split" feel safe to put in a doc that Ops will read?
   4. Does "Show what's sent" together with her own swap list change what she pastes?
 - Any 02b, notice-weight or too-long-paste concepts the DESIGNER delivers before the next demo.
+- **#61, the new error copy** ("Copy the conversation", then "Start a new one"), shipping with the paste box. Does it stop her throwing away her work?
 - **The PO's test: replay her Sunday attempt end to end** on the paste-box slice. Paste the 12k sanitized thread (multiline, speaker lines intact), hit the limit, and see whether the draft is kept and the limit stated. Does the reply attribute Tom's line to finance? Is there a purpose line and placeholder (#57)? Would she still switch to company Claude?
 - **Design Exploration 04, "Paste box"** (`outputs/design/explore-04/`: stills p1-first-visit → p2b-replied → p3-too-long → p4-two-parts, p5-phone, `explore-04-2.5x.mp4`, `pastebox.html`). Pair it with the Sunday replay. Probes:
   1. Does the notice now read as content, not a banner? Which of her 5 checklist items does it meet?
@@ -39,3 +41,9 @@ Split it like 03: **04a** covers the built paste-box slice with Exploration 04 a
   - (b) Which source would Marcus (the skeptical staff engineer) respect?
   - (c) Should the coach teach DDD terms, or stay in her words? This is in tension with "no jargon." Does the answer change between her prep and the exported doc?
 - For 04b, test Marcus's claims with Priya: a link per row, a "what the code does" row, and who settles a split and by when. Marcus is not the ICP, so only Priya's answers re-rank anything.
+
+## Queued for interview 05
+
+- **Exploration 03b** (DESIGNER, in progress): Source column with plain-text references, "Code" as a Team value, one "settle by 27 Oct" date, corrections replacing old notes everywhere, no DDD terms she didn't type. Check it passes "nothing missing, nothing stale".
+- **02b, revised after 04b** (`outputs/design/explore-02b/limits-v2.html`): TONU kept, stale AMENDED note removed, notice visible. Quick check only: did the carried board keep everything?
+- Tooling: `agent-browser` screenshots were hanging machine-wide on 2026-09-25. Interview agents can fall back to Playwright over a local server.
