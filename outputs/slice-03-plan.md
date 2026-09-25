@@ -35,7 +35,7 @@ Spec: the issue body of #4 (the source of truth). Also #44 (complete sentence), 
 - `server/openRouterCoach.smoke.test.ts` runs in `npm test` only when the OpenRouter vars are in the shell. It asks for "Reply with one word." and the code word PELICAN. **Under a coaching prompt, an off-topic code-word test is fragile.** Change it to a domain memory check (test 12).
 
 **Model (`GET https://openrouter.ai/api/v1/models`, 2026-09-25, no key):**
-- **Production model: `openai/gpt-5.6-terra` at effort `none` with prompt v4** (Steven, 2026-09-25, after the eval). It's the only model that meets the ship bar (`outputs/evals/slice-03/summary.md`).
+- **Production model: `openai/gpt-5.6-terra` at effort `none` with prompt v4** (the owner, 2026-09-25, after the eval). It's the only model that meets the ship bar (`outputs/evals/slice-03/summary.md`).
 - **Local dev model: `openai/gpt-6-luna` at effort `none`**: $0.10/M prompt, $0.50/M completion, reasoning optional. It's cheap and passes the latency gate, but misses the ship bar on names and split teams.
 - History: the first choice was `openai/gpt-5.6-luna`. The catalog check that day gave:
   - prices: **$0.20/M prompt, $1.20/M completion**, $0.02/M cache read, $0.25/M cache write, 10× cheaper than terra;
@@ -264,7 +264,7 @@ It runs from the dev machine against OpenRouter, the same upstream the function 
 
 **Layer 2: the eval, a paid run that's never in `npm test` or `bin/check.sh`.**
 - Run it as `npm run eval` = `node --env-file=.env server/eval/runEval.ts`. Node 24 strips the TS types, and it reads `.env` without printing it.
-- The deployer, or Steven, runs it; per AGENTS.md only they read `.env`.
+- The deployer, or the owner, runs it; per AGENTS.md only they read `.env`.
 - It reuses the real `createOpenRouterCoach` and `coachInstructions()`. It wraps `ChatClient` in a recorder that captures `usage`, `finishReason` and ms, so production code needs no metadata changes.
 - It writes `outputs/evals/slice-03/<date>-v<version>.json` plus a `summary.md` table. Each row: fixture × run, pass/fail for each hard check, soft scores, ms, tokens, cost.
 - `server/eval/checkReply.ts <fixture> <reply.txt>` runs the same checks on one reply. The verifier uses it on the hosted reply.
@@ -305,7 +305,7 @@ It runs from the dev machine against OpenRouter, the same upstream the function 
 - The latency spike (5 + 2 streamed + 1 follow-up turn): about 8 × ($0.0014 + $0.0012) ≈ **$0.02**.
 - A full slice's spend, including 2–3 prompt iterations and the hosted demo, stays **under $0.25**.
 
-**Model-size fallback.** Luna is the smaller model, so rule-following is what to watch: attribution, no names, and the prefixes. If luna still misses the ship bar after 3 prompt versions, run the same eval once on terra (about $0.15) and send both summaries to team-lead. Switching the model is Steven's call.
+**Model-size fallback.** Luna is the smaller model, so rule-following is what to watch: attribution, no names, and the prefixes. If luna still misses the ship bar after 3 prompt versions, run the same eval once on terra (about $0.15) and send both summaries to team-lead. Switching the model is the owner's call.
 
 ### 8. Purpose line, sharpened (`PURPOSE_LINE`)
 
@@ -313,7 +313,7 @@ It runs from the dev machine against OpenRouter, the same upstream the function 
 
 It says exactly what the reply now does, in the order it does it. It keeps Priya's "what to ask your expert" (03b), and has no DDD words. `PASTE_EXAMPLE` is unchanged.
 
-### 9. Cost per exchange (for Steven; not blocking)
+### 9. Cost per exchange (for the owner; not blocking)
 
 | Turn | Input | Output | Cost |
 |---|---|---|---|
@@ -502,11 +502,11 @@ Convert to `slice-03.mp4` + `.gif` as in agent-team.md.
    - at most 4 "words that don't match";
    - the visitor's own chat statements count as "From thread:", keeping two labels rather than adding "From you:";
    - aggregates are allowed only when she asks.
-6. **Eval spend:** about $0.15 per run and about $0.20 for the latency spike, under $1.50 for the slice. The deployer, or Steven, runs it, because it reads `.env`. Also: set a monthly cap on the OpenRouter key before #58.
+6. **Eval spend:** about $0.15 per run and about $0.20 for the latency spike, under $1.50 for the slice. The deployer, or the owner, runs it, because it reads `.env`. Also: set a monthly cap on the OpenRouter key before #58.
 
-## Approved (2026-09-25, Steven + team-lead)
+## Approved (2026-09-25, the owner + team-lead)
 
-- The model is `openai/gpt-5.6-luna` at effort `none`, locally and in production (the deployer sets the production env at the next deploy). **Superseded the same day:** `openai/gpt-6-luna` at effort `none` for local dev, and **`openai/gpt-5.6-terra` at effort `none` with prompt v4 for production** (Steven, after the eval).
+- The model is `openai/gpt-5.6-luna` at effort `none`, locally and in production (the deployer sets the production env at the next deploy). **Superseded the same day:** `openai/gpt-6-luna` at effort `none` for local dev, and **`openai/gpt-5.6-terra` at effort `none` with prompt v4 for production** (the owner, after the eval).
 - Eval spend is approved (a few dollars at most, far less on luna). The deployer runs the latency gate and the eval, reading `.env` in the redacted way.
 - (a) A free-text fixed layout. (b) `maxCompletionTokens` 1,000. (c) A body cap of about 391 KiB derived from the 64k conversation cap. (d) The text cut-short note partly satisfies #44, which stays open for a UI marker. (e) The prompt choices are accepted.
 - "Try an example thread" is out of this slice. The PO decides whether it gets its own issue.

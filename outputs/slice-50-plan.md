@@ -309,7 +309,7 @@ Off-video:
     - the "Chromium only" note;
     - side-by-side links to the explore-04 stills.
 
-## Decisions recorded (team-lead, 2026-09-24; defaults, not waiting on Steven)
+## Decisions recorded (team-lead, 2026-09-24; defaults, not waiting on the owner)
 
 1. **Keys.**
    - Desktop: Enter sends, Shift+Enter adds a new line, and Cmd/Ctrl+Enter also sends.

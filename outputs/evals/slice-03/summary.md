@@ -1,6 +1,6 @@
 # Slice 3 eval summary (#4)
 
-**Ships on `openai/gpt-5.6-terra` at effort `none` with prompt v6 (`COACH_INSTRUCTIONS_VERSION = 6`), under #73's every-run bar.** Steven decided on 2026-09-25 to ship v6. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Before this, v4 shipped under the older 2/3 bar. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
+**Ships on `openai/gpt-5.6-terra` at effort `none` with prompt v6 (`COACH_INSTRUCTIONS_VERSION = 6`), under #73's every-run bar.** The owner decided on 2026-09-25 to ship v6. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Before this, v4 shipped under the older 2/3 bar. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
 
 ## How it's measured
 
@@ -58,7 +58,7 @@ The checks tightened as the PO added win conditions (04a, 05), so the dashes are
 - **Smaller slips.** One F1 meaning line had no holder ("The dashboard counts…"). One v3 F3 reply printed all three parts twice.
 - **What it gets right:** v4's plain text, no offers, Code → Guess, joint roles and forum held in every run.
 
-A v5 was an option: show the name-to-team swap in the worked example, and forbid shift and desk names as holders. It wasn't tried, because Steven chose terra.
+A v5 was an option: show the name-to-team swap in the worked example, and forbid shift and desk names as holders. It wasn't tried, because the owner chose terra.
 
 ## Held on terra v4, in every run
 
@@ -142,7 +142,7 @@ F3's "Customers see…" passes, because the key allows Customers (U1). The inter
 
 v7's remaining attribution miss is F1 r1, "Ops means every non-CANCELLED row in the dashboard, including old REBOOKED rows and new rows". The line never names Code, so it still counts as a miss. It's a judgment call: Ops's count really does include the rows the code creates.
 
-## Effort `low` on terra (Steven's call after v7)
+## Effort `low` on terra (the owner's call after v7)
 
 | Run | Hard | Attribution | Below 3/3 | Hard failures | finishReason | Median / max ms | Cost $ | Summary |
 |---|---|---|---|---|---|---|---|---|

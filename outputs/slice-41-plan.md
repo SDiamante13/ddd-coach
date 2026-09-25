@@ -1,6 +1,6 @@
 # Slice 41 (#41, P1): a shared-password gate for conference use
 
-Today anyone with the URL can spend OpenRouter credit. The only guards are a per-IP rate limit (20/min) and whatever credit limit is set on the key. Steven wants conference attendees to use the hosted coach, so this slice adds **one shared passphrase**. There are no accounts.
+Today anyone with the URL can spend OpenRouter credit. The only guards are a per-IP rate limit (20/min) and whatever credit limit is set on the key. The owner wants conference attendees to use the hosted coach, so this slice adds **one shared passphrase**. There are no accounts.
 
 After this slice, a first visit shows the purpose line, the data-flow notice and one field, "Conference password". The right password sets a signed HttpOnly cookie that lasts 7 days. `/api/chat` returns 401 without a valid cookie, **before** it reads the body or creates a coach. Everything stays stateless: the cookie is an HMAC over an expiry, keyed with the existing `COACH_SIGNING_KEY`, and it binds the current password. Changing `ACCESS_PASSWORD` invalidates every cookie.
 
@@ -125,19 +125,19 @@ At a venue, most attendees share **one public IP** (the Wi-Fi NAT), and phones o
   grep -q '^ACCESS_PASSWORD=' .env || echo 'ACCESS_PASSWORD=local-coach-dev' >> .env
   ```
   Then restart `npm run dev`. Agents may type `local-coach-dev` in local checks, since it's documented here. Production secrets are set for `production` only, so `netlify dev` doesn't pull them.
-- `.env.example` gains `ACCESS_PASSWORD=`, with a comment: required; dev can use any value; production is set by Steven in the Netlify UI.
+- `.env.example` gains `ACCESS_PASSWORD=`, with a comment: required; dev can use any value; production is set by the owner in the Netlify UI.
 
-### How Steven sets the production password: the Netlify UI (decided)
+### How the owner sets the production password: the Netlify UI (decided)
 
-Steven sets it himself, so the value never enters chat, the transcript, or a command line an agent runs. There's no script.
+The owner sets it themselves, so the value never enters chat, the transcript, or a command line an agent runs. There's no script.
 
 1. Netlify → project `ddd-coach` → Project configuration → Environment variables → Add a variable → key `ACCESS_PASSWORD`.
 2. Tick **"Contains secret values"**, choose different values per deploy context, and fill **Production only**. Leave deploy previews and branch deploys empty; drafts already fail at `OPENROUTER_API_KEY` (2a).
 3. Tell navigator "set". The deployer redeploys, because env changes need a redeploy, and runs the slice 2a Step C filter with `ACCESS_PASSWORD` added to the key list. It prints `set`/`absent` only.
 
-Rotation (only on abuse) is the same steps with a new value, then a redeploy. Secret values can't be read back in the UI, so Steven keeps the passphrase where he keeps the slide.
+Rotation (only on abuse) is the same steps with a new value, then a redeploy. Secret values can't be read back in the UI, so the owner keeps the passphrase where they keep the slide.
 
-**Passphrase advice (for Steven):**
+**Passphrase advice (for the owner):**
 - Use three unrelated lowercase words joined by hyphens, easy to put on a slide, that appear nowhere in the app or repo text. For example "tidal-lantern-quartz", but not that one.
 - If it's also a word in the repo, a future remote build (B45) fails secrets scanning. Fix that with a stronger phrase, or with `SECRETS_SCAN_OMIT_KEYS=ACCESS_PASSWORD`.
 
@@ -291,7 +291,7 @@ That proves `netlify dev` passes the cookie through.
 ## Env and deploy sequence
 
 1. **Deployer, local:** append the dev password (the command above) and restart `npm run dev` in tmux `ddd-coach`.
-2. **Deployer, production:** set a **throwaway demo password**. It's generated, never printed, and written to a scratch file outside the repo, readable only by Steven's user account (mode 600):
+2. **Deployer, production:** set a **throwaway demo password**. It's generated, never printed, and written to a scratch file outside the repo, readable only by the owner's user account (mode 600):
    ```bash
    DEMO_PASS_FILE="$SCRATCH/slice-41-demo-pass"   # the session scratchpad dir, never under the repo
    node -e '
@@ -309,9 +309,9 @@ That proves `netlify dev` passes the cookie through.
 3. **Verifier:** the hosted demo below. It reads the value only through command substitution (`"$(cat "$DEMO_PASS_FILE")"`), so the value never appears in a command line the transcript records.
    - Check the first `agent-browser fill` output doesn't echo the value. If it does, stop, have the deployer rotate the demo value, and switch to `agent-browser eval` that reads a `window` variable set by that eval.
    - Delete the file after the last curl: `rm "$DEMO_PASS_FILE"`.
-4. **Steven:** sets the real conference passphrase in the Netlify UI (above) and tells navigator "set".
+4. **The owner:** sets the real conference passphrase in the Netlify UI (above) and tells navigator "set".
 5. **Deployer:** redeploys and runs Step C (`set`).
-6. **Verifier:** reloads the demo browser → the gate is back, because the demo cookie is invalidated (AC8). Then a `curl` unlock with the old demo value, run before the file is deleted, → 401. **Steven** enters the real passphrase himself → the app works.
+6. **Verifier:** reloads the demo browser → the gate is back, because the demo cookie is invalidated (AC8). Then a `curl` unlock with the old demo value, run before the file is deleted, → 401. **The owner** enters the real passphrase themselves → the app works.
 
 ## Demo script (verifier, hosted URL)
 
@@ -325,7 +325,7 @@ Use `agent-browser --session verifier` with a fresh profile (no cookie) and one 
 6. `record stop`.
 
 Off-video, record the output in `outputs/demos/slice-41.md`:
-- `curl -si -X POST $U/api/chat -H 'Content-Type: application/json' -d '{"message":"hi","history":[]}'` → 401 `ACCESS_REQUIRED`, with its `time_total`. **Before OpenRouter:** the OpenRouter activity count doesn't change (Steven checks the dashboard, or the verifier compares key usage before and after), and there's no "Coach failed" in the function logs. The handler test (16) is the proof of order.
+- `curl -si -X POST $U/api/chat -H 'Content-Type: application/json' -d '{"message":"hi","history":[]}'` → 401 `ACCESS_REQUIRED`, with its `time_total`. **Before OpenRouter:** the OpenRouter activity count doesn't change (the owner checks the dashboard, or the verifier compares key usage before and after), and there's no "Coach failed" in the function logs. The handler test (16) is the proof of order.
 - The same request with a forged `-b 'coach_access=9999999999.AAAA…'` → 401.
 - The unlock via `curl -si` with the body built from `"$(cat "$DEMO_PASS_FILE")"` → 204 plus the `Set-Cookie` attributes as listed.
 - Session with and without that cookie → 204 and 401, with `cache-control: no-store`.
@@ -357,19 +357,19 @@ Part B, locally, fail closed: `ACCESS_PASSWORD= npm run dev` gives unlock 500 an
 - **Secrets scanning on future remote builds** fails if the passphrase appears in the repo (see the passphrase advice).
 - **The harness refactor touches 50 test call sites.** Keep it a separate `r` commit so the `feat` diffs stay small.
 - **Rotating `COACH_SIGNING_KEY` logs everyone out.** Intended; note it in the rotation steps.
-- **The demo password is live in production** until Steven sets the real one (step 4). It's never printed, but rotate the same day and delete the scratch file.
+- **The demo password is live in production** until the owner sets the real one (step 4). It's never printed, but rotate the same day and delete the scratch file.
 
 ## Decisions (approved 2026-09-25)
 
-1. **Steven sets the production `ACCESS_PASSWORD` himself in the Netlify UI** (secret, Production only). No script.
-2. **The hosted demo uses a throwaway password.** The deployer generates it, it's never printed, and the verifier reads it from a mode-600 scratch file outside the repo, deleted afterwards. Then Steven sets the real one and we redeploy, which also demonstrates rotation.
+1. **The owner sets the production `ACCESS_PASSWORD` themselves in the Netlify UI** (secret, Production only). No script.
+2. **The hosted demo uses a throwaway password.** The deployer generates it, it's never printed, and the verifier reads it from a mode-600 scratch file outside the repo, deleted afterwards. Then the owner sets the real one and we redeploy, which also demonstrates rotation.
 3. **Rate limits:** unlock 30/min per IP, and chat raised from 20 to 300/min per IP (venue NAT).
 4. **Reuse `COACH_SIGNING_KEY`** with the `ddd-coach/access/v1` tag. Rotating it logs everyone out.
 5. **Dev:** the deployer appends `ACCESS_PASSWORD=local-coach-dev` to `.env` (append only; no read).
-6. **For Steven:**
+6. **For the owner:**
    - **Passphrase:** three random lowercase words joined by hyphens, not a DDD term, and nowhere in the repo, so a future remote build doesn't fail secrets scanning. Rotate only on abuse.
    - **Before the conference, set an OpenRouter credit limit:** about $50, ideally on a dedicated hosting key. The estimate is $25–50 for 100 people × 20 turns.
 
 **Rotation (90-day pass):** rotate `ACCESS_PASSWORD` only on abuse. Rotating right after the conference would break the "unlocked for 90 days" promise to attendees (PO, #72). To rotate: change it in the Netlify UI, then redeploy. The password is part of the cookie MAC, so every existing pass stops working at once.
 
-**As built (supersedes earlier sections where they differ):** the pass lasts 90 days (`ACCESS_MAX_AGE_S` = 7,776,000, 4f038cf). ACCESS_REQUIRED reads "Your access has expired. Enter the conference password below, then send your message again." and the password form appears inline above the composer (9520203). A session check that can't reach the server shows "Can't reach the coach" with Try again (d07c68c). Steven set the production password directly, so no throwaway demo password was used.
+**As built (supersedes earlier sections where they differ):** the pass lasts 90 days (`ACCESS_MAX_AGE_S` = 7,776,000, 4f038cf). ACCESS_REQUIRED reads "Your access has expired. Enter the conference password below, then send your message again." and the password form appears inline above the composer (9520203). A session check that can't reach the server shows "Can't reach the coach" with Try again (d07c68c). The owner set the production password directly, so no throwaway demo password was used.

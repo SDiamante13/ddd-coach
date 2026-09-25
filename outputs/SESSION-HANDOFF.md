@@ -37,12 +37,12 @@ The HTML plan uses stable IDs: `1, 2, 2a, 3 … 13`. Do not renumber sensor refe
 
 Start the coach with a short Eazy Freight briefing, then ask about gaps and exceptions. This was explicitly chosen over discovering everything from scratch.
 
-- Repository: `/Users/stevendiamante/personal/eazy-freight`.
-- Supplied explanation: `/Users/stevendiamante/explanations/2026-09-24-explanation-eazy-freight-shipment-trace.html`.
+- Repository: `~/personal/eazy-freight`.
+- Supplied explanation: `~/explanations/2026-09-24-explanation-eazy-freight-shipment-trace.html`.
 - The user's original `../eazy-freight` did not resolve relative to this workspace; the repository above was located and inspected.
 - First bounded exercise: booking request → carrier submission → carrier confirmation → customer confirmation. Exception: rejection → resubmission. Carrier confirmation and customer confirmation are distinct in the inspected source.
 - Repository behavior is evidence of implementation, not proof of intended business policy. Actor assignments and other missing facts remain questions.
-- Sensor source: `/Users/stevendiamante/personal/katacombs-kata-ts`. Read its `INSTALL.md` before implementing the transfer; the earlier inspection covered README, SENSORS, trigger notes, hooks, and design-review machinery.
+- Sensor source: `~/personal/katacombs-kata-ts`. Read its `INSTALL.md` before implementing the transfer; the earlier inspection covered README, SENSORS, trigger notes, hooks, and design-review machinery.
 - Research agent produced seven original author/publisher resources. Start with Khononov, Evans's free reference, and Brandolini. Commercial books were not read in full. Keep DDD, EventStorming, Example Mapping, and Event Modeling distinct.
 
 ## Open choices — resolve when needed

@@ -94,7 +94,7 @@ Spec: the bodies of issues #63 and #75. This plan adds decisions and the test or
   - `forum` ["Friday", "service review"];
   - `questionEvidence` `[["delivery appointment", "contract"], ["7731"]]`. It has exactly two groups, so a pass means the question hits **both** planted lines.
 
-The text (the builder copies it verbatim into the module; Steven may edit the wording):
+The text (the builder copies it verbatim into the module; the owner may edit the wording):
 
 ```
 Example thread (fictional). #late-loads at a made-up freight broker. Every person, customer, carrier and load is invented.
@@ -185,7 +185,7 @@ createAccessPass(key, password) → MAC input JSON.stringify([ACCESS_TAG, exp, c
 - **The MAC uses the canonical form (decided).** The pass then binds the password *as the gate understands it*. Changing only the case of `ACCESS_PASSWORD` isn't a rotation (both values unlock the same set of inputs), so it shouldn't sign anyone out. Changing the words still does.
 - **Existing cookies:**
   - If the production `ACCESS_PASSWORD` is already canonical (lowercase ASCII words and hyphens, per slice 41's passphrase advice), then `canonical(p) === p`, the MAC input is byte-identical, and **every issued pass keeps working**. A unit test pins this: for a lowercase password, `issue` equals an HMAC computed by hand over the old input.
-  - If the value has any capital or non-NFKC character, every current pass fails once. The browser shows the gate on reload, or the inline form mid-conversation, and one unlock fixes it. The conference hasn't happened yet (06b is synthetic, dated 22 Oct), so today's passes are Steven's and the agents' test browsers only. **Recommend accepting it.** Nobody checks the value, since agents never read it.
+  - If the value has any capital or non-NFKC character, every current pass fails once. The browser shows the gate on reload, or the inline form mid-conversation, and one unlock fixes it. The conference hasn't happened yet (06b is synthetic, dated 22 Oct), so today's passes are the owner's and the agents' test browsers only. **Recommend accepting it.** Nobody checks the value, since agents never read it.
 - The tag stays `ddd-coach/access/v1`. A bump would sign everyone out even with a canonical password, for nothing.
 - **Security cost:** none worth counting. A three-word lowercase passphrase loses no entropy. A mixed-case one loses about 1 bit per capital letter, against a 30/min limiter.
 
@@ -364,7 +364,7 @@ Off-video, record in `outputs/demos/slice-63.md`:
 - Two more live example runs by `curl` with the cookie from step 3 (three in all with step 6). For each: seconds, the question text, and `questionSpansThread`/`questionAsks` via `server/eval/checkReply.ts example-thread <reply.txt>`. **3/3 must pass** (AC5).
 - A `curl` unlock with the UPPER CASE body built by substitution → 204 + `Set-Cookie`. Mixed case → 204. `wrong` → 401 with the new copy.
 - **Out of credit (Part B, local):** this can't be triggered on production without spending the budget.
-  - **Skipped for this slice (U6: no key).** Tests 8–11 are the proof. If Steven later provides a throwaway OpenRouter key with a $0 limit, the deployer puts it into `.env` for one `netlify dev` run (append/replace by key, never print), and then restores it.
+  - **Skipped for this slice (U6: no key).** Tests 8–11 are the proof. If the owner later provides a throwaway OpenRouter key with a $0 limit, the deployer puts it into `.env` for one `netlify dev` run (append/replace by key, never print), and then restores it.
   - Send → the entry shows `COACH_OUT_OF_CREDIT` with no Retry, and the function log shows `CoachOutOfCredit 402`. That run also **proves OpenRouter returns 402, not 403, for a spent key limit.**
   - Without that key, tests 8–11 are the proof; note it in the demo report.
 
@@ -400,5 +400,5 @@ Off-video, record in `outputs/demos/slice-63.md`:
 6. **U6:** there's **no throwaway $0-limit key for now.**
    - Tests 8–11 (acceptance, `askCoach`, `chatHandler`, the `openRouterCoach` adapter with real SDK error classes) are the only proof of the out-of-credit path.
    - The demo skips Part B, and the demo report says so.
-   - Whether a spent key limit returns 402 or 403 stays unverified, and it stays in Risks. Steven can run the live check later with such a key. The function log's `statusCode` also shows it at the first real exhaustion.
+   - Whether a spent key limit returns 402 or 403 stays unverified, and it stays in Risks. The owner can run the live check later with such a key. The function log's `statusCode` also shows it at the first real exhaustion.
 7. **U7:** accept the possible one-time re-unlock. The MAC uses the canonical password.

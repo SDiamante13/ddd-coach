@@ -1,6 +1,6 @@
 # DDD Coach backlog
 
-**Work items live in GitHub Issues: https://github.com/SDiamante13/ddd-coach/issues** — owned by the PRODUCT OWNER session. B-numbers are kept in issue titles. Labels: `P1`/`P2`/`P3`, `type:*`, `icp`, `icebox` (#33), `slice:*`. Decisions awaiting Steven: label `type:decision`.
+**Work items live in GitHub Issues: https://github.com/SDiamante13/ddd-coach/issues** — owned by the PRODUCT OWNER session. B-numbers are kept in issue titles. Labels: `P1`/`P2`/`P3`, `type:*`, `icp`, `icebox` (#33), `slice:*`. Decisions awaiting the owner: label `type:decision`.
 
 This file keeps product direction and rules only.
 
@@ -32,7 +32,7 @@ Recommendation: support both, beginning with public GitHub links and dropped loc
 
 Broader local access remains a proposal: let the user select a project folder and automatically read within that scope. Start read-only; coaching does not require changing source files. Browser directory access requires user interaction and permission, and `showDirectoryPicker()` is not supported uniformly. Preserve file attachment as the fallback. Source: [MDN directory picker](https://developer.mozilla.org/en-US/docs/Web/API/Window/showDirectoryPicker).
 
-The hosted server cannot use the visitor’s `/Users/...` path as a local filesystem path. Selected content must be supplied by the browser, or through a later local companion. Since replies use OpenRouter, reading locally does not mean inference stays on the device.
+The hosted server cannot use the visitor’s `~/...` path as a local filesystem path. Selected content must be supplied by the browser, or through a later local companion. Since replies use OpenRouter, reading locally does not mean inference stays on the device.
 
 Use one source representation for dropped files and GitHub results: source identity, revision when available, readable content, and load state. Keep selection/loading separate from the coach’s conversation. In the eventual voice experience, GitHub links are context attachments, with no conversational text composer.
 

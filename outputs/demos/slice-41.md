@@ -40,9 +40,9 @@ Take notes: the recording was split at each reload (the recorder stops capturing
 | 4 | Chat without a valid cookie → 401 ACCESS_REQUIRED before the body is read or a coach is created | **PASS** | `curl` without a cookie → **401 in 0.62 s**. Forged `coach_access=9999999999.AAAA…` → **401 in 0.23 s**. A 40,000-char message (over the 24k message cap, which would be 413 with a cookie) without a cookie → **401 in 0.54 s, not 413**, so the message isn't validated first. It's under `MAX_BODY_BYTES`, so the strict body-not-read proof stays with handler test 16. The deployer saw the same: fast, no model call. Handler test 16 proves the order |
 | 4b | With a valid cookie, chat is unchanged | **PASS** | Video: four chat 200s, including the signed follow-up recalling Maersk |
 | 5 | Chat 401 in the UI: ACCESS_REQUIRED, no Retry, prompt back in the draft | **PASS** (plus the inline form from 9520203) | Video 2:07. `{draft: "Which word do Ops and Finance use differently?", retry: false}` |
-| 6 | Unlock rate limit 30/min → 429 | not run | The burst was skipped: the demo password is live, and a 429 burst from this IP would block the team for about 60 s. Deployer/Steven can run it last |
+| 6 | Unlock rate limit 30/min → 429 | not run | The burst was skipped: the demo password is live, and a 429 burst from this IP would block the team for about 60 s. Deployer or the owner can run it last |
 | 7 | Missing `ACCESS_PASSWORD` → 500, UI stays on the gate | not run here | Part B (local restart) is out of this task's scope. Covered by tests (17) |
-| 8 | Rotation invalidates old cookies | pending | Needs Steven's real password and a redeploy (env steps 4–6) |
+| 8 | Rotation invalidates old cookies | pending | Needs the owner's real password and a redeploy (env steps 4–6) |
 | 9 | No secret in `dist/` | **PASS** (deployer) | Deployer: no leaks, headers present |
 | 10 | Session and unlock carry `Cache-Control: no-store` | **PASS** | `curl`: session without a cookie → 401 `no-store`, with a cookie → 204 `no-store`. Unlock 401 and 204 → `no-store` |
 
@@ -67,4 +67,4 @@ The temporary cookie jar was deleted right after.
 3. **Prompt behaviour, not the gate:** after the reload, "Nonce … Reply only OK." got "I'm here to help analyze a business work thread; paste the material you want…" instead of OK. The same instruction got "OK" in take 1, so replies are inconsistent on non-thread input. This is relevant to #73 (prompt v5).
 4. **The ACCESS_REQUIRED copy on a plain 401** reads "Your access has expired" even for someone who never had access (a `curl` or scripted client). It's fine for the UI, because the gate catches first-timers before any chat.
 5. **Tooling:** `network route` doesn't survive `record start <url>`, because that opens a new context. To record the offline state, set the route *after* `record start` and reach the state without a reload. For example, start the take on a page, route, then trigger the session recheck in the app. Or accept an off-video screenshot.
-6. Still open: AC6 (unlock 429 burst, run last), AC8 (rotation after Steven sets the real password) and Part B (fail closed locally).
+6. Still open: AC6 (unlock 429 burst, run last), AC8 (rotation after the owner sets the real password) and Part B (fail closed locally).

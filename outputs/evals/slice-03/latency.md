@@ -6,7 +6,7 @@ The gate ran on 2026-09-25 from the dev machine against OpenRouter, with `npm ru
 - Output rate is completion ÷ (wall − the median probe).
 - The recorded calls keep the replies but store only each prompt's length and sha256.
 
-**Verdict for production, `openai/gpt-5.6-terra` at effort `none` with prompt v4: the 15 s rule doesn't fire.** The median first turn took 8.1 s and the slowest 8.8 s, against limits of 15 s (median) and 22 s (any run). Streaming (#8) stays behind #58. Steven chose terra for production because only terra meets the eval's ship bar (`summary.md`). `openai/gpt-6-luna` is the local dev model. It also passes the gate, with a median of 5.4 s.
+**Verdict for production, `openai/gpt-5.6-terra` at effort `none` with prompt v4: the 15 s rule doesn't fire.** The median first turn took 8.1 s and the slowest 8.8 s, against limits of 15 s (median) and 22 s (any run). Streaming (#8) stays behind #58. The owner chose terra for production because only terra meets the eval's ship bar (`summary.md`). `openai/gpt-6-luna` is the local dev model. It also passes the gate, with a median of 5.4 s.
 
 ## `openai/gpt-5.6-terra`, effort `none` (production; prompt v4)
 
