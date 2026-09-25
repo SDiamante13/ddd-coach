@@ -361,6 +361,7 @@ Reported only, v10 against v8:
 | Check change | Verdict | What moved |
 |---|---|---|
 | New gating hard check `question sources` (thread fixtures). Exactly two `From thread: "…"` lines follow the question, and nothing else does. Each quote is a distinct 3–30-word excerpt that appears verbatim in the paste, after normalizing curly quotes, apostrophes and whitespace. `complete ending` now judges the question rather than a source line | Ship: yes (unchanged) | `question sources` 0/6 on every thread fixture in both arms, since no recorded reply quotes its sources. No drop, and `complete ending` is unchanged. This is the v11 A/B's target |
+| New hard check `no merged split`, **reported only for now** (in the shared `REPORTED_ONLY_HARD`). A plain line for a team fails when it mentions one of the named groups the reply gives that team elsewhere, e.g. "Ops means the dashboard count…, although night shift subtracts rebooks". A plain line where the groups agree still passes (the prompt allows it). Came from the team-lead's v10 hosted demo finding, option A | Ship: yes (unchanged) | v10 F1 1/6 flagged (r2, a real merge); 0/24 v9 thread replies flagged; letter-view replies (v8) can't be judged. Precision 1/1, but recall is partial: F1 r6 "with rebooks mentally subtracted" merges the split without naming the group |
 
 ## Limits
 

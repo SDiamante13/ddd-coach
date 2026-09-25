@@ -1,12 +1,11 @@
 import type { SoftScores } from "./replyChecks.ts";
-import type { ScoredRun, Tally } from "./shipBar.ts";
+import { REPORTED_ONLY_HARD, type ScoredRun, type Tally } from "./shipBar.ts";
 
 export type Arm = "live" | "candidate";
 export type ArmRun = ScoredRun & { arm: Arm };
 export type AbVerdict = NonNullable<ReturnType<typeof abVerdict>>;
 export type CheckRow = { fixture: string; check: string; live: Tally; candidate: Tally };
 
-const REPORTED_ONLY_HARD = ["same meaning not split"];
 const GATING_SOFT: readonly (keyof SoftScores)[] = ["attribution", "split", "codeLine", "questionSpansThread"];
 const TARGET_GAIN = 2;
 const NOISE_RUNS = 1;

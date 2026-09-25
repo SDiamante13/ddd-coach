@@ -56,6 +56,7 @@ describe("abVerdict", () => {
 
   it.each([
     ["same meaning not split", { hardFailures: ["same meaning not split"] }],
+    ["no merged split", { hardFailures: ["no merged split"] }],
     ["sameMeaningNamed", { soft: { sameMeaningNamed: false } }],
     ["jointRoles", { soft: { jointRoles: false } }],
   ])("ships when only the reported-only %s drops", (_check, miss) => {

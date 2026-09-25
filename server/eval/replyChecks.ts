@@ -3,6 +3,7 @@ import { asksOpenly, namesACase, quotesTwoSources } from "./questionChecks.ts";
 import {
   hasCleanSplitLabels,
   hasKnownHolders,
+  hasNoMergedSplit,
   hasStableViews,
   holderOf,
   keepsSameMeaningWhole,
@@ -69,6 +70,7 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   holders: ({ words, fixture }) => hasKnownHolders(words, fixture.key),
   "split labels": ({ words, fixture }) => hasCleanSplitLabels(words, fixture.key),
   "stable views": ({ words, fixture }) => hasStableViews(words, fixture.key),
+  "no merged split": ({ words, fixture }) => hasNoMergedSplit(words, fixture.key),
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
   "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),

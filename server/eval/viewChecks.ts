@@ -21,6 +21,15 @@ export function hasCleanSplitLabels(words: CoachReply["words"], { teams }: Fixtu
   });
 }
 
+export function hasNoMergedSplit(words: CoachReply["words"], { teams }: FixtureKey): boolean {
+  const lines = words.flatMap((word) => word.meanings).map((meaning) => ({ meaning, holder: holderOf(meaning, teams) }));
+  const groupsOf = (team: string) =>
+    lines.flatMap(({ holder }) => (holder?.team === team && holder.view !== null && holder.view.length > 1 ? [holder.view] : []));
+  return lines.every(({ meaning, holder }) => holder === null || holder.view !== null || !mentionsAny(meaning, groupsOf(holder.team)));
+}
+
+const mentionsAny = (meaning: string, groups: string[]): boolean => groups.some((group) => meaning.toLowerCase().includes(group));
+
 function mixesPlainAndView({ team, view }: Holder, holders: Holder[]): boolean {
   return view === null && holders.some((other) => other.team === team && other.view !== null);
 }

@@ -164,6 +164,13 @@ describe("hard checks", () => {
     expect(failedHardChecks(named, "stop", fixture)).toEqual([]);
   });
 
+  it("fail no merged split for a plain team line that speaks for one of the team's named groups", () => {
+    const named = GOOD_REPLY.replaceAll("Ops (view A)", "Ops (day desk)").replaceAll("Ops (view B)", "Ops (night shift)");
+    const merged = '"booking count"\n- From thread: Ops means the dashboard count of every row, although night shift subtracts rebooks.';
+
+    expect(failedHardChecks(named.replace("\n\nQuestion for", `\n${merged}\n\nQuestion for`), "stop", fixture)).toEqual(["no merged split"]);
+  });
+
   it("fail stable views when a group's name moves to the other group under another word", () => {
     const named = GOOD_REPLY.replaceAll("Ops (view A)", "Ops (day desk)").replaceAll("Ops (view B)", "Ops (night shift)");
     const swapped = '"booking count"\n- From thread: Ops (night shift) means same carrier keeps one row.\n- From thread: Ops (day desk) means every change adds a row.';
