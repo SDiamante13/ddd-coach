@@ -5,10 +5,10 @@ import { readAccessPassword, readConfig, readSigningKey, readTimeoutMs } from ".
 const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
 
 describe("readConfig", () => {
-  it("reads the key and model", () => {
+  it("reads the key and model, with no reasoning by default so a reasoning model can't spend the reply cap", () => {
     expect(readConfig(requiredEnv)).toEqual({
       ok: true,
-      config: { apiKey: "sk-or-test-key", model: "test/model" },
+      config: { apiKey: "sk-or-test-key", model: "test/model", reasoningEffort: "none" },
     });
   });
 

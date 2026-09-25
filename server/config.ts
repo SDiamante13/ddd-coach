@@ -17,6 +17,7 @@ const SIGNING_KEY = "COACH_SIGNING_KEY";
 const ACCESS_PASSWORD = "ACCESS_PASSWORD";
 export const MIN_SIGNING_KEY_CHARS = 32;
 const DEFAULT_TIMEOUT_MS = 25_000;
+const DEFAULT_REASONING_EFFORT: ReasoningEffort = "none";
 const REASONING_EFFORTS: readonly string[] = Object.values(ChatRequestEffort);
 
 export function readConfig(env: Env): ConfigResult {
@@ -24,11 +25,10 @@ export function readConfig(env: Env): ConfigResult {
   if (apiKey === undefined) return missing(API_KEY);
   const model = present(env[MODEL]);
   if (model === undefined) return missing(MODEL);
-  return withReasoningEffort({ apiKey, model }, present(env[REASONING_EFFORT]));
+  return withReasoningEffort({ apiKey, model }, present(env[REASONING_EFFORT]) ?? DEFAULT_REASONING_EFFORT);
 }
 
-function withReasoningEffort(config: CoachConfig, effort: string | undefined): ConfigResult {
-  if (effort === undefined) return { ok: true, config };
+function withReasoningEffort(config: CoachConfig, effort: string): ConfigResult {
   if (!isReasoningEffort(effort)) return unknownReasoningEffort();
   return { ok: true, config: { ...config, reasoningEffort: effort } };
 }
