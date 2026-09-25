@@ -7,3 +7,4 @@ dist/
 .netlify/
 .claude/scheduled_tasks.lock
 deno.lock
+.idea/
