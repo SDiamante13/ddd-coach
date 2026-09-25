@@ -7,20 +7,17 @@ import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult 
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import { CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
-import { ACCESS_MAX_AGE_S, createAccessPass } from "./accessPass.ts";
+import { createAccessPass } from "./accessPass.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
+import { cookieOf, JUST_EXPIRED_ISSUE, NOW, OTHER_SIGNING_KEY, TEST_ACCESS_PASSWORD } from "./test/access.ts";
 import { signedTurn, TEST_SIGNING_KEY } from "./test/conversations.ts";
 
 const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key", model: "test/model" } };
-const OTHER_SIGNING_KEY = "other-signing-key-0123456789abcdefghijklmn";
-const ACCESS_PASSWORD = "tidal-lantern-quartz";
-const NOW = new Date("2026-09-25T09:00:00Z");
-const JUST_EXPIRED_ISSUE = new Date(NOW.getTime() - ACCESS_MAX_AGE_S * 1000);
-const validAccessCookie = cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, ACCESS_PASSWORD), NOW);
+const validAccessCookie = cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, TEST_ACCESS_PASSWORD), NOW);
 
 function cookieIssuedBy(pass: { issue(now: Date): string }, at: Date): string {
-  return pass.issue(at).split("; ")[0] ?? "";
+  return cookieOf(pass.issue(at));
 }
 
 type HandlerOverrides = {
@@ -39,7 +36,7 @@ function handler(overrides: HandlerOverrides = {}) {
     deadlineMs: 1_000,
     log: () => {},
     signingKey: { ok: true, key: TEST_SIGNING_KEY },
-    access: { ok: true, password: ACCESS_PASSWORD },
+    access: { ok: true, password: TEST_ACCESS_PASSWORD },
     now: () => NOW,
     ...overrides,
   });
@@ -353,15 +350,15 @@ describe("chat handler", () => {
   });
 
   const [validExp = "", validMac = ""] = validAccessCookie.slice("coach_access=".length).split(".");
-  const turnSignatureAsMac = createTurnSigner(TEST_SIGNING_KEY).sign({ prompt: validExp, reply: ACCESS_PASSWORD });
+  const turnSignatureAsMac = createTurnSigner(TEST_SIGNING_KEY).sign({ prompt: validExp, reply: TEST_ACCESS_PASSWORD });
 
   it.each([
     ["no cookie", null],
-    ["an expired cookie", cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, ACCESS_PASSWORD), JUST_EXPIRED_ISSUE)],
+    ["an expired cookie", cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, TEST_ACCESS_PASSWORD), JUST_EXPIRED_ISSUE)],
     ["a cookie with a tampered expiry", `coach_access=${Number(validExp) + 1}.${validMac}`],
     ["a cookie with a tampered MAC", `coach_access=${validExp}.${validMac.slice(0, -1)}${validMac.endsWith("A") ? "B" : "A"}`],
     ["a cookie for another password", cookieIssuedBy(createAccessPass(TEST_SIGNING_KEY, "old-password"), NOW)],
-    ["a cookie made with another key", cookieIssuedBy(createAccessPass(OTHER_SIGNING_KEY, ACCESS_PASSWORD), NOW)],
+    ["a cookie made with another key", cookieIssuedBy(createAccessPass(OTHER_SIGNING_KEY, TEST_ACCESS_PASSWORD), NOW)],
     ["a malformed cookie", "coach_access=garbage"],
     ["a turn signature as the MAC", `coach_access=${validExp}.${turnSignatureAsMac}`],
   ])("refuses a request with %s as needing access, without creating a coach", async (_case, cookie) => {

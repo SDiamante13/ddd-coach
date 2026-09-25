@@ -1,21 +1,20 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { ACCESS_BAD_REQUEST, ACCESS_WRONG_PASSWORD } from "../src/shared/accessContract.ts";
-import { ACCESS_MAX_AGE_S, createAccessPass } from "./accessPass.ts";
+import { createAccessPass } from "./accessPass.ts";
 import type { AccessPasswordResult, SigningKeyResult } from "./config.ts";
+import { cookieOf, JUST_EXPIRED_ISSUE, NOW, TEST_ACCESS_PASSWORD } from "./test/access.ts";
 import { TEST_SIGNING_KEY } from "./test/conversations.ts";
 import { createSessionHandler, createUnlockHandler } from "./unlockHandler.ts";
 
-const PASSWORD = "tidal-lantern-quartz";
-const NOW = new Date("2026-09-25T09:00:00Z");
-const JUST_EXPIRED_ISSUE = new Date(NOW.getTime() - ACCESS_MAX_AGE_S * 1000);
-const testPass = createAccessPass(TEST_SIGNING_KEY, PASSWORD);
+const testPass = createAccessPass(TEST_SIGNING_KEY, TEST_ACCESS_PASSWORD);
+const validCookie = cookieOf(testPass.issue(NOW));
 
 type AccessOverrides = { access?: AccessPasswordResult; signingKey?: SigningKeyResult };
 
 function depsWith(overrides: AccessOverrides) {
   return {
-    access: { ok: true, password: PASSWORD },
+    access: { ok: true, password: TEST_ACCESS_PASSWORD },
     signingKey: { ok: true, key: TEST_SIGNING_KEY },
     now: () => NOW,
     ...overrides,
@@ -48,17 +47,17 @@ function attributesOf(setCookie: string): string[] {
 
 describe("unlock handler", () => {
   it("sets a 90-day HttpOnly access cookie for the right password", async () => {
-    const response = await unlockHandler()(postPassword(PASSWORD));
+    const response = await unlockHandler()(postPassword(TEST_ACCESS_PASSWORD));
 
     expect(response.status).toBe(204);
     const setCookie = response.headers.get("Set-Cookie") ?? "";
     expect(attributesOf(setCookie)).toEqual(["Max-Age=7776000", "Path=/api", "HttpOnly", "Secure", "SameSite=Lax"]);
-    expect(testPass.admits(setCookie.split("; ")[0] ?? null, NOW)).toBe(true);
+    expect(testPass.admits(cookieOf(setCookie), NOW)).toBe(true);
   });
 
   it.each([
     ["a wrong password", "not-the-password"],
-    ["the password in another case", PASSWORD.toUpperCase()],
+    ["the password in another case", TEST_ACCESS_PASSWORD.toUpperCase()],
     ["a blank password", "   "],
   ])("refuses %s without setting a cookie", async (_case, password) => {
     const response = await unlockHandler()(postPassword(password));
@@ -69,7 +68,7 @@ describe("unlock handler", () => {
   });
 
   it("ignores spaces around the right password", async () => {
-    const response = await unlockHandler()(postPassword(`  ${PASSWORD}  `));
+    const response = await unlockHandler()(postPassword(`  ${TEST_ACCESS_PASSWORD}  `));
 
     expect(response.status).toBe(204);
   });
@@ -77,7 +76,7 @@ describe("unlock handler", () => {
   it.each([
     ["a body that is not JSON", post("password=hunter2")],
     ["a password that is not text", postPassword(42)],
-    ["a body over 1 KiB", postPassword(`${PASSWORD}${" ".repeat(1024)}`)],
+    ["a body over 1 KiB", postPassword(`${TEST_ACCESS_PASSWORD}${" ".repeat(1024)}`)],
   ])("asks for the password on %s", async (_case, request) => {
     const response = await unlockHandler()(request);
 
@@ -96,7 +95,7 @@ describe("unlock handler", () => {
     ["the access password", { access: { ok: false, error: "ACCESS_PASSWORD is not set." } } as const],
     ["the signing key", { signingKey: { ok: false, error: "COACH_SIGNING_KEY is not set." } } as const],
   ])("fails closed, naming %s, when it is missing", async (_case, overrides) => {
-    const response = await unlockHandler(overrides)(postPassword(PASSWORD));
+    const response = await unlockHandler(overrides)(postPassword(TEST_ACCESS_PASSWORD));
 
     expect(response.status).toBe(500);
     expect(await response.json()).toEqual({ error: Object.values(overrides)[0].error });
@@ -104,7 +103,7 @@ describe("unlock handler", () => {
   });
 
   it.each([
-    ["the right password", PASSWORD],
+    ["the right password", TEST_ACCESS_PASSWORD],
     ["a wrong password", "not-the-password"],
   ])("tells caches not to store the answer to %s", async (_case, password) => {
     const response = await unlockHandler()(postPassword(password));
@@ -115,15 +114,15 @@ describe("unlock handler", () => {
 
 describe("session handler", () => {
   it("answers 204 to a valid access cookie", async () => {
-    const response = await sessionHandler()(getSession(testPass.issue(NOW).split("; ")[0]));
+    const response = await sessionHandler()(getSession(validCookie));
 
     expect(response.status).toBe(204);
   });
 
   it.each([
     ["no cookie", undefined],
-    ["an expired cookie", createAccessPass(TEST_SIGNING_KEY, PASSWORD).issue(JUST_EXPIRED_ISSUE).split("; ")[0]],
-    ["a cookie for another password", createAccessPass(TEST_SIGNING_KEY, "old-pass").issue(NOW).split("; ")[0]],
+    ["an expired cookie", cookieOf(testPass.issue(JUST_EXPIRED_ISSUE))],
+    ["a cookie for another password", cookieOf(createAccessPass(TEST_SIGNING_KEY, "old-pass").issue(NOW))],
     ["a forged cookie", `coach_access=9999999999.${"A".repeat(43)}`],
   ])("answers 401 to %s", async (_case, cookie) => {
     const response = await sessionHandler()(getSession(cookie));
@@ -135,13 +134,13 @@ describe("session handler", () => {
     ["the access password", { access: { ok: false, error: "ACCESS_PASSWORD is not set." } } as const],
     ["the signing key", { signingKey: { ok: false, error: "COACH_SIGNING_KEY is not set." } } as const],
   ])("fails closed when %s is missing", async (_case, overrides) => {
-    const response = await sessionHandler(overrides)(getSession(testPass.issue(NOW).split("; ")[0]));
+    const response = await sessionHandler(overrides)(getSession(validCookie));
 
     expect(response.status).toBe(500);
   });
 
   it.each([
-    ["a valid cookie", testPass.issue(NOW).split("; ")[0]],
+    ["a valid cookie", validCookie],
     ["no cookie", undefined],
   ])("tells caches not to store the answer to %s", async (_case, cookie) => {
     const response = await sessionHandler()(getSession(cookie));
