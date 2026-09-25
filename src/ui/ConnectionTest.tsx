@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
 import { isBusy } from "../domain/exchange.ts";
 import { AccessGate } from "./AccessGate.tsx";
+import { ComposerActions } from "./ComposerActions.tsx";
 import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { ExchangeOutcome } from "./ExchangeOutcome.tsx";
 import { MessageForm } from "./MessageForm.tsx";
-import { NewConversation } from "./NewConversation.tsx";
 import type { Unlock } from "./useAccess.ts";
 import { useAccessRecovery } from "./useAccessRecovery.ts";
 import { useClearConfirmation } from "./useClearConfirmation.ts";
@@ -44,7 +44,12 @@ export function ConnectionTest({ unlock }: { unlock: Unlock }) {
       </ol>
       {accessLost && <AccessGate onUnlock={unlockAgain} />}
       <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} boxRef={boxRef}>
-        {exchanges.length > 0 && <NewConversation busy={busy} confirmation={confirmation} conversation={conversation} />}
+        <ComposerActions
+          started={exchanges.length > 0}
+          busy={busy}
+          confirmation={confirmation}
+          conversation={conversation}
+        />
       </MessageForm>
     </>
   );
