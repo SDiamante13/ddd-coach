@@ -370,6 +370,7 @@ describe("Connection test", () => {
 
     expect(await navigator.clipboard.readText()).toBe("You: A\nCoach: R1\n\nYou: B");
     expect(within(log()).getByRole("button", { name: "Copied" })).toBeInTheDocument();
+    expect(within(log()).getByRole("status")).toHaveTextContent("Copied");
   });
 
   it("says when the conversation couldn't be copied", async () => {

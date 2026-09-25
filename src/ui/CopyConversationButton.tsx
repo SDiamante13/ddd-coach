@@ -29,8 +29,13 @@ export function CopyConversationButton({ text }: { text: () => string }) {
   }
 
   return (
-    <button type="button" className="copy" onClick={() => void copy()}>
-      {LABELS[state]}
-    </button>
+    <>
+      <button type="button" className="copy" onClick={() => void copy()}>
+        {LABELS[state]}
+      </button>
+      <span role="status" className="visually-hidden">
+        {state === "ready" ? "" : LABELS[state]}
+      </span>
+    </>
   );
 }
