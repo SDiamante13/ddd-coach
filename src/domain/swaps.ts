@@ -7,12 +7,28 @@ export const MAX_SWAPS = 50;
 const WORD_CHAR = "[\\p{L}\\p{N}_]";
 
 export function applySwaps(list: SwapList, text: string): SwappedText {
+  return replaceWords(list, text, ANY_CASE);
+}
+
+export function restoreSwaps(list: SwapList, text: string): SwappedText {
+  const unambiguous = list.filter(({ to }) => list.filter((other) => other.to === to).length === 1);
+  return replaceWords(
+    unambiguous.map(({ from, to }) => ({ from: to, to: from })),
+    text,
+    EXACT_CASE,
+  );
+}
+
+const ANY_CASE = "giu";
+const EXACT_CASE = "gu";
+
+function replaceWords(list: SwapList, text: string, flags: string): SwappedText {
   if (list.length === 0) return { text, spans: [] };
   const ordered = longestFirst(list);
   const spans: Span[] = [];
   let swapped = "";
   let copiedUpTo = 0;
-  for (const match of text.matchAll(anyOf(ordered.map((swap) => swap.from)))) {
+  for (const match of text.matchAll(anyOf(ordered.map((swap) => swap.from), flags))) {
     const placeholder = placeholderOf(ordered, match);
     swapped += text.slice(copiedUpTo, match.index);
     spans.push({ start: swapped.length, end: swapped.length + placeholder.length });
@@ -27,9 +43,9 @@ function placeholderOf(ordered: SwapList, match: RegExpExecArray): string {
   return ordered[matched]?.to ?? match[0];
 }
 
-function anyOf(words: readonly string[]): RegExp {
+function anyOf(words: readonly string[], flags = ANY_CASE): RegExp {
   const alternatives = words.map((word) => `(${escaped(word)})`).join("|");
-  return new RegExp(`(?<!${WORD_CHAR})(?:${alternatives})(?!${WORD_CHAR})`, "giu");
+  return new RegExp(`(?<!${WORD_CHAR})(?:${alternatives})(?!${WORD_CHAR})`, flags);
 }
 
 function escaped(word: string): string {

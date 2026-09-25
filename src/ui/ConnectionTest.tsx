@@ -24,6 +24,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         conversation={composer.conversation}
         onStartNew={composer.confirmation.ask}
         logRef={composer.follow.logRef}
+        restoreNames={composer.box.restoreNames}
       />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}
       {justUnlocked && (

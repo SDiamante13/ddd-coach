@@ -165,9 +165,10 @@ describe("Swapping sensitive words", () => {
   });
 
   it("replays the sent text as history, so a follow-up verifies", async () => {
-    const { user, server, send, sendAndReply } = await startConversation();
+    const { user, server, log, send } = await startConversation();
     await addSwap(user, "Acme", "Customer A");
-    await sendAndReply("Acme is late", "Ask Customer A why.", "sig-1");
+    server.reply(await send("Acme is late"), 200, { reply: "Ask Customer A why.", signature: "sig-1" });
+    await within(log()).findByText("Ask Acme why.");
 
     await send("Acme says the carrier");
 

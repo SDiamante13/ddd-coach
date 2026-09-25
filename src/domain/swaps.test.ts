@@ -1,5 +1,6 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { addSwap, applySwaps, madeUpPlaceholders, placeholderClash, removeSwap, type SwapList } from "./swaps.ts";
+import { addSwap, applySwaps, madeUpPlaceholders, placeholderClash, removeSwap, type SwapList, restoreSwaps } from "./swaps.ts";
 
 const swaps = (...pairs: [string, string][]): SwapList => pairs.map(([from, to]) => ({ from, to }));
 
@@ -146,5 +147,47 @@ describe("madeUpPlaceholders", () => {
   it("suggests the first customer letter and person number the thread and list don't use", () => {
     const list = swaps(["Acme", "Customer A"], ["Maya", "Person 1"]);
     expect(madeUpPlaceholders(list, "Customer B asked Person 2")).toEqual(["Customer C", "Person 3"]);
+  });
+});
+
+describe("restoreSwaps", () => {
+  const acme = [{ from: "Acme Foods", to: "Customer A" }];
+
+  it("puts the visitor's word back in place of its placeholder", () => {
+    expect(restoreSwaps(acme, "Customer A is split on rebook.")).toEqual({ text: "Acme Foods is split on rebook.", spans: [{ start: 0, end: 10 }] });
+  });
+
+  it("leaves a placeholder the model wrote in another case as sent", () => {
+    expect(restoreSwaps(acme, "customer a is split.").text).toBe("customer a is split.");
+  });
+
+  it("leaves a placeholder two swaps share as sent, rather than guess", () => {
+    const shared = [...acme, { from: "Acme", to: "Customer A" }];
+
+    expect(restoreSwaps(shared, "Customer A is late.").text).toBe("Customer A is late.");
+  });
+
+  it("restores the longest placeholder first, in one pass, and only whole words", () => {
+    const list = [
+      { from: "Acme", to: "Customer A" },
+      { from: "Beta", to: "Customer A Ltd" },
+      { from: "Zeta", to: "Acme" },
+    ];
+
+    expect(restoreSwaps(list, "Customer A Ltd, Customer A and Customer Al.").text).toBe("Beta, Acme and Customer Al.");
+  });
+
+  it("undoes applySwaps for text that uses each word as the visitor typed it", () => {
+    const words = ["Acme Foods", "Laredo", "Maya", "Tom"];
+    const list = words.map((from, index) => ({ from, to: `Placeholder ${index + 1}` }));
+    const text = fc.array(fc.oneof(fc.constantFrom(...words), fc.constantFrom("the", "lane", "is", "late.", "re-rated", "and")), { maxLength: 30 });
+
+    fc.assert(
+      fc.property(text, (parts) => {
+        const original = parts.join(" ");
+        expect(restoreSwaps(list, applySwaps(list, original).text).text).toBe(original);
+      }),
+      { numRuns: 300 },
+    );
   });
 });

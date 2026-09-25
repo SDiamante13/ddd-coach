@@ -1,5 +1,6 @@
 import type { Ref } from "react";
 import type { Exchange, FailedExchange } from "../domain/exchange.ts";
+import type { RestoreNames } from "./ReplyView.tsx";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { ExchangeOutcome } from "./ExchangeOutcome.tsx";
 
@@ -10,20 +11,15 @@ type ExchangeLogProps = {
   conversation: () => string;
   onStartNew: () => void;
   logRef: Ref<HTMLOListElement>;
+  restoreNames: RestoreNames;
 };
 
-export function ExchangeLog({ exchanges, busy, onRetry, conversation, onStartNew, logRef }: ExchangeLogProps) {
+export function ExchangeLog({ exchanges, logRef, ...outcome }: ExchangeLogProps) {
   return (
     <ol role="log" ref={logRef}>
       {exchanges.map((exchange) => (
         <ExchangeEntry key={exchange.id} exchange={exchange}>
-          <ExchangeOutcome
-            exchange={exchange}
-            busy={busy}
-            onRetry={onRetry}
-            conversation={conversation}
-            onStartNew={onStartNew}
-          />
+          <ExchangeOutcome exchange={exchange} {...outcome} />
         </ExchangeEntry>
       ))}
     </ol>

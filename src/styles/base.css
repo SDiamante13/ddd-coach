@@ -689,3 +689,9 @@ table.words {
     letter-spacing: 0;
   }
 }
+
+/* #86: names restored in the browser from the swap list. */
+.reply .restored-note {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}

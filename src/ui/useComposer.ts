@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { isBusy, type Prompt } from "../domain/exchange.ts";
-import { applySwaps } from "../domain/swaps.ts";
+import { applySwaps, restoreSwaps, type SwappedText } from "../domain/swaps.ts";
 import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
 import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
@@ -30,7 +30,7 @@ export function useComposer(unlock: Unlock) {
     send(prompt);
     box.focus();
   };
-  const conversation = () => conversationText(exchanges);
+  const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
   return { box, access, exchanges, retry, confirmation, follow, submit, conversation, busy: isBusy(exchanges) };
 }
 
@@ -46,7 +46,8 @@ function useDraftBox() {
     showFromTop(boxRef.current);
   };
   const outgoing = (text: string) => applySwaps(swaps.swaps, text).text;
-  return { draft, setDraft, boxRef, swaps, form, focus, restore, tryExample, outgoing, blank: draft.trim() === "" };
+  const restoreNames = (text: string): SwappedText => restoreSwaps(swaps.swaps, text);
+  return { draft, setDraft, boxRef, swaps, form, focus, restore, tryExample, outgoing, restoreNames, blank: draft.trim() === "" };
 }
 
 function showFromTop(box: HTMLTextAreaElement | null) {
