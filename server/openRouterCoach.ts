@@ -25,7 +25,7 @@ function userMessage(model: string, prompt: Prompt): SendChatCompletionRequestRe
   return { chatRequest: { model, messages: [{ role: "user", content: prompt }], stream: false } };
 }
 
-export function extractText(response: SendChatCompletionRequestResponse): string {
+function extractText(response: SendChatCompletionRequestResponse): string {
   const content = "choices" in response ? response.choices[0]?.message.content : undefined;
   if (typeof content === "string") return content;
   return (content ?? []).map(textOf).join("");
