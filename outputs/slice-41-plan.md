@@ -371,3 +371,5 @@ Part B, locally, fail closed: `ACCESS_PASSWORD= npm run dev` gives unlock 500 an
    - **Before the conference, set an OpenRouter credit limit:** about $50, ideally on a dedicated hosting key. The estimate is $25–50 for 100 people × 20 turns.
 
 **Rotation (90-day pass):** change `ACCESS_PASSWORD` in the Netlify UI after the conference, then redeploy. The password is part of the cookie MAC, so every existing pass stops working at once.
+
+**As built (supersedes earlier sections where they differ):** the pass lasts 90 days (`ACCESS_MAX_AGE_S` = 7,776,000, 4f038cf). ACCESS_REQUIRED reads "Your access has expired. Enter the conference password below, then send your message again." and the password form appears inline above the composer (9520203). A session check that can't reach the server shows "Can't reach the coach" with Try again (d07c68c). Steven set the production password directly, so no throwaway demo password was used.
