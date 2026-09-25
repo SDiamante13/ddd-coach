@@ -134,6 +134,19 @@ describe("Connection test", () => {
     expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
   });
 
+  it("shows a refusal of an unverifiable conversation inline, asking to reload, without Retry", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+
+    await user.type(input(), "Hello coach{Enter}");
+    server.reply(0, 400, { error: "This conversation can't be verified. Reload the page to start a new one." });
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent(
+      "This conversation can't be verified. Reload the page to start a new one.",
+    );
+    expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+  });
+
   it("retries the same message without duplicating it in the log", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();
