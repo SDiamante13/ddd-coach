@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { MAX_MESSAGE_CHARS, parseChatRequest } from "./chatRequest.ts";
+import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { parseChatRequest } from "./chatRequest.ts";
 
 function turns(count: number) {
   return Array.from({ length: count }, () => ({ prompt: "A", reply: "R" }));

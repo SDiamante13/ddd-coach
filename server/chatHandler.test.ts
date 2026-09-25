@@ -4,7 +4,7 @@ import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
-import { MAX_MESSAGE_CHARS } from "./chatRequest.ts";
+import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
 import { createTurnSigner } from "./turnSignature.ts";
 import { signedTurn, TEST_SIGNING_KEY } from "./test/conversations.ts";

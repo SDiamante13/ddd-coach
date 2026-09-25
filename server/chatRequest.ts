@@ -3,8 +3,6 @@ import { messageLength, parsePrompt, type Prompt } from "../src/domain/exchange.
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { field, stringField } from "../src/shared/json.ts";
 
-export { MAX_MESSAGE_CHARS };
-
 export type RejectionReason = "malformed" | "tooLong" | "messageTooLong";
 export type ChatRequestResult = { ok: true; conversation: Conversation } | { ok: false; reason: RejectionReason };
 
