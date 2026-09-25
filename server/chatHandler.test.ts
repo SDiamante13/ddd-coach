@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
 import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
+import type { Conversation } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
 
@@ -24,7 +25,7 @@ function handler(overrides: HandlerOverrides = {}) {
 }
 
 function echoCoach(): Coach {
-  return { reply: vi.fn(async (prompt: string) => `Echo: ${prompt}`) };
+  return { reply: vi.fn(async ({ prompt }: Conversation) => `Echo: ${prompt}`) };
 }
 
 function post(body: string): Request {

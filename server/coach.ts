@@ -1,5 +1,5 @@
-import type { Prompt } from "../src/domain/exchange.ts";
+import type { Conversation } from "../src/domain/conversation.ts";
 
 export interface Coach {
-  reply(prompt: Prompt): Promise<string>;
+  reply(conversation: Conversation): Promise<string>;
 }

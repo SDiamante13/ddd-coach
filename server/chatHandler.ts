@@ -1,4 +1,5 @@
-import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
+import type { Conversation } from "../src/domain/conversation.ts";
+import { parsePrompt } from "../src/domain/exchange.ts";
 import {
   COACH_TIMED_OUT,
   COACH_UNAVAILABLE,
@@ -24,9 +25,9 @@ export function createChatHandler({ config, createCoach, ...replyDeps }: ChatHan
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
-    const prompt = await readPrompt(request);
-    if (prompt === null) return badRequest();
-    return replyFrom(createCoach(config.config), prompt, replyDeps);
+    const conversation = await readConversation(request);
+    if (conversation === null) return badRequest();
+    return replyFrom(createCoach(config.config), conversation, replyDeps);
   };
 }
 
@@ -42,14 +43,19 @@ function badRequest(): Response {
   return respond({ error: "Send a message." }, { status: 400 });
 }
 
-async function readPrompt(request: Request): Promise<Prompt | null> {
+async function readConversation(request: Request): Promise<Conversation | null> {
   const body = await readJson(request);
-  return isChatRequestBody(body) ? parsePrompt(body.message) : null;
+  const prompt = isChatRequestBody(body) ? parsePrompt(body.message) : null;
+  return prompt === null ? null : { history: [], prompt };
 }
 
-async function replyFrom(coach: Coach, prompt: Prompt, { deadlineMs, log }: ReplyDeps): Promise<Response> {
+async function replyFrom(
+  coach: Coach,
+  conversation: Conversation,
+  { deadlineMs, log }: ReplyDeps,
+): Promise<Response> {
   try {
-    return replied(await withDeadline(coach.reply(prompt), deadlineMs));
+    return replied(await withDeadline(coach.reply(conversation), deadlineMs));
   } catch (error) {
     log(failureOf(error));
     return coachUnavailable();

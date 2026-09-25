@@ -3,6 +3,7 @@ import type { ChatContentItems, ChatResult } from "@openrouter/sdk/models";
 import type { SendChatCompletionRequestRequest } from "@openrouter/sdk/models/operations";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
 import { describe, expect, it } from "vitest";
+import type { Conversation } from "../src/domain/conversation.ts";
 import type { Prompt } from "../src/domain/exchange.ts";
 import { createOpenRouterCoach } from "./openRouterCoach.ts";
 
@@ -28,11 +29,15 @@ function fakeChat(content: string | ChatContentItems[] | null) {
   return { chat: { send }, requests };
 }
 
+function conversationOf(prompt: string): Conversation {
+  return { history: [], prompt: prompt as Prompt };
+}
+
 describe("OpenRouter coach", () => {
   it("sends the prompt as one capped, non-streaming user message without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
 
-    const reply = await createOpenRouterCoach(config, chat).reply("Hello coach" as Prompt);
+    const reply = await createOpenRouterCoach(config, chat).reply(conversationOf("Hello coach"));
 
     expect(reply).toBe("Hi there");
     expect(requests).toEqual([
@@ -57,12 +62,12 @@ describe("OpenRouter coach", () => {
       { type: "text", text: "there" },
     ]);
 
-    expect(await createOpenRouterCoach(config, chat).reply("Hello coach" as Prompt)).toBe("Hi there");
+    expect(await createOpenRouterCoach(config, chat).reply(conversationOf("Hello coach"))).toBe("Hi there");
   });
 
   it("treats missing content as empty text", async () => {
     const { chat } = fakeChat(null);
 
-    expect(await createOpenRouterCoach(config, chat).reply("Hello coach" as Prompt)).toBe("");
+    expect(await createOpenRouterCoach(config, chat).reply(conversationOf("Hello coach"))).toBe("");
   });
 });

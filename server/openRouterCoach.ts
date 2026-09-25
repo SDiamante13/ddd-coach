@@ -5,6 +5,7 @@ import type {
   SendChatCompletionRequestRequest,
   SendChatCompletionRequestResponse,
 } from "@openrouter/sdk/models/operations";
+import type { Conversation } from "../src/domain/conversation.ts";
 import type { Prompt } from "../src/domain/exchange.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
@@ -24,7 +25,7 @@ export function createOpenRouterCoach(
   chat: ChatClient = new OpenRouter({ apiKey: config.apiKey }).chat,
 ): Coach {
   return {
-    reply: async (prompt: Prompt) =>
+    reply: async ({ prompt }: Conversation) =>
       extractText(await chat.send(userMessage(config.model, prompt), WITHOUT_RETRIES)),
   };
 }
