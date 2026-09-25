@@ -33,7 +33,8 @@ A map of where things live. Rules and guidelines live in the files it points to.
 - `src/shared/` — chat contract and JSON helpers shared by client and server
 - `src/ui/` — React components and the `useExchanges` hook
 - `src/styles/` — live design tokens and base styles (source of truth; the copies in `outputs/design/` are the handoff record, so don't copy them back over)
-- `src/test/` — Vitest setup and fetch stub
+- `src/acceptance/` — app-level tests, one file per feature, driving `<App />` through the browser surface
+- `src/test/` — Vitest setup, fetch stub and `appDriver` (render and converse helpers for acceptance tests)
 - `src/App.tsx`, `src/main.tsx` — app shell and entry
 - `server/` — chat handler, config, deadline, `Coach` port and OpenRouter adapter
 - `netlify/functions/chat.mts` — Netlify Function wiring config and coach into the handler
