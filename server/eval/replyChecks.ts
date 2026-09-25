@@ -81,7 +81,8 @@ const NON_THREAD_CHECKS: Record<string, HardCheck> = {
 
 const isReplyPart = (line: string): boolean => line === EVENTS_HEADING || line === WORDS_HEADING || isQuestion(line);
 
-const BOILERPLATE = /\bI(?:['’]m| am) (?:here to help|for helping|(?:a )?DDD Coach)\b|\bas (?:a|your) DDD coach\b/i;
+const BOILERPLATE =
+  /\bI(?:['’]m| am) (?:here to help|for \w+ing|(?:a )?DDD Coach)\b|\bas (?:a|your) DDD coach\b|(?:^|[.!?]\s+)I help\b/im;
 
 const NOT_NEGATED = String.raw`(?<!\b(?:don['’]t|do not|never)\s+)`;
 const NEAR_A_THREAD_NOUN = String.raw`(?:\W+\w+){0,6}?\W+(?:threads?|notes|messages|chats?|conversations?|material|code)\b`;

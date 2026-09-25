@@ -288,6 +288,12 @@ describe("soft scores", () => {
 describe("hard checks on a message that isn't a thread", () => {
   const greeting: Fixture = { thread: "hi", key: { people: [], teams: [], attributions: [], expect: { nonThread: true } } };
 
+  it("pass no boilerplate for an offer of what the coach will do with a paste", () => {
+    const reply = "Hi. Paste a work thread, meeting notes, status list, or code, and I’ll help identify the mismatched terms and the key question to settle.";
+
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual([]);
+  });
+
   it("pass a short natural answer that invites a thread in one line", () => {
     const reply = "Hi! Good to have you here.\nPaste a chat thread, meeting notes or code from your work and I'll show where people mean different things.";
 
@@ -300,6 +306,8 @@ describe("hard checks on a message that isn't a thread", () => {
     ["Hi, I'm DDD Coach. I look at work threads for words that don't match. Paste a thread."],
     ["As a DDD coach, my job is to analyze business conversations. Paste a thread."],
     ["I’m for helping you prepare from messy business threads, notes, status lists, or code; paste the material when you have it."],
+    ["I help you prepare for a business conversation by finding mismatched terms. Paste a thread, notes, status list, or code."],
+    ["I’m for unpacking messy business threads into events and mismatched words. Paste the conversation when you have it."],
   ])("fail no boilerplate for a canned role statement: %s", (reply) => {
     expect(failedHardChecks(reply, "stop", greeting)).toEqual(["no boilerplate"]);
   });

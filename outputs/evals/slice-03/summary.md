@@ -271,6 +271,14 @@ Reported only: F1 "same meaning not split" is 0/6 in both arms (#76). F1 sameMea
 
 **Spend:** v6 $0.1739, v8 $0.1671, total **$0.3411** over 84 calls (estimate $0.34, cap $1.20). Median 4,112 ms, max 8,752 ms.
 
+## #77 check changes, re-scored on the v6/v8 A/B ($0)
+
+Each check change re-scores `ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.json` with `node server/eval/rescore.ts`. The keys are unchanged throughout.
+
+| Check change | Verdict | What moved |
+|---|---|---|
+| `no boilerplate` also catches sentence-initial "I help…" and "I'm for <verb>ing…" | Ship: yes (unchanged) | target live 3/18 → 0/18; greeting no boilerplate v6 1/6 → 0/6, one-line-note v6 2/6 → 0/6 |
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.
