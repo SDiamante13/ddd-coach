@@ -1,13 +1,15 @@
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
+import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { field, stringField } from "../src/shared/json.ts";
+
+export { MAX_MESSAGE_CHARS };
 
 export type RejectionReason = "malformed" | "tooLong" | "messageTooLong";
 export type ChatRequestResult = { ok: true; conversation: Conversation } | { ok: false; reason: RejectionReason };
 
 export const MAX_HISTORY_TURNS = 50;
 export const MAX_CONVERSATION_CHARS = 24_000;
-export const MAX_MESSAGE_CHARS = 8_000;
 
 const MALFORMED: ChatRequestResult = { ok: false, reason: "malformed" };
 const TOO_LONG: ChatRequestResult = { ok: false, reason: "tooLong" };
