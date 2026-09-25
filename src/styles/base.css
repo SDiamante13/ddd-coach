@@ -126,6 +126,10 @@ ol[role="log"] .refusal-actions {
   column-gap: var(--space-2);
 }
 
+ol[role="log"] .refusal-actions button {
+  min-height: var(--target-min);
+}
+
 li[data-status="pending"] > p:nth-child(2) {
   color: var(--color-ink-muted);
   font-style: italic;
@@ -208,6 +212,14 @@ form .row {
   align-items: center;
   gap: var(--space-2);
   color: var(--color-ink);
+}
+
+.formfoot .confirm > span:first-child {
+  flex-basis: 100%;
+}
+
+.formfoot .confirm button {
+  min-height: var(--target-min);
 }
 
 .formfoot .confirm .clear {
