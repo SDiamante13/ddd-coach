@@ -68,7 +68,7 @@ describe("Connection test", () => {
     expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
     expect(within(log()).getByText("Coach is thinking…")).toBeInTheDocument();
 
-    server.reply(0, 200, { reply: "Hi there" });
+    server.reply(0, 200, { reply: "Hi there", signature: "sig-1" });
     expect(await within(log()).findAllByText("Hi there")).toHaveLength(1);
     expect(within(log()).queryByText("Coach is thinking…")).not.toBeInTheDocument();
   });
@@ -157,7 +157,7 @@ describe("Connection test", () => {
 
     expect(within(log()).getByText("Coach is thinking…")).toBeInTheDocument();
     expect(server.bodyOf(1)).toEqual(server.bodyOf(0));
-    server.reply(1, 200, { reply: "Hi there" });
+    server.reply(1, 200, { reply: "Hi there", signature: "sig-1" });
     expect(await within(log()).findAllByText("Hi there")).toHaveLength(1);
     expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
     expect(within(log()).queryByRole("alert")).not.toBeInTheDocument();
@@ -175,7 +175,7 @@ describe("Connection test", () => {
 
     expect(retryButton).toBeDisabled();
     expect(server.fetchMock).toHaveBeenCalledTimes(2);
-    server.reply(1, 200, { reply: "Hi there" });
+    server.reply(1, 200, { reply: "Hi there", signature: "sig-1" });
     await within(log()).findByText("Hi there");
     expect(retryButton).toBeEnabled();
   });
@@ -237,7 +237,7 @@ describe("Connection test", () => {
     const { user, input, log } = renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
-    server.reply(0, 200, { reply: "<b>x</b>" });
+    server.reply(0, 200, { reply: "<b>x</b>", signature: "sig-1" });
 
     expect(await within(log()).findByText("<b>x</b>")).toBeInTheDocument();
   });

@@ -44,7 +44,8 @@ async function readResult(response: Response): Promise<AskResult> {
   const body = await readJson(response);
   if (!response.ok) return errorFrom(body, response.status);
   const reply = stringField(body, "reply");
-  return reply === undefined ? UNEXPECTED : { ok: true, reply, signature: stringField(body, "signature") ?? "" };
+  const signature = stringField(body, "signature");
+  return reply === undefined || signature === undefined ? UNEXPECTED : { ok: true, reply, signature };
 }
 
 function errorFrom(body: unknown, status: number): AskResult {

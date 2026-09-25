@@ -14,11 +14,11 @@ function respondWith(response: Response | Promise<Response>) {
 }
 
 describe("askCoach", () => {
-  it("posts the message with its history and returns the reply", async () => {
-    const fetchMock = respondWith(jsonResponse(200, { reply: "Hi there" }));
+  it("posts the message with its history and returns the signed reply", async () => {
+    const fetchMock = respondWith(jsonResponse(200, { reply: "Hi there", signature: "sig-B" }));
     const followUp = conversationOf("B", [{ prompt: "A", reply: "R1" }]);
 
-    expect(await askCoach(followUp)).toEqual({ ok: true, reply: "Hi there", signature: "" });
+    expect(await askCoach(followUp)).toEqual({ ok: true, reply: "Hi there", signature: "sig-B" });
     expect(fetchMock).toHaveBeenCalledWith("/api/chat", expect.objectContaining({
       method: "POST",
       body: JSON.stringify({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "" }] }),
@@ -49,6 +49,16 @@ describe("askCoach", () => {
 
   it("reports an unexpected response when a success body has no reply", async () => {
     respondWith(jsonResponse(200, { unexpected: true }));
+
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: "Unexpected response from the coach.",
+      retryable: true,
+    });
+  });
+
+  it("reports an unexpected response when a reply comes without a signature", async () => {
+    respondWith(jsonResponse(200, { reply: "Hi there", signature: 42 }));
 
     expect(await askCoach(conversation)).toEqual({
       ok: false,
