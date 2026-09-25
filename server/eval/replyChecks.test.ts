@@ -288,6 +288,10 @@ describe("soft scores", () => {
 describe("hard checks on a message that isn't a thread", () => {
   const greeting: Fixture = { thread: "hi", key: { people: [], teams: [], attributions: [], expect: { nonThread: true } } };
 
+  it("hold jointRoles, since a reply that asks no question has no roles to join", () => {
+    expect(softScores("Hi! Paste a thread when you have one.", greeting)).toMatchObject({ jointRoles: true });
+  });
+
   it("pass no boilerplate for an offer of what the coach will do with a paste", () => {
     const reply = "Hi. Paste a work thread, meeting notes, status list, or code, and I’ll help identify the mismatched terms and the key question to settle.";
 

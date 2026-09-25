@@ -278,6 +278,7 @@ Each check change re-scores `ab-2026-09-25-openai-gpt-5-6-terra-v6-v8.json` with
 | Check change | Verdict | What moved |
 |---|---|---|
 | `no boilerplate` also catches sentence-initial "I help…" and "I'm for <verb>ing…" | Ship: yes (unchanged) | target live 3/18 → 0/18; greeting no boilerplate v6 1/6 → 0/6, one-line-note v6 2/6 → 0/6 |
+| `jointRoles` holds on non-thread fixtures, which ask no question | Ship: yes (unchanged) | the three always-0/6 non-thread jointRoles rows leave the reported-only table |
 
 ## Limits
 

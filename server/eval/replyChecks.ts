@@ -173,7 +173,7 @@ export function softScores(reply: string, fixture: Fixture): SoftScores {
     quotedWordsInThread: layout.quotedWords.every((word) => includesIgnoringCase(fixture.thread, word)),
     under400Words: reply.split(/\s+/).filter(Boolean).length < 400,
     questionSpansThread: spansThread(question?.text ?? "", fixture.key.expect.questionEvidence),
-    jointRoles: / (and|with) /.test(question?.roles ?? ""),
+    jointRoles: fixture.key.expect.nonThread === true || / (and|with) /.test(question?.roles ?? ""),
     forum: namesForum(question, fixture.key.expect.forum),
     sameMeaningNamed: namesSameMeaning(parsed?.words ?? [], fixture.key),
   };
