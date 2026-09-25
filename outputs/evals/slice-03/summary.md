@@ -61,6 +61,16 @@ A v5 was an option: show the name-to-team swap in the worked example, and forbid
 - Only the corrected meaning in F2, with no "initially means" lines.
 - Plain text, no offers, `stop` well under the cap (215–464 completion tokens), and under 400 words.
 
+## Re-score after #71 (2026-09-25, $0)
+
+#71 fixed four checker bugs:
+- no names now uses Unicode word boundaries, NFC and escaped names, so "José" and "C.J." are caught and "Ana" no longer matches inside "Anaïs";
+- the complete-ending check and `replyEnding` now share one sentence-end rule, which accepts curly closing quotes and rejects a bare ")";
+- a full stop in "e.g.", "i.e." or "vs." no longer counts as a sentence end;
+- the median of an even count is now correct.
+
+Only the checker changed, so the recorded terra v4 replies were re-scored offline with `node server/eval/rescore.ts outputs/evals/slice-03/2026-09-25-openai-gpt-5-6-terra-v4.json`. Result: **ships, hard 9/9, attribution 9/9**, split, Code line and question 3/3 in every fixture. No gap, so the 9/9 claim holds under the fixed checks.
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.

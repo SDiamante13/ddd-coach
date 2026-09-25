@@ -1,9 +1,11 @@
 import type { EvalRun } from "./fullEval.ts";
 import type { ShipBar, Tally } from "./shipBar.ts";
 
+export type SummaryRun = Omit<EvalRun, "prompt">;
+
 const count = ({ passed, total }: Tally) => `${passed}/${total}`;
 
-export function evalSummary(heading: string, runs: readonly EvalRun[], bar: ShipBar): string {
+export function evalSummary(heading: string, runs: readonly SummaryRun[], bar: ShipBar): string {
   return [
     `# ${heading}`,
     "",
@@ -20,7 +22,7 @@ export function evalSummary(heading: string, runs: readonly EvalRun[], bar: Ship
   ].join("\n");
 }
 
-function runRow(run: EvalRun): string {
+function runRow(run: SummaryRun): string {
   const misses = Object.entries(run.soft).filter(([, held]) => !held).map(([score]) => score);
   const cells = [run.label, run.hardFailures.join(", ") || "none", misses.join(", ") || "none", run.ms, run.promptTokens];
   return `| ${[...cells, run.cachedTokens, run.completionTokens, run.finishReason, run.cost?.toFixed(5) ?? "?"].join(" | ")} |`;
