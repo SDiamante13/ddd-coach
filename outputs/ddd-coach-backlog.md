@@ -48,6 +48,18 @@ The [generative coach direction](generative-coach-direction.md) supersedes the c
 | B26 | Stable focus while the board evolves | Visitor pans away; new coach edits do not yank the viewport back. Follow coach restores focus when wanted. | Slice 4. |
 | B27 | Point and speak | Select a sticky and say “rename this”; the intended card changes, with undo available. | Slice 4 correction + voice input. |
 
+## Slice 1b leftovers
+
+Slice 1b ([plan](slice-01b-plan.md)) landed in 6ea0482 without its own demo; the slice 2 demo covers it. It added the 600-token cap, turned SDK retries off, added a 25 s deadline returning 504 and a 502 for empty replies, blocks Retry while another exchange is busy, maps status codes to error messages, and logs only the error name and status. Still open:
+
+| ID | Candidate | Acceptance check |
+| --- | --- | --- |
+| B33 | Focus after Send/Retry | Focus returns to the input after Send and stays on the entry after Retry. |
+| B34 | Clear a whitespace draft | Submitting only whitespace clears the input. |
+| B35 | Streaming replies | Tokens stream to the entry, so long replies don't hit sync function limits. Promote before or at 2a. |
+| B36 | Log deadline timeouts | A 504 deadline hit logs `{name:"Timeout"}` server-side; today only thrown errors are logged. |
+| B37 | Cancel provider call on 504 | The in-flight OpenRouter fetch is aborted when the deadline fires. |
+
 ## Development tooling candidate
 
 **B21 — DDD analysis-quality sensor (development only).** Review our domain analysis, language, scenarios, and boundary decisions as we build. Attach this to the slice 5 sensor integration, then implement one small increment at a time: charter → receipt validator → trigger → reasoned review → hook liveness proof. See [sensor contract](ddd-analysis-sensor.md), [initial domain analysis](ddd-domain-analysis.md), and [research sources](ddd-research.md).
