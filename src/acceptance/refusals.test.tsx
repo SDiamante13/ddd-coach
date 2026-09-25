@@ -9,7 +9,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("Refusals", () => {
   it("shows a refusal of an overlong message inline, asking to shorten it, without Retry", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "A very long message{Enter}");
     server.reply(0, 413, { error: "This message is too long for the coach. Shorten it and send it again." });
@@ -22,7 +22,7 @@ describe("Refusals", () => {
 
   it("shows a refusal of an unverifiable message inline, saying it was skipped, without Retry", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     server.reply(0, 400, { error: COACH_UNVERIFIED });
@@ -40,7 +40,7 @@ describe("Refusals", () => {
     [400, COACH_UNVERIFIED],
   ])("puts a message refused with %i back into the empty box: %s", async (status, error) => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Long one{Enter}");
     server.reply(0, status, { error });
@@ -52,7 +52,7 @@ describe("Refusals", () => {
 
   it("keeps text typed while a refused message was pending", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "A{Enter}");
     await user.type(input(), "B");
@@ -64,7 +64,7 @@ describe("Refusals", () => {
 
   it("leaves the box empty after a failure that can be retried", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "A{Enter}");
     server.reply(0, 502, { error: COACH_UNAVAILABLE });
@@ -74,7 +74,7 @@ describe("Refusals", () => {
   });
 
   it("copies the whole conversation as plain text from an unverifiable refusal", async () => {
-    const { server, user, log, send, sendAndReply } = startConversation();
+    const { server, user, log, send, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
     server.reply(await send("B"), 400, { error: COACH_UNVERIFIED });
 
@@ -86,7 +86,7 @@ describe("Refusals", () => {
   });
 
   it("keeps the refusal's actions outside its alert, so copying is announced once", async () => {
-    const { server, log, send } = startConversation();
+    const { server, log, send } = await startConversation();
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
 
     const alert = await within(log()).findByRole("alert");
@@ -96,7 +96,7 @@ describe("Refusals", () => {
   });
 
   it("asks to clear the conversation from an unverifiable refusal, with focus on Keep", async () => {
-    const { server, user, log, send } = startConversation();
+    const { server, user, log, send } = await startConversation();
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
 
     await user.click(await within(log()).findByRole("button", { name: "Start a new one" }));
@@ -106,7 +106,7 @@ describe("Refusals", () => {
   });
 
   it("moves focus to Keep from an unverifiable refusal even when the question is already open", async () => {
-    const { server, user, log, send } = startConversation();
+    const { server, user, log, send } = await startConversation();
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
     await user.click(await screen.findByRole("button", { name: "New conversation" }));
 
@@ -116,7 +116,7 @@ describe("Refusals", () => {
   });
 
   it("says when the conversation couldn't be copied", async () => {
-    const { server, user, log, send } = startConversation();
+    const { server, user, log, send } = await startConversation();
     vi.spyOn(navigator.clipboard, "writeText").mockRejectedValue(new DOMException("Denied", "NotAllowedError"));
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
 

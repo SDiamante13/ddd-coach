@@ -6,7 +6,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("New conversation", () => {
   it("starts a new conversation after confirming, keeping the draft and sending no history", async () => {
-    const { server, user, input, log, sendAndReply } = startConversation();
+    const { server, user, input, log, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
     await user.type(input(), "Draft");
 
@@ -21,7 +21,7 @@ describe("New conversation", () => {
   });
 
   it("offers a new conversation again, without asking, once the cleared conversation restarts", async () => {
-    const { user, sendAndReply } = startConversation();
+    const { user, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
     await user.click(screen.getByRole("button", { name: "New conversation" }));
     await user.click(screen.getByRole("button", { name: "Clear" }));
@@ -33,7 +33,7 @@ describe("New conversation", () => {
   });
 
   it("asks with focus on Keep, and keeps the conversation with focus back on New conversation", async () => {
-    const { user, log, sendAndReply } = startConversation();
+    const { user, log, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
 
     await user.click(screen.getByRole("button", { name: "New conversation" }));
@@ -46,7 +46,7 @@ describe("New conversation", () => {
   });
 
   it("says what clearing takes away and what it keeps", async () => {
-    const { user, sendAndReply } = startConversation();
+    const { user, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
 
     await user.click(screen.getByRole("button", { name: "New conversation" }));
@@ -57,7 +57,7 @@ describe("New conversation", () => {
   });
 
   it("copies the conversation from the question before clearing it", async () => {
-    const { user, log, sendAndReply } = startConversation();
+    const { user, log, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
 
     await user.click(screen.getByRole("button", { name: "New conversation" }));
@@ -70,7 +70,7 @@ describe("New conversation", () => {
   });
 
   it("lets the conversation be cleared only once no reply is pending", async () => {
-    const { server, user, send, sendAndReply } = startConversation();
+    const { server, user, send, sendAndReply } = await startConversation();
     await sendAndReply("A", "R1", "sig-A");
     await user.click(screen.getByRole("button", { name: "New conversation" }));
 

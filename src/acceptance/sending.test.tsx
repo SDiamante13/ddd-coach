@@ -8,7 +8,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("Sending a message", () => {
   it("shows a message sent with Enter as pending, then exactly one reply", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe("Sending a message", () => {
 
   it("sends a pasted thread with its speaker lines and line breaks unchanged", async () => {
     const server = stubFetch();
-    const { user, input } = renderApp();
+    const { user, input } = await renderApp();
     const thread = "Ops: shipment delayed\nTom (Finance): we can't invoice until carrier confirms";
 
     await user.click(input());
@@ -33,7 +33,7 @@ describe("Sending a message", () => {
 
   it("adds a line with Shift+Enter and sends both lines with Enter", async () => {
     const server = stubFetch();
-    const { user, input } = renderApp();
+    const { user, input } = await renderApp();
 
     await user.type(input(), "A{Shift>}{Enter}{/Shift}B");
     expect(server.fetchMock).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe("Sending a message", () => {
 
   it("sends with the Send button, clears the input and disables Send while pending", async () => {
     stubFetch();
-    const { user, input, log, sendButton } = renderApp();
+    const { user, input, log, sendButton } = await renderApp();
 
     await user.type(input(), "Hello coach");
     await user.click(sendButton());
@@ -58,7 +58,7 @@ describe("Sending a message", () => {
 
   it("sends with Ctrl+Enter", async () => {
     const server = stubFetch();
-    const { user, input } = renderApp();
+    const { user, input } = await renderApp();
 
     await user.type(input(), "Hello coach{Control>}{Enter}{/Control}");
 
@@ -70,7 +70,7 @@ describe("Sending a message", () => {
     ["ending a composition in Safari", { keyCode: 229 }],
   ])("sends nothing on Enter while an input method is %s", async (_state, composition) => {
     const server = stubFetch();
-    const { user, input } = renderApp();
+    const { user, input } = await renderApp();
     await user.type(input(), "Hello coach");
 
     fireEvent.keyDown(input(), { key: "Enter", ...composition });
@@ -81,7 +81,7 @@ describe("Sending a message", () => {
   it("adds a line on Enter with a touch pointer and sends with the Send button", async () => {
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
     const server = stubFetch();
-    const { user, input, sendButton } = renderApp();
+    const { user, input, sendButton } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     expect(server.fetchMock).not.toHaveBeenCalled();
@@ -96,7 +96,7 @@ describe("Sending a message", () => {
     ["newline-only", "{Shift>}{Enter}{Enter}{/Shift}{Enter}"],
   ])("ignores a %s message", async (_kind, keys) => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), keys);
 
@@ -106,7 +106,7 @@ describe("Sending a message", () => {
 
   it("ignores another submit while a reply is pending and keeps the draft", async () => {
     const server = stubFetch();
-    const { user, input, log, sendButton } = renderApp();
+    const { user, input, log, sendButton } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     await user.type(input(), "Again{Enter}");

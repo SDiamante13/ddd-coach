@@ -8,7 +8,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("Retry", () => {
   it("shows a server failure inline with Retry beside the message", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     server.reply(0, 502, { error: "The coach sent an empty reply. Try again." });
@@ -21,7 +21,7 @@ describe("Retry", () => {
 
   it("retries the same message without duplicating it in the log", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     server.reply(0, 502, { error: "The coach is unavailable." });
@@ -37,7 +37,7 @@ describe("Retry", () => {
 
   it("disables Retry while another exchange is pending, then enables it once that settles", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
     await user.type(input(), "First message{Enter}");
     server.fail(0);
     const retryButton = await within(log()).findByRole("button", { name: "Retry" });
@@ -54,7 +54,7 @@ describe("Retry", () => {
 
   it("shows a network failure inline with Retry", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     server.fail(0);

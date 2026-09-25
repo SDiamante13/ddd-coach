@@ -6,22 +6,37 @@ type PendingCall = {
   reject: (reason: unknown) => void;
 };
 
-export function stubFetch() {
+type StubOptions = { session?: number };
+
+const SESSION_URL = "/api/session";
+const NO_CONTENT = 204;
+
+export function stubFetch({ session = NO_CONTENT }: StubOptions = {}) {
   const calls: PendingCall[] = [];
   const fetchMock = vi.fn(
     (_url: string, init?: RequestInit) =>
       new Promise<Response>((resolve, reject) => {
-        calls.push({ body: JSON.parse(String(init?.body)), resolve, reject });
+        calls.push({ body: jsonBodyOf(init), resolve, reject });
       }),
   );
-  vi.stubGlobal("fetch", fetchMock);
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((url: string, init?: RequestInit) =>
+      url === SESSION_URL ? Promise.resolve(new Response(null, { status: session })) : fetchMock(url, init),
+    ),
+  );
   return {
     fetchMock,
+    pendingCount: () => calls.length,
     bodyOf: (index: number) => callAt(calls, index).body,
     reply: (index: number, status: number, body: unknown) =>
       callAt(calls, index).resolve(jsonResponse(status, body)),
     fail: (index: number) => callAt(calls, index).reject(new TypeError("Failed to fetch")),
   };
+}
+
+function jsonBodyOf(init?: RequestInit): unknown {
+  return init?.body === undefined ? undefined : JSON.parse(String(init.body));
 }
 
 function callAt(calls: PendingCall[], index: number): PendingCall {

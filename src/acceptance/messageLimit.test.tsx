@@ -13,7 +13,7 @@ function threadOf(chars: number, lines: number): string {
 
 describe("Message limit", () => {
   it("shows no character count below 80% of the limit, not counting surrounding whitespace", async () => {
-    const { user, input } = renderApp();
+    const { user, input } = await renderApp();
 
     await user.click(input());
     await user.paste(`${"M".repeat(MAX_MESSAGE_CHARS * 0.8 - 1)}\n\n\n`);
@@ -22,7 +22,7 @@ describe("Message limit", () => {
   });
 
   it("shows the character count once a draft reaches 80% of the limit", async () => {
-    const { user, input } = renderApp();
+    const { user, input } = await renderApp();
     const nearLimit = MAX_MESSAGE_CHARS * 0.8;
 
     await user.click(input());
@@ -34,7 +34,7 @@ describe("Message limit", () => {
   });
 
   it("does not flag a draft at the limit with surrounding spaces", async () => {
-    const { user, input, sendButton } = renderApp();
+    const { user, input, sendButton } = await renderApp();
 
     await user.click(input());
     await user.paste(`  ${"M".repeat(MAX_MESSAGE_CHARS)}  `);
@@ -48,7 +48,7 @@ describe("Message limit", () => {
     [1, "1 character"],
     [1412, "1,412 characters"],
   ])("flags a draft %i over the limit, disables Send and says by how much", async (over, overage) => {
-    const { user, input, sendButton } = renderApp();
+    const { user, input, sendButton } = await renderApp();
 
     await user.click(input());
     await user.paste("M".repeat(MAX_MESSAGE_CHARS + over));
@@ -62,7 +62,7 @@ describe("Message limit", () => {
 
   it("sends nothing on Enter over the limit and keeps the draft", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
     const tooLong = "M".repeat(MAX_MESSAGE_CHARS + 1);
     await user.click(input());
     await user.paste(tooLong);
@@ -76,7 +76,7 @@ describe("Message limit", () => {
 
   it("sends a 20,000-character thread of 40 lines with its line breaks kept", async () => {
     const server = stubFetch();
-    const { user, input, sendButton } = renderApp();
+    const { user, input, sendButton } = await renderApp();
     const thread = threadOf(20_000, 40);
     await user.click(input());
     await user.paste(thread);

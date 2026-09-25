@@ -8,7 +8,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("Message log", () => {
   it("collapses a long message in the log to four lines with Show more and Show less", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
     const lines = Array.from({ length: 10 }, (_, i) => `line ${i + 1}`);
     await user.click(input());
     await user.paste(lines.join("\n"));
@@ -32,7 +32,7 @@ describe("Message log", () => {
 
   it("shows a short multi-line message in full, without Show more", async () => {
     stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "line one{Shift>}{Enter}{/Shift}line two{Enter}");
 
@@ -42,7 +42,7 @@ describe("Message log", () => {
 
   it("shows HTML in a reply as literal text", async () => {
     const server = stubFetch();
-    const { user, input, log } = renderApp();
+    const { user, input, log } = await renderApp();
 
     await user.type(input(), "Hello coach{Enter}");
     server.reply(0, 200, { reply: "<b>x</b>", signature: "sig-1" });

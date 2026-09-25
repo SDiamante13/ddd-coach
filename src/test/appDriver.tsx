@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 import { App } from "../App.tsx";
 import { stubFetch } from "./fetchStub.ts";
 
@@ -11,9 +12,11 @@ export function composerOf(box: HTMLElement): HTMLFormElement {
   return form;
 }
 
-export function renderApp() {
+export async function renderApp() {
+  if (!vi.isMockFunction(globalThis.fetch)) stubFetch();
   const user = userEvent.setup();
   render(<App />);
+  await screen.findByRole("textbox", { name: "Message" });
   return {
     user,
     input: () => screen.getByRole("textbox", { name: "Message" }),
@@ -22,13 +25,13 @@ export function renderApp() {
   };
 }
 
-export function startConversation() {
+export async function startConversation() {
   const server = stubFetch();
-  const app = renderApp();
+  const app = await renderApp();
 
   async function send(message: string): Promise<number> {
     await app.user.type(app.input(), `${message}{Enter}`);
-    return server.fetchMock.mock.calls.length - 1;
+    return server.pendingCount() - 1;
   }
 
   return {

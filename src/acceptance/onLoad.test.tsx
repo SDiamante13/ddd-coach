@@ -7,8 +7,8 @@ import { PASTE_EXAMPLE } from "../ui/MessageBox.tsx";
 afterEach(() => vi.unstubAllGlobals());
 
 describe("On load", () => {
-  it("tells the user on load where their messages are sent", () => {
-    renderApp();
+  it("tells the user on load where their messages are sent", async () => {
+    await renderApp();
 
     expect(
       screen.getByText(
@@ -18,8 +18,8 @@ describe("On load", () => {
     ).toBeVisible();
   });
 
-  it("says on load what the coach is for", () => {
-    renderApp();
+  it("says on load what the coach is for", async () => {
+    await renderApp();
 
     expect(
       screen.getByText(
@@ -29,30 +29,30 @@ describe("On load", () => {
     ).toBeVisible();
   });
 
-  it("shows an example of what to paste in the empty message box", () => {
-    const { input } = renderApp();
+  it("shows an example of what to paste in the empty message box", async () => {
+    const { input } = await renderApp();
 
     expect(input()).toHaveAttribute("placeholder", PASTE_EXAMPLE);
   });
 
-  it("describes the message box with its keys and its character limit", () => {
-    const { input } = renderApp();
+  it("describes the message box with its keys and its character limit", async () => {
+    const { input } = await renderApp();
 
     expect(input()).toHaveAccessibleDescription(
       `Enter sends · Shift+Enter adds a line Up to ${formatCount(MAX_MESSAGE_CHARS)} characters.`,
     );
   });
 
-  it("leaves the Enter key hint out with a touch pointer, where Enter adds a line", () => {
+  it("leaves the Enter key hint out with a touch pointer, where Enter adds a line", async () => {
     vi.stubGlobal("matchMedia", () => ({ matches: true }));
-    const { input } = renderApp();
+    const { input } = await renderApp();
 
     expect(input()).toHaveAccessibleDescription(`Up to ${formatCount(MAX_MESSAGE_CHARS)} characters.`);
     expect(screen.queryByText(/Enter sends/)).not.toBeInTheDocument();
   });
 
-  it("starts with the message input focused and an empty log", () => {
-    const { input, log } = renderApp();
+  it("starts with the message input focused and an empty log", async () => {
+    const { input, log } = await renderApp();
 
     expect(input()).toHaveFocus();
     expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
