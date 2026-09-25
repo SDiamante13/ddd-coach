@@ -41,6 +41,22 @@ describe("askCoach", () => {
     });
   });
 
+  it("marks a refusal of an unverifiable conversation as not worth retrying", async () => {
+    respondWith(jsonResponse(400, { error: "This conversation can't be verified." }));
+
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: "This conversation can't be verified.",
+      retryable: false,
+    });
+  });
+
+  it("keeps a rate-limited request worth retrying", async () => {
+    respondWith(jsonResponse(429, { error: "Too many requests." }));
+
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Too many requests.", retryable: true });
+  });
+
   it("reports an unreachable coach when the request throws", async () => {
     respondWith(Promise.reject(new TypeError("Failed to fetch")));
 
