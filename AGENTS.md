@@ -3,7 +3,7 @@
 A map of where things live. Rules and guidelines live in the files it points to.
 
 ## Product & planning
-- `outputs/SESSION-HANDOFF.md` — orientation and latest decisions (its workspace path is stale; the repo root is the workspace)
+- `outputs/SESSION-HANDOFF.md` — orientation and latest decisions
 - `outputs/ddd-coach-plan.html` — interactive roadmap; stable slice IDs `1, 2, 2a, 3 … 13`
 - `outputs/generative-coach-direction.md` — shared modeling board and voice direction
 - `outputs/app-assessment.md` — seven-angle snapshot of the app, evidence limits, and proposed product test

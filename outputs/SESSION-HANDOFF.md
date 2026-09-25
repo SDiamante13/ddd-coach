@@ -4,7 +4,7 @@
 
 Planning and research are complete enough to begin slice 1. No application, SDK integration, deployment, or development hook has been implemented. Do not mistake the interactive HTML plan for the running product.
 
-Workspace: `/Users/stevendiamante/Documents/Codex/2026-09-24/ddd-coach-ai-vocal-modal-asks`.
+Workspace: `~/personal/ddd-coach` (the repository root).
 
 ## Latest decisions override earlier drafts
 
