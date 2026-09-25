@@ -210,24 +210,24 @@ describe("Connection test", () => {
     expect(server.bodyOf(1)).toEqual({ message: "B", history: [] });
   });
 
-  it("retries with the turns before it, then keeps the retried turn at its log position", async () => {
+  it("retries with the signed turns before it, then keeps the retried turn and its signature at its log position", async () => {
     const { server, user, log, send, sendAndReply, sendAndFail } = startConversation();
-    await sendAndReply("A", "R1");
+    await sendAndReply("A", "R1", "sig-A");
     await sendAndFail("B");
-    await sendAndReply("C", "R3");
+    await sendAndReply("C", "R3", "sig-C");
 
     await user.click(within(log()).getByRole("button", { name: "Retry" }));
-    server.reply(3, 200, { reply: "RB" });
+    server.reply(3, 200, { reply: "RB", signature: "sig-B" });
     await within(log()).findByText("RB");
     await send("D");
 
-    expect(server.bodyOf(3)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "" }] });
+    expect(server.bodyOf(3)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1", signature: "sig-A" }] });
     expect(server.bodyOf(4)).toEqual({
       message: "D",
       history: [
-        { prompt: "A", reply: "R1", signature: "" },
-        { prompt: "B", reply: "RB", signature: "" },
-        { prompt: "C", reply: "R3", signature: "" },
+        { prompt: "A", reply: "R1", signature: "sig-A" },
+        { prompt: "B", reply: "RB", signature: "sig-B" },
+        { prompt: "C", reply: "R3", signature: "sig-C" },
       ],
     });
   });
