@@ -1,10 +1,9 @@
 import type { EvalRun } from "./fullEval.ts";
-import type { shipBar } from "./shipBar.ts";
+import type { ShipBar, Tally } from "./shipBar.ts";
 
-type Bar = ReturnType<typeof shipBar>;
-const count = ({ passed, total }: { passed: number; total: number }) => `${passed}/${total}`;
+const count = ({ passed, total }: Tally) => `${passed}/${total}`;
 
-export function evalSummary(heading: string, runs: readonly EvalRun[], bar: Bar): string {
+export function evalSummary(heading: string, runs: readonly EvalRun[], bar: ShipBar): string {
   return [
     `# ${heading}`,
     "",
