@@ -1,0 +1,561 @@
+<title>Marcus Stakeholder Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+
+/* Influencer variant: blue (command) actor to separate him from the ICP */
+.actor.infl { background: var(--command); color: var(--command-ink); transform: rotate(-1.2deg); }
+.actor.infl .label { color: var(--command-ink); }
+.avatar.infl { background: var(--command); color: var(--command-ink); }
+.chip.infl { border-color: var(--command); color: var(--ink); }
+.banner {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start;
+  padding: 18px 22px; background: var(--surface); border: 1px solid var(--rule);
+  border-left: 6px solid var(--command); border-radius: 6px;
+}
+.banner .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--command); color: var(--command-ink); transform: rotate(-2deg); white-space: nowrap;
+}
+.banner p { color: var(--ink-soft); max-width: 78ch; }
+.banner strong { color: var(--ink); }
+.suggestions.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) {
+  .suggestions.three { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .banner { grid-template-columns: 1fr; gap: 10px; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic stakeholder interview M01 · influencer / blocker, not ICP</div>
+      <h1>“From thread with no link is <em>trust me</em> with better formatting.” Marcus on Priya’s glossary export.</h1>
+      <p class="dek">We showed the staff engineer who called a bounded context “a folder” the table Priya might paste into her Booking RFC. It passed his first ten seconds. It nearly lost him on a Status cell he couldn’t open. He’d check every citation, trust the uncertain rows most, and ask where the Slack went before he read a word.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip infl">Influencer / blocker · never re-ranks alone</span>
+        <span class="chip">Mom Test script · 11 questions</span>
+        <span class="chip">Exploration 03 t2 + t4 · concept, not built</span>
+        <span class="chip">Touches #58 · #59 · #6</span>
+      </div>
+    </div>
+    <aside class="sticky actor infl" aria-label="Persona">
+      <div class="label">Influencer · not ICP</div>
+      <h2>Marcus</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Staff engineer, ~15 yrs; owns Rails monolith reliability; sits on architecture review</dd></div>
+        <div><dt>Scar tissue</dt><dd>Two failed splits: 12 services on one DB (2017); carrier integrations, merged back 2022</dd></div>
+        <div><dt>On record</dt><dd>“So, a folder?” · DDD is “enterprise astronaut stuff”</dd></div>
+        <div><dt>Moved by</dt><dd>Priya’s last-ten-tickets spreadsheet</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="banner" aria-label="Who this interview is for">
+    <span class="tag">Not the ICP</span>
+    <p><strong>Marcus is the reviewer Priya has to convince, not the person the product is built for.</strong> His answers shape how the export reads, what it cites and what it must never do. <strong>They never re-rank the backlog on their own.</strong> Any change he suggests needs a matching signal from Priya first.</p>
+  </section>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">What would move him</div>
+    <div>
+      <blockquote>“Run the spreadsheet again on the next ten booking tickets. <strong>If the terms predict which team’s code each ticket touches, I’ll stop calling it a folder,</strong> and I’ll say so in review.”</blockquote>
+      <cite class="label">Marcus, Q10. “If the answer turns out to be ‘don’t split, rename three things,’ I want the tool to be able to say that.”</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>influencer signal · strong</span>
+        <span><i class="swatch hotspot"></i>hotspot: challenges a current plan</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>Evidence he can open beats any authority.</b> “From thread” with no link reads as “trust me.” The TONU row names load 48213, so it’s the one he trusts.</span>
+        <div class="tags"><span>influencer</span><span>strong</span><span>#6</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">02</span>
+        <span><b>Visible uncertainty is the most credible cell.</b> The spreadsheet’s “not sure” column is why he believed the rest. Name who breaks the tie and by when.</span>
+        <div class="tags"><span>influencer</span><span>strong</span><span>#6</span></div>
+      </div>
+      <div class="sticky s-neutral weak">
+        <span class="n">03</span>
+        <span><b>Evans defines words; he doesn’t decide boundaries.</b> He’d open the PDF to check the section. One phantom citation loses him. He links Fowler on the cost of splitting.</span>
+        <div class="tags"><span>influencer</span><span>weak</span><span>#58 · #59</span></div>
+      </div>
+      <div class="sticky s-neutral weak">
+        <span class="n">04</span>
+        <span><b>No row for “what the code does.”</b> He thinks rebook inserts a new booking, which matches finance, not ops. He says he’d have to check.</span>
+        <div class="tags"><span>influencer</span><span>weak</span><span>idea · #6</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">05</span>
+        <span><b>He assumes AI helped and discounts what he can’t verify.</b> He bounced a PR description that claimed tests that weren’t there. He wants a checkable source on every row.</span>
+        <div class="tags"><span>influencer</span><span>strong</span><span>#58 · #6</span></div>
+      </div>
+      <div class="sticky s-neutral weak">
+        <span class="n">06</span>
+        <span><b>His first review question is data, not jargon.</b> “Where did our Slack go?” He asks it before reading a row. Same vendor block Priya hit, from the reviewer’s chair.</span>
+        <div class="tags"><span>influencer</span><span>weak</span><span>#34</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="jargon-h">
+    <div class="section-head">
+      <h2 id="jargon-h">Jargon verdict</h2>
+      <span class="label">Q7 · six DDD terms</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Accept</span><span class="count">2 terms</span></div>
+        <ul>
+          <li><b>Aggregate</b><q>A consistency boundary, what gets locked in one transaction. People misuse it to mean “big class.”</q></li>
+          <li><b>Domain event</b><q>We have Kafka and an event is an event.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Define first</span><span class="count">2 terms</span></div>
+        <ul>
+          <li><b>Bounded context</b><q>Only if the next sentence says which code, which tables and which team. Otherwise it really is a folder.</q></li>
+          <li><b>Anti-corruption layer</b><q>It’s an adapter, I’ve written three, and the name sounds like a verdict on the other team.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Reject</span><span class="count">2 terms</span></div>
+        <ul>
+          <li><b>Ubiquitous language → “glossary”</b><q>Nothing here is ubiquitous, and that’s the whole problem.</q></li>
+          <li><b>Context map → “dependency graph”</b><q>It’s the diagram I stopped reading at in August.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="triggers-h">
+    <div class="section-head">
+      <h2 id="triggers-h">10-second dismissal triggers</h2>
+      <span class="label">What closes the tab</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>A DDD term as a heading or on the first screen</h3><div class="ref">Q5 · Q7</div></div><p>“It’s called ‘Glossary,’ not ‘Ubiquitous Language,’ and it’s a table, not a map.” That’s why t4 survived.</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>A box-and-arrow diagram before any number</h3><div class="ref">Q1 · past behavior</div></div><p>He closed the notifications RFC in about three minutes: “If a doc can’t tell me what hurts now, the diagram is decoration.”</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>Sources he can’t open</h3><div class="ref">Q5 · #6</div></div><p>“From thread” with no link. “Which thread?” A ticket, permalink, load or line of code on every row.</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>Every row “confirmed”</h3><div class="ref">Q5 · Q8</div></div><p>“Nothing about booking is confirmed.” Uncertainty shown is the credible part.</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>A book cited to decide their boundary</h3><div class="ref">Q3 · #58</div></div><p>“A book can’t know our invoice table.” Fine as a footnote that defines a word.</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>A citation that doesn’t exist</h3><div class="ref">Q4 · #58</div></div><p>He’d open the PDF first. A phantom section or a stretched paraphrase: “I’m done with the tool, and a bit done with the doc.”</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>“Split” concluded before the evidence</h3><div class="ref">Q10</div></div><p>He wants a tool that can say “don’t split, rename three things.”</p></div>
+      <div class="challenge"><span class="dot" aria-hidden="true"></span><div><h3>AI help he finds out about afterwards</h3><div class="ref">Q9</div></div><p>“If she tells me a tool helped, fine; if I find out afterwards, I reread everything.”</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="touches-h">
+    <div class="section-head">
+      <h2 id="touches-h">Touches #58 · #59 · #6</h2>
+      <span class="label">Implications · none re-rank on their own</span>
+    </div>
+    <div class="suggestions three">
+      <article class="card">
+        <header><span class="cmd">#58</span><div><h3>Knowledge base grounded in Evans</h3><div class="where">DDD Reference 2015 · CC BY 4.0</div></div></header>
+        <dl>
+          <div><dt>Where citations go</dt><dd>In the coach’s replies to Priya, where they guard against hallucinated rules. Not in the exported table by default.</dd></div>
+          <div><dt>Two kinds of claim</dt><dd>A definition cites Evans by section. A claim about <em>their</em> system (“rebook inserts a new booking”) cites her ticket, permalink, load or code, never Evans.</dd></div>
+          <div><dt>Add check</dt><dd>Every cited section title exists verbatim in the Reference text in <code>server/knowledge/</code>.</dd></div>
+          <div><dt>Keep</dt><dd>“Says so when the sources don’t cover it.” That’s the uncertainty he respects.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">#59</span><div><h3>Copyright: CC BY plus our own notes</h3><div class="where">paid books need permission</div></div></header>
+        <dl>
+          <div><dt>Stands</dt><dd>Nothing he said argues for chasing permission for paid books. He doesn’t cite Khononov, Vernon or Brandolini.</dd></div>
+          <div><dt>Fowler</dt><dd>The source he respects isn’t CC BY, as far as we know. Paraphrase it in our own notes, cite by title with a link, and check the license before quoting.</dd></div>
+          <div><dt>Add</dt><dd>A “when not to split” section in our notes, so the CC-BY-only rule doesn’t produce a DDD cheerleader.</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <header><span class="cmd">#6</span><div><h3>Export: rich-text table + Markdown</h3><div class="where">t2 · t4 concept</div></div></header>
+        <dl>
+          <div><dt>Link the status</dt><dd>“From thread” carries a permalink or ticket ID, a hyperlink in rich text and <code>[text](url)</code> in Markdown. Ask Priya if she has them.</dd></div>
+          <div><dt>Plain labels</dt><dd>“Glossary,” “Words that don’t match.” No DDD term in the header, title or first row.</dd></div>
+          <div><dt>Markdown’s second job</dt><dd>Decisions land as Markdown ADRs in the monolith repo. The fallback must be a clean GFM table with links intact.</dd></div>
+          <div><dt>Keep</dt><dd>“Ops is split” and “unconfirmed” survive the paste. Optional “who resolves, by when.” A “Code” row only if Priya would fill it.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Past docs</a>
+      <a href="#part-b">B · Sources</a>
+      <a href="#part-c">C · The export</a>
+      <a href="#part-d">D · Words and doubt</a>
+      <a href="#part-e">E · AI and close</a>
+    </nav>
+
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Past docs</h3><span class="aside">past behavior first, no product yet</span></div>
+        <p class="stage">Thursday 8 October 2026. Priya’s Booking RFC is due 30 October, and Marcus hasn’t opened it yet.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>Think of the last design doc from someone else that you dismissed quickly. What made you stop reading?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>The notifications RFC from platform, back in August. Page one was a box-and-arrow diagram with “Notification Context” and “Customer Context” and an anti-corruption layer between them, and no number anywhere. I scrolled for the part that says what breaks today, didn’t find it, left one comment asking “What incident does this prevent?” and closed the tab. That was maybe three minutes. <mark>If a doc can’t tell me what hurts now, the diagram is decoration.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>And the last one that changed your mind. What was in it?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>Priya’s spreadsheet, honestly. She took the last ten Jira tickets that touched booking and marked which tables and which team’s code each one changed. Eight stayed inside the line she’d drawn, and the two that didn’t were both rebook tickets, which were also our two double-invoice P2s. She had a “not sure” column with two rows in it. <mark>The “not sure” column is why I believed the other eight.</mark> I went in thinking “don’t split,” and I came out thinking “maybe split, but not where I assumed.”</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>Sources</h3><span class="aside">told the coach may cite Evans’s DDD Reference by section</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q3</span><span>Which sources or citations would you respect in a doc Priya shares? Evans’s DDD Reference, say, against Fowler’s bliki, against our own incident data.</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>Incident data first, then tickets, then the code, then everything else a long way behind. I’ve linked Fowler’s “MonolithFirst” and “Microservice Premium” posts in reviews myself, twice this year, because they argue about the cost of splitting. Evans I’ve half-read, years ago. The first half was good, and people mostly quote the second half. A footnote like “Evans, DDD Reference: Bounded Context” is fine if it’s defining a word. <mark>If it’s there to tell me where our boundary goes, it hurts, because a book can’t know our invoice table.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q4</span><span>Does a citation like that help or hurt if the tool wrote it?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>It depends whether the section exists. The first thing I’d do is open the PDF and check. <mark>If the tool cites a section that isn’t there, or paraphrases Evans into saying something he didn’t, I’m done with the tool, and a bit done with the doc.</mark> If it’s accurate and it only defines the word, it costs me ten seconds and I move on.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>The export</h3><span class="aside">Exploration 03 · a concept, not built</span></div>
+        <p class="stage">Shown t2-table.png (“Words that don’t match” with Term, Team, Meaning and Status), then t4-in-rfc.png (the same table pasted into an RFC’s “4. Glossary”). Told this is roughly what Priya might paste.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Here’s what Priya might paste into her RFC. What would make you dismiss this in ten seconds?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>It passes the first ten seconds, which surprised me. It’s called “Glossary,” not “Ubiquitous Language,” and it’s a table, not a map. What nearly lost me is “From thread” in the Status column. Which thread? <mark>“From thread” with no link is “trust me” with better formatting.</mark> If every row said “confirmed,” I’d have dismissed it, because nothing about booking is confirmed.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>What in it would you actually read, and what would you check?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>The Rebook rows, because those are our P2s. I think the rebook code sets REBOOKED on the old row and inserts a new booking, which would make finance’s “cancel plus a new booking” what the code actually does, and ops’s version what ops believes. I’d have to look; I haven’t read that method in a year. <mark>If that’s true, it’s the most important finding here, and the table doesn’t have a row for “what the code does.”</mark> TONU I’d check straight away, because it names load 48213 and I can open that in two minutes. That’s also why I trust that row more than the “From thread” ones.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Words and doubt</h3><span class="aside">jargon, then visible uncertainty</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q7</span><span>Some DDD words. For each, tell me accept, accept if defined, or reject, and why: bounded context, ubiquitous language, aggregate, domain event, context map, anti-corruption layer.</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>“Aggregate” I accept. It’s a consistency boundary, what gets locked in one transaction, and I use it myself, though people misuse it to mean “big class.” “Domain event” I accept, because we have Kafka and an event is an event. “Bounded context” only if the next sentence says which code, which tables and which team, because otherwise it really is a folder. “Anti-corruption layer” only if defined: it’s an adapter, I’ve written three, and the name sounds like a verdict on the other team. <mark>“Ubiquitous language” I reject; call it a glossary, because nothing here is ubiquitous, and that’s the whole problem.</mark> “Context map” I reject too; it’s the diagram I stopped reading at in August, so draw who calls whom and call it a dependency graph.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q8</span><span>If the table says “Status: unconfirmed” or “Ops is split,” is that a strength or a weakness?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>A strength, and it’s the most believable cell on the page. It’s the “not sure” column again. It turns into a weakness if half the rows say it three weeks before the decision, because then it’s a research plan, not a design, and the RFC should say so. <mark>What I’d want next to “Ops is split” is who breaks the tie and by when.</mark> “Dana to confirm” is close, but Priya tells me Dana’s out from mid-month.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>AI and close</h3><span class="aside">what earns a second look</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q9</span><span>What would an AI-assisted artifact need to show for you not to discount it as “ChatGPT output”?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>I’ll assume AI helped anyway; most docs I review now had some. Last month I bounced a PR whose description said “adds tests for the retry path,” and there were no tests, which is exactly the kind of thing a model writes. <mark>ChatGPT output is never wrong in a way I can check. So give me things I can check: a ticket, a permalink, a load, a line of code, on every row.</mark> And I want to see what Priya changed. If she tells me a tool helped, fine; if I find out afterwards, I reread everything.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>What would make you ask Priya to keep going with this approach?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>Run the spreadsheet again on the next ten booking tickets, after the glossary’s done. If the terms predict which team’s code each ticket touches, I’ll stop calling it a folder, and I’ll say so in review. Second, the finance review of the RFC. If finance and ops read the Rebook rows and the argument is about the facts rather than the word, the glossary did its job. <mark>And if the answer turns out to be “don’t split, rename three things,” I want the tool to be able to say that.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>Anything else?</span></div>
+            <div class="a"><span class="avatar infl">M</span><div><p>A few things. In architecture review, the first thing I’d ask isn’t about DDD. It’s where our Slack went, because our policy says approved vendors only, and I’d ask that before I read a single row. Second, don’t build this for me. <mark>I’m the one who says no, not the one who does the work, and a tool built for me would be a spreadsheet generator.</mark> And if it gets decided, the decision goes in the repo as a Markdown ADR, not in Confluence; I merged the last two.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Test with Priya next</h2>
+      <span class="label">Marcus’s signals need her confirmation</span>
+    </div>
+    <ul class="next">
+      <li>When you showed Marcus the ten-ticket spreadsheet, how did you send it, and what did he reply to first?</li>
+      <li>Could you give each “From thread” row a Slack permalink or ticket ID today? How long would it take?</li>
+      <li>Have you ever cited a book or a blog post in an RFC? Which one, and did anyone react?</li>
+      <li>Where do decided RFCs end up: Confluence only, or an ADR in the repo? Who writes it?</li>
+      <li>Would you add a “what the code does” row? Have you checked the rebook code path?</li>
+      <li>Has anyone raised the AI policy in architecture review yet, for any doc?</li>
+      <li>(A real staff engineer) Show t4 cold. Ten-second reaction, then: what would you open first?</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite stakeholder played by an AI agent, built from what Priya said about him in interviews 01–03a and the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. Marcus is an influencer and blocker, not the ICP: his answers inform how exports read and cite, and never re-rank the backlog on their own. Exploration 03 is a design concept, not shipped software.
+  </footer>
+
+</main>
