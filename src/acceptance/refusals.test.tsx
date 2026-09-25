@@ -85,6 +85,16 @@ describe("Refusals", () => {
     expect(within(log()).getByRole("status")).toHaveTextContent("Copied");
   });
 
+  it("keeps the refusal's actions outside its alert, so copying is announced once", async () => {
+    const { server, log, send } = startConversation();
+    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
+
+    const alert = await within(log()).findByRole("alert");
+
+    expect(within(log()).getByRole("button", { name: "Copy the conversation" })).toBeInTheDocument();
+    expect(within(alert).queryAllByRole("button")).toHaveLength(0);
+  });
+
   it("asks to clear the conversation from an unverifiable refusal, with focus on Keep", async () => {
     const { server, user, log, send } = startConversation();
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });

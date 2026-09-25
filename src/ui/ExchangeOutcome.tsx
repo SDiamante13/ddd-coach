@@ -18,18 +18,10 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
     case "failed":
       return (
         <>
-          <p role="alert">
-            {exchange.error}
-            {isRefused(exchange) && (
-              <span className="refusal-actions">
-                <CopyConversationButton text={conversation} />
-                <button type="button" onClick={onStartNew}>
-                  Start a new one
-                </button>
-              </span>
-            )}
-          </p>
-          {!isRefused(exchange) && (
+          <p role="alert">{exchange.error}</p>
+          {isRefused(exchange) ? (
+            <RefusalActions conversation={conversation} onStartNew={onStartNew} />
+          ) : (
             <button type="button" disabled={busy} onClick={() => onRetry(exchange)}>
               Retry
             </button>
@@ -37,4 +29,15 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
         </>
       );
   }
+}
+
+function RefusalActions({ conversation, onStartNew }: { conversation: () => string; onStartNew: () => void }) {
+  return (
+    <span className="refusal-actions">
+      <CopyConversationButton text={conversation} />
+      <button type="button" onClick={onStartNew}>
+        Start a new one
+      </button>
+    </span>
+  );
 }
