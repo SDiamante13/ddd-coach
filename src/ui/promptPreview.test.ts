@@ -17,4 +17,9 @@ describe("previewOf", () => {
   it("cuts a single line one character past the preview length", () => {
     expect(previewOf("M".repeat(PREVIEW_CHARS + 1))).toEqual({ preview: "M".repeat(PREVIEW_CHARS), hidden: 1 });
   });
+
+  it("does not split a character that straddles the preview length", () => {
+    const beforeEmoji = "M".repeat(PREVIEW_CHARS - 1);
+    expect(previewOf(`${beforeEmoji}📦x`)).toEqual({ preview: beforeEmoji, hidden: 3 });
+  });
 });
