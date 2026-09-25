@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
 import { readAccessPassword, readSigningKey } from "../../server/config.ts";
-import { createSessionHandler } from "../../server/unlockHandler.ts";
+import { createSessionHandler } from "../../server/accessHandlers.ts";
 
 export default (request: Request): Promise<Response> =>
   createSessionHandler({

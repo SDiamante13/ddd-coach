@@ -5,7 +5,7 @@ import { createAccessPass } from "./accessPass.ts";
 import type { AccessPasswordResult, SigningKeyResult } from "./config.ts";
 import { cookieOf, JUST_EXPIRED_ISSUE, NOW, TEST_ACCESS_PASSWORD } from "./test/access.ts";
 import { TEST_SIGNING_KEY } from "./test/conversations.ts";
-import { createSessionHandler, createUnlockHandler } from "./unlockHandler.ts";
+import { createSessionHandler, createUnlockHandler } from "./accessHandlers.ts";
 
 const testPass = createAccessPass(TEST_SIGNING_KEY, TEST_ACCESS_PASSWORD);
 const validCookie = cookieOf(testPass.issue(NOW));
