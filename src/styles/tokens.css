@@ -19,6 +19,8 @@
   --color-alert-tint: #fbe9ec;
   --color-alert-line: #e3a9b6;
   --color-ok: #2f6b3a;
+  --color-warn: #8a5a10;
+  --color-warn-tint: #fbf1dc;
 
   --color-card-event: #f6a65c;
   --color-card-question: #ee9bb0;
@@ -89,6 +91,8 @@
     --color-alert-tint: #3a1d25;
     --color-alert-line: #6e3444;
     --color-ok: #9ccf94;
+    --color-warn: #e2b36a;
+    --color-warn-tint: #3a2e18;
     --shadow-card: 0 1px 0 rgb(0 0 0 / 0.4), 0 8px 18px -10px rgb(0 0 0 / 0.7);
     --shadow-float: 0 12px 30px -16px rgb(0 0 0 / 0.7);
   }
@@ -112,6 +116,8 @@
   --color-alert-tint: #3a1d25;
   --color-alert-line: #6e3444;
   --color-ok: #9ccf94;
+  --color-warn: #e2b36a;
+  --color-warn-tint: #3a2e18;
   --shadow-card: 0 1px 0 rgb(0 0 0 / 0.4), 0 8px 18px -10px rgb(0 0 0 / 0.7);
   --shadow-float: 0 12px 30px -16px rgb(0 0 0 / 0.7);
 }
