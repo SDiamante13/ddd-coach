@@ -130,6 +130,60 @@ describe("Connection test", () => {
     expect(within(log()).getByRole("button", { name: "Retry" })).toBeInTheDocument();
   });
 
+  it("sends a follow-up with the earlier replied turn as history", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+    await user.type(input(), "A{Enter}");
+    server.reply(0, 200, { reply: "R1" });
+    await within(log()).findByText("R1");
+
+    await user.type(input(), "B{Enter}");
+
+    expect(server.bodyOf(0)).toEqual({ message: "A", history: [] });
+    expect(server.bodyOf(1)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1" }] });
+  });
+
+  it("leaves a failed turn out of the next message's history", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+    await user.type(input(), "A{Enter}");
+    server.reply(0, 502, { error: "The coach is unavailable." });
+    await within(log()).findByRole("alert");
+
+    await user.type(input(), "B{Enter}");
+
+    expect(server.bodyOf(1)).toEqual({ message: "B", history: [] });
+  });
+
+  it("retries with the turns before it, then keeps the retried turn at its log position", async () => {
+    const server = stubFetch();
+    const { user, input, log } = renderApp();
+    await user.type(input(), "A{Enter}");
+    server.reply(0, 200, { reply: "R1" });
+    await within(log()).findByText("R1");
+    await user.type(input(), "B{Enter}");
+    server.reply(1, 502, { error: "The coach is unavailable." });
+    await within(log()).findByRole("alert");
+    await user.type(input(), "C{Enter}");
+    server.reply(2, 200, { reply: "R3" });
+    await within(log()).findByText("R3");
+
+    await user.click(within(log()).getByRole("button", { name: "Retry" }));
+    server.reply(3, 200, { reply: "RB" });
+    await within(log()).findByText("RB");
+    await user.type(input(), "D{Enter}");
+
+    expect(server.bodyOf(3)).toEqual({ message: "B", history: [{ prompt: "A", reply: "R1" }] });
+    expect(server.bodyOf(4)).toEqual({
+      message: "D",
+      history: [
+        { prompt: "A", reply: "R1" },
+        { prompt: "B", reply: "RB" },
+        { prompt: "C", reply: "R3" },
+      ],
+    });
+  });
+
   it("shows HTML in a reply as literal text", async () => {
     const server = stubFetch();
     const { user, input, log } = renderApp();

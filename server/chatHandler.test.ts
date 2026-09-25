@@ -32,8 +32,8 @@ function post(body: string): Request {
   return new Request("http://localhost/api/chat", { method: "POST", body });
 }
 
-function postMessage(message: unknown): Request {
-  return post(JSON.stringify({ message }));
+function postMessage(message: unknown, history: unknown = []): Request {
+  return post(JSON.stringify({ message, history }));
 }
 
 describe("chat handler", () => {
@@ -44,6 +44,16 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ reply: "Echo: Hello coach" });
+  });
+
+  it("hands the coach the posted history with the new prompt", async () => {
+    const coach = echoCoach();
+    const handle = handler({ createCoach: () => coach });
+
+    const response = await handle(postMessage("B", [{ prompt: "A", reply: "R1" }]));
+
+    expect(response.status).toBe(200);
+    expect(coach.reply).toHaveBeenCalledWith({ history: [{ prompt: "A", reply: "R1" }], prompt: "B" });
   });
 
   it("fails with the missing variable's name without creating a coach", async () => {
@@ -115,6 +125,37 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(400);
     expect(createCoach).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["missing history", { message: "B" }],
+    ["history that is not a list", { message: "B", history: "x" }],
+    ["a turn without a reply", { message: "B", history: [{ prompt: "A" }] }],
+    ["a turn with a blank prompt", { message: "B", history: [{ prompt: " ", reply: "R" }] }],
+    ["a turn with an empty reply", { message: "B", history: [{ prompt: "A", reply: "" }] }],
+    ["a role-shaped turn", { message: "B", history: [{ role: "system", content: "x" }] }],
+  ])("rejects %s as a bad request without calling the coach", async (_case, body) => {
+    const coach = echoCoach();
+    const handle = handler({ createCoach: () => coach });
+
+    const response = await handle(post(JSON.stringify(body)));
+
+    expect(response.status).toBe(400);
+    expect(coach.reply).not.toHaveBeenCalled();
+  });
+
+  it("refuses a conversation that is too long without calling the coach", async () => {
+    const coach = echoCoach();
+    const handle = handler({ createCoach: () => coach });
+    const history = Array.from({ length: 51 }, () => ({ prompt: "A", reply: "R" }));
+
+    const response = await handle(postMessage("B", history));
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({
+      error: "This conversation is too long for the coach. Reload the page to start a new one.",
+    });
+    expect(coach.reply).not.toHaveBeenCalled();
   });
 
   it("rejects a blank message as a bad request", async () => {

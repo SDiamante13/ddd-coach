@@ -34,10 +34,17 @@ function conversationOf(prompt: string): Conversation {
 }
 
 describe("OpenRouter coach", () => {
-  it("sends the prompt as one capped, non-streaming user message without SDK retries", async () => {
+  it("sends the history as alternating turns before the prompt, capped and without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
+    const conversation: Conversation = {
+      history: [
+        { prompt: "A" as Prompt, reply: "R1" },
+        { prompt: "B" as Prompt, reply: "R2" },
+      ],
+      prompt: "C" as Prompt,
+    };
 
-    const reply = await createOpenRouterCoach(config, chat).reply(conversationOf("Hello coach"));
+    const reply = await createOpenRouterCoach(config, chat).reply(conversation);
 
     expect(reply).toBe("Hi there");
     expect(requests).toEqual([
@@ -45,7 +52,13 @@ describe("OpenRouter coach", () => {
         {
           chatRequest: {
             model: "test/model",
-            messages: [{ role: "user", content: "Hello coach" }],
+            messages: [
+              { role: "user", content: "A" },
+              { role: "assistant", content: "R1" },
+              { role: "user", content: "B" },
+              { role: "assistant", content: "R2" },
+              { role: "user", content: "C" },
+            ],
             stream: false,
             maxCompletionTokens: 600,
           },

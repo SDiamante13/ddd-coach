@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { askCoach } from "../api/askCoach.ts";
+import { historyBefore, turnsOf, type Conversation } from "../domain/conversation.ts";
 import {
   canRetry,
   retry,
@@ -14,21 +15,21 @@ import {
 export function useExchanges() {
   const [exchanges, setExchanges] = useState<readonly Exchange[]>([]);
 
-  async function ask(id: ExchangeId, prompt: Prompt) {
-    const result = await askCoach(prompt);
+  async function ask(id: ExchangeId, conversation: Conversation) {
+    const result = await askCoach(conversation);
     setExchanges((current) => settle(current, id, result));
   }
 
   function send(prompt: Prompt) {
     const id = crypto.randomUUID() as ExchangeId;
     setExchanges((current) => [...current, submit(id, prompt)]);
-    void ask(id, prompt);
+    void ask(id, { history: turnsOf(exchanges), prompt });
   }
 
   function retryFailed(failed: FailedExchange) {
     if (!canRetry(exchanges, failed.id)) return;
     setExchanges((current) => current.map((e) => (e.id === failed.id ? retry(e) : e)));
-    void ask(failed.id, failed.prompt);
+    void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt });
   }
 
   return { exchanges, send, retry: retryFailed };

@@ -1,12 +1,11 @@
 import { OpenRouter } from "@openrouter/sdk";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
-import type { ChatContentItems } from "@openrouter/sdk/models";
+import type { ChatContentItems, ChatMessages } from "@openrouter/sdk/models";
 import type {
   SendChatCompletionRequestRequest,
   SendChatCompletionRequestResponse,
 } from "@openrouter/sdk/models/operations";
-import type { Conversation } from "../src/domain/conversation.ts";
-import type { Prompt } from "../src/domain/exchange.ts";
+import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
 
@@ -25,20 +24,31 @@ export function createOpenRouterCoach(
   chat: ChatClient = new OpenRouter({ apiKey: config.apiKey }).chat,
 ): Coach {
   return {
-    reply: async ({ prompt }: Conversation) =>
-      extractText(await chat.send(userMessage(config.model, prompt), WITHOUT_RETRIES)),
+    reply: async (conversation: Conversation) =>
+      extractText(await chat.send(chatRequest(config.model, conversation), WITHOUT_RETRIES)),
   };
 }
 
-function userMessage(model: string, prompt: Prompt): SendChatCompletionRequestRequest {
+function chatRequest(model: string, conversation: Conversation): SendChatCompletionRequestRequest {
   return {
     chatRequest: {
       model,
-      messages: [{ role: "user", content: prompt }],
+      messages: messagesOf(conversation),
       stream: false,
       maxCompletionTokens: MAX_COMPLETION_TOKENS,
     },
   };
+}
+
+function messagesOf({ history, prompt }: Conversation): ChatMessages[] {
+  return [...history.flatMap(messagesOfTurn), { role: "user", content: prompt }];
+}
+
+function messagesOfTurn({ prompt, reply }: Turn): ChatMessages[] {
+  return [
+    { role: "user", content: prompt },
+    { role: "assistant", content: reply },
+  ];
 }
 
 function extractText(response: SendChatCompletionRequestResponse): string {

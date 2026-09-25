@@ -1,3 +1,4 @@
+import type { Conversation } from "../domain/conversation.ts";
 import type { AskResult } from "../domain/exchange.ts";
 import { COACH_TIMED_OUT, COACH_UNAVAILABLE, type ChatRequestBody } from "../shared/chatContract.ts";
 import { readJson, stringField } from "../shared/json.ts";
@@ -7,16 +8,16 @@ const UNEXPECTED: AskResult = { ok: false, error: "Unexpected response from the 
 const UNAVAILABLE: AskResult = { ok: false, error: COACH_UNAVAILABLE };
 const TIMED_OUT: AskResult = { ok: false, error: COACH_TIMED_OUT };
 
-export async function askCoach(message: string): Promise<AskResult> {
+export async function askCoach(conversation: Conversation): Promise<AskResult> {
   try {
-    return await readResult(await postMessage(message));
+    return await readResult(await postConversation(conversation));
   } catch {
     return UNREACHABLE;
   }
 }
 
-function postMessage(message: string): Promise<Response> {
-  const body: ChatRequestBody = { message };
+function postConversation({ prompt, history }: Conversation): Promise<Response> {
+  const body: ChatRequestBody = { message: prompt, history: [...history] };
   return fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

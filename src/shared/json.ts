@@ -6,8 +6,12 @@ export async function readJson(message: Body): Promise<unknown> {
   }
 }
 
-export function stringField(body: unknown, key: string): string | undefined {
+export function field(body: unknown, key: string): unknown {
   if (typeof body !== "object" || body === null) return undefined;
-  const value: unknown = (body as Record<string, unknown>)[key];
+  return (body as Record<string, unknown>)[key];
+}
+
+export function stringField(body: unknown, key: string): string | undefined {
+  const value = field(body, key);
   return typeof value === "string" ? value : undefined;
 }

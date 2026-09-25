@@ -19,4 +19,16 @@ describe.runIf(config.ok)("OpenRouter coach against the real provider", () => {
 
     expect(reply.trim()).not.toBe("");
   }, 30_000);
+
+  it("uses a detail from an earlier turn", async () => {
+    if (!config.ok) throw new Error(config.error);
+    const conversation: Conversation = {
+      history: [{ prompt: "Remember the code word: PELICAN. Reply only OK." as Prompt, reply: "OK" }],
+      prompt: "What was the code word? Answer in one word." as Prompt,
+    };
+
+    const reply = await createOpenRouterCoach(config.config).reply(conversation);
+
+    expect(reply.toUpperCase()).toContain("PELICAN");
+  }, 30_000);
 });

@@ -1,12 +1,12 @@
 import type { Conversation } from "../src/domain/conversation.ts";
-import { parsePrompt } from "../src/domain/exchange.ts";
 import {
   COACH_TIMED_OUT,
+  COACH_TOO_LONG,
   COACH_UNAVAILABLE,
-  isChatRequestBody,
   type ChatResponseBody,
 } from "../src/shared/chatContract.ts";
 import { readJson } from "../src/shared/json.ts";
+import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
 import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
@@ -25,9 +25,9 @@ export function createChatHandler({ config, createCoach, ...replyDeps }: ChatHan
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
     if (!config.ok) return misconfigured(config.error);
-    const conversation = await readConversation(request);
-    if (conversation === null) return badRequest();
-    return replyFrom(createCoach(config.config), conversation, replyDeps);
+    const parsed = parseChatRequest(await readJson(request));
+    if (!parsed.ok) return rejected(parsed.reason);
+    return replyFrom(createCoach(config.config), parsed.conversation, replyDeps);
   };
 }
 
@@ -39,14 +39,16 @@ function misconfigured(error: string): Response {
   return respond({ error }, { status: 500 });
 }
 
-function badRequest(): Response {
-  return respond({ error: "Send a message." }, { status: 400 });
+function rejected(reason: RejectionReason): Response {
+  return reason === "tooLong" ? tooLong() : badRequest();
 }
 
-async function readConversation(request: Request): Promise<Conversation | null> {
-  const body = await readJson(request);
-  const prompt = isChatRequestBody(body) ? parsePrompt(body.message) : null;
-  return prompt === null ? null : { history: [], prompt };
+function tooLong(): Response {
+  return respond({ error: COACH_TOO_LONG }, { status: 413 });
+}
+
+function badRequest(): Response {
+  return respond({ error: "Send a message." }, { status: 400 });
 }
 
 async function replyFrom(
