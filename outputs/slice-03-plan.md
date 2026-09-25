@@ -35,7 +35,7 @@ Spec: the issue body of #4 (the source of truth). Also #44 (complete sentence), 
 - `server/openRouterCoach.smoke.test.ts` runs in `npm test` only when the OpenRouter vars are in the shell. It asks for "Reply with one word." and the code word PELICAN. **Under a coaching prompt, an off-topic code-word test is fragile.** Change it to a domain memory check (test 12).
 
 **Model (`GET https://openrouter.ai/api/v1/models`, 2026-09-25, no key):**
-- **Slice 3 model: `openai/gpt-5.6-luna`** (Steven, 2026-09-25). The catalog check on the same day gave:
+- **Slice 3 model: `openai/gpt-6-luna` at effort `none`** (Steven, 2026-09-25, after the latency gate): $0.10/M prompt, $0.50/M completion, reasoning optional. The gate and the eval run on it. `gpt-5.6-luna`, below, was the first choice. The catalog check that day gave:
   - prices: **$0.20/M prompt, $1.20/M completion**, $0.02/M cache read, $0.25/M cache write, 10× cheaper than terra;
   - context: 1.05M tokens;
   - reasoning: optional (`default_enabled: true`, `default_effort: "medium"`), and `none` is supported. Keep `OPENROUTER_REASONING_EFFORT=none`;
@@ -234,7 +234,7 @@ This meets both halves of #44's acceptance in text form: a visible marker plus a
 
 **Measure before building the rest (test step 7 is a gate).** The builder, or the deployer, since the run reads `.env`, runs `npm run eval -- --latency`:
 - fixture F1 (the 20k-char thread) as a first turn;
-- with the v1 prompt, against `openai/gpt-5.6-luna` at effort `none` with the 1,000 cap;
+- with the current prompt, against `openai/gpt-6-luna` at effort `none` with the 1,000 cap (first run on `gpt-5.6-luna`; both are in `outputs/evals/slice-03/latency.md`);
 - **5 runs**, one after another.
 
 It records per run:
@@ -455,7 +455,7 @@ Each method stays ≤ 25 lines. `coachInstructions` is a `SECTIONS` array joined
 
 ## Demo script (verifier, hosted)
 
-After `bin/check.sh` is green, the eval summary is committed, and the deployer has deployed to production (`https://ddd-coach.netlify.app`, with `OPENROUTER_MODEL` switched to `openai/gpt-5.6-luna` in the same deploy). Use `agent-browser --session verifier`. Record `$PWD/outputs/demos/slice-03.webm` in a desktop context (1280×800), with a caption banner per step. Install the pass-through fetch spy with the **ms column** (agent-team.md). Put F1's text into the page from the verifier's scratchpad copy of `server/eval/fixtures/booking-split.txt`, using eval (`textarea` value + `input` event).
+After `bin/check.sh` is green, the eval summary is committed, and the deployer has deployed to production (`https://ddd-coach.netlify.app`, with `OPENROUTER_MODEL=openai/gpt-6-luna` and `OPENROUTER_REASONING_EFFORT=none`). Use `agent-browser --session verifier`. Record `$PWD/outputs/demos/slice-03.webm` in a desktop context (1280×800), with a caption banner per step. Install the pass-through fetch spy with the **ms column** (agent-team.md). Put F1's text into the page from the verifier's scratchpad copy of `server/eval/fixtures/booking-split.txt`, using eval (`textarea` value + `input` event).
 
 1. Open the site. Caption: "Slice 3 (#4): paste a messy thread, see where people disagree." The first visit shows the new purpose line.
 2. Fill F1 (20,000 chars). The count reads "20,000 / 24,000 characters"; Send is enabled. Caption: "A 20k Slack thread, line breaks and all."
@@ -504,7 +504,7 @@ Convert to `slice-03.mp4` + `.gif` as in agent-team.md.
 
 ## Approved (2026-09-25, Steven + team-lead)
 
-- The model is `openai/gpt-5.6-luna` at effort `none`, locally and in production (the deployer sets the production env at the next deploy).
+- The model is `openai/gpt-5.6-luna` at effort `none`, locally and in production (the deployer sets the production env at the next deploy). **Superseded the same day: `openai/gpt-6-luna` at effort `none`** (Steven, after the gate).
 - Eval spend is approved (a few dollars at most, far less on luna). The deployer runs the latency gate and the eval, reading `.env` in the redacted way.
 - (a) A free-text fixed layout. (b) `maxCompletionTokens` 1,000. (c) A body cap of about 391 KiB derived from the 64k conversation cap. (d) The text cut-short note partly satisfies #44, which stays open for a UI marker. (e) The prompt choices are accepted.
 - "Try an example thread" is out of this slice. The PO decides whether it gets its own issue.
