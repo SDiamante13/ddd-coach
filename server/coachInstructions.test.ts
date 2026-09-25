@@ -16,9 +16,13 @@ describe("coach instructions", () => {
   });
 
   it.each([
-    ["views that hold across words", "Decide once, before Part 2: view A is the group that appears first in the material"],
-    ["one plain line when views agree", "Never write view A and view B lines that say the same thing."],
-    ["no screen as a holder", "A screen or system, such as the patient portal, isn't a holder either"],
+    ["views named after their group", 'labelled with the team\'s name and that group\'s name from the thread in brackets, such as "Ops (night shift)" and "Ops (day desk)"'],
+    ["views that hold across words", "Decide once, before Part 2, what to call each group, and use that name under every word."],
+    ["one plain line when views agree", "Never write two view lines that say the same thing."],
+    ["a question that names its case", "Name that case in the question: a load or order number, a customer, or the time of a message."],
+    ["named views in pairs", "When one group of a team gets a named line under a word, give every group of that team its own named line under that word."],
+    ["no screen as Team unclear", 'A screen, portal, status or enum is never a holder, not even as "Team unclear" or "Customer-facing portal": put what it shows in the Code line.'],
+    ["no should rulings", 'Never start the question, or a clause in it, with "should": that asks them to rule, not to answer.'],
     ["teams as holders", "Never start it with a shift, desk or group inside a team"],
     ["a question that asks", "Ask; don't propose."],
     ["an example question that offers a choice", "which does billing see: an appointment, a request, or nothing yet?"],

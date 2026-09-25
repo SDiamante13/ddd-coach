@@ -1,6 +1,6 @@
 # Slice 3 eval summary (#4)
 
-**Live: prompt v8 on `openai/gpt-5.6-terra` at effort `none`, confirmed by #78's paired A/B at n=6 per arm (2026-09-25, see "v8 under the ship rule, n=6").** v6 shipped before it under #73's every-run bar, and v4 before that under the 2/3 bar. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
+**Decided: prompt v10 ships on `openai/gpt-5.6-terra` at effort `none`** (#77's paired A/B against v8 at n=6, 2026-09-25, see "v10 against v8"). It replaces v8, which was confirmed by #78's A/B against v6. v10 goes live when it's deployed. Before v8, v6 shipped under #73's every-run bar and v4 under the 2/3 bar. The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
 
 ## How it's measured
 
@@ -314,6 +314,47 @@ F2 split labels goes 6/6 → 5/6, within noise.
 **Spend:** v8 $0.1517, v9 $0.1732, total **$0.3249**. #77's running total is $0.32 of its $1.50 cap. The v6/v8 run was #78's.
 
 v8 stays live, and main keeps v8. `coach-instructions.v9.txt` is kept as the record of what ran.
+
+## v10 against v8 under the ship rule, n=6 (2026-09-25, #77): ships
+
+v10 = v9 plus two rules aimed at v9's two drops:
+- when one group of a team gets a named line under a word, every group of that team gets one, and the team has no plain line there;
+- a screen, portal, status or enum is never a holder, not even as "Team unclear" or "Customer-facing portal".
+
+The command: the same as v9's, with `--ab 10` ([md](ab-2026-09-25-openai-gpt-5-6-terra-v8-v10.md), [data](ab-2026-09-25-openai-gpt-5-6-terra-v8-v10.json)). The JSON records model terra, effort none, n=6, and system sha256s v8 `c5f6c6aa…` and v10 `a8c3a8e3…`. 84 calls, all `stop`, no aborts.
+
+**Ship: yes.** The target goes from v8 13/18 to v10 18/18 (+5, needs +2). No gating check drops at all (total drop 0).
+
+Every gating check that missed in any of the three arms:
+
+| Check | v8 (v9 run) | v9 | v8 (v10 run) | v10 |
+|---|---|---|---|---|
+| F1 question asks | 4/6 | 6/6 | 3/6 | 6/6 |
+| example question asks | 4/6 | 6/6 | 5/6 | 6/6 |
+| F2 split labels | 6/6 | 5/6 | 5/6 | 6/6 |
+| F1 split labels | 6/6 | **4/6** | 6/6 | 6/6 |
+| F3 attribution | 6/6 | **4/6** | 5/6 | 5/6 |
+| F1 attribution | 2/6 | 6/6 | 6/6 | 6/6 |
+| F3 holders | 5/6 | 4/6 | 4/6 | 6/6 |
+| example holders | 5/6 | 6/6 | 5/6 | 6/6 |
+| F1 question spans the thread | 6/6 | 6/6 | 5/6 | 6/6 |
+| F2 split, no names | 6/6 | 6/6 | 5/6 | 6/6 |
+
+Reported only, v10 against v8:
+- F1 sameMeaningNamed 0/6 → 3/6 (#76's "hold");
+- F1 under 400 words 5/6 → 4/6 (longest reply 444 words; the 600 ceiling holds);
+- F1 "same meaning not split" 0/6 in both arms.
+
+**Hand-read:**
+- Every v10 thread reply uses group names: "Ops (day desk)" and "Ops (night shift)" on F1 and F2, "Ops (day desk)" and "Ops (night desk)" on the example. Each keeps its name under every word.
+- All 24 questions name their case (Customer B/D, Load 48213, 7731, 11:55 PM) and none has a "should" clause.
+- The 18 non-thread replies answer naturally and invite a paste, with no role statement.
+
+**Answer-key guard:** `node server/eval/rescore.ts outputs/evals/slice-03/ab-2026-09-25-openai-gpt-5-6-terra-v8-v10.json` gives the same verdict, and "Keys changed since this run: none".
+
+**Spend:** v8 $0.1496, v10 $0.1767, total **$0.3263**. #77's total is **$0.65** of its $1.50 cap (v9 $0.32 and v10 $0.33).
+
+`LIVE_INSTRUCTIONS_VERSION` becomes 10 in the commit that records this ship. Deployment and the hosted F2 check are the deployer's.
 
 ## Limits
 
