@@ -9,4 +9,12 @@ describe("DDD_REFERENCE", () => {
 
     expect(DDD_REFERENCE).toBe(source);
   });
+
+  it("still holds the sentence bin/check.sh looks for in dist/, so the client-bundle guard can't go silent", () => {
+    const checkScript = readFileSync(new URL("../../bin/check.sh", import.meta.url), "utf8");
+    const sentinel = /grep -rqF "([^"]+)" dist/.exec(checkScript)?.[1];
+
+    expect(sentinel).toBeDefined();
+    expect(DDD_REFERENCE).toContain(sentinel);
+  });
 });
