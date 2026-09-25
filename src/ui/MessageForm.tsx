@@ -18,7 +18,8 @@ export function MessageForm({ busy, draft, onDraftChange, onSend, children }: Me
   const id = useId();
   const keyHint = !hasTouchPointer();
   const length = messageLength(draft);
-  const over = draftLimit(length, MAX_MESSAGE_CHARS) === "over";
+  const limit = draftLimit(length, MAX_MESSAGE_CHARS);
+  const over = limit === "over";
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -43,7 +44,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend, children }: Me
           Send
         </button>
       </div>
-      <DraftFoot length={length} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`}>
+      <DraftFoot length={length} limit={limit} keyHint={keyHint} hintId={`${id}-hint`} limitId={`${id}-limit`}>
         {children}
       </DraftFoot>
     </form>

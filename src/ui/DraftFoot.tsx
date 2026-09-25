@@ -1,13 +1,19 @@
 import type { ReactNode } from "react";
 import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
-import { draftLimit, formatCount, type DraftLimit } from "./draftLimit.ts";
+import { formatCount, type DraftLimit } from "./draftLimit.ts";
 
 const KEY_HINT = "Enter sends · Shift+Enter adds a line";
 
-type DraftFootProps = { length: number; keyHint: boolean; hintId: string; limitId: string; children?: ReactNode };
+type DraftFootProps = {
+  length: number;
+  limit: DraftLimit;
+  keyHint: boolean;
+  hintId: string;
+  limitId: string;
+  children?: ReactNode;
+};
 
-export function DraftFoot({ length, keyHint, hintId, limitId, children }: DraftFootProps) {
-  const limit = draftLimit(length, MAX_MESSAGE_CHARS);
+export function DraftFoot({ length, limit, keyHint, hintId, limitId, children }: DraftFootProps) {
   return (
     <>
       {limit === "over" && <OverLimitAlert length={length} />}
