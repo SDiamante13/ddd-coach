@@ -71,14 +71,16 @@ describe("chat handler", () => {
     expect(first.signature).not.toBe(second.signature);
   });
 
-  it("hands the coach the posted history with the new prompt", async () => {
+  it("hands the coach the history it signed earlier with the new prompt", async () => {
     const coach = echoCoach();
     const handle = handler({ createCoach: () => coach });
+    const { reply, signature } = await (await handle(postMessage("A"))).json();
+    const history = [{ prompt: "A", reply, signature }];
 
-    const response = await handle(postMessage("B", [{ prompt: "A", reply: "R1" }]));
+    const response = await handle(postMessage("B", history));
 
     expect(response.status).toBe(200);
-    expect(coach.reply).toHaveBeenCalledWith({ history: [{ prompt: "A", reply: "R1", signature: "" }], prompt: "B" });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history, prompt: "B" });
   });
 
   it("fails with the missing variable's name without creating a coach", async () => {
