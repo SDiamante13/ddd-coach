@@ -57,7 +57,7 @@ table.terms{width:100%;border-collapse:separate;border-spacing:0;background:var(
 <body>
 <header>
   <div style="display:flex;align-items:center;gap:16px"><div class="brand">DDD Coach</div><div style="width:1px;height:22px;background:var(--color-line)"></div><div style="font-size:14px">Eazy Freight · what is a booking?</div></div>
-  <div class="notice">Where your text goes: OpenRouter routes it to OpenAI (openai/gpt-5.6-terra). Kept in this browser only. Don't paste customer names, rates, lanes or contract terms. Your swaps run in this browser before anything is sent.</div>
+  <div class="notice">Where your text goes: OpenRouter routes it to OpenAI (openai/gpt-6-luna). Kept in this browser only. Don't paste customer names, rates, lanes or contract terms. Your swaps run in this browser before anything is sent.</div>
 </header>
 <div class="wrap">
   <section class="left" id="left">
@@ -122,12 +122,12 @@ $("add").onclick = () => {
 };
 $("preview").onclick = () => { $("out").innerHTML = outgoing(); $("out").classList.remove("hide"); };
 const ROWS = [
-  ["Booking", "Ops", "The customer submitted a request", "Slack #booking-split, 22 Sep 2026"],
-  ["", "Finance", "Carrier confirmed and rate locked", "Slack #booking-split, 22 Sep 2026"],
+  ["Booking", "Ops", "The customer submitted a request", "Slack #booking-split, Tue"],
+  ["", "Finance", "Carrier confirmed and rate locked", "Slack #booking-split, Tue"],
   ["", "Carriers", "The tender sent to a carrier", "EDI mapping, as carriers described it"],
   ["Rebook", "Ops", "Same booking, new carrier", "Confirmed by Dana, 29 Sep 2026", "ok"],
   ["", "Ops", "Open: on a lane change, one view says rebook, another says amend", "Split, to settle at the 27 Oct review", "unc"],
-  ["", "Finance", "Cancel plus a new booking", "Slack #booking-split, 22 Sep 2026"],
+  ["", "Finance", "Cancel plus a new booking", "Slack #booking-split, Tue"],
   ["", "Code", "Guess: the screen keeps the booking; the database writes a new one", "Guess (no code was sent)", "unc"],
   ["TONU", "Ops", "A fee when the first carrier already sent a truck", "My notes from Dana, 22 Sep 2026 (unconfirmed)", "unc"],
 ];
