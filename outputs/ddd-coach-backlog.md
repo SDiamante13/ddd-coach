@@ -1,10 +1,8 @@
 # DDD Coach backlog
 
-Status: candidate work, separate from the 14 planned slices (1, 2, 2a, then 3–13). Promote individual items when needed; do not automatically expand slice 1.
+**Work items live in GitHub Issues: https://github.com/SDiamante13/ddd-coach/issues** — owned by the PRODUCT OWNER session. B-numbers are kept in issue titles. Labels: `P1`/`P2`/`P3`, `type:*`, `icp`, `icebox` (#33), `slice:*`. Decisions awaiting Steven: label `type:decision`.
 
-## Confirmed deployment milestone
-
-Slice **2a**, immediately after slice 2: publish a working preview to **Sites or the user’s Netlify**. Target is chosen during implementation. Include the server-side OpenRouter endpoint and hosted environment configuration; verify a real two-turn exchange and failure/retry at the resulting URL. Existing board and sensor slice numbers remain 4 and 5.
+This file keeps product direction and rules only.
 
 ## Confirmed product direction
 
@@ -18,63 +16,6 @@ Slice **2a**, immediately after slice 2: publish a working preview to **Sites or
 - Optional application guardrails default off. Topic restrictions, enforced exercise order, and approval checkpoints can be added as explicit configuration later.
 - Keep basic visuals. Text supports early slices; the final voice experience has no text composer. File attachment remains available alongside voice.
 
-## First candidates to turn into slices
-
-| ID | Candidate | Smallest observable result | Acceptance check | Suggested dependency |
-| --- | --- | --- | --- | --- |
-| B01 | Drop one text file | Drop a `.txt` or `.md` file onto the coaching screen; it becomes context for the next reply. Include an attachment button for keyboard/mobile access. | Drop a short Eazy Freight glossary, then ask about a term. The reply uses its definition; the filename and ready state appear inline. A failed read shows an inline retry/remove action. | After slice 2; candidate before deeper coaching work. |
-| B02 | Start coaching from a dropped file | A successful drop automatically produces a brief acknowledgment and one relevant question. | A new visitor drops a workflow note without typing or pressing Send. The coach asks about a gap or exception; no import dialog appears. | B01. |
-| B03 | Remove attached context | Remove a file from the active context using its inline attachment chip. | The next request excludes the removed file body. The interface makes clear that previous conversation messages remain. | B01. |
-| B04 | Drop a text-based HTML explanation | Extract readable content from one HTML file and attach its source name. | Drop the supplied Eazy Freight shipment trace. Coaching can refer to its booking section; scripts and styling do not become conversational content or execute. | B01. |
-| B05 | Add a second source | Include two attachments in the same session with source attribution. | Drop two notes that disagree. The coach identifies which source says what and asks the visitor to resolve the discrepancy. | B01. |
-| B06 | Refresh the recap automatically | Update the existing workflow recap after the visitor supplies a new confirmed fact. | Explain carrier rejection/resubmission. The recap adds the exception without a separate Generate action. Keep it inside the coaching screen. | Slice 4. |
-| B07 | Make optional guardrails configurable | Add a small server configuration for one optional topic restriction; default is disabled. | With default configuration, the coach follows a visitor’s change of topic without an app-added topic gate. When explicitly enabled, the restriction is observable and reversible. | First demonstrated need; separate behavior-preserving refactor before integration if required. |
-| B08 | Read a text-based PDF | Extract text from one PDF using the same attachment flow. | A readable PDF contributes context. An image-only PDF gets an accurate inline unsupported message, not an empty success. | B01; OCR remains separate. |
-| B17 | Attach a public GitHub file URL | Fetch one text file and make it available to the coach automatically. | Attach a public Markdown or source-file URL. The reply uses its content and identifies the file/revision; invalid or unavailable links show an inline recovery action. | Shared attachment context from B01; generalize that mechanism in a separate refactor commit first if needed. |
-| B18 | Attach a public repository URL | Resolve the revision, read its README and file listing, then retrieve a small set of relevant text files as coaching needs them. | Attach a repository URL and ask about a workflow. The coach names the files it read and asks about missing context; it does not imply it read the whole repository. | B17. |
-
-These are proposed extraction points, not new numbered commitments. B01–B02 and B17 are the leading context candidates for the next planning session.
-
-## Generative UI candidates
-
-The [generative coach direction](generative-coach-direction.md) supersedes the chat-first mockup. B11 is now core product work, not a decorative future board.
-
-| ID | Candidate | Acceptance check | Dependency |
-| --- | --- | --- | --- |
-| B22 | One Example Map | Select a workflow event; coach creates a story with one rule, concrete example, and open question. Original event remains linked and visible. | Slice 4 board actions. |
-| B23 | Captions on by default | A spoken exchange shows current captions. CC hides them immediately without stopping voice or board updates. They do not accumulate into chat history. | Speech output/input slices. |
-| B24 | Optional transcript drawer | Visitor explicitly enables transcript capture and opens it on the same screen. Default is off/closed; define capture timing explicitly. | Conversation + voice turns. |
-| B25 | Coach selects a useful technique | Coach opens an Example Map when exploring a rule, explains the move briefly, and preserves the originating timeline and fact identities. | B22; real coaching examples. |
-| B26 | Stable focus while the board evolves | Visitor pans away; new coach edits do not yank the viewport back. Follow coach restores focus when wanted. | Slice 4. |
-| B27 | Point and speak | Select a sticky and say “rename this”; the intended card changes, with undo available. | Slice 4 correction + voice input. |
-
-## Slice 1b leftovers
-
-Slice 1b ([plan](slice-01b-plan.md)) landed in 6ea0482 without its own demo; the slice 2 demo covers it. It added the 600-token cap, turned SDK retries off, added a 25 s deadline returning 504 and a 502 for empty replies, blocks Retry while another exchange is busy, maps status codes to error messages, and logs only the error name and status. Still open:
-
-| ID | Candidate | Acceptance check |
-| --- | --- | --- |
-| B33 | Focus after Send/Retry | Focus returns to the input after Send and stays on the entry after Retry. |
-| B34 | Clear a whitespace draft | Submitting only whitespace clears the input. |
-| B35 | Streaming replies | Tokens stream to the entry, so long replies don't hit sync function limits. Promote before or at 2a. |
-| B36 | Log deadline timeouts | A 504 deadline hit logs `{name:"Timeout"}` server-side; today only thrown errors are logged. |
-| B37 | Cancel provider call on 504 | The in-flight OpenRouter fetch is aborted when the deadline fires. |
-| B38 | Trim or summarise long conversations | At the slice 2 limit (50 turns / 24k chars), older turns are summarised or dropped instead of a 413 dead end until reload. |
-| B39 | Cap request body size before parsing | An oversized POST to `/api/chat` gets a 413 before the full body is read or JSON-parsed. Check it at 2a hosting. |
-| B40 | Per-message cap with its own message | A single oversized message gets "message too long, shorten it", not "reload" (a reload can't help). chatRequest.ts counts the message in the conversation total. |
-| B41 | No dead Retry on 413 | A 413 entry offers no Retry, or Retry after trimming. Today it always gets a 413 again. Refines B38. |
-| B42 | Busy guard in `send` | `useExchanges.send` refuses while busy (a domain guard like `canRetry`), not relying only on the disabled button. |
-| B43 | Distrust client-supplied assistant turns | Before slice 3's system prompt: sign or keep coach turns server-side, so forged assistant turns can't steer the coach. |
-| B44 | Build-only strict CSP | A `script-src 'self'` CSP applies to deployed builds only, without breaking `netlify dev`. |
-| B45 | GitHub continuous deploy | Link the private repo through the Netlify GitHub App, and deploy from `main` only once CI runs `bin/check.sh`. |
-| B46 | Access gate for the hosted coach | Add a shared passphrase or sign-in if credit use shows abuse. |
-
-## Development tooling candidate
-
-**B21 — DDD analysis-quality sensor (development only).** Review our domain analysis, language, scenarios, and boundary decisions as we build. Attach this to the slice 5 sensor integration, then implement one small increment at a time: charter → receipt validator → trigger → reasoned review → hook liveness proof. See [sensor contract](ddd-analysis-sensor.md), [initial domain analysis](ddd-domain-analysis.md), and [research sources](ddd-research.md).
-
-Acceptance: a seeded unsupported business claim produces a located, evidence-backed finding and a useful next question; a simple slice is not rejected for lacking aggregates; stale or unavailable review never looks current. Do not add a reviewer or enforcement gate to live coaching sessions. Hook implementation remains pending.
-
 ## Friction checks for every promoted slice
 
 - A first-time visitor can understand the next action from the main screen.
@@ -84,21 +25,6 @@ Acceptance: a seeded unsupported business claim produces a located, evidence-bac
 - The next conversational question is asked only when the answer is needed; routine processing continues automatically.
 
 For file slices, choose the first supported format and a clear size/context limit during implementation. Show unreadable or oversized files honestly, preserve the conversation, and let the visitor recover inline.
-
-## Later ideas awaiting refinement
-
-| ID | Idea | Evidence needed before slicing |
-| --- | --- | --- |
-| B09 | Images, scanned PDFs, and diagrams | Examples where visual context changes coaching quality. |
-| B10 | Read a selected local project folder | Need for local/uncommitted context beyond individual file drops; verify browser support and selected-folder permissions. Read-only, limited to the chosen project. |
-| B11 | Promoted: generative event board | Core direction confirmed; replace slice 4’s text-only recap with sub-slices 4a–4d. See generative-coach-direction.md. |
-| B12 | Saved sessions and projects | Repeat visits that need prior context, plus a retention decision. |
-| B13 | Additional DDD exercises | A concrete next exercise requested by pilot users. |
-| B14 | Team facilitation | A real multi-person session with clear turn-taking needs. |
-| B15 | Accounts | A demonstrated need for ownership or cross-device history. |
-| B16 | Three.js / GSAP visuals | A specific interaction that improves understanding. |
-| B19 | Private GitHub repositories | A pilot using private code; add repository-scoped authentication when needed. |
-| B20 | Local companion with ongoing project access | Repeated context refresh needs that a web folder selection cannot satisfy; justify installation and maintenance cost. |
 
 ## GitHub versus local files
 
@@ -112,4 +38,4 @@ Use one source representation for dropped files and GitHub results: source ident
 
 ## Promotion rule
 
-Select one backlog ID, define one visible behavior and its failure recovery, confirm dependencies, and assign a slice number. Record the mapping here and update the HTML plan. Preserve the current slice 1 boundary and the planned sensor integration after slice 4 unless explicitly rescheduling them.
+Pick one issue, define one visible behavior and its failure recovery, confirm dependencies, assign a slice label, and update the HTML plan. Parked ideas move out of the icebox (#33) into their own issue only with the listed evidence.
