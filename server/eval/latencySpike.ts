@@ -10,12 +10,22 @@ const FOLLOW_UP = "Which of those lines are guesses?";
 
 type SpikeCall = Measured & { pastedAt: string };
 
-export async function latencySpike(config: CoachConfig, chat: ChatClient, thread: string) {
-  const firstTurn = async (label: string, overrides?: Overrides): Promise<SpikeCall> => {
+function firstTurnOf(config: CoachConfig, chat: ChatClient, thread: string) {
+  return async (label: string, overrides?: Overrides): Promise<SpikeCall> => {
     const pastedAt = new Date();
     const asPasted = verifiedConversationOf(`${nonceLine(pastedAt)}\n${thread.trim()}`);
     return { ...(await measure(config, chat, label, asPasted, overrides)), pastedAt: pastedAt.toISOString() };
   };
+}
+
+export async function firstTurnLatency(config: CoachConfig, chat: ChatClient, thread: string, runs: number) {
+  const firstTurn = firstTurnOf(config, chat, thread);
+  const calls = await repeat(runs, (i) => firstTurn(`run ${i}`));
+  return { verdict: latencyVerdict(calls.map((call) => call.ms)), calls };
+}
+
+export async function latencySpike(config: CoachConfig, chat: ChatClient, thread: string) {
+  const firstTurn = firstTurnOf(config, chat, thread);
   const probes = await repeat(3, (i) => firstTurn(`probe ${i}`, { maxCompletionTokens: 1 }));
   const runs = await repeat(5, (i) => firstTurn(`run ${i}`));
   const streamed = await repeat(2, (i) => firstTurn(`stream ${i}`, { stream: true }));

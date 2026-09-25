@@ -9,7 +9,7 @@ import { abArgsOf, type AbArgs } from "./evalArgs.ts";
 import { evalSummary } from "./evalSummary.ts";
 import { FIXTURE_NAMES, loadFixture } from "./fixtures.ts";
 import { fullEval } from "./fullEval.ts";
-import { latencySpike } from "./latencySpike.ts";
+import { firstTurnLatency, latencySpike } from "./latencySpike.ts";
 import { instructionsOf } from "./promptVersions.ts";
 import { recordable } from "./recordable.ts";
 
@@ -38,6 +38,13 @@ async function runLatency(config: CoachConfig, chat: OpenRouter["chat"]): Promis
   console.log(JSON.stringify({ ...spike.verdict, nonceMentions: spike.nonceMentions }));
   const record = { ...describeRun(config), ...spike, calls: spike.calls.map(recordable) };
   writeResult(`latency-${today()}-${slugOf(config)}.json`, asJson(record));
+}
+
+async function runFirstTurns(config: CoachConfig, chat: OpenRouter["chat"], runs: number): Promise<void> {
+  const { verdict, calls } = await firstTurnLatency(config, chat, loadFixture("booking-split").thread, runs);
+  console.log(JSON.stringify(verdict));
+  const record = { ...describeRun(config), kind: "first-turns", runs, verdict, calls: calls.map(recordable) };
+  writeResult(`latency-first-turns-${today()}-${slugOf(config)}-v${COACH_INSTRUCTIONS_VERSION}.json`, asJson(record));
 }
 
 async function runFullEval(config: CoachConfig, chat: OpenRouter["chat"]): Promise<void> {
@@ -94,6 +101,8 @@ async function main(): Promise<void> {
   console.log(JSON.stringify(describeRun(config.config)));
   const chat = new OpenRouter({ apiKey: config.config.apiKey }).chat;
   if (ab !== null) return runAb(config.config, chat, ab);
+  const firstTurns = process.argv.indexOf("--first-turns");
+  if (firstTurns >= 0) return runFirstTurns(config.config, chat, Number(process.argv[firstTurns + 1] ?? 5));
   await (process.argv.includes("--latency") ? runLatency : runFullEval)(config.config, chat);
 }
 
