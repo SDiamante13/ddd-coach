@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
+
+type Step = "offered" | "confirming" | "kept";
 
 export function NewConversation({ onClear }: { onClear: () => void }) {
-  const [confirming, setConfirming] = useState(false);
+  const [step, setStep] = useState<Step>("offered");
 
-  if (!confirming) {
+  function clear(event: MouseEvent<HTMLButtonElement>) {
+    event.currentTarget.form?.querySelector("textarea")?.focus();
+    onClear();
+  }
+
+  if (step !== "confirming") {
     return (
-      <button type="button" className="new" onClick={() => setConfirming(true)}>
+      <button type="button" className="new" autoFocus={step === "kept"} onClick={() => setStep("confirming")}>
         New conversation
       </button>
     );
@@ -14,10 +21,10 @@ export function NewConversation({ onClear }: { onClear: () => void }) {
   return (
     <span className="confirm">
       Clear this conversation?
-      <button type="button" onClick={onClear}>
+      <button type="button" onClick={clear}>
         Clear
       </button>
-      <button type="button" onClick={() => setConfirming(false)}>
+      <button type="button" autoFocus onClick={() => setStep("kept")}>
         Keep
       </button>
     </span>

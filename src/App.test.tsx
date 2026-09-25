@@ -513,8 +513,21 @@ describe("Connection test", () => {
 
     expect(within(log()).queryAllByRole("listitem")).toHaveLength(0);
     expect(input()).toHaveValue("Draft");
+    expect(input()).toHaveFocus();
     await user.type(input(), "{Enter}");
     expect(server.bodyOf(1)).toEqual({ message: "Draft", history: [] });
+  });
+
+  it("asks with focus on Keep, and keeps the conversation with focus back on New conversation", async () => {
+    const { user, log, sendAndReply } = startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+    expect(screen.getByRole("button", { name: "Keep" })).toHaveFocus();
+    await user.keyboard("{Enter}");
+
+    expect(within(log()).getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "New conversation" })).toHaveFocus();
   });
 
   it("shows HTML in a reply as literal text", async () => {
