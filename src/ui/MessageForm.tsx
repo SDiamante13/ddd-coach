@@ -13,9 +13,10 @@ type MessageFormProps = {
   onSend: (prompt: Prompt) => void;
   children?: ReactNode;
   boxRef?: Ref<HTMLTextAreaElement>;
+  notice?: ReactNode;
 };
 
-export function MessageForm({ busy, draft, onDraftChange, onSend, children, boxRef }: MessageFormProps) {
+export function MessageForm({ busy, draft, onDraftChange, onSend, children, boxRef, notice }: MessageFormProps) {
   const id = useId();
   const keyHint = !hasTouchPointer();
   const length = messageLength(draft);
@@ -32,6 +33,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend, children, boxR
 
   return (
     <form onSubmit={handleSubmit}>
+      {notice}
       <label htmlFor={`${id}-box`}>Message</label>
       <div className="row">
         <MessageBox

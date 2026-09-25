@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { isBusy, type Prompt } from "../domain/exchange.ts";
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
@@ -9,10 +9,12 @@ import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
 import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
+import { NewReplyButton } from "./NewReplyButton.tsx";
 import type { Unlock } from "./useAccess.ts";
 import { useAccessRecovery } from "./useAccessRecovery.ts";
 import { useClearConfirmation } from "./useClearConfirmation.ts";
 import { useExchanges } from "./useExchanges.ts";
+import { useLogFollow } from "./useLogFollow.ts";
 
 type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 
@@ -28,6 +30,8 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
     clear();
     boxRef.current?.focus();
   });
+  const composer = useCallback(() => boxRef.current?.form ?? null, []);
+  const follow = useLogFollow(exchanges.at(-1), composer);
   const busy = isBusy(exchanges);
   const sendFromBox = (prompt: Prompt) => {
     send(prompt);
@@ -47,6 +51,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         onRetry={retry}
         conversation={conversation}
         onStartNew={confirmation.ask}
+        logRef={follow.logRef}
       />
       {accessLost && <AccessGate onUnlock={unlockAgain} />}
       {justUnlocked && (
@@ -54,7 +59,14 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
           {UNLOCKED_FOR}
         </p>
       )}
-      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={sendFromBox} boxRef={boxRef}>
+      <MessageForm
+        busy={busy}
+        draft={draft}
+        onDraftChange={setDraft}
+        onSend={sendFromBox}
+        boxRef={boxRef}
+        notice={follow.newReply && <NewReplyButton onReveal={follow.revealNewest} />}
+      >
         <ComposerActions
           started={exchanges.length > 0}
           draftBlank={draft.trim() === ""}

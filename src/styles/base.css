@@ -347,6 +347,17 @@ form button[type="submit"]:hover:not(:disabled) {
   background: var(--color-coach-strong);
 }
 
+form .new-reply {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: var(--color-coach);
+  background: var(--color-coach-tint);
+  color: var(--color-coach);
+  box-shadow: var(--shadow-float);
+}
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
