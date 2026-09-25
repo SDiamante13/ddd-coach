@@ -5,9 +5,15 @@ import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
 import { describe, expect, it } from "vitest";
 import { CUT_SHORT_NOTE } from "../src/shared/chatContract.ts";
 import { verifiedConversationOf } from "./test/conversations.ts";
-import { createOpenRouterCoach } from "./openRouterCoach.ts";
+import type { CoachConfig } from "./config.ts";
+import { createOpenRouterCoach, type ChatClient } from "./openRouterCoach.ts";
 
 const config = { apiKey: "sk-or-test-key", model: "test/model" };
+const INSTRUCTIONS = "INSTRUCTIONS";
+
+function coachOn(chat: ChatClient, coachConfig: CoachConfig = config) {
+  return createOpenRouterCoach(coachConfig, INSTRUCTIONS, chat);
+}
 
 type Content = string | ChatContentItems[] | null;
 
@@ -39,7 +45,7 @@ describe("OpenRouter coach", () => {
       { prompt: "B", reply: "R2" },
     ]);
 
-    const reply = await createOpenRouterCoach(config, "INSTRUCTIONS", chat).reply(conversation);
+    const reply = await coachOn(chat).reply(conversation);
 
     expect(reply).toBe("Hi there");
     expect(requests).toEqual([
@@ -48,7 +54,7 @@ describe("OpenRouter coach", () => {
           chatRequest: {
             model: "test/model",
             messages: [
-              { role: "system", content: "INSTRUCTIONS" },
+              { role: "system", content: INSTRUCTIONS },
               { role: "user", content: "A" },
               { role: "assistant", content: "R1" },
               { role: "user", content: "B" },
@@ -67,7 +73,7 @@ describe("OpenRouter coach", () => {
   it("asks for the configured reasoning effort", async () => {
     const { chat, requests } = fakeChat("Hi there");
 
-    await createOpenRouterCoach({ ...config, reasoningEffort: "low" }, "INSTRUCTIONS", chat).reply(verifiedConversationOf("A"));
+    await coachOn(chat, { ...config, reasoningEffort: "low" }).reply(verifiedConversationOf("A"));
 
     expect(requests[0]?.[0].chatRequest.reasoning).toEqual({ effort: "low" });
   });
@@ -79,19 +85,19 @@ describe("OpenRouter coach", () => {
       { type: "text", text: "there" },
     ]);
 
-    expect(await createOpenRouterCoach(config, "INSTRUCTIONS", chat).reply(verifiedConversationOf("Hello coach"))).toBe("Hi there");
+    expect(await coachOn(chat).reply(verifiedConversationOf("Hello coach"))).toBe("Hi there");
   });
 
   it("treats missing content as empty text", async () => {
     const { chat } = fakeChat(null);
 
-    expect(await createOpenRouterCoach(config, "INSTRUCTIONS", chat).reply(verifiedConversationOf("Hello coach"))).toBe("");
+    expect(await coachOn(chat).reply(verifiedConversationOf("Hello coach"))).toBe("");
   });
 
   it("ends a reply cut at the token cap on its last complete line, with the cut-short note", async () => {
     const { chat } = fakeChat("Events, in order\n1. From thread: Customer submits.\n2. From thr", "length");
 
-    const reply = await createOpenRouterCoach(config, "INSTRUCTIONS", chat).reply(verifiedConversationOf("Thread"));
+    const reply = await coachOn(chat).reply(verifiedConversationOf("Thread"));
 
     expect(reply).toBe(`Events, in order\n1. From thread: Customer submits.\n\n${CUT_SHORT_NOTE}`);
   });
