@@ -5,7 +5,7 @@ import type {
   SendChatCompletionRequestResponse,
 } from "@openrouter/sdk/models/operations";
 import type { Prompt } from "../src/domain/exchange.ts";
-import type { Coach } from "./chatHandler.ts";
+import type { Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
 
 export type ChatClient = {

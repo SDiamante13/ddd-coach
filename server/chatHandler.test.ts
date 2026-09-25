@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
-import { createChatHandler, type Coach } from "./chatHandler.ts";
+import { createChatHandler } from "./chatHandler.ts";
+import type { Coach } from "./coach.ts";
 import type { ConfigResult } from "./config.ts";
 
 const validConfig: ConfigResult = { ok: true, config: { apiKey: "sk-or-test-key", model: "test/model" } };

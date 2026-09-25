@@ -1,10 +1,7 @@
 import { parsePrompt, type Prompt } from "../src/domain/exchange.ts";
 import { isChatRequestBody } from "../src/shared/chatContract.ts";
+import type { Coach } from "./coach.ts";
 import type { CoachConfig, ConfigResult } from "./config.ts";
-
-export interface Coach {
-  reply(prompt: Prompt): Promise<string>;
-}
 
 type ChatHandlerDeps = {
   config: ConfigResult;
