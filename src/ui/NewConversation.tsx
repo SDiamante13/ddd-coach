@@ -1,4 +1,4 @@
-import { useId, type MouseEvent } from "react";
+import { useId } from "react";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 import type { ClearConfirmation } from "./useClearConfirmation.ts";
 
@@ -6,12 +6,7 @@ type NewConversationProps = { busy: boolean; confirmation: ClearConfirmation; co
 
 export function NewConversation({ busy, confirmation, conversation }: NewConversationProps) {
   const questionId = useId();
-  const { step, askCount, ask, keep } = confirmation;
-
-  function clear(event: MouseEvent<HTMLButtonElement>) {
-    event.currentTarget.form?.querySelector("textarea")?.focus();
-    confirmation.clear();
-  }
+  const { step, askCount, ask, keep, clear } = confirmation;
 
   if (step !== "confirming") {
     return (

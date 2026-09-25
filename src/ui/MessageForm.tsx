@@ -1,4 +1,4 @@
-import { useId, type FormEvent, type ReactNode } from "react";
+import { useId, type FormEvent, type ReactNode, type Ref } from "react";
 import { messageLength, parsePrompt, type Prompt } from "../domain/exchange.ts";
 import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
 import { DraftFoot } from "./DraftFoot.tsx";
@@ -12,9 +12,10 @@ type MessageFormProps = {
   onDraftChange: (text: string) => void;
   onSend: (prompt: Prompt) => void;
   children?: ReactNode;
+  boxRef?: Ref<HTMLTextAreaElement>;
 };
 
-export function MessageForm({ busy, draft, onDraftChange, onSend, children }: MessageFormProps) {
+export function MessageForm({ busy, draft, onDraftChange, onSend, children, boxRef }: MessageFormProps) {
   const id = useId();
   const keyHint = !hasTouchPointer();
   const length = messageLength(draft);
@@ -39,6 +40,7 @@ export function MessageForm({ busy, draft, onDraftChange, onSend, children }: Me
           describedBy={keyHint ? `${id}-hint ${id}-limit` : `${id}-limit`}
           invalid={over}
           onDraftChange={onDraftChange}
+          boxRef={boxRef}
         />
         <button type="submit" disabled={busy || over}>
           Send

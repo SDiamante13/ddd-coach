@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { isBusy } from "../domain/exchange.ts";
 import { conversationText } from "./conversationText.ts";
 import { restoredDraft } from "./draftLimit.ts";
@@ -14,7 +14,11 @@ export function ConnectionTest() {
   const { exchanges, send, retry, clear } = useExchanges({
     onRefused: (prompt) => setDraft((current) => restoredDraft(current, prompt)),
   });
-  const confirmation = useClearConfirmation(clear);
+  const boxRef = useRef<HTMLTextAreaElement>(null);
+  const confirmation = useClearConfirmation(() => {
+    clear();
+    boxRef.current?.focus();
+  });
   const busy = isBusy(exchanges);
   const conversation = () => conversationText(exchanges);
 
@@ -33,7 +37,7 @@ export function ConnectionTest() {
           </ExchangeEntry>
         ))}
       </ol>
-      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send}>
+      <MessageForm busy={busy} draft={draft} onDraftChange={setDraft} onSend={send} boxRef={boxRef}>
         {exchanges.length > 0 && <NewConversation busy={busy} confirmation={confirmation} conversation={conversation} />}
       </MessageForm>
     </>

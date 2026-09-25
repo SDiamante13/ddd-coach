@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, Ref } from "react";
 import { hasTouchPointer } from "./pointer.ts";
 
 const SAFARI_COMPOSITION_KEY_CODE = 229;
@@ -13,11 +13,13 @@ type MessageBoxProps = {
   describedBy: string;
   invalid: boolean;
   onDraftChange: (text: string) => void;
+  boxRef?: Ref<HTMLTextAreaElement>;
 };
 
-export function MessageBox({ id, draft, describedBy, invalid, onDraftChange }: MessageBoxProps) {
+export function MessageBox({ id, draft, describedBy, invalid, onDraftChange, boxRef }: MessageBoxProps) {
   return (
     <textarea
+      ref={boxRef}
       id={id}
       autoFocus
       rows={2}
