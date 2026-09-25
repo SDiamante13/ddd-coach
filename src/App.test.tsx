@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App.tsx";
 import { stubFetch } from "./test/fetchStub.ts";
+import { PURPOSE_LINE } from "./ui/PurposeLine.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -51,6 +52,12 @@ describe("Connection test", () => {
           "Nothing is stored on our server. Don't paste customer names or rates.",
       ),
     ).toBeVisible();
+  });
+
+  it("says on load what the coach is for", () => {
+    renderApp();
+
+    expect(screen.getByText(PURPOSE_LINE)).toBeVisible();
   });
 
   it("starts with the message input focused and an empty log", () => {

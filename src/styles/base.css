@@ -43,6 +43,15 @@ main > p {
   font-size: var(--text-sm);
 }
 
+main > p.purpose {
+  max-width: 60ch;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  font-size: var(--text-md);
+}
+
 ol[role="log"] {
   list-style: none;
   margin: 0;
