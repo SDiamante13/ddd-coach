@@ -44,12 +44,12 @@ form button[type="submit"]:disabled{opacity:.5}
 </head>
 <body><div id="root"><main>
 <h1>DDD Coach</h1>
-<div class="lockline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><strong style="font-weight:600">Where your text goes</strong><a href="#" onclick="return false">show</a></div>
+<div class="lockline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span><strong style="font-weight:600">Where your text goes:</strong> OpenRouter routes it to OpenAI (openai/gpt-5.6-terra). Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms. <a href="#" onclick="return false">Policies</a></span></div>
 <div class="prev hide" id="prev"><span>Started fresh with your board.</span><button type="button" id="openPrev">Previous conversation (read-only)</button></div>
 <ol role="log" id="log">
 <li data-status="replied"><p>Paste: #booking-split thread (sanitized)</p><p>Two words don't match. “Booking”: ops means the request, finance means confirmed and rate locked, carriers mean the tender. “Rebook”: ops keeps the booking, finance cancels and re-creates it.</p></li>
-<li data-status="replied"><p>My notes from Dana: RB = same bkg unless lane/date chg → AMEND. 2nd inv sometimes legit, TONU.</p><p>Matched to your questions and kept as unconfirmed. TONU is its own term now: a fee when the first carrier already sent a truck.</p></li>
-<li data-status="replied" id="cutli"><p>What should I ask Dana next?</p><p id="cutp"><span id="before">Three questions, each on a different load. 1. Load 48213 was rebooked with another carrier after a rejection: same booking, or a new one? 2. Load 47990 shows AMENDED after a date change: is that the rule for every lane or date change? 3. Load 48102 got two invoices. Was the</span></p><div class="cut" id="cut"><span>Cut short at the reply length limit.</span><button type="button" id="continue">Continue</button></div></li>
+<li data-status="replied"><p>My notes from Dana: RB = same bkg, new carrier. 2nd inv sometimes legit, TONU.</p><p>Matched to your questions and kept as unconfirmed. TONU is its own term now: a fee when the first carrier already sent a truck.</p></li>
+<li data-status="replied" id="cutli"><p>What should I ask Dana next?</p><p id="cutp"><span id="before">Three questions, each on a different load. 1. Load 48213 was rebooked with another carrier after a rejection: same booking, or a new one? 2. Load 47990 shows AMENDED: what made it AMENDED rather than REBOOKED? 3. Load 48102 got two invoices. Was the</span></p><div class="cut" id="cut"><span>Cut short at the reply length limit.</span><button type="button" id="continue">Continue</button></div></li>
 </ol>
 <div class="full hide" id="full">
   <h2>This conversation is full</h2>
@@ -112,16 +112,16 @@ $("copyall").onclick = () => toast("Copied the whole conversation, word for word
 $("fresh").onclick = () => {
   step(4); oldLog = log.innerHTML;
   log.innerHTML = `<li data-status="replied"><div class="carry"><div class="k">Carried over word for word from your last conversation · edit anything wrong</div>
-<table><thead><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Status</th></tr></thead><tbody>
+<table><thead><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Source</th></tr></thead><tbody>
 <tr><td>Booking</td><td>Ops</td><td>The customer submitted a request</td><td>From thread</td></tr>
 <tr><td></td><td>Finance</td><td>Carrier confirmed and rate locked</td><td>From thread</td></tr>
 <tr><td></td><td>Carriers</td><td>The tender sent to a carrier</td><td>From thread</td></tr>
-<tr><td>Rebook</td><td>Ops</td><td>Same booking, new carrier, unless lane or date changes</td><td>My notes from Dana · unconfirmed</td></tr>
+<tr><td>Rebook</td><td>Ops</td><td>Same booking, new carrier</td><td>My notes from Dana · unconfirmed</td></tr>
 <tr><td></td><td>Finance</td><td>Cancel plus a new booking</td><td>From thread</td></tr>
 <tr><td>TONU</td><td>Ops</td><td>A fee when the first carrier already sent a truck</td><td>My notes from Dana · unconfirmed</td></tr>
 </tbody></table>
 <div class="k">Statuses matched by name (7 of 23)</div><div style="font-size:var(--text-sm)">REQUESTED, TENDERED, REJECTED, REBOOKED, AMENDED, CONFIRMED, INVOICED</div>
-<div class="k">Open questions</div><ul><li>Load 48213: same booking or a new one? · for Dana</li><li>Load 47990: AMENDED for every lane or date change? · for Dana</li><li>AMENDED: Dana's sheet vs the code · for you to check</li></ul></div></li>`;
+<div class="k">Open questions</div><ul><li>Load 48213: same booking or a new one? · for Dana</li><li>Load 47990: what made it AMENDED rather than REBOOKED? · for Dana</li><li>Load 48102: had the first carrier already sent a truck (TONU)? · for you to check</li><li>AMENDED: Dana's sheet vs the code · for you to check</li></ul></div></li>`;
   used = 1900; $("full").classList.add("hide"); $("form").classList.remove("hide"); $("prev").classList.remove("hide");
 };
 $("openPrev").onclick = () => { const fresh = log.innerHTML; log.dataset.fresh = fresh; log.innerHTML = oldLog; $("form").classList.add("hide"); $("prev").classList.add("hide"); $("ro").classList.remove("hide"); log.scrollTop = 0; };

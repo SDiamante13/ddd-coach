@@ -43,7 +43,7 @@ Prototype: `pastebox.html`, built on `src/styles/tokens.css` and `base.css`. Its
   - "This app, run by **[OPERATOR]**, stores nothing on its server."
   - "Don't paste customer names, rates, lanes or contract terms."
   - A small line with retention and training links.
-- After the first send it collapses to one line, "Where your text goes · show", so it stays reachable without crowding the log.
+- After the first send it compacts to one visible line that keeps the facts, not a "show" toggle: "Where your text goes: OpenRouter routes it to OpenAI (openai/gpt-5.6-terra). Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms. Policies". (Interview 04b: a notice hidden behind "show" reads as "a cookie banner I have to open".)
 - [MODEL COMPANY] is derived from the configured model id prefix. The hosted model is `openai/gpt-5.6-terra`, so it reads "OpenAI (openai/gpt-5.6-terra)". [OPERATOR] stays a placeholder until Steven confirms. Nothing is hard-coded.
 
 ## Out of scope
