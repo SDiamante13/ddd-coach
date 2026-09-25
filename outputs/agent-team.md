@@ -30,7 +30,7 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 - `agent-browser record start <path>.webm` → scripted acceptance steps → `record stop`.
 - Captions: inject an on-page banner per step via agent-browser (local ffmpeg lacks `drawtext`/`subtitles` filters).
 - Convert: `ffmpeg -i in.webm -c:v libx264 -pix_fmt yuv420p out.mp4`; GIF via `-vf "fps=10,scale=800:-1"`; optional soft CC track by muxing `.srt` as `mov_text`.
-- Output: `outputs/demos/slice-NN.{mp4,gif,md}`.
+- Output: `outputs/demos/slice-NN.{mp4,png,md}`. Skip the GIF (git history keeps every byte forever); make one only if asked, and keep it under 1 MB.
 - Never reload or open mid-recording: the recorder silently stops capturing. Split with `record stop`/`start` and join with ffmpeg concat.
 - Recording ignores `set viewport`, so take the 1280×800 PNG outside the recording. If `record stop` fails with "ffmpeg wait failed", retry it.
 - Injected overlays (captions, spy panels) need `pointer-events:none` and body padding so they don't hide results or catch clicks.
