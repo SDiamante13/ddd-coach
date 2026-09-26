@@ -6,7 +6,7 @@ export function useFlashOnChange(key: string | null) {
   const previous = useRef(key);
   const [flashing, setFlashing] = useState(false);
   useEffect(() => {
-    const changed = previous.current !== null && key !== null && key !== previous.current;
+    const changed = key !== null && key !== previous.current;
     previous.current = key;
     if (!changed) return;
     setFlashing(true);

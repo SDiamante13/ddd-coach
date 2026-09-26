@@ -19,22 +19,34 @@ async function replied(reply: string) {
 }
 
 describe("The question strip (#111)", () => {
-  it("sums up the pinned question on a strip: its roles, then the question, collapsed until asked", async () => {
+  it("sums up the pinned question on a strip: its roles, then the question", async () => {
     await replied(SECOND_BOARD_REPLY);
 
     expect(within(pinned()).getByText("Question · the ops sign-off lead, at the Tue 27 Oct RFC review")).toBeInTheDocument();
     expect(within(pinned()).getAllByText("Who picks the next carrier after a rejection?")).not.toHaveLength(0);
+  });
+
+  it("opens by itself for 3 s when the first question arrives, then closes", async () => {
+    const { send, server } = await startConversation();
+    const first = await send("Here is our #booking-split thread.");
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+
+    await act(async () => server.reply(first, 200, { reply: SECOND_BOARD_REPLY, signature: "sig-1" }));
+    await act(async () => {});
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
+
+    act(() => vi.advanceTimersByTime(3_000));
     expect(toggle()).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("opens to the whole question and closes again on the toggle", async () => {
+  it("closes on the toggle, then opens to the whole question again", async () => {
     const { user } = await replied(SECOND_BOARD_REPLY);
 
     await user.click(toggle());
-    expect(toggle()).toHaveAttribute("aria-expanded", "true");
+    expect(toggle()).toHaveAttribute("aria-expanded", "false");
 
     await user.click(toggle());
-    expect(toggle()).toHaveAttribute("aria-expanded", "false");
+    expect(toggle()).toHaveAttribute("aria-expanded", "true");
   });
 
   it("opens by itself for 3 s when a new reply changes the question, then closes", async () => {
