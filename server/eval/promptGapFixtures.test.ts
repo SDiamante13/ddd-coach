@@ -29,6 +29,7 @@ From thread: "It should reuse the invoice's number with a suffix"
 From thread: "It needs its own number series"`;
 const SIDES_UNCLEAR = SIDES_GOOD.replace("German localisation maintainer means", "Team unclear (view A) means").replace("India localisation maintainer means", "Team unclear (view B) means");
 const SIDES_INVENTED_ROLES = SIDES_GOOD.replace("Question for the German localisation maintainer and the India localisation maintainer", "Question for the invoicing product lead and the tax compliance officer");
+const SIDES_NO_CASE = SIDES_GOOD.replace("For issue #5120, which number series", "For a partial return, which number series");
 const SIDES_BACKTICKS = SIDES_GOOD.replace("one credit_note_series setting", "one `credit_note_series` setting");
 
 const SETTLED_GOOD = `Events, in order
@@ -46,6 +47,7 @@ Words that don't match
 Question for the carrier desk lead and the billing lead, at Thursday's carrier review: For load 6120, which trip counts as a dry run: any trip with nothing loaded, or only one where the shipper wasn't ready?
 From thread: "any trip with nothing loaded is a dry run"
 From thread: "a dry run is when the truck is sent back empty"`;
+const SETTLED_NO_CASE = SETTLED_GOOD.replace("For load 6120, which trip", "Which trip");
 const SETTLED_REASKED = SETTLED_GOOD.replace("For load 6120, which trip counts", "For load 6120, what does on hold mean now, and which trip counts");
 const SETTLED_RELISTED = SETTLED_GOOD.replace('\n\nQuestion for', '\n"on hold"\n- From thread: Warehouse means the freight stays on the dock until the customer releases it.\n- From thread: Billing means the load isn\'t invoiced yet.\n\nQuestion for');
 
@@ -60,8 +62,10 @@ describe("the #99 prompt-gap fixtures", () => {
     ["a reply that names the sides by their stated context", "named-sides", SIDES_GOOD, []],
     ["a reply that writes Team unclear for sides the thread names", "named-sides", SIDES_UNCLEAR, ["sides named"]],
     ["a reply whose question invents roles", "named-sides", SIDES_INVENTED_ROLES, ["roles from thread"]],
+    ["a product-debate reply whose question names no number, since that check is scoped to ops threads", "named-sides", SIDES_NO_CASE, []],
     ["a reply that copies the thread's backticks", "named-sides", SIDES_BACKTICKS, ["no markdown"]],
     ["a reply that leaves the settled split alone and asks what's open", "settled-in-thread", SETTLED_GOOD, []],
+    ["an ops reply whose question names no case", "settled-in-thread", SETTLED_NO_CASE, ["question names a case"]],
     ["a reply that re-asks the split the thread settled", "settled-in-thread", SETTLED_REASKED, ["settled not re-asked"]],
     ["a reply that relists the split the thread settled", "settled-in-thread", SETTLED_RELISTED, ["settled not relisted"]],
   ])("judge %s", (_case, fixture, reply, failures) => {

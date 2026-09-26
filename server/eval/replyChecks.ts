@@ -54,6 +54,7 @@ export type FixtureKey = {
     settled?: string[][];
     sides?: string[][];
     questionRoles?: string[];
+    caseNamed?: boolean;
   };
 };
 export type Fixture = { thread: string; key: FixtureKey; glossary?: KeptGlossaryRow[] };
@@ -85,7 +86,8 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "no merged split": ({ words, fixture }) => hasNoMergedSplit(words, fixture.key),
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
-  "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
+  "question names a case": ({ text, fixture }) =>
+    fixture.key.expect.caseNamed === false || namesACase(parseCoachReply(text)?.question.text ?? ""),
   "roles from thread": ({ text, fixture }) => rolesFromThread(parseCoachReply(text)?.question.roles ?? "", fixture.key.expect.questionRoles),
   "sides named": ({ words, fixture }) => namesSides(words, fixture.key.expect.sides),
   "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
