@@ -1,5 +1,5 @@
 /* Styles the current coaching screen with tokens.css. Selectors follow today's markup:
-   main > h1, data-flow <p>, <ol role="log"> of <li data-status="pending|replied|failed">, <form>. */
+   main > h1, data-flow <aside class="notice">, <ol role="log"> of <li data-status="pending|replied|failed">, <form>. */
 
 *,
 *::before,
@@ -42,7 +42,7 @@ main > p {
   margin: 0;
 }
 
-main > p.notice {
+main > .notice {
   padding: var(--space-4) var(--space-5);
   border: 1px solid var(--color-line-strong);
   border-left: 4px solid var(--color-coach);
@@ -51,6 +51,21 @@ main > p.notice {
   color: var(--color-ink);
   font-size: var(--text-base);
   font-weight: 500;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.notice .notice-links {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+
+.notice a {
+  color: var(--color-coach-strong);
+  text-underline-offset: 0.15em;
 }
 
 main > p.purpose {

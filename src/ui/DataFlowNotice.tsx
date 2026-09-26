@@ -1,8 +1,18 @@
 export const DATA_FLOW_NOTICE =
-  "Your messages are sent to OpenRouter, an AI model provider, to generate replies. " +
+  "Your messages go to OpenRouter, which routes them to OpenAI to write replies. " +
+  "OpenAI doesn't train on them but may keep them for up to 30 days for abuse monitoring. " +
   "Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms. " +
   "Add swaps below to replace names before sending.";
 
 export function DataFlowNotice() {
-  return <p className="notice">{DATA_FLOW_NOTICE}</p>;
+  return (
+    <aside className="notice" aria-label="Where your text goes">
+      <p>{DATA_FLOW_NOTICE}</p>
+      <p className="notice-links">
+        <a href="https://developers.openai.com/api/docs/guides/your-data" rel="noreferrer" target="_blank">
+          OpenAI's data policy
+        </a>
+      </p>
+    </aside>
+  );
 }

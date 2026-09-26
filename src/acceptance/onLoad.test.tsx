@@ -7,16 +7,26 @@ import { PASTE_EXAMPLE } from "../ui/MessageBox.tsx";
 afterEach(() => vi.unstubAllGlobals());
 
 describe("On load", () => {
-  it("tells the user on load where their messages are sent", async () => {
+  it("tells the user on load where their messages go and how long the model company may keep them", async () => {
     await renderApp();
 
     expect(
       screen.getByText(
-        "Your messages are sent to OpenRouter, an AI model provider, to generate replies. " +
+        "Your messages go to OpenRouter, which routes them to OpenAI to write replies. " +
+          "OpenAI doesn't train on them but may keep them for up to 30 days for abuse monitoring. " +
           "Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms. " +
           "Add swaps below to replace names before sending.",
       ),
     ).toBeVisible();
+  });
+
+  it("links the notice to OpenAI's data policy", async () => {
+    await renderApp();
+
+    expect(screen.getByRole("link", { name: "OpenAI's data policy" })).toHaveAttribute(
+      "href",
+      "https://developers.openai.com/api/docs/guides/your-data",
+    );
   });
 
   it("says on load what the coach is for", async () => {
