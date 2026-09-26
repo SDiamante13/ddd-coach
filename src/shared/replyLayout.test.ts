@@ -39,4 +39,19 @@ describe("parseLayout", () => {
 
     expect(parseLayout(stray).wordLines).toContain("No other word is used in different ways.");
   });
+
+  it("keeps a Changed since you kept it section out of the word lines and reads it as drift lines (#100)", () => {
+    const drift = '- "late": Carrier desk here means a missed delivery appointment; you kept: a missed pickup (kept 25 Sep 2026 from load 7731).';
+    const withDrift = REPLY.replace("\n\nQuestion for", `\n\nChanged since you kept it\n${drift}\n\nQuestion for`);
+
+    const layout = parseLayout(withDrift);
+
+    expect(layout.wordLines).not.toContain(drift);
+    expect(layout.driftLines).toEqual([drift]);
+    expect(layout.inOrder).toBe(true);
+  });
+
+  it("reads a drift section placed after the question as out of order", () => {
+    expect(parseLayout(`${REPLY}\nChanged since you kept it\n- "late": Ops here means x; you kept: y (from load 1).`).inOrder).toBe(false);
+  });
 });

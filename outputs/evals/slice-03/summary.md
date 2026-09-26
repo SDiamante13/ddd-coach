@@ -487,6 +487,12 @@ Up: F2 split labels 4/6 → 6/6 and F3 holders 5/6 → 6/6. Reported only: F1 un
 
 `LIVE_INSTRUCTIONS_VERSION` becomes 13 in this commit. The deploy is team-lead's. `chat.mts` now sends `systemPrompt()` (instructions plus the Reference).
 
+## #100 glossary checks, re-scored on the v10/v11 and v11/v13 A/Bs ($0)
+
+| Check change | Verdict | What moved |
+|---|---|---|
+| New gating hard checks. **`drift named`** (thread fixtures with `expect.drift`): each expected word has a line under "Changed since you kept it" naming one of `expect.keptFrom`. **`no false drift`** (every fixture): every drift line's word is in `expect.drift`, and a fixture with no kept glossary has none. **`settled not re-asked`** (`expect.settled`): the question mentions no settled phrase (whole word, any case). **Reported only:** `settled not relisted` (Part 2 quotes no settled word). `parseLayout` reads the drift section apart from the word lines, and a drift heading outside Words…question breaks the order | Unchanged in both | No recorded reply has a drift section or settled expectations, so every new check passes vacuously. The v14 A/B targets `kept-drift:drift named` and `kept-drift:settled not re-asked`, with `kept-steady` as the false-drift control |
+
 ## Limits
 
 - The fixtures are synthetic. Priya's real thread (03b, 04a) is the product test.

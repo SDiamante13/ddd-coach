@@ -229,6 +229,31 @@ describe("hard checks", () => {
     expect(failedHardChecks(cited, "stop", fixture)).toContain("citations verbatim");
   });
 
+  describe("kept glossary checks (#100)", () => {
+    const keptLate = { ...fixture, key: { ...fixture.key, expect: { ...fixture.key.expect, drift: ["late"], keptFrom: ["load 7731"] } } };
+    const driftSection =
+      'Changed since you kept it\n- "late": Ops here means a missed delivery appointment; you kept: a missed pickup (kept 25 Sep 2026 from load 7731).';
+    const withDrift = GOOD_REPLY.replace("\n\nQuestion for", `\n\n${driftSection}\n\nQuestion for`);
+
+    it("fail drift named when the reply doesn't name the planted change", () => {
+      expect(failedHardChecks(GOOD_REPLY, "stop", keptLate)).toEqual(["drift named"]);
+    });
+
+    it("pass the planted change, named as the kept glossary's drift", () => {
+      expect(failedHardChecks(withDrift, "stop", keptLate)).toEqual([]);
+    });
+
+    it("report settled not relisted when Part 2 quotes a settled word again", () => {
+      const settledBooking = { ...fixture, key: { ...fixture.key, expect: { ...fixture.key.expect, settled: [["booking"]] } } };
+
+      expect(failedHardChecks(GOOD_REPLY, "stop", settledBooking)).toContain("settled not relisted");
+    });
+
+    it("fail no false drift for a drift section where nothing was kept", () => {
+      expect(failedHardChecks(withDrift, "stop", fixture)).toEqual(["no false drift"]);
+    });
+  });
+
   it("fail question sources for a question with no source lines under it (#85)", () => {
     const noSources = GOOD_REPLY.split("\n").filter((line) => !line.startsWith('From thread: "')).join("\n");
 
@@ -440,6 +465,12 @@ describe("hard checks on a message that isn't a thread", () => {
     ])("judges an answer that %s", (_case, answer, failures) => {
       expect(failedHardChecks(`${answer}\nPaste a thread when you have one.`, "stop", eventStorming)).toEqual(failures);
     });
+  });
+
+  it("fail no false drift on a message that isn't a thread (#100)", () => {
+    const reply = 'Hi!\nChanged since you kept it\n- "late": Ops here means x; you kept: y (kept 25 Sep 2026 from load 7731).\nPaste a thread when you have one.';
+
+    expect(failedHardChecks(reply, "stop", greeting)).toEqual(["no false drift"]);
   });
 
   it("hold jointRoles, since a reply that asks no question has no roles to join", () => {

@@ -1,5 +1,6 @@
 export const EVENTS_HEADING = "Events, in order";
 export const WORDS_HEADING = "Words that don't match";
+export const DRIFT_HEADING = "Changed since you kept it";
 export const QUESTION = /^Question for ([^:]+): (.+\?)$/;
 export const SOURCE_QUOTE = /^From thread: ["“](.+)["”]$/;
 export const CITATION = /^Source: Evans, Domain-Driven Design Reference \(2015\), ["“](.+?)["”]\.?$/;
@@ -17,6 +18,7 @@ export type ReplyLayout = {
   meaningClaims: string[];
   quotedWords: string[];
   wordLines: string[];
+  driftLines: string[];
 };
 
 export type CoachReply = {
@@ -28,17 +30,20 @@ export type CoachReply = {
 export function parseLayout(reply: string): ReplyLayout {
   const lines = reply.split("\n").map((line) => line.trim());
   const positions = [lines.indexOf(EVENTS_HEADING), lines.indexOf(WORDS_HEADING), lines.findIndex(isQuestion)];
-  const [events = -1, words = -1] = positions;
-  const eventLines = between(lines, events, sectionEnd(events, positions));
-  const wordLines = between(lines, words, sectionEnd(words, positions));
+  const [events = -1, words = -1, question = -1] = positions;
+  const drift = lines.indexOf(DRIFT_HEADING);
+  const boundaries = [...positions, drift];
+  const eventLines = between(lines, events, sectionEnd(events, boundaries));
+  const wordLines = between(lines, words, sectionEnd(words, boundaries));
   return {
     lines,
-    inOrder: isAscending(positions),
+    inOrder: isAscending(positions) && (drift < 0 || (drift > words && drift < question)),
     eventLines,
     eventClaims: eventLines.map((line) => line.replace(NUMBERED, "")),
     meaningClaims: wordLines.filter((line) => MEANING.test(line)).map((line) => line.replace(MEANING, "")),
     quotedWords: wordLines.flatMap((line) => QUOTED_WORD.exec(line)?.[1] ?? []),
     wordLines,
+    driftLines: between(lines, drift, sectionEnd(drift, boundaries)),
   };
 }
 

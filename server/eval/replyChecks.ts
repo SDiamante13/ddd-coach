@@ -1,5 +1,6 @@
 import { endsSentence } from "../replyEnding.ts";
 import { admitsNotCovered, citesOneOf, citesVerbatim } from "./citationChecks.ts";
+import { driftNamed, noFalseDrift, settledNotReAsked, settledNotRelisted } from "./glossaryChecks.ts";
 import { asksOpenly, namesACase, quotesTwoSources } from "./questionChecks.ts";
 import {
   hasCleanSplitLabels,
@@ -45,6 +46,9 @@ export type FixtureKey = {
     nonThread?: boolean;
     cites?: string[];
     notCovered?: boolean;
+    drift?: string[];
+    keptFrom?: string[];
+    settled?: string[][];
   };
 };
 export type Fixture = { thread: string; key: FixtureKey };
@@ -79,6 +83,10 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
   "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
   "question sources": ({ layout, fixture }) => quotesTwoSources(afterQuestion(layout.lines), fixture.thread),
+  "drift named": ({ layout, fixture }) => driftNamed(layout.driftLines, fixture.key.expect),
+  "no false drift": ({ layout, fixture }) => noFalseDrift(layout.driftLines, fixture.key.expect),
+  "settled not re-asked": ({ text, fixture }) => settledNotReAsked(parseCoachReply(text)?.question.text ?? "", fixture.key.expect),
+  "settled not relisted": ({ layout, fixture }) => settledNotRelisted(layout.quotedWords, fixture.key.expect),
   "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
 
@@ -91,6 +99,7 @@ const NON_THREAD_CHECKS: Record<string, HardCheck> = {
   "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
   "cites the reference": ({ layout, fixture }) => citesOneOf(layout.lines, fixture.key.expect.cites),
   "admits not covered": ({ text, fixture }) => admitsNotCovered(text, fixture.key.expect.notCovered),
+  "no false drift": ({ layout, fixture }) => noFalseDrift(layout.driftLines, fixture.key.expect),
   "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };
 
