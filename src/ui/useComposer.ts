@@ -35,6 +35,7 @@ export function useComposer(unlock: Unlock) {
   });
   const confirmation = useClearConfirmation((startWith) => {
     clear();
+    fixes.clear();
     if (startWith === undefined) box.focus();
     else box.startWith(startWith);
   });

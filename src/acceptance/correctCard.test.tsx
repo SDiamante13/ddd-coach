@@ -82,6 +82,23 @@ describe("Correcting a card (#95)", () => {
     expect(within(board()).getByRole("textbox", { name: "Correct this event" })).toHaveFocus();
   });
 
+  it("starts a new conversation with no corrections, so Undo there only ever touches its own", async () => {
+    const conversation = await onTheBoard();
+    await correctCard(conversation.user, GUESS, FIXED);
+    await conversation.user.click(screen.getByRole("button", { name: "New conversation" }));
+    await conversation.user.click(screen.getByRole("button", { name: "Clear" }));
+
+    conversation.server.reply(await conversation.send("Here is our #booking-split thread again."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-3" });
+    await within(board()).findByRole("list", { name: "Events on the board" });
+    expect(within(board()).queryByText("YOU SAID")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status", { name: "Board correction" })).not.toBeInTheDocument();
+
+    await correctCard(conversation.user, "The carrier rejects the booking.", "The carrier turns the booking down.");
+    await conversation.user.click(within(cardItem("The carrier turns the booking down.")).getByRole("button", { name: "Undo" }));
+    expect(within(board()).queryByText("YOU SAID")).not.toBeInTheDocument();
+    expect(within(board()).queryByRole("button", { name: "Undo" })).not.toBeInTheDocument();
+  });
+
   describe.skipIf(CORRECTIONS_ENABLED)("while the coach isn't told about corrections", () => {
     it("claims only the board change, and sends the coach nothing about it", async () => {
       const conversation = await onTheBoard();

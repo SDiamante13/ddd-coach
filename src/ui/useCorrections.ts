@@ -8,5 +8,5 @@ export function useCorrections(outgoing: (text: string) => string) {
   const correct = (id: EntityId, text: string, after: ExchangeId) =>
     setCorrections((list) => [...list, { id, text: outgoing(text), after }]);
   const undo = () => setCorrections((list) => list.slice(0, -1));
-  return { corrections, correct, undo };
+  return { corrections, correct, undo, clear: () => setCorrections([]) };
 }
