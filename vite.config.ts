@@ -1,8 +1,9 @@
 import { configDefaults, defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import { fixtureApi } from "./dev/fixtureApi.ts";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), ...(process.env.COACH_FIXTURES === "1" ? [fixtureApi()] : [])],
   test: {
     environment: "jsdom",
     globals: true,

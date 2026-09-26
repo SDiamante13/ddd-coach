@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "netlify dev",
     "dev:vite": "vite --port 5180 --strictPort",
+    "demo:board": "COACH_FIXTURES=1 vite --port 5190 --strictPort",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "vite build",
