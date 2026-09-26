@@ -5,11 +5,12 @@ import { referenceTitles } from "./knowledge/sections.ts";
 export type VettedReply = { reply: string; dropped: string[] };
 
 const SOURCE_LINE = /^Source:/;
+export const UNSOURCED = "General practice: not from the Reference.";
 
 export function dropUnknownCitations(reply: string, titles: readonly string[]): VettedReply {
   const lines = reply.split("\n");
   const unknown = (line: string) => SOURCE_LINE.test(line.trim()) && !titles.includes(CITATION.exec(line.trim())?.[1] ?? "");
-  return { reply: lines.filter((line) => !unknown(line)).join("\n"), dropped: lines.filter(unknown) };
+  return { reply: lines.map((line) => (unknown(line) ? UNSOURCED : line)).join("\n"), dropped: lines.filter(unknown) };
 }
 
 const REFERENCE_TITLES = referenceTitles(DDD_REFERENCE);

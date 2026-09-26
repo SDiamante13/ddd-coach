@@ -6,11 +6,11 @@ const TITLES = ["Bounded Context", "Context Map"];
 const answer = (sourceLine: string) => ["DDD shapes software around a shared model.", sourceLine, "Paste a thread when you have one."].join("\n");
 
 describe("dropUnknownCitations", () => {
-  it("drops a Source line citing a title the Reference doesn't have, and says which", () => {
+  it("replaces a Source line citing a title the Reference doesn't have with an honest General practice label, and says which", () => {
     const reply = answer('Source: Evans, Domain-Driven Design Reference (2015), "Domain-Driven Design"');
 
     expect(dropUnknownCitations(reply, TITLES)).toEqual({
-      reply: ["DDD shapes software around a shared model.", "Paste a thread when you have one."].join("\n"),
+      reply: ["DDD shapes software around a shared model.", "General practice: not from the Reference.", "Paste a thread when you have one."].join("\n"),
       dropped: ['Source: Evans, Domain-Driven Design Reference (2015), "Domain-Driven Design"'],
     });
   });
