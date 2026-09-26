@@ -1,4 +1,5 @@
-import { parseReply, type ReplyBlock } from "../domain/replyBlocks.ts";
+import { entityId } from "../domain/entityId.ts";
+import { type Claim, parseReply, type ReplyBlock } from "../domain/replyBlocks.ts";
 import type { SwappedText } from "../domain/swaps.ts";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
@@ -45,7 +46,7 @@ function displayOrder(blocks: ReplyBlock[]): ReplyBlock[] {
 function ReplyPart({ block, questionPinned, newCards }: PartProps) {
   switch (block.kind) {
     case "events":
-      return <EventsOnBoard events={block.items.length} added={newCards} />;
+      return <EventsOnBoard events={distinctEvents(block.items)} added={newCards} />;
     case "words":
       return <WordTable rows={block.rows} />;
     case "question":
@@ -72,3 +73,5 @@ function Citation({ title }: { title: string }) {
     </p>
   );
 }
+
+const distinctEvents = (items: readonly Claim[]): number => new Set(items.map(({ text }) => entityId("event", text))).size;
