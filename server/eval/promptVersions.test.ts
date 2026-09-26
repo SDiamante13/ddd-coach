@@ -2,11 +2,12 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { COACH_INSTRUCTIONS_VERSION, coachInstructions } from "../coachInstructions.ts";
+import { systemPrompt } from "../systemPrompt.ts";
 import { instructionsOf } from "./promptVersions.ts";
 
 describe("instructionsOf", () => {
   it("gives the current version as the prompt the coach sends", () => {
-    expect(instructionsOf(COACH_INSTRUCTIONS_VERSION)).toBe(coachInstructions());
+    expect(instructionsOf(COACH_INSTRUCTIONS_VERSION)).toBe(systemPrompt());
   });
 
   it("gives an earlier version as its snapshot, byte for byte", () => {

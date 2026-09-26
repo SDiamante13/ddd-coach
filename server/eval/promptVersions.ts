@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
-import { COACH_INSTRUCTIONS_VERSION, coachInstructions } from "../coachInstructions.ts";
+import { COACH_INSTRUCTIONS_VERSION } from "../coachInstructions.ts";
+import { systemPrompt } from "../systemPrompt.ts";
 
-export const LIVE_INSTRUCTIONS_VERSION = 11;
+export const LIVE_INSTRUCTIONS_VERSION = 13;
 
 export type SnapshotReader = (version: number) => string | undefined;
 
@@ -15,7 +16,7 @@ const readSnapshot: SnapshotReader = (version) => {
 export function instructionsOf(version: number, read: SnapshotReader = readSnapshot): string {
   const snapshot = read(version);
   if (snapshot === undefined) throw new Error(`No snapshot of coach instructions v${version}`);
-  if (version === COACH_INSTRUCTIONS_VERSION && snapshot !== coachInstructions()) {
+  if (version === COACH_INSTRUCTIONS_VERSION && snapshot !== systemPrompt()) {
     throw new Error(`The v${version} snapshot is stale; run npm test`);
   }
   return snapshot;

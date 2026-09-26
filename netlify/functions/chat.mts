@@ -1,6 +1,6 @@
 import type { Config } from "@netlify/functions";
 import { createChatHandler, type CoachFailure } from "../../server/chatHandler.ts";
-import { coachInstructions } from "../../server/coachInstructions.ts";
+import { systemPrompt } from "../../server/systemPrompt.ts";
 import { readAccessPassword, readConfig, readSigningKey, readTimeoutMs } from "../../server/config.ts";
 import { createOpenRouterCoach } from "../../server/openRouterCoach.ts";
 
@@ -11,7 +11,7 @@ export default (request: Request): Promise<Response> =>
     access: readAccessPassword(process.env),
     now: () => new Date(),
     config: readConfig(process.env),
-    createCoach: (config) => createOpenRouterCoach(config, coachInstructions()),
+    createCoach: (config) => createOpenRouterCoach(config, systemPrompt()),
     deadlineMs: readTimeoutMs(process.env),
     log: logCoachFailure,
     signingKey: readSigningKey(process.env),

@@ -1,0 +1,56 @@
+{
+  "model": "openai/gpt-5.6-terra",
+  "reasoningEffort": "none",
+  "instructionsVersion": 13,
+  "kind": "first-turns",
+  "runs": 3,
+  "verdict": {
+    "medianMs": 5454,
+    "maxMs": 6216,
+    "pullStreamingAhead": false
+  },
+  "calls": [
+    {
+      "ms": 6216,
+      "promptTokens": 22695,
+      "cachedTokens": 17078,
+      "completionTokens": 523,
+      "reasoningTokens": 0,
+      "cost": 0.0237326,
+      "finishReason": "stop",
+      "label": "run 1",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders the load and the carrier accepts it.\n3. From thread: A same-carrier date change can be AMENDED or REBOOKED.\n4. From thread: REBOOKED creates a new row and new ref, while the carrier sees a cancel plus new tender.\n5. From thread: Night shift rebooked two Customer B date changes because Amend does not reach the carrier portal.\n\nWords that don't match\n\"booking\"\n- From thread: Ops (day desk) means the customer's request, including a same-carrier date change that remains the same booking.\n- From thread: Ops (night shift) means work that may be REBOOKED to get the changed date to the carrier.\n- From thread: Finance means an invoiceable shipment, which becomes invoiceable at delivery with proof of delivery.\n- From thread: Carriers mean a load or tender, not a booking.\n- From thread: Code means a row, and REBOOKED creates a new row with a new ref.\n\"rebook\"\n- From thread: Ops (day desk) means a new booking for a carrier change or lane change, not a same-carrier date change.\n- From thread: Ops (night shift) means the action used for date changes when Amend does not reach the carrier portal.\n- From thread: Finance means a new booking with a new invoice while the old one is voided.\n- From thread: Carriers mean cancel plus a new tender, which can trigger a TONU.\n- From thread: Code means marking the old row REBOOKED and inserting a new booking row.\n\"hold\"\n- From thread: Ops (day desk) means “waiting on customer,” not hold.\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account, where nothing ships.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct booking-split RFC review: For Customer B’s second same-carrier date change at 11:40 PM, which booking count includes the old REBOOKED row, the new row, or neither before proof of delivery?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"Invoiceable at delivery, not pickup. Proof of delivery closes it.\"",
+      "pastedAt": "2026-09-25T23:59:03.859Z",
+      "promptChars": 20038,
+      "promptSha256": "f20e1744aa9d297b2e5261a4d111e3274a5d229896d630eb29a9a7d538681453"
+    },
+    {
+      "ms": 5454,
+      "promptTokens": 22695,
+      "cachedTokens": 17078,
+      "completionTokens": 491,
+      "reasoningTokens": 0,
+      "cost": 0.0233486,
+      "finishReason": "stop",
+      "label": "run 2",
+      "reply": "Events, in order\n1. From thread: Customer submits on the portal and Ops starts working the booking.\n2. From thread: Ops tenders the load and the carrier accepts it.\n3. From thread: A same-carrier date change is processed as AMENDED or REBOOKED.\n4. From thread: REBOOKED creates a new row and ref, while AMENDED keeps the same row and ref.\n5. From thread: Proof of delivery makes the load invoiceable.\n\nWords that don't match\n\"booking\"\n- From thread: Ops means the customer request from portal submission onward.\n- From thread: Finance means an invoiceable load for its booking count.\n- From thread: Carriers mean a load or a tender, never a booking.\n- From thread: Code creates a booking row on submit and creates another row on rebook.\n\"rebook\"\n- From thread: Ops (day desk) means a carrier change or lane change that makes a new booking.\n- From thread: Ops (night shift) means changes handled through Rebook, including date changes and carrier drops.\n- From thread: Finance means a new booking with its own invoice while the old one is voided.\n- From thread: Carriers mean cancellation of the original load plus a new tender.\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer\".\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account that prevents shipping.\n\"booking count\"\n- From thread: Ops means dashboard rows not CANCELLED, with rebooks mentally subtracted at night.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code counts every row where status is not CANCELLED, including old REBOOKED rows and new rows.\n\nQuestion for the ops lead and the finance controller, at the booking-split RFC review on tue 27 oct: For Customer B's second same-carrier date change at 11:55 PM, which booking count includes the original REBOOKED row, the new ref, or neither?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"second one was already rolling, might be one TONU on that load.\"",
+      "pastedAt": "2026-09-25T23:59:10.076Z",
+      "promptChars": 20038,
+      "promptSha256": "8a976535594927d4fd73bf8ecc7aa36f635b853518108fdfa94c0befbaf959a3"
+    },
+    {
+      "ms": 5111,
+      "promptTokens": 22695,
+      "cachedTokens": 17078,
+      "completionTokens": 532,
+      "reasoningTokens": 0,
+      "cost": 0.0238406,
+      "finishReason": "stop",
+      "label": "run 3",
+      "reply": "Events, in order\n1. From thread: Customer submits a booking on the portal and Ops starts working it.\n2. From thread: A carrier is tendered and can accept the tender before pickup.\n3. From thread: Night dispatch rebooks date changes because AMENDED does not sync the new date to the carrier portal.\n4. From thread: Rebook creates a REBOOKED old row and a new booking row with a new ref.\n5. From thread: Customer B had two same-carrier date changes rebooked overnight, with a possible TONU on the second load.\n\nWords that don't match\n\"booking\"\n- From thread: Ops means the customer's submitted request that the team starts working on.\n- From thread: Finance means an invoiceable shipment, after proof of delivery.\n- From thread: Carriers means neither; they call it a load or a tender.\n- From thread: Code creates a booking row on submit and creates another row on rebook.\n\n\"rebook\"\n- From thread: Ops (day desk) means a new booking for a carrier change or lane change; a same-carrier date or window change is AMENDED.\n- From thread: Ops (night shift) means the action used for date changes, carrier drops, or lane changes when the carrier must receive the update.\n- From thread: Finance means a new booking with a new invoice while the old one is voided.\n- From thread: Carriers means cancel the original load and send a new tender.\n\n\"booking count\"\n- From thread: Ops means the dashboard count used for the shift plan, including rows not CANCELLED.\n- From thread: Finance means invoiceable bookings from the ledger export.\n- From thread: Code counts every row whose status is not CANCELLED, including both rows of a rebook.\n\n\"hold\"\n- From thread: Ops (day desk) means \"waiting on customer,\" not hold.\n- From thread: Ops (night shift) means a booking waiting on the customer.\n- From thread: Finance means a credit hold on the account that stops shipping.\n\nQuestion for the ops lead and the finance controller, at the tue 27 oct RFC review: For Customer B's second same-carrier date change at 11:40 PM, which count includes the original REBOOKED row, the new ref, or neither?\nFrom thread: \"the dashboard query counts every row where status is not CANCELLED. so a rebooked shipment counts twice: the old REBOOKED row and the new one\"\nFrom thread: \"second one was already rolling, might be one TONU on that load.\"",
+      "pastedAt": "2026-09-25T23:59:15.531Z",
+      "promptChars": 20038,
+      "promptSha256": "28c659b588c3c4dfffd5a653fc3affafc07c1204a9a5fdb95534c0662200ebc3"
+    }
+  ]
+}

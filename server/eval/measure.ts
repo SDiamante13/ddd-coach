@@ -1,5 +1,5 @@
 import type { Prompt } from "../../src/domain/exchange.ts";
-import { coachInstructions } from "../coachInstructions.ts";
+import { systemPrompt } from "../systemPrompt.ts";
 import type { CoachConfig } from "../config.ts";
 import { createOpenRouterCoach, type ChatClient } from "../openRouterCoach.ts";
 import type { VerifiedConversation } from "../turnSignature.ts";
@@ -13,7 +13,7 @@ export async function measure(
   label: string,
   conversation: VerifiedConversation,
   overrides?: Overrides,
-  instructions: string = coachInstructions(),
+  instructions: string = systemPrompt(),
 ): Promise<Measured> {
   const recorder = recordingChat(chat, overrides);
   const reply = await createOpenRouterCoach(config, instructions, recorder.chat).reply(conversation);

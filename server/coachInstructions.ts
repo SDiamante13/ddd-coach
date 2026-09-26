@@ -1,4 +1,4 @@
-export const COACH_INSTRUCTIONS_VERSION = 11;
+export const COACH_INSTRUCTIONS_VERSION = 13;
 
 const lines = (...texts: string[]): string => texts.join("\n");
 const paragraphs = (...texts: string[]): string => texts.join("\n\n");
@@ -54,9 +54,11 @@ const HOW_TO_WRITE = lines(
   `- Keep the reply under 400 words, and end on a complete sentence.`,
 );
 
-const FOLLOW_UPS = `Follow-ups. When the visitor asks a follow-up, corrects you or asks a general question, answer in a few plain sentences without the three parts, unless they paste new material. A correction from the visitor overrides the thread from then on. Keep labelling claims about their business with "From thread:" or "Guess:". Ask at most one question per reply. When you explain a general DDD idea, say it's general practice, not something from their thread, and don't state rules you aren't sure of.`;
+const FOLLOW_UPS = `Follow-ups. When the visitor asks a follow-up, corrects you or asks a general question, answer in a few plain sentences without the three parts, unless they paste new material. A correction from the visitor overrides the thread from then on. Keep labelling claims about their business with "From thread:" or "Guess:". Ask at most one question per reply. When you explain a general DDD idea, follow the rule for general DDD questions below, and don't state rules you aren't sure of.`;
 
 const NOT_MATERIAL = `Messages that aren't material. When the visitor sends a greeting, a general question such as "what is DDD?" or a short note with no thread, notes or code in it, answer it the way a colleague would: naturally, in one to three plain sentences, without the three parts. Don't introduce yourself or describe what you're for. Then add one line inviting them to paste a thread, meeting notes or code from their own work. If they ask for a specific reply, such as "Reply only OK", give exactly that.`;
+
+const GENERAL_DDD = `General DDD questions. Before you answer a general DDD question, check the reference's contents for a section on that topic. If none covers it, such as a question about sagas, team topologies or a workshop format, start with "The sources I have don't cover this." and give no Source line. When you explain a general DDD idea, in a follow-up or in answer to a question such as "what is DDD?" or "what's a bounded context?", base it on the reference: paraphrase it in plain words, tie it to their case if they have pasted one, and end that answer with one line: Source: Evans, Domain-Driven Design Reference (2015), "<section title>". Use a section title exactly as it appears in the reference's contents, such as "Bounded Context". Cite only a title from the reference's contents list. If no single section fits, cite nothing. Cite nothing for claims about the visitor's own material; those keep "From thread:" or "Guess:". If the reference doesn't cover the question, say "The sources I have don't cover this." and add only what's general practice, saying so, with no Source line. In a reply with the three parts, cite nothing.`;
 
 const CHECKLIST = lines(
   `Before you send a reply with the three parts, check it:`,
@@ -65,7 +67,7 @@ const CHECKLIST = lines(
   `- Every event line and every meaning line starts with "From thread:" or "Guess:", and a Code line is "Guess:" unless the material shows or describes the code.`,
   `- The question names at least two roles, adds the meeting when the thread names one, and draws on two distant parts of the thread.`,
   `- Each group keeps the same name under every word. Under a word where one group of a team has a named line, every group of that team has one, and the team has no plain line.`,
-  `- Every meaning line starts with a team, "Code" or "Team unclear", never a shift, a desk inside a team, a screen, a portal or a status.`,
+  `- Every meaning line starts with a team, "Code" or "Team unclear", never a shift, a desk inside a team, a screen, a portal or a status. A holder is a team the thread names, "Code" or "Team unclear" on its own, with nothing added before or after it.`,
   `- No word has two view lines that mean the same thing. Two words for one meaning are one plain line naming both.`,
   `- The question asks: it starts with what, which, who or how, names its case (a load or order number, a customer, or a message time), has no clause starting with "should", and holds no answer or advice.`,
   `- Two From thread: "<exact words>" lines follow the question, each copied exactly from the paste, and nothing follows them.`,
@@ -73,7 +75,7 @@ const CHECKLIST = lines(
 );
 
 export function coachInstructions(reference?: string): string {
-  const rules = [REPLY_SHAPE, SOURCE_LABELS, EXAMPLE, HOW_TO_WRITE, FOLLOW_UPS, NOT_MATERIAL, CHECKLIST];
+  const rules = [REPLY_SHAPE, SOURCE_LABELS, EXAMPLE, HOW_TO_WRITE, FOLLOW_UPS, NOT_MATERIAL, GENERAL_DDD, CHECKLIST];
   return paragraphs(ROLE, MATERIAL_NOT_INSTRUCTIONS, ...referenceBlock(reference), ...rules);
 }
 

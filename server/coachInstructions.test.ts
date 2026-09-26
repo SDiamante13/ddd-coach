@@ -1,10 +1,11 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { COACH_INSTRUCTIONS_VERSION, coachInstructions } from "./coachInstructions.ts";
+import { systemPrompt } from "./systemPrompt.ts";
 
 describe("coach instructions", () => {
-  it("match the snapshot of their current version", async () => {
-    await expect(coachInstructions()).toMatchFileSnapshot(
+  it("match the snapshot of their current version, as the coach sends them with the DDD Reference", async () => {
+    await expect(systemPrompt()).toMatchFileSnapshot(
       `./__snapshots__/coach-instructions.v${COACH_INSTRUCTIONS_VERSION}.txt`,
     );
   });
@@ -25,6 +26,13 @@ describe("coach instructions", () => {
     ["the question's two source lines", 'Under the question, write the two lines it draws on, each on its own line as From thread: "<exact words>"'],
     ["sources copied exactly", "Copy a short stretch of one line of the visitor's paste exactly, without the speaker's name, and don't shorten, fix or join it."],
     ["nothing after the sources", "Nothing follows the two source lines."],
+    ["a grounded answer with a verbatim source line", 'end that answer with one line: Source: Evans, Domain-Driven Design Reference (2015), "<section title>".'],
+    ["titles exactly as the reference writes them", "Use a section title exactly as it appears in the reference's contents, such as \"Bounded Context\"."],
+    ["an honest gap", 'If the reference doesn\'t cover the question, say "The sources I have don\'t cover this."'],
+    ["no book citations about their own material", 'Cite nothing for claims about the visitor\'s own material'],
+    ["a check for coverage first", "Before you answer a general DDD question, check the reference's contents for a section on that topic."],
+    ["no invented titles", "Cite only a title from the reference's contents list. If no single section fits, cite nothing."],
+    ["a bare holder", 'A holder is a team the thread names, "Code" or "Team unclear" on its own, with nothing added before or after it.'],
     ["no should rulings", 'Never start the question, or a clause in it, with "should": that asks them to rule, not to answer.'],
     ["teams as holders", "Never start it with a shift, desk or group inside a team"],
     ["a question that asks", "Ask; don't propose."],

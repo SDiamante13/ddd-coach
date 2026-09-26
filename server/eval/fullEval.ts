@@ -1,4 +1,4 @@
-import { coachInstructions } from "../coachInstructions.ts";
+import { systemPrompt } from "../systemPrompt.ts";
 import type { CoachConfig } from "../config.ts";
 import type { ChatClient } from "../openRouterCoach.ts";
 import { verifiedConversationOf } from "../test/conversations.ts";
@@ -9,7 +9,7 @@ import { shipBar, type ScoredRun } from "./shipBar.ts";
 
 export type EvalRun = Measured & ScoredRun;
 
-export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: number, instructions = coachInstructions()) {
+export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: number, instructions = systemPrompt()) {
   const runs: EvalRun[] = [];
   for (const name of FIXTURE_NAMES) {
     const fixture = loadFixture(name);

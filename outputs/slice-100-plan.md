@@ -13,7 +13,7 @@ In one line: **Keep** under a reply saves its term rows to a glossary in this br
   - one localStorage store, one request field, one prompt version and three eval checks;
   - no aggregate, repository, sync or server storage.
 
-## Verified facts (main at `cd163d5`, with #58's v12 in the working tree)
+## Verified facts (main at `cd163d5`; #58 shipped as prompt v13, see the D5 note)
 - **Reply parsing:**
   - `parseReply(reply)` (`src/domain/replyBlocks.ts`) yields `words` blocks of `WordRow { word, meanings: Meaning { source, holder, meaning }[] }`, plus `events`, `question`, `cut` and `text`.
   - The question block's `text` names the case (v11: "For Customer D load 7731, …").
@@ -118,10 +118,9 @@ type Glossary = readonly KeptRow[];
   ```
   It groups rows by word, in kept order, using the Part 2 line shape the model already writes.
 
-**D5. Prompt v13 = live + a kept-glossary rule (U2)**
+**D5. Prompt v14 = live v13 + a kept-glossary rule (U2)**
 - **Dependency:**
-  - v13 goes on top of v12 if #58's A/B ships v12, with `--live 12`.
-  - If v12 doesn't ship, the next unused number goes on top of v11, with `--live 11`. Never reuse 12.
+  - **Settled by #58:** v12 didn't ship; #58 shipped **v13** (the Reference plus grounding rules). So this slice's prompt is **v14**, on top of v13, with `--live 13`. Never reuse 12 or 13.
   - Build after #58's A/B is recorded.
 - **New rule block, `KEPT_GLOSSARY`, after `SOURCE_LABELS`:**
   > When the conversation starts with a kept glossary and the visitor pastes material, compare it with the kept rows. When a team in the new material uses a kept word with a different meaning from the one kept for that team, add a part between Part 2 and Part 3: a line "Changed since you kept it", then one line per change, at most 3: `- "<word>": <team> here means <new meaning>; you kept: <kept meaning> (kept <date> from <source>).` A different wording of the same meaning is not a change. Don't list a kept "From thread" meaning in Part 2 when the material uses it the same way, and don't ask about it: it's settled. A kept "Guess" row isn't settled. Ask your one question about what is new or what changed. With no kept glossary, or no change, leave the part out.
@@ -129,7 +128,7 @@ type Glossary = readonly KeptRow[];
   - REPLY_SHAPE: "three parts" becomes "three parts, plus the optional 'Changed since you kept it' part".
   - Add a checklist line.
   - Update the 400-word line so it counts drift lines.
-- **Snapshot** `coach-instructions.v13.txt`, with content assertions in `coachInstructions.test.ts` (red first).
+- **Snapshot** `coach-instructions.v14.txt`, with content assertions in `coachInstructions.test.ts` (red first).
 
 **D6. Drift in the reply and the UI (U3)**
 - **Layout constants** (`replyLayout.ts`):
@@ -222,7 +221,7 @@ type Glossary = readonly KeptRow[];
    - The rendered glossary counts toward 64k.
    - A max glossary plus a max conversation stays under `MAX_BODY_BYTES`.
    - History signing is unchanged, and a tampered history turn is still refused.
-6. **Model context.** The coach receives `[system, glossary user message, …history, prompt]`. The system text is byte-identical to the v13 snapshot.
+6. **Model context.** The coach receives `[system, glossary user message, …history, prompt]`. The system text is byte-identical to the v14 snapshot.
 7. **Drift in the UI.**
    - A reply with "Changed since you kept it" shows a drift list, placed after the word table and before the question card, with each item's word, the new meaning, the kept meaning and the kept label.
    - An unparseable drift line still shows as text.
@@ -266,32 +265,32 @@ type Glossary = readonly KeptRow[];
 
 **Prompt:**
 
-13. v13 content assertions (red), then the `KEPT_GLOSSARY` block and the snapshot.
+13. v14 content assertions (red), then the `KEPT_GLOSSARY` block and the snapshot.
 14. **The paid A/B** (below), then record it. If it ships, set `LIVE_INSTRUCTIONS_VERSION` to 13 in the recording commit and hand off to deploy.
 
 ## Testing at $0 with fakes
-- **Acceptance:** `stubFetch` plus `sendAndReply` with the recorded v11 reply and a hand-written, labelled v13-shaped drift reply. localStorage is jsdom's and is cleared in `afterEach`. The clock is injected for `keptOn`.
+- **Acceptance:** `stubFetch` plus `sendAndReply` with the recorded v11 reply and a hand-written, labelled v14-shaped drift reply. localStorage is jsdom's and is cleared in `afterEach`. The clock is injected for `keptOn`.
 - **Server:** a fake `Coach` records the `VerifiedConversation`, and a fake `ChatClient` records the messages. Neither uses the network.
 - **Eval checks:** unit tests on hand-written replies, plus `rescore.ts` over the recorded JSON.
 - **Local demo rehearsal (optional, $0):** reuse #94's `dev/fixtureApi.ts` fixture mode if it has landed. Serve the v11 reply, then the drift reply. It can't ship, by #94's three guards.
 
 ## Paid A/B (#78 ship rule)
 ```
-OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run eval -- --ab 13 --live 12 \
+OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run eval -- --ab 14 --live 13 \
   --target "kept-drift:drift named,kept-drift:settled not re-asked"
 ```
-- If #58 didn't ship v12, use `--ab <next> --live 11`.
+- #58 shipped v13, so the live arm is v13, which carries the ~17k-token Reference prefix. Expect roughly twice the per-call cost of the v10–v11 figures below: #58's A/Bs cost about $0.58 for 108 calls.
 - **Scope:** 11 fixtures (9 plus `kept-drift` and `kept-steady`) × n=6 × 2 arms = 132 calls. **Both arms get the same glossary message**, since it's conversation, not prompt. The live arm just has no rule for it.
 - **Estimate:**
   - v10–v11 cost $0.35 for 84 calls, i.e. about $0.0042 per call.
   - Both arms now carry #58's KB: about +$0.0034 per call cached, and +$0.036 for each arm's first uncached call.
   - The glossary adds about 400 tokens, negligible.
   - That's 132 × about $0.0076 + $0.07, **about $1.05**. Replace this with #58's measured per-call cost once recorded.
-- **Cap: $2.50**: at most two runs (v13, plus one fix if a fixable gating drop blocks). Stop if a run passes $1.50.
+- **Cap: $2.50**: at most two runs (v14, plus one fix if a fixable gating drop blocks). Stop if a run passes $1.50.
 - **Expected:** live `drift named` about 0/6 against candidate about 5–6/6. `settled not re-asked` gains if live re-asks "on time". `no false drift` stays 6/6 on `kept-steady` and all older fixtures.
 - **Watch:** F1 length (400 words), and latency median/max per arm.
 
-## Hosted demo (verifier, about $0.04, after v13 is deployed; `outputs/demos/slice-100.{mp4,png,md}`)
+## Hosted demo (verifier, about $0.04, after v14 is deployed; `outputs/demos/slice-100.{mp4,png,md}`)
 1. **Setup:** production, 1280×800, fresh storage, the fetch spy in the right column. Add the swap Brightline Foods → Customer D.
 2. **Thread A:** Try an example, then Send. Under the reply, click **Keep these words**, and the status reads "Kept N rows from load 7731". Open **Glossary (N)**: rows grouped by word, "Brightline Foods" restored, each row showing "25 Sep 2026 from load 7731".
 3. **Persistence:** reload, re-unlock (outside the recording, per the recorder rules), and the glossary is still there. Then "Start a new one".
@@ -309,7 +308,7 @@ OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run e
   - a row kept before a swap existed could carry a name, so outgoing rows are swapped at send time and IDs are never sent;
   - Show what's sent proves it;
   - the rows still sit unswapped in localStorage, the same as the screen.
-- **R5. The #58 dependency:** v13's base and `--live` depend on #58's A/B verdict. If v12 fails, renumber, and don't build on an unshipped prompt.
+- **R5. The #58 dependency (settled):** #58 shipped v13, so this slice builds v14 on it with `--live 13`.
 - **R6. #94 timing:** `entityId` may land twice. Follow U13, with one owner of the module.
 - **R7. Storage:**
   - two tabs: last write wins;
@@ -337,7 +336,7 @@ OPENROUTER_MODEL=openai/gpt-5.6-terra OPENROUTER_REASONING_EFFORT=none npm run e
 - **U1: transport.** **Recommended: a separate, bounded, unsigned `glossary` field of structured rows, rendered server-side into a first user message** (D4).
   - Alternative A: prepend the glossary to `message`. It's signed for free, but it's duplicated in every history turn (cap burn), and it shows in the "You" bubble and in Copy the conversation.
   - Alternative B: an HMAC-signed glossary token. It adds a round trip and protects nothing the user role needs.
-- **U2: prompt base.** **Recommended: v13 on top of #58's v12 if it ships** (`--live 12`). Otherwise the next number on v11. Build only after #58's A/B is recorded.
+- **U2: prompt base.** **Settled: v14 on top of #58's shipped v13** (`--live 13`).
 - **U3: the drift format.** **Recommended: its own part, "Changed since you kept it", between Part 2 and the question, at most 3 lines, one fixed line shape** (easy to check, parse and render). The alternative is inline "(you kept: …)" suffixes on Part 2 lines, which are harder to check and mix with source labels.
 - **U4: what Keep saves.** **Recommended: every row of the reply's word table, Guess rows included and labelled. Only "From thread" rows count as settled.** The alternative saves "From thread" rows only.
 - **U5: re-keeping the same meaning ID.** **Recommended: newest wins, replaced in place with a new date and source.** That's how she resolves drift: keep the new reply. The alternative keeps a version history (v1).

@@ -1,6 +1,6 @@
 # Slice 3 eval summary (#4)
 
-**Decided: prompt v11 ships on `openai/gpt-5.6-terra` at effort `none`** (#85's paired A/B against v10 at n=6, 2026-09-25, see "v11 against v10"). **It's held from deploy until #64's question card renders its source lines.** Production runs v10 (deploy 6ab6caf7), which shipped under #77's A/B against v8. Before that: v8 (confirmed by #78 against v6), v6 (#73's every-run bar) and v4 (the 2/3 bar). The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
+**Decided: prompt v13 ships on `openai/gpt-5.6-terra` at effort `none`**. It's grounded in the DDD Reference (#58), per the paired A/B against v11 at n=6 on 2026-09-25 (see "v13 against v11"). v11 (#85) is live until the next deploy. Before it: v10 (#77), v8 (#78), v6 (#73's every-run bar) and v4 (the 2/3 bar). The F1 synonym case ("hold" = "waiting on customer") is reported only and is #76's known limitation. Local dev stays on `openai/gpt-6-luna`. Latency is in `latency.md`.
 
 ## How it's measured
 
@@ -439,6 +439,53 @@ Two gating drops:
 - Also up: F1 under 400 words, 3/6 → 6/6 (reported only).
 
 v11 stays live and main keeps v11. The v12 snapshot and result are kept as the record.
+
+## v13 against v11 under the ship rule, n=6 (2026-09-25, #58): ships
+
+v13 = v12 plus three rules aimed at v12's misses:
+- before answering a general DDD question, check the reference's contents for a section on it. If none covers it (the examples given are sagas, team topologies or a workshop format, deliberately not the fixture's Event Storming), open with "The sources I have don't cover this." and give no Source line;
+- cite only a Contents title, and if no single section fits, cite nothing;
+- a holder is a team name, "Code" or "Team unclear" on its own, with nothing added before or after it.
+
+The command: `… npm run eval -- --ab 13 --live 11 --target "ddd-bounded-context:cites the reference,not-covered:admits not covered"` ([md](ab-2026-09-25-openai-gpt-5-6-terra-v11-v13.md), [data](ab-2026-09-25-openai-gpt-5-6-terra-v11-v13.json)). The JSON records system sha256s v11 `c858c50a…` and v13 `9d7d567d…`, 108 calls, all `stop`, and no aborts.
+
+**Ship: yes.** The target goes from 0/12 to 10/12 (+10):
+- not-covered admits it in 6/6 runs;
+- bounded context cites "Bounded Context" in 4/6. The other two cite nothing, the "cite nothing if no section fits" rule erring safe.
+
+No gating check drops by more than one run (the total drop is 6 single-run slips):
+- F1 attribution and split, 5/6 each;
+- F2 no names, 5/6;
+- F3 attribution, 5/6;
+- example question spans the thread, 5/6;
+- "what is DDD?" citations verbatim, 5/6: r1 again cites the invented "Domain-Driven Design", and the check catches it.
+
+Up: F2 split labels 4/6 → 6/6 and F3 holders 5/6 → 6/6. Reported only: F1 under 400 words 3/6 → 6/6, and sameMeaningNamed 0/6 → 2/6.
+
+**Hand-read:**
+- Not-covered replies open with "The sources I have don't cover this." and label the rest "General practice:".
+- No thread reply carries a Source line.
+- Every cited title is a Contents title, except "what is DDD?" r1.
+
+**Latency and cost (#58 bars: $0.03 per cached exchange, TTFT 10 s, a 20k paste within 15 s):**
+
+| Condition | Cost | Latency |
+|---|---|---|
+| A/B, cached (candidate) | total $0.3913 | median 3.1 s, max 8.0 s |
+| **20k paste with the prefix cache warm** (`--first-turns 3`, nonce'd first turns) | **$0.024 per exchange** | **median 5.5 s, max 6.2 s** |
+| Fully cold (the first candidate F1 call of each A/B) | $0.063 | 5.7 s and 6.6 s |
+
+- In the A/B, 97% of candidate input was cached.
+- The warm-cache rows: 22.7k prompt tokens, 17.1k of them cached ([data](latency-first-turns-2026-09-25-openai-gpt-5-6-terra-v13.json)).
+- All well under 15 s, so #8 streaming isn't pulled ahead. Cold cost only applies when the shared prefix cache has expired.
+
+**Spend for #58:**
+- v12 A/B $0.5849;
+- v13 A/B $0.5768;
+- latency n=3 $0.0709;
+- total **$1.2326**, within the $1.50 cap.
+
+`LIVE_INSTRUCTIONS_VERSION` becomes 13 in this commit. The deploy is team-lead's. `chat.mts` now sends `systemPrompt()` (instructions plus the Reference).
 
 ## Limits
 
