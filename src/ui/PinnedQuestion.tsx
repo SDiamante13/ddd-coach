@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import type { LatestQuestion } from "../domain/latestQuestion.ts";
 import { useFlashOnChange } from "./useFlashOnChange.ts";
 import { usePinnedReserve } from "./usePinnedReserve.ts";
+import { useQuestionLead } from "./useQuestionLead.ts";
 import { QuestionCard } from "./QuestionCard.tsx";
 
 export const PINNED_QUESTION_ID = "current-question";
@@ -16,6 +17,7 @@ export function PinnedQuestion({ question }: { question: LatestQuestion | null }
     flash.stop();
   };
   usePinnedReserve(ref, question !== null);
+  useQuestionLead(ref, expanded, question?.exchangeId ?? null);
   if (question === null) return null;
   return (
     <aside ref={ref} id={PINNED_QUESTION_ID} className="pinned-question" aria-label="Current question" tabIndex={-1} data-expanded={expanded || undefined}>

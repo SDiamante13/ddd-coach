@@ -1,4 +1,4 @@
-import { useId, type FormEvent, type ReactNode, type Ref } from "react";
+import { useId, useState, type FocusEvent, type FormEvent, type ReactNode, type Ref } from "react";
 import { messageLength, parsePrompt, type Prompt } from "../domain/exchange.ts";
 import { MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
 import { DraftFoot } from "./DraftFoot.tsx";
@@ -27,17 +27,19 @@ export function MessageForm(props: MessageFormProps) {
   const length = messageLength(sent);
   const limit = draftLimit(length, MAX_MESSAGE_CHARS);
   const over = limit === "over";
+  const rest = useRestAfterSend();
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const prompt = parsePrompt(sent);
     if (busy || over) return;
     onDraftChange("");
+    rest.start();
     if (prompt !== null) onSend(prompt);
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} onBlur={rest.endOnLeave} data-resting={rest.resting || undefined}>
       {notice}
       <label htmlFor={`${id}-box`}>Message</label>
       <div className="row">
@@ -46,7 +48,10 @@ export function MessageForm(props: MessageFormProps) {
           draft={draft}
           describedBy={keyHint ? `${id}-hint ${id}-limit` : `${id}-limit`}
           invalid={over}
-          onDraftChange={onDraftChange}
+          onDraftChange={(text) => {
+            rest.end();
+            onDraftChange(text);
+          }}
           boxRef={boxRef}
         />
         <button type="submit" disabled={busy || over}>
@@ -58,4 +63,15 @@ export function MessageForm(props: MessageFormProps) {
       </DraftFoot>
     </form>
   );
+}
+
+function useRestAfterSend() {
+  const [resting, setResting] = useState(false);
+  const end = () => setResting(false);
+  return {
+    resting,
+    start: () => setResting(true),
+    end,
+    endOnLeave: (event: FocusEvent<HTMLFormElement>) => event.currentTarget.contains(event.relatedTarget) || end(),
+  };
 }

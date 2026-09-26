@@ -202,6 +202,13 @@ html {
   background: var(--color-paper);
 }
 
+/* #115: the pinned box sits inside the scroll padding it reserves, so its own focus targets count as below it and focusing them never scrolls. */
+.pinned-question,
+.pinned-question * {
+  scroll-margin-top: calc(-1 * var(--pinned-reserve, 0px));
+  scroll-margin-bottom: var(--pinned-reserve, 0px);
+}
+
 .pinned-question:focus-visible {
   outline: none;
 }
@@ -267,7 +274,13 @@ ol[role="log"] mark {
 
   body:has(.event-board) .pinned-question {
     order: -1;
-    max-height: 32vh;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  body:has(.event-board) .pinned-question .question-card {
+    max-height: min(max(calc(32vh - 2 * var(--space-2)), var(--question-lead, 0px)), 60vh);
+    overflow-y: auto;
   }
 
   body:has(.event-board) .words th,
@@ -336,17 +349,20 @@ ol[role="log"] mark {
   }
 
   body:has(.event-board) .pinned-question[data-expanded] .question-card {
-    margin-top: var(--space-2);
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    box-shadow: var(--shadow-float);
   }
 }
 
 @media (min-width: 1024px) {
-  body:has(.event-board) form:not(.gate):not(:focus-within):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) {
     gap: 0;
     padding: var(--space-2);
   }
 
-  body:has(.event-board) form:not(.gate):not(:focus-within):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) > label {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) > label {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -355,11 +371,11 @@ ol[role="log"] mark {
     white-space: nowrap;
   }
 
-  body:has(.event-board) form:not(.gate):not(:focus-within):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) :is(button[type="submit"], .formfoot) {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) :is(button[type="submit"], .formfoot) {
     display: none;
   }
 
-  body:has(.event-board) form:not(.gate):not(:focus-within):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) textarea {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) textarea {
     height: 44px;
     min-height: 44px;
     max-height: 44px;
