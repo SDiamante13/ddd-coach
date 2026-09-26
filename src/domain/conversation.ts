@@ -13,6 +13,12 @@ export function historyBefore(exchanges: readonly Exchange[], id: ExchangeId): T
   return turnsOf(position === -1 ? exchanges : exchanges.slice(0, position));
 }
 
+export const LONG_PASTE_CHARS = 1_000;
+
+export function lastLongPaste(exchanges: readonly Exchange[]): Prompt | undefined {
+  return [...exchanges].reverse().find(({ prompt }) => prompt.length >= LONG_PASTE_CHARS)?.prompt;
+}
+
 function isReplied(exchange: Exchange): exchange is RepliedExchange {
   return exchange.status === "replied";
 }

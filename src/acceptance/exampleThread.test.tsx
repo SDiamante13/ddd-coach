@@ -49,6 +49,7 @@ describe("Try an example thread", () => {
     expect(queryTryExample()).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "New conversation" }));
+    await user.click(screen.getByRole("radio", { name: "An empty box" }));
     await user.click(screen.getByRole("button", { name: "Clear" }));
     expect(tryExample()).toBeVisible();
   });

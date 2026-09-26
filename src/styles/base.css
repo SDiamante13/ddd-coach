@@ -247,6 +247,19 @@ form .row {
   min-height: var(--target-min);
 }
 
+.formfoot .confirm .start-with {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+}
+
+.formfoot .confirm .start-with label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+}
+
 .formfoot .confirm .clear {
   color: var(--color-alert);
   border-color: var(--color-alert-line);

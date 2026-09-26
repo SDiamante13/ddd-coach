@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { historyBefore, turnsOf } from "./conversation.ts";
+import { historyBefore, lastLongPaste, turnsOf } from "./conversation.ts";
 import { fail, reply, submit, type ExchangeId, type Prompt } from "./exchange.ts";
 
 function exchangeId(n: number): ExchangeId {
@@ -30,5 +30,14 @@ describe("historyBefore", () => {
 
   it("keeps every replied turn for an exchange that is not in the log", () => {
     expect(historyBefore([repliedA, failedB, repliedC], exchangeId(99))).toEqual([turnA, turnC]);
+  });
+});
+
+describe("lastLongPaste", () => {
+  it("is the most recent message of 1,000 characters or more, skipping shorter follow-ups (#68)", () => {
+    const older = reply(submit(exchangeId(5), asPrompt("O".repeat(2_000))), "R", "sig-O");
+    const thread = reply(submit(exchangeId(6), asPrompt("T".repeat(1_000))), "R", "sig-T");
+
+    expect(lastLongPaste([older, thread, repliedA, failedB])).toBe("T".repeat(1_000));
   });
 });

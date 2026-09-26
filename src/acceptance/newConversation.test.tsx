@@ -1,8 +1,10 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { formatCount, startConversation } from "../test/appDriver.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
+
+const PASTED_THREAD = ["#booking-split (Slack, sanitized)", ...Array(40).fill("Ops: a booking exists at submit.")].join("\n");
 
 describe("New conversation", () => {
   it("starts a new conversation after confirming, keeping the draft and sending no history", async () => {
@@ -18,6 +20,46 @@ describe("New conversation", () => {
     expect(input()).toHaveFocus();
     await user.type(input(), "{Enter}");
     expect(server.bodyOf(1)).toEqual({ message: "Draft", history: [] });
+  });
+
+  it("starts the new conversation with the last pasted thread by default, not the follow-up draft (#68)", async () => {
+    const { user, input, sendAndReply } = await startConversation();
+    await sendAndReply(PASTED_THREAD, "R1", "sig-A");
+    await sendAndReply("And what about 48102?", "R2", "sig-B");
+    await user.type(input(), "One more");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    expect(input()).toHaveValue(PASTED_THREAD);
+    expect(input()).toHaveFocus();
+    expect((input() as HTMLTextAreaElement).selectionStart).toBe(PASTED_THREAD.length);
+  });
+
+  it("names the pasted thread by size and first line, and keeps just the draft when chosen (#68)", async () => {
+    const { user, input, sendAndReply } = await startConversation();
+    await sendAndReply(PASTED_THREAD, "R1", "sig-A");
+    await user.type(input(), "And what about 48102?");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+    const choice = screen.getByRole("radiogroup", { name: "Start the new one with:" });
+    expect(within(choice).getByRole("radio", { name: /^Your pasted thread/ })).toBeChecked();
+    expect(within(choice).getByRole("radio", { name: /^Your pasted thread/ })).toHaveAccessibleName(
+      `Your pasted thread (${formatCount(PASTED_THREAD.length)} characters, "#booking-split (Slack, sanitized)…")`,
+    );
+    await user.click(within(choice).getByRole("radio", { name: 'Just your draft ("And what about 48102?")' }));
+    await user.click(screen.getByRole("button", { name: "Clear" }));
+
+    expect(input()).toHaveValue("And what about 48102?");
+  });
+
+  it("offers no choice when nothing long was pasted (#68)", async () => {
+    const { user, sendAndReply } = await startConversation();
+    await sendAndReply("A", "R1", "sig-A");
+
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
   });
 
   it("offers a new conversation again, without asking, once the cleared conversation restarts", async () => {

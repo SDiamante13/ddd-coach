@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { isBusy, type Prompt } from "../domain/exchange.ts";
+import { lastLongPaste } from "../domain/conversation.ts";
+import { isBusy, type Exchange, type Prompt } from "../domain/exchange.ts";
 import { applySwaps, restoreSwaps, type SwappedText } from "../domain/swaps.ts";
 import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
 import { conversationText } from "./conversationText.ts";
@@ -27,9 +28,10 @@ export function useComposer(unlock: Unlock) {
     onAccessLost: access.loseAccess,
     glossary: () => (GLOSSARY_ENABLED ? outgoingGlossary(glossary.rows, box.swaps.swaps).sent : []),
   });
-  const confirmation = useClearConfirmation(() => {
+  const confirmation = useClearConfirmation((startWith) => {
     clear();
-    box.focus();
+    if (startWith === undefined) box.focus();
+    else box.startWith(startWith);
   });
   const follow = useLogFollow(exchanges.at(-1), box.form);
   useComposerReserve(box.form);
@@ -39,7 +41,13 @@ export function useComposer(unlock: Unlock) {
     box.focus();
   };
   const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
-  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, busy: isBusy(exchanges) };
+  const pastedThread = pastedThreadOf(exchanges, box.restoreNames);
+  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, pastedThread, busy: isBusy(exchanges) };
+}
+
+function pastedThreadOf(exchanges: readonly Exchange[], restoreNames: (text: string) => SwappedText): string | undefined {
+  const pasted = lastLongPaste(exchanges);
+  return pasted === undefined ? undefined : restoreNames(pasted).text;
 }
 
 function useDraftBox() {
@@ -49,6 +57,10 @@ function useDraftBox() {
   const form = useCallback(() => boxRef.current?.form ?? null, []);
   const focus = () => boxRef.current?.focus();
   const restore = (prompt: Prompt) => setDraft((current) => restoredDraft(current, prompt));
+  const startWith = (text: string) => {
+    flushSync(() => setDraft(text));
+    focusAtEnd(boxRef.current);
+  };
   const tryExample = () => {
     flushSync(() => setDraft(EXAMPLE_THREAD));
     showFromTop(boxRef.current);
@@ -57,7 +69,13 @@ function useDraftBox() {
   const restoreNames = (text: string): SwappedText => restoreSwaps(swaps.swaps, text);
   const [swapsOpen, setSwapsOpen] = useState(false);
   const swapsPanel = { open: swapsOpen, setOpen: setSwapsOpen };
-  return { draft, setDraft, boxRef, swaps, swapsPanel, form, focus, restore, tryExample, outgoing, restoreNames, blank: draft.trim() === "" };
+  return { draft, setDraft, boxRef, swaps, swapsPanel, form, focus, restore, startWith, tryExample, outgoing, restoreNames, blank: draft.trim() === "" };
+}
+
+function focusAtEnd(box: HTMLTextAreaElement | null) {
+  if (!box) return;
+  box.focus();
+  box.setSelectionRange(box.value.length, box.value.length);
 }
 
 function showFromTop(box: HTMLTextAreaElement | null) {

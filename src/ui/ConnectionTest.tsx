@@ -54,10 +54,11 @@ function ComposerForm({ composer }: { composer: Composer }) {
     >
       <ComposerActions
         started={composer.exchanges.length > 0}
-        draftBlank={box.blank}
+        draft={box.draft}
         busy={busy}
         confirmation={composer.confirmation}
         conversation={composer.conversation}
+        pastedThread={composer.pastedThread}
         onTryExample={box.tryExample}
       />
       {GLOSSARY_ENABLED && <GlossaryPanel {...composer.glossary} shown={(text) => box.restoreNames(text).text} />}

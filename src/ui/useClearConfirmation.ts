@@ -7,10 +7,10 @@ export type ClearConfirmation = {
   askCount: number;
   ask: () => void;
   keep: () => void;
-  clear: () => void;
+  clear: (startWith?: string) => void;
 };
 
-export function useClearConfirmation(onClear: () => void): ClearConfirmation {
+export function useClearConfirmation(onClear: (startWith?: string) => void): ClearConfirmation {
   const [step, setStep] = useState<ClearStep>("offered");
   const [askCount, setAskCount] = useState(0);
 
@@ -22,9 +22,9 @@ export function useClearConfirmation(onClear: () => void): ClearConfirmation {
       setAskCount((count) => count + 1);
     },
     keep: () => setStep("kept"),
-    clear: () => {
+    clear: (startWith) => {
       setStep("offered");
-      onClear();
+      onClear(startWith);
     },
   };
 }
