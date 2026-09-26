@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ReplyCounts } from "../domain/replyChip.ts";
 import { isRefused, type Exchange, type FailedExchange } from "../domain/exchange.ts";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 import { ReplyView, type RestoreNames } from "./ReplyView.tsx";
@@ -15,15 +16,15 @@ type ExchangeOutcomeProps = {
   restoreNames: RestoreNames;
   onKeep: KeepReply;
   questionPinned: boolean;
-  newCards: number;
+  counts: ReplyCounts;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, questionPinned, newCards }: ExchangeOutcomeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, questionPinned, counts }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
     case "replied":
-      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} questionPinned={questionPinned} newCards={newCards} />;
+      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} questionPinned={questionPinned} counts={counts} />;
     case "failed":
       return (
         <>

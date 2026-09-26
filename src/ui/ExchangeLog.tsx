@@ -1,5 +1,6 @@
 import type { Ref } from "react";
 import type { Exchange, ExchangeId, FailedExchange } from "../domain/exchange.ts";
+import type { ReplyCounts } from "../domain/replyChip.ts";
 import type { LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 import type { KeepReply } from "./useGlossary.ts";
@@ -17,15 +18,15 @@ type ExchangeLogProps = {
   onKeep: KeepReply;
   pinnedQuestionOf: ExchangeId | null;
   highlight: LineMatch | null;
-  newCardsOf: (id: ExchangeId) => number;
+  countsOf: (id: ExchangeId) => ReplyCounts;
 };
 
-export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, newCardsOf, ...outcome }: ExchangeLogProps) {
+export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, ...outcome }: ExchangeLogProps) {
   return (
     <ol role="log" ref={logRef}>
       {exchanges.map((exchange) => (
         <ExchangeEntry key={exchange.id} exchange={exchange} highlight={highlight?.exchangeId === exchange.id ? highlight : null}>
-          <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} newCards={newCardsOf(exchange.id)} />
+          <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} counts={countsOf(exchange.id)} />
         </ExchangeEntry>
       ))}
     </ol>

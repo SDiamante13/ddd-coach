@@ -62,6 +62,15 @@ describe("Event board", () => {
     expect(chips).toEqual(["← 5 new on the board", "← 2 new on the board · 1 already there"]);
   });
 
+  it("counts a card the reply updated as updated, never as already there", async () => {
+    const conversation = await replied(SECOND_BOARD_REPLY);
+
+    await replyNext(conversation, THIRD_BOARD_REPLY, 3);
+
+    const chips = within(conversation.log()).getAllByRole("button", { name: /on the board/ }).map((chip) => chip.textContent);
+    expect(chips).toEqual(["← 3 new on the board", "← 1 updated on the board"]);
+  });
+
   it("doesn't call an event already there when the same reply just listed it twice", async () => {
     const { log } = await replied("Events, in order\n1. From thread: Carrier 3 rejects the booking.\n2. From thread: carrier 3 rejects the booking");
 

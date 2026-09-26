@@ -9,7 +9,7 @@ import {
   THIRD_BOARD_REPLY,
 } from "../test/boardReplies.ts";
 import { type Board, changeOf, previousTextOf, PROVENANCE_LABEL } from "./board.ts";
-import { boardOf } from "./boardFromReplies.ts";
+import { boardOf, replyCountsOf } from "./boardFromReplies.ts";
 import { entityId } from "./entityId.ts";
 import { type Exchange, type ExchangeId, fail, type Prompt, reply, submit } from "./exchange.ts";
 
@@ -97,5 +97,21 @@ describe("boardOf with the visitor's corrections (#95)", () => {
 
   it("returns to the coach's wording when the correction is undone", () => {
     expect(boardOf(firstTwoReplies, []).cards.at(-1)).toMatchObject({ text: GUESS });
+  });
+});
+
+describe("replyCountsOf (#95)", () => {
+  it("counts per reply what it added, updated and found already there, and keeps earlier replies' counts", () => {
+    const counts = replyCountsOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)]);
+
+    expect(counts.get("reply-1" as ExchangeId)).toEqual({ added: 5, updated: 0, already: 0 });
+    expect(counts.get("reply-2" as ExchangeId)).toEqual({ added: 2, updated: 0, already: 1 });
+    expect(counts.get("reply-3" as ExchangeId)).toEqual({ added: 0, updated: 1, already: 0 });
+  });
+
+  it("counts an event a reply lists twice once", () => {
+    const counts = replyCountsOf([replied("reply-1", "Events, in order\n1. From thread: Ops rebooks.\n2. From thread: ops rebooks")]);
+
+    expect(counts.get("reply-1" as ExchangeId)).toEqual({ added: 1, updated: 0, already: 0 });
   });
 });

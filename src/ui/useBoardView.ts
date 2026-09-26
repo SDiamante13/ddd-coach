@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { type Board, cardsPlacedBy, struckWordsOf } from "../domain/board.ts";
-import { boardOf, type Correction } from "../domain/boardFromReplies.ts";
+import { type Board, struckWordsOf } from "../domain/board.ts";
+import { boardOf, type Correction, replyCountsOf } from "../domain/boardFromReplies.ts";
+import type { ReplyCounts } from "../domain/replyChip.ts";
 import type { EntityId } from "../domain/entityId.ts";
 import type { Exchange, ExchangeId } from "../domain/exchange.ts";
 import { latestQuestionOf } from "../domain/latestQuestion.ts";
@@ -11,12 +12,13 @@ import type { useCorrections } from "./useCorrections.ts";
 
 export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, fixes: ReturnType<typeof useCorrections>) {
   const board = useMemo(() => boardOf(exchanges, fixes.corrections), [exchanges, fixes.corrections]);
+  const counts = useMemo(() => replyCountsOf(exchanges, fixes.corrections), [exchanges, fixes.corrections]);
   const { selected, toggle } = useBoardSelection();
   const selectedCard = board.cards.find((card) => card.id === selected);
   const highlight = selectedCard ? lineOfCard(selectedCard, exchanges) : null;
   return {
     board,
-    newCardsOf: (id: ExchangeId) => cardsPlacedBy(board, id),
+    countsOf: (id: ExchangeId): ReplyCounts => counts.get(id) ?? NO_EVENTS,
     selected: selectedCard?.id ?? null,
     toggle,
     correct: (id: EntityId, text: string) => board.latest && fixes.correct(id, text, board.latest),
@@ -27,6 +29,8 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
   };
 }
+
+const NO_EVENTS: ReplyCounts = { added: 0, updated: 0, already: 0 };
 
 function undoableOf(board: Board, last: Correction | undefined): EntityId | null {
   const card = board.cards.find(({ id }) => id === last?.id);

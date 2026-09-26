@@ -37,7 +37,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         onKeep={composer.glossary.keepReply}
         pinnedQuestionOf={view.question?.exchangeId ?? null}
         highlight={view.highlight}
-        newCardsOf={view.newCardsOf}
+        countsOf={view.countsOf}
       />
       <CorrectionNote shown={view.undoable !== null} />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}

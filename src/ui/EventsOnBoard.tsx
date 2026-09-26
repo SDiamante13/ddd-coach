@@ -1,11 +1,11 @@
+import { chipLabel, type ReplyCounts } from "../domain/replyChip.ts";
 import { BOARD_LANE_ID } from "./EventBoard.tsx";
 
-export function EventsOnBoard({ events, added }: { events: number; added: number }) {
+export function EventsOnBoard({ counts }: { counts: ReplyCounts }) {
   const focusBoard = () => document.getElementById(BOARD_LANE_ID)?.focus();
-  const already = Math.max(events - added, 0);
   return (
     <button type="button" className="board-chip" onClick={focusBoard}>
-      ← {added} new on the board{already > 0 && ` · ${already} already there`}
+      {chipLabel(counts)}
     </button>
   );
 }
