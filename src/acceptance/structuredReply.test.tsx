@@ -47,16 +47,6 @@ describe("Structured reply", () => {
     ]);
   });
 
-  it("lists the events in order, each with its source", async () => {
-    const { log } = await replyWith(LAID_OUT_REPLY);
-    const events = await within(log()).findByRole("list", { name: "Events, in order" });
-
-    expect(within(events).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
-      "From threadThe customer submits a booking on the portal.",
-      "GuessOps rebooks a date change at night.",
-    ]);
-  });
-
   it("sets the question apart as a card with its roles and the two thread lines it joins", async () => {
     const { log } = await replyWith(LAID_OUT_REPLY);
     const card = await within(log()).findByRole("region", { name: "Question" });

@@ -58,3 +58,9 @@ export function previousProvenanceOf(board: Board, card: EventCard): Provenance 
 }
 
 const changedByLatest = (board: Board, card: EventCard): boolean => card.changedBy === board.latest;
+
+export function boardSummary({ cards }: Board): string {
+  const guesses = cards.filter((card) => card.provenance === "guess").length;
+  const events = `${cards.length} ${cards.length === 1 ? "event" : "events"}`;
+  return guesses === 0 ? events : `${events} · ${guesses} ${guesses === 1 ? "guess" : "guesses"}`;
+}

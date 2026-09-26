@@ -5,6 +5,7 @@ import type { ExchangeId } from "./exchange.ts";
 import {
   applyAction,
   type Board,
+  boardSummary,
   type BoardAction,
   changeOf,
   emptyBoard,
@@ -179,5 +180,19 @@ describe("a board folded from actions", () => {
         history.forEach((earlier, i) => expect(earlier).toEqual(boardOfActions(actions.slice(0, i))));
       }),
     );
+  });
+});
+
+describe("boardSummary", () => {
+  const boardWith = (...provenances: Provenance[]): Board =>
+    provenances.map((provenance, index) => addEvent(`Event ${index}.`, provenance, "x1")).reduce(applyAction, emptyBoard);
+
+  it.each([
+    [["thread"], "1 event"],
+    [["thread", "thread"], "2 events"],
+    [["guess"], "1 event · 1 guess"],
+    [["thread", "guess", "guess"], "3 events · 2 guesses"],
+  ] as [Provenance[], string][])("counts %j as %s", (provenances, summary) => {
+    expect(boardSummary(boardWith(...provenances))).toBe(summary);
   });
 });

@@ -1,7 +1,10 @@
+import { useMemo } from "react";
+import { boardOf } from "../domain/boardFromReplies.ts";
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { AccessGate } from "./AccessGate.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
+import { EventBoard } from "./EventBoard.tsx";
 import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { NewReplyButton } from "./NewReplyButton.tsx";
@@ -16,9 +19,11 @@ type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
+  const board = useMemo(() => boardOf(composer.exchanges), [composer.exchanges]);
 
   return (
     <>
+      <EventBoard board={board} thinking={composer.busy} restoreNames={composer.box.restoreNames} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}

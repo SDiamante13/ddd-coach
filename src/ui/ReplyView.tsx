@@ -3,7 +3,7 @@ import type { SwappedText } from "../domain/swaps.ts";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { UNSOURCED } from "../shared/replyLayout.ts";
-import { EventList } from "./EventList.tsx";
+import { EventsOnBoard } from "./EventsOnBoard.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
 import { KeepButton } from "./KeepButton.tsx";
 import { RfcCopyButton } from "./RfcCopyButton.tsx";
@@ -41,7 +41,7 @@ function displayOrder(blocks: ReplyBlock[]): ReplyBlock[] {
 function ReplyPart({ block }: { block: ReplyBlock }) {
   switch (block.kind) {
     case "events":
-      return <EventList items={block.items} />;
+      return <EventsOnBoard count={block.items.length} />;
     case "words":
       return <WordTable rows={block.rows} />;
     case "question":
