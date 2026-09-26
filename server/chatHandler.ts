@@ -63,7 +63,7 @@ export function createChatHandler({ access, now, config, createCoach, signingKey
 }
 
 function methodNotAllowed(): Response {
-  return respond({ error: "Use POST." }, { status: 405, headers: { Allow: "POST" } });
+  return respond({ error: "Use POST.", reason: "malformed" }, { status: 405, headers: { Allow: "POST" } });
 }
 
 function accessRequired(): Response {

@@ -19,13 +19,16 @@ describe("checkAccess", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/session");
   });
 
-  it.each([
-    ["answers 401", () => Promise.resolve(new Response(null, { status: 401 }))],
-    ["answers 500", () => Promise.resolve(new Response(null, { status: 500 }))],
-  ])("is locked when the session check %s", async (_case, respond) => {
-    vi.stubGlobal("fetch", vi.fn(respond));
+  it("is locked when the session check answers 401", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(new Response(null, { status: 401 }))));
 
     expect(await checkAccess()).toBe("locked");
+  });
+
+  it("is unreachable, not locked, when the session check answers 500 (#74)", async () => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.resolve(new Response(null, { status: 500 }))));
+
+    expect(await checkAccess()).toBe("unreachable");
   });
 
   it("is unreachable when the session check cannot reach the server", async () => {

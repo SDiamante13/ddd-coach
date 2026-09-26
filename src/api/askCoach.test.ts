@@ -1,6 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ACCESS_REQUIRED } from "../shared/accessContract.ts";
-import { COACH_OUT_OF_CREDIT } from "../shared/chatContract.ts";
+import {
+  COACH_EMPTY_REPLY,
+  COACH_GLOSSARY_TOO_LONG,
+  COACH_MALFORMED,
+  COACH_MESSAGE_TOO_LONG,
+  COACH_OUT_OF_CREDIT,
+  COACH_TIMED_OUT,
+  COACH_TOO_LONG,
+  COACH_UNAVAILABLE,
+  COACH_UNVERIFIED,
+} from "../shared/chatContract.ts";
 import { conversationOf } from "../test/conversations.ts";
 import { jsonResponse } from "../test/fetchStub.ts";
 import { askCoach } from "./askCoach.ts";
@@ -30,7 +40,41 @@ describe("askCoach", () => {
   it("returns the server's error for a non-2xx response", async () => {
     respondWith(jsonResponse(502, { error: "The coach is unavailable." }));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: "The coach is unavailable.", retryable: true });
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: "The coach is unavailable.", remedy: "retry" });
+  });
+
+  it("takes the copy and remedy from the reason code, not the server's wording (#74)", async () => {
+    respondWith(jsonResponse(400, { error: "Reworded on the server.", reason: "unverified" }));
+
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: COACH_UNVERIFIED, remedy: "startOver" });
+  });
+
+  it.each([
+    ["malformed", COACH_MALFORMED, "copy"],
+    ["conversation_too_long", COACH_TOO_LONG, "startOver"],
+    ["message_too_long", COACH_MESSAGE_TOO_LONG, "copy"],
+    ["glossary_too_long", COACH_GLOSSARY_TOO_LONG, "copy"],
+    ["unverified", COACH_UNVERIFIED, "startOver"],
+    ["access_expired", ACCESS_REQUIRED, "unlock"],
+    ["credit_exhausted", COACH_OUT_OF_CREDIT, "copy"],
+    ["timed_out", COACH_TIMED_OUT, "retry"],
+    ["empty_reply", COACH_EMPTY_REPLY, "retry"],
+    ["unavailable", COACH_UNAVAILABLE, "retry"],
+  ])("answers reason %s with its own copy and remedy (#74)", async (reason, error, remedy) => {
+    respondWith(jsonResponse(500, { error: "Server wording.", reason }));
+
+    expect(await askCoach(conversation)).toEqual({ ok: false, error, remedy });
+  });
+
+  it("carries how long to wait before retrying a briefly busy coach (#74)", async () => {
+    respondWith(jsonResponse(502, { error: "Busy.", reason: "unavailable", retryAfterSeconds: 20 }));
+
+    expect(await askCoach(conversation)).toEqual({
+      ok: false,
+      error: "The coach is unavailable. Try again in 20 s.",
+      remedy: "retry",
+      retryAfterSeconds: 20,
+    });
   });
 
   it("marks a refusal as too long as not worth retrying", async () => {
@@ -39,7 +83,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "This message is too long for the coach.",
-      retryable: false,
+      remedy: "copy",
     });
   });
 
@@ -49,7 +93,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "This conversation can't be verified.",
-      retryable: false,
+      remedy: "copy",
     });
   });
 
@@ -59,27 +103,26 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: ACCESS_REQUIRED,
-      retryable: false,
-      accessLost: true,
+      remedy: "unlock",
     });
   });
 
   it("marks a coach paused for its spent usage budget as not worth retrying", async () => {
     respondWith(jsonResponse(503, { error: COACH_OUT_OF_CREDIT }));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: COACH_OUT_OF_CREDIT, retryable: false });
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: COACH_OUT_OF_CREDIT, remedy: "copy" });
   });
 
   it("keeps a rate-limited request worth retrying", async () => {
     respondWith(jsonResponse(429, { error: "Too many requests." }));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Too many requests.", retryable: true });
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Too many requests.", remedy: "retry" });
   });
 
   it("reports an unreachable coach when the request throws", async () => {
     respondWith(Promise.reject(new TypeError("Failed to fetch")));
 
-    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Could not reach the coach.", retryable: true });
+    expect(await askCoach(conversation)).toEqual({ ok: false, error: "Could not reach the coach.", remedy: "retry" });
   });
 
   it("reports an unexpected response when a success body has no reply", async () => {
@@ -88,7 +131,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "Unexpected response from the coach.",
-      retryable: true,
+      remedy: "retry",
     });
   });
 
@@ -98,7 +141,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "Unexpected response from the coach.",
-      retryable: true,
+      remedy: "retry",
     });
   });
 
@@ -108,7 +151,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "The coach took too long. Try a shorter question or Retry.",
-      retryable: true,
+      remedy: "retry",
     });
   });
 
@@ -118,7 +161,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "This message is too long for the coach. Shorten it and send it again.",
-      retryable: false,
+      remedy: "copy",
     });
   });
 
@@ -128,7 +171,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "The coach is unavailable. Try again.",
-      retryable: true,
+      remedy: "retry",
     });
   });
 
@@ -138,7 +181,7 @@ describe("askCoach", () => {
     expect(await askCoach(conversation)).toEqual({
       ok: false,
       error: "The coach is unavailable. Try again.",
-      retryable: true,
+      remedy: "retry",
     });
   });
 });

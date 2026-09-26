@@ -3,20 +3,21 @@ export type ExchangeId = string & { readonly __brand: "ExchangeId" };
 
 export type PendingExchange = { id: ExchangeId; prompt: Prompt; status: "pending" };
 export type RepliedExchange = { id: ExchangeId; prompt: Prompt; status: "replied"; reply: string; signature: string };
-export type Failure = { error: string; retryable: boolean };
+export type Remedy = "retry" | "copy" | "startOver" | "unlock";
+export type Failure = { error: string; remedy: Remedy; retryAfterSeconds?: number };
 export type FailedExchange = { id: ExchangeId; prompt: Prompt; status: "failed" } & Failure;
 export type Exchange = PendingExchange | RepliedExchange | FailedExchange;
 
 export type AskResult =
   | { ok: true; reply: string; signature: string }
-  | ({ ok: false; accessLost?: true } & Failure);
+  | ({ ok: false } & Failure);
 
 export function submit(id: ExchangeId, prompt: Prompt): PendingExchange {
   return { id, prompt, status: "pending" };
 }
 
-export function fail(exchange: PendingExchange, { error, retryable }: Failure): FailedExchange {
-  return { ...exchange, status: "failed", error, retryable };
+export function fail(exchange: PendingExchange, { error, remedy, retryAfterSeconds }: Failure): FailedExchange {
+  return { ...exchange, status: "failed", error, remedy, ...(retryAfterSeconds !== undefined && { retryAfterSeconds }) };
 }
 
 export function reply(exchange: PendingExchange, text: string, signature: string): RepliedExchange {
@@ -41,7 +42,7 @@ export function isBusy(exchanges: readonly Exchange[]): boolean {
 
 export function canRetry(exchanges: readonly Exchange[], id: ExchangeId): boolean {
   const target = exchanges.find((exchange) => exchange.id === id);
-  return target?.status === "failed" && target.retryable && !isBusy(exchanges);
+  return target?.status === "failed" && target.remedy === "retry" && !isBusy(exchanges);
 }
 
 export function parsePrompt(text: string): Prompt | null {
@@ -54,5 +55,5 @@ export function messageLength(text: string): number {
 }
 
 export function isRefused(outcome: Exchange | AskResult): boolean {
-  return "retryable" in outcome && !outcome.retryable;
+  return "remedy" in outcome && outcome.remedy !== "retry";
 }

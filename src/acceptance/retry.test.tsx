@@ -1,9 +1,12 @@
-import { within } from "@testing-library/react";
+import { act, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderApp, sendText } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 describe("Retry", () => {
   it("shows a server failure inline with Retry beside the message", async () => {
@@ -17,6 +20,20 @@ describe("Retry", () => {
     expect(await within(entry).findByRole("alert")).toHaveTextContent("The coach sent an empty reply. Try again.");
     expect(within(entry).getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(within(log()).getAllByText("Hello coach")).toHaveLength(1);
+  });
+
+  it("says when to try again for a briefly busy coach, holding Retry back until then (#74)", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const server = stubFetch();
+    const { user, input, log } = await renderApp();
+
+    await sendText(user, input(), "Hello coach");
+    server.reply(0, 502, { error: "Busy.", reason: "unavailable", retryAfterSeconds: 20 });
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent("The coach is unavailable. Try again in 20 s.");
+    expect(within(log()).getByRole("button", { name: "Retry" })).toBeDisabled();
+    act(() => vi.advanceTimersByTime(20_000));
+    expect(within(log()).getByRole("button", { name: "Retry" })).toBeEnabled();
   });
 
   it("retries the same message without duplicating it in the log", async () => {

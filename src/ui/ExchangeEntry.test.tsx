@@ -9,7 +9,7 @@ describe("ExchangeEntry", () => {
   it.each<Exchange>([
     pending,
     reply(pending, "A consistency boundary.", "sig-1"),
-    fail(pending, { error: "The coach is unavailable.", retryable: true }),
+    fail(pending, { error: "The coach is unavailable.", remedy: "retry" }),
   ])("exposes the $status exchange status on its log item", (exchange) => {
     render(
       <ol>
@@ -23,7 +23,7 @@ describe("ExchangeEntry", () => {
   });
 
   it("marks a refused exchange, which Retry can't help, apart from a failed one", () => {
-    const refused = fail(pending, { error: "That message couldn't be checked.", retryable: false });
+    const refused = fail(pending, { error: "That message couldn't be checked.", remedy: "copy" });
     render(
       <ol>
         <ExchangeEntry exchange={refused}>

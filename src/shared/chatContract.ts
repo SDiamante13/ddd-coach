@@ -1,19 +1,25 @@
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
 export type ChatTurn = { prompt: string; reply: string; signature: string };
 export type ChatRequestBody = { message: string; history: readonly ChatTurn[]; glossary?: readonly KeptGlossaryRow[] };
-export type ChatFailureReason =
-  | "malformed"
-  | "conversation_too_long"
-  | "message_too_long"
-  | "glossary_too_long"
-  | "unverified"
-  | "access_expired"
-  | "credit_exhausted"
-  | "timed_out"
-  | "empty_reply"
-  | "unavailable";
+export const CHAT_FAILURE_REASONS = [
+  "malformed",
+  "conversation_too_long",
+  "message_too_long",
+  "glossary_too_long",
+  "unverified",
+  "access_expired",
+  "credit_exhausted",
+  "timed_out",
+  "empty_reply",
+  "unavailable",
+] as const;
+export type ChatFailureReason = (typeof CHAT_FAILURE_REASONS)[number];
 export type ChatFailureBody = { error: string; reason: ChatFailureReason; retryAfterSeconds?: number };
-export type ChatResponseBody = { reply: string; signature: string } | ChatFailureBody | { error: string };
+export type ChatResponseBody = { reply: string; signature: string } | ChatFailureBody;
+
+export function isChatFailureReason(value: unknown): value is ChatFailureReason {
+  return CHAT_FAILURE_REASONS.some((reason) => reason === value);
+}
 
 export const MAX_MESSAGE_CHARS = 24_000;
 

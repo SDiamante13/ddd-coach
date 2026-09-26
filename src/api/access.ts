@@ -13,11 +13,15 @@ const UNCHECKED: UnlockResult = { ok: false, error: COULD_NOT_CHECK };
 
 export async function checkAccess(): Promise<Access> {
   try {
-    const response = await fetch("/api/session");
-    return response.status === NO_CONTENT ? "open" : "locked";
+    return accessOf((await fetch("/api/session")).status);
   } catch {
     return "unreachable";
   }
+}
+
+function accessOf(status: number): Access {
+  if (status === NO_CONTENT) return "open";
+  return status >= SERVER_ERROR ? "unreachable" : "locked";
 }
 
 export async function unlock(password: string): Promise<UnlockResult> {

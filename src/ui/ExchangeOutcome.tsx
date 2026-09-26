@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import { isRefused, type Exchange, type FailedExchange } from "../domain/exchange.ts";
-import { COACH_TOO_LONG, COACH_UNVERIFIED } from "../shared/chatContract.ts";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 import { ReplyView, type RestoreNames } from "./ReplyView.tsx";
 import type { KeepReply } from "./useGlossary.ts";
 
-const FIXED_BY_A_NEW_CONVERSATION: readonly string[] = [COACH_TOO_LONG, COACH_UNVERIFIED];
+const MS_PER_SECOND = 1_000;
 
 type ExchangeOutcomeProps = {
   exchange: Exchange;
@@ -29,10 +29,10 @@ export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStart
           {isRefused(exchange) ? (
             <RefusalActions
               conversation={conversation}
-              onStartNew={FIXED_BY_A_NEW_CONVERSATION.includes(exchange.error) ? onStartNew : undefined}
+              onStartNew={exchange.remedy === "startOver" ? onStartNew : undefined}
             />
           ) : (
-            <RetryButton disabled={busy} onRetry={() => onRetry(exchange)} />
+            <RetryButton disabled={busy} waitSeconds={exchange.retryAfterSeconds} onRetry={() => onRetry(exchange)} />
           )}
         </>
       );
@@ -54,11 +54,14 @@ function RefusalActions({ conversation, onStartNew }: RefusalActionsProps) {
   );
 }
 
-function RetryButton({ disabled, onRetry }: { disabled: boolean; onRetry: () => void }) {
+type RetryButtonProps = { disabled: boolean; waitSeconds: number | undefined; onRetry: () => void };
+
+function RetryButton({ disabled, waitSeconds, onRetry }: RetryButtonProps) {
+  const waiting = useWaiting(waitSeconds);
   return (
     <button
       type="button"
-      disabled={disabled}
+      disabled={disabled || waiting}
       onClick={(event) => {
         focusEntryOf(event.currentTarget);
         onRetry();
@@ -67,6 +70,16 @@ function RetryButton({ disabled, onRetry }: { disabled: boolean; onRetry: () => 
       Retry
     </button>
   );
+}
+
+function useWaiting(seconds: number | undefined): boolean {
+  const [waiting, setWaiting] = useState(seconds !== undefined);
+  useEffect(() => {
+    if (seconds === undefined) return;
+    const timer = setTimeout(() => setWaiting(false), seconds * MS_PER_SECOND);
+    return () => clearTimeout(timer);
+  }, [seconds]);
+  return waiting;
 }
 
 function focusEntryOf(button: HTMLElement) {

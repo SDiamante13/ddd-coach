@@ -501,5 +501,6 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(405);
     expect(response.headers.get("Allow")).toBe("POST");
+    expect(await response.json()).toEqual({ error: "Use POST.", reason: "malformed" });
   });
 });

@@ -113,6 +113,18 @@ describe("Access gate", () => {
     expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
   });
 
+  it("says it can't reach the coach, without the password form, when the access check fails on the server (#74)", async () => {
+    stubFetch({ session: [500, 204] });
+    const user = userEvent.setup();
+    render(<App />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(ACCESS_UNREACHABLE);
+    expect(screen.queryByLabelText("Conference password")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+
+    expect(await screen.findByRole("textbox", { name: "Message" })).toBeVisible();
+  });
+
   it("says it can't reach the coach when the access check fails offline, and tries again", async () => {
     stubFetch({ session: ["offline", 204] });
     const user = userEvent.setup();

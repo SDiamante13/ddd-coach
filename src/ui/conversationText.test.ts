@@ -8,7 +8,7 @@ const exchange = (id: string, prompt: string) => submit(id as ExchangeId, prompt
 describe("conversationText", () => {
   it("writes each turn as You and Coach lines, with a blank line between turns", () => {
     const replied = reply(exchange("1", "A"), "R1", "sig-A");
-    const refused = fail(exchange("2", "B"), { error: "Skipped", retryable: false });
+    const refused = fail(exchange("2", "B"), { error: "Skipped", remedy: "copy" });
 
     expect(conversationText([replied, refused, exchange("3", "C")])).toBe("You: A\nCoach: R1\n\nYou: B\n\nYou: C");
   });

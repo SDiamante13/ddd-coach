@@ -105,7 +105,7 @@ describe("Refusals", () => {
 
   it("asks to clear the conversation from an unverifiable refusal, with focus on Keep", async () => {
     const { server, user, log, send } = await startConversation();
-    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
+    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED, reason: "unverified" });
 
     await user.click(await within(log()).findByRole("button", { name: "New conversation" }));
 
@@ -115,7 +115,7 @@ describe("Refusals", () => {
 
   it("moves focus to Keep from an unverifiable refusal even when the question is already open", async () => {
     const { server, user, input, log, send } = await startConversation();
-    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
+    server.reply(await send("A"), 400, { error: COACH_UNVERIFIED, reason: "unverified" });
     await user.click(await within(composerOf(input())).findByRole("button", { name: "New conversation" }));
 
     await user.click(within(log()).getByRole("button", { name: "New conversation" }));
@@ -149,9 +149,17 @@ describe("Refusals", () => {
     expect(within(log()).queryByRole("button", { name: "New conversation" })).not.toBeInTheDocument();
   });
 
+  it("picks the copy and a new conversation from the server's reason code, whatever its wording (#74)", async () => {
+    const { server, log, send } = await startConversation();
+    server.reply(await send("A"), 400, { error: "Reworded on the server.", reason: "unverified" });
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent(COACH_UNVERIFIED);
+    expect(within(log()).getByRole("button", { name: "New conversation" })).toBeInTheDocument();
+  });
+
   it("offers a new conversation when the conversation itself is too long", async () => {
     const { server, log, send } = await startConversation();
-    server.reply(await send("A"), 413, { error: COACH_TOO_LONG });
+    server.reply(await send("A"), 413, { error: COACH_TOO_LONG, reason: "conversation_too_long" });
 
     expect(await within(log()).findByRole("button", { name: "New conversation" })).toBeInTheDocument();
   });

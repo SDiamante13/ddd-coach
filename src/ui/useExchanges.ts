@@ -27,7 +27,7 @@ export function useExchanges({ onRefused, onAccessLost, glossary = () => [] }: E
     const result = await askCoach(conversation);
     setExchanges((current) => settle(current, id, result));
     if (isRefused(result)) onRefused?.(conversation.prompt);
-    if (!result.ok && result.accessLost) onAccessLost?.();
+    if (!result.ok && result.remedy === "unlock") onAccessLost?.();
   }
 
   function send(prompt: Prompt) {

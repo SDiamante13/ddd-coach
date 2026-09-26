@@ -17,8 +17,8 @@ import {
 
 const id = "exchange-1" as ExchangeId;
 const prompt = "Hello coach" as Prompt;
-const unavailable: Failure = { error: "Coach unavailable", retryable: true };
-const unverified: Failure = { error: "Coach couldn't verify the history", retryable: false };
+const unavailable: Failure = { error: "Coach unavailable", remedy: "retry" };
+const unverified: Failure = { error: "Coach couldn't verify the history", remedy: "copy" };
 
 describe("Exchange", () => {
   it("fails a pending exchange with the error", () => {
@@ -27,7 +27,7 @@ describe("Exchange", () => {
       prompt,
       status: "failed",
       error: "Coach unavailable",
-      retryable: true,
+      remedy: "retry",
     });
   });
 
@@ -105,7 +105,7 @@ describe("canRetry", () => {
   });
 
   it("blocks retrying a failure that is not worth retrying", () => {
-    const refused = fail(submit(id, prompt), { error: "Too long", retryable: false });
+    const refused = fail(submit(id, prompt), { error: "Too long", remedy: "copy" });
 
     expect(canRetry([refused], id)).toBe(false);
   });
