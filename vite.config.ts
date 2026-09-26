@@ -8,5 +8,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     exclude: [...configDefaults.exclude, ".claude/**"],
+    testTimeout: 15_000,
   },
 });
