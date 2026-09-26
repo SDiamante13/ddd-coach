@@ -6,7 +6,8 @@ import { readAccessPassword, readConfig, readSigningKey, readTimeoutMs } from ".
 import { createOpenRouterCoach } from "../../server/openRouterCoach.ts";
 
 const logCoachFailure = (failure: CoachFailure): void => console.error("Coach failed", failure);
-const logDroppedCitations = (dropped: string[]): void => console.warn("Dropped unverified citations", dropped);
+const logDroppedCitations = (dropped: string[]): void =>
+  console.warn("Dropped unverified citations", { count: dropped.length });
 
 export default (request: Request): Promise<Response> =>
   createChatHandler({
