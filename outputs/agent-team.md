@@ -39,6 +39,7 @@ Template: `outputs/demos/chores-30af2d6-deploy.md`.
 - Hosted checks: headers; chat GET 405 / POST 401; session 401 no-store; unlock GET 405; source paths 404; 0 `sk-or`/`OPENROUTER` in the HTML, JS, CSS and function zips; no `.map`.
 - Fonts: every CSS font URL is same-origin, every woff2 returns 200, and there are 0 googleapis/gstatic references.
 - Shell gotchas on this machine: quote globs in zsh (`'--include=*.tsx'`), and `stat -f` resolves to GNU stat, so use `wc -c` for file sizes.
+- Before a paid run or deploy, check the key for free: GET https://openrouter.ai/api/v1/key with `node --env-file=.env`, printing only status, error and the limit fields (never the key). OpenRouter keys can expire ("API key expired", 401); prod's Netlify secret can't be read back by the CLI, so verify prod with one hosted call.
 - No unlock and no paid calls; the verifier owns the demo.
 
 ## Demo recording
