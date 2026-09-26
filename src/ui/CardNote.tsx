@@ -1,8 +1,8 @@
 import type { Provenance } from "../domain/board.ts";
 
-type CardNoteProps = { id: string; provenance: Provenance; line: string | null };
+type CardNoteProps = { id: string; provenance: Provenance; line: string | null; onCorrect: () => void };
 
-export function CardNote({ id, provenance, line }: CardNoteProps) {
+export function CardNote({ id, provenance, line, onCorrect }: CardNoteProps) {
   return (
     <div id={id} role="note" className="card-note">
       {provenance === "guess" ? (
@@ -16,6 +16,9 @@ export function CardNote({ id, provenance, line }: CardNoteProps) {
           <p className="card-note-hint">Shown in your paste on the right →</p>
         </>
       )}
+      <button type="button" className="card-correct" onClick={onCorrect}>
+        Correct this card
+      </button>
     </div>
   );
 }
