@@ -21,5 +21,6 @@ jobs:
           case "$status" in
             ok) ;;
             key_expiring) echo "::error::OpenRouter key expires within 7 days; rotate it and redeploy"; exit 1 ;;
+            config_invalid) echo "::error::The server's OpenRouter config is invalid (model, provider or reasoning effort); fix the Netlify env and redeploy"; exit 1 ;;
             *) echo "::error::Health is $status"; exit 1 ;;
           esac

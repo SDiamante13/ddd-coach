@@ -1,15 +1,17 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
+import type { ConfigResult } from "./config.ts";
 import { createHealthHandler } from "./healthHandler.ts";
 
 const KEY = "sk-or-test-key";
+const CONFIG: ConfigResult = { ok: true, config: { apiKey: KEY, model: "openai/test-model" } };
 
 function upstream(status: number, body: unknown) {
   return vi.fn(async () => new Response(JSON.stringify(body), { status }));
 }
 
 function health(fetch: typeof globalThis.fetch, apiKey: string | undefined = KEY, now = () => 0) {
-  return createHealthHandler({ apiKey, fetch, now });
+  return createHealthHandler({ apiKey, config: CONFIG, fetch, now });
 }
 
 const get = () => new Request("http://localhost/api/health");
@@ -71,9 +73,20 @@ describe("health handler", () => {
   it("reports a server with no key as invalid without calling OpenRouter", async () => {
     const fetch = upstream(200, {});
 
-    const response = await createHealthHandler({ apiKey: undefined, fetch, now: () => 0 })(get());
+    const response = await createHealthHandler({ apiKey: undefined, config: CONFIG, fetch, now: () => 0 })(get());
 
     expect(await response.json()).toEqual({ ok: false, status: "key_invalid", detail: "missing" });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("reports a config the chat would refuse as config_invalid, without values and without calling OpenRouter", async () => {
+    const fetch = upstream(200, { data: {} });
+    const config: ConfigResult = { ok: false, error: "OPENROUTER_MODEL must be an openai/ model, the provider the data notice names (coachProvider)." };
+
+    const response = await createHealthHandler({ apiKey: KEY, config, fetch, now: () => 0 })(get());
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ ok: false, status: "config_invalid", detail: null });
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -88,7 +101,7 @@ describe("health handler", () => {
   it("asks OpenRouter at most once a minute, so it can't be used as a proxy", async () => {
     let clock = 0;
     const fetch = upstream(200, { data: {} });
-    const handle = createHealthHandler({ apiKey: KEY, fetch, now: () => clock });
+    const handle = createHealthHandler({ apiKey: KEY, config: CONFIG, fetch, now: () => clock });
 
     await handle(get());
     clock = 59_999;
