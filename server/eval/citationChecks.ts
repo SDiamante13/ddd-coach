@@ -20,3 +20,12 @@ export function admitsNotCovered(text: string, notCovered: boolean | undefined):
   if (!notCovered) return true;
   return NOT_COVERED.test(text) && !text.split("\n").some((line) => SOURCE_LINE.test(line));
 }
+
+const GENERAL_PRACTICE = /^General practice:/;
+
+export function sourcedOrGeneralPractice(text: string, required: boolean | undefined): boolean {
+  if (!required) return true;
+  const lines = text.split("\n");
+  const sourced = lines.some((line) => TITLES.has(CITATION.exec(line)?.[1] ?? ""));
+  return sourced || (NOT_COVERED.test(text) && lines.some((line) => GENERAL_PRACTICE.test(line)));
+}

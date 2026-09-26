@@ -1,8 +1,8 @@
 import type { KeptGlossaryRow } from "../../src/domain/glossary.ts";
 import { endsSentence } from "../replyEnding.ts";
-import { admitsNotCovered, citesOneOf, citesVerbatim } from "./citationChecks.ts";
+import { admitsNotCovered, citesOneOf, citesVerbatim, sourcedOrGeneralPractice } from "./citationChecks.ts";
 import { driftNamed, noFalseDrift, settledNotReAsked, settledNotRelisted, type ContradictedRow } from "./glossaryChecks.ts";
-import { asksOpenly, namesACase, quotesTwoSources } from "./questionChecks.ts";
+import { asksOpenly, namesACase, quotesTwoSources, rolesFromThread } from "./questionChecks.ts";
 import {
   hasCleanSplitLabels,
   hasKnownHolders,
@@ -11,6 +11,7 @@ import {
   holderOf,
   keepsSameMeaningWhole,
   namesSameMeaning,
+  namesSides,
 } from "./viewChecks.ts";
 import {
   EVENTS_HEADING,
@@ -47,9 +48,12 @@ export type FixtureKey = {
     nonThread?: boolean;
     cites?: string[];
     notCovered?: boolean;
+    sourcedOrGeneral?: boolean;
     drift?: ContradictedRow[];
     keptFrom?: string[];
     settled?: string[][];
+    sides?: string[][];
+    questionRoles?: string[];
   };
 };
 export type Fixture = { thread: string; key: FixtureKey; glossary?: KeptGlossaryRow[] };
@@ -82,6 +86,8 @@ const HARD_CHECKS: Record<string, HardCheck> = {
   "same meaning not split": ({ words, fixture }) => keepsSameMeaningWhole(words, fixture.key),
   "question asks": ({ text }) => asksOpenly(parseCoachReply(text)?.question.text ?? ""),
   "question names a case": ({ text }) => namesACase(parseCoachReply(text)?.question.text ?? ""),
+  "roles from thread": ({ text, fixture }) => rolesFromThread(parseCoachReply(text)?.question.roles ?? "", fixture.key.expect.questionRoles),
+  "sides named": ({ words, fixture }) => namesSides(words, fixture.key.expect.sides),
   "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
   "question sources": ({ layout, fixture }) => quotesTwoSources(afterQuestion(layout.lines), fixture.thread),
   "drift named": ({ layout, fixture }) => driftNamed(layout.driftLines, fixture.key.expect, fixture.glossary ?? []),
@@ -100,6 +106,7 @@ const NON_THREAD_CHECKS: Record<string, HardCheck> = {
   "citations verbatim": ({ layout }) => citesVerbatim(layout.lines),
   "cites the reference": ({ layout, fixture }) => citesOneOf(layout.lines, fixture.key.expect.cites),
   "admits not covered": ({ text, fixture }) => admitsNotCovered(text, fixture.key.expect.notCovered),
+  "sourced or general practice": ({ text, fixture }) => sourcedOrGeneralPractice(text, fixture.key.expect.sourcedOrGeneral),
   "no false drift": ({ layout, fixture }) => noFalseDrift(layout.driftLines, fixture.key.expect, fixture.glossary ?? []),
   "at most 600 words": ({ text }) => wordCount(text) <= RUNAWAY_WORDS,
 };

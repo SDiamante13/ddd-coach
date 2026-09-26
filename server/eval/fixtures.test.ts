@@ -14,7 +14,7 @@ describe("eval fixtures", () => {
 
     expect(nonThread.map(({ thread, key }) => [thread.trim(), key.expect])).toEqual([
       ["hi", { nonThread: true }],
-      ["what is DDD?", { nonThread: true }],
+      ["what is DDD?", { nonThread: true, sourcedOrGeneral: true }],
       ["Just trying this out before the next talk.", { nonThread: true }],
       ["What's a bounded context?", { nonThread: true, cites: ["Bounded Context"] }],
       ["How do I run an Event Storming workshop?", { nonThread: true, notCovered: true }],

@@ -100,3 +100,10 @@ export function holderOf(meaning: string, teams: string[]): Holder | null {
 function longestFirst(teams: string[]): string[] {
   return [...teams].sort((a, b) => b.length - a.length);
 }
+
+export function namesSides(words: CoachReply["words"], sides: readonly string[][] | undefined): boolean {
+  if (sides === undefined) return true;
+  const claims = words.flatMap((word) => word.meanings).map((meaning) => withoutSourceLabel(meaning).toLowerCase());
+  const heldBy = (markers: readonly string[]) => claims.some((claim) => markers.some((marker) => claim.startsWith(marker.toLowerCase())));
+  return !claims.some((claim) => claim.startsWith("team unclear")) && sides.every(heldBy);
+}

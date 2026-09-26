@@ -1,0 +1,11 @@
+Fictional thread for the eval. #dock-ops at a made-up freight broker. Every person, customer, carrier and load is invented.
+
+Mon 08:05  Warehouse: 6120 for Customer F is on hold at dock 4
+Mon 08:07  Billing: on hold for us means we don't invoice it yet. is that what you mean?
+Mon 08:10  Warehouse: no, on hold means the freight stays on the dock until the customer releases it
+Mon 08:15  Account team: ok let's settle it: from now on "on hold" is the warehouse meaning, freight stays on the dock. billing calls theirs "invoice hold"
+Mon 08:16  Billing: agreed, we'll say invoice hold
+Mon 09:40  Carrier desk: driver for 6120 showed up, nothing to load, that's a dry run, we owe Carrier 5 the dry run fee
+Mon 09:45  Billing: a dry run is when the truck is sent back empty because the shipper wasn't ready. here the freight was ready, it just wasn't released
+Mon 09:47  Carrier desk: for carriers any trip with nothing loaded is a dry run, reason doesn't matter
+Mon 09:50  Account team: can we sort out dry run at Thursday's carrier review? Customer F asks who pays

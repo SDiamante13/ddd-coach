@@ -39,3 +39,11 @@ const MIN_QUOTE_WORDS = 3;
 const MAX_QUOTE_WORDS = 30;
 
 const normalized = (text: string): string => text.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, " ");
+
+const FORUM_CLAUSE = /^(?:at|in|on|during|before)\b/i;
+
+export function rolesFromThread(roles: string, allowed: readonly string[] | undefined): boolean {
+  if (allowed === undefined) return true;
+  const named = roles.split(/,\s*|\s+and\s+/).map((role) => role.trim().toLowerCase()).filter((role) => role !== "" && !FORUM_CLAUSE.test(role));
+  return named.every((role) => allowed.some((term) => role.includes(term.toLowerCase())));
+}

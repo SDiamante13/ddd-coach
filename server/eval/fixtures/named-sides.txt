@@ -1,0 +1,17 @@
+Fictional thread for the eval. A GitHub-style issue on a made-up open-source invoicing app, Tallybook. Every person, company and number is invented.
+
+Issue #5120: Credit note for a partial return creates a new number series
+
+mkoenig (maintainer, German localisation, works with Berlin retailers): In Germany a credit note just corrects an invoice we already sent. It should reuse the invoice's number with a suffix, like RE-0413-K1. Our tax advisers expect one series.
+
+psharma (maintainer, India localisation, supports small firms in Pune): For our users in India a credit note is its own GST document for goods returned. It needs its own number series, like CN/24-25/0017, and it is filed in the monthly return.
+
+mkoenig: Right now `credit_note_series` is one setting for everyone, so whichever of us changes it breaks the other country.
+
+psharma: The code sets `is_return = 1` for both, then picks the series from `credit_note_series`. Nothing checks the country.
+
+tnowak (release manager): I can't ship 15.2 with #5120 open. Can the two localisation maintainers agree what a credit note is before Friday's release call?
+
+mkoenig: Also, in Germany a cancelled invoice is not a credit note, we cancel it separately. Same for you?
+
+psharma: Yes, in India cancelling is separate too. We both keep cancellation out of this.
