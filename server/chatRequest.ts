@@ -4,6 +4,7 @@ import { messageLength, parsePrompt, type Prompt } from "../src/domain/exchange.
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { GLOSSARY_ENABLED } from "../src/shared/features.ts";
 import { field, stringField } from "../src/shared/json.ts";
+import { hasTooManyCorrections, readCorrections } from "./chatCorrections.ts";
 
 export type RejectionReason = "malformed" | "tooLong" | "messageTooLong" | "glossaryTooLong";
 export type ChatRequestResult = { ok: true; conversation: Conversation } | { ok: false; reason: RejectionReason };
@@ -18,7 +19,7 @@ const GLOSSARY_TOO_LONG: ChatRequestResult = { ok: false, reason: "glossaryTooLo
 export const MAX_GLOSSARY_FIELD_CHARS = 300;
 
 export function parseChatRequest(body: unknown): ChatRequestResult {
-  if (hasTooManyTurns(body)) return TOO_LONG;
+  if (hasTooManyTurns(body) || hasTooManyCorrections(body)) return TOO_LONG;
   if (hasTooBigGlossary(body)) return GLOSSARY_TOO_LONG;
   const conversation = readConversation(body);
   if (conversation === null) return MALFORMED;
@@ -40,8 +41,8 @@ function hasTooBigGlossary(body: unknown): boolean {
 
 const isLongText = (value: unknown): boolean => typeof value === "string" && value.length > MAX_GLOSSARY_FIELD_CHARS;
 
-function charactersIn({ history, prompt, glossary }: Conversation): number {
-  const kept = glossary.reduce((total, row) => total + Object.values(row).join("").length, 0);
+function charactersIn({ history, prompt, glossary, corrections = [] }: Conversation): number {
+  const kept = [...glossary, ...corrections].reduce((total, row) => total + Object.values(row).join("").length, 0);
   return history.reduce((total, turn) => total + turn.prompt.length + turn.reply.length, prompt.length + kept);
 }
 
@@ -49,7 +50,9 @@ function readConversation(body: unknown): Conversation | null {
   const prompt = promptField(body, "message");
   const history = readHistory(body);
   const glossary = readGlossary(body);
-  return prompt === null || history === null || glossary === null ? null : { history, prompt, glossary };
+  const corrections = readCorrections(body);
+  if (prompt === null || history === null || glossary === null || corrections === null) return null;
+  return { history, prompt, glossary, ...(corrections.length > 0 && { corrections }) };
 }
 
 const KEPT_DAY = /^\d{4}-\d{2}-\d{2}$/;

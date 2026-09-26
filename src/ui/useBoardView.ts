@@ -7,10 +7,9 @@ import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { lineOfCard, type LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 import { useBoardSelection } from "./useBoardSelection.ts";
-import { useCorrections } from "./useCorrections.ts";
+import type { useCorrections } from "./useCorrections.ts";
 
-export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, outgoing: (text: string) => string) {
-  const fixes = useCorrections(outgoing);
+export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, fixes: ReturnType<typeof useCorrections>) {
   const board = useMemo(() => boardOf(exchanges, fixes.corrections), [exchanges, fixes.corrections]);
   const { selected, toggle } = useBoardSelection();
   const selectedCard = board.cards.find((card) => card.id === selected);

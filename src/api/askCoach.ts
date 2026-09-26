@@ -37,8 +37,8 @@ export async function askCoach(conversation: Conversation): Promise<AskResult> {
   }
 }
 
-function postConversation({ prompt, history, glossary }: Conversation): Promise<Response> {
-  const body: ChatRequestBody = { message: prompt, history, ...(glossary.length > 0 && { glossary }) };
+function postConversation({ prompt, history, glossary, corrections = [] }: Conversation): Promise<Response> {
+  const body: ChatRequestBody = { message: prompt, history, ...(glossary.length > 0 && { glossary }), ...(corrections.length > 0 && { corrections }) };
   return fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

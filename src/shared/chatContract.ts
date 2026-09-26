@@ -1,6 +1,12 @@
+import type { SentCorrection } from "../domain/board.ts";
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
 export type ChatTurn = { prompt: string; reply: string; signature: string };
-export type ChatRequestBody = { message: string; history: readonly ChatTurn[]; glossary?: readonly KeptGlossaryRow[] };
+export type ChatRequestBody = {
+  message: string;
+  history: readonly ChatTurn[];
+  glossary?: readonly KeptGlossaryRow[];
+  corrections?: readonly SentCorrection[];
+};
 export const CHAT_FAILURE_REASONS = [
   "malformed",
   "conversation_too_long",

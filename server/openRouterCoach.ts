@@ -6,6 +6,7 @@ import type {
   SendChatCompletionRequestResponse,
 } from "@openrouter/sdk/models/operations";
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
+import { correctionsContext } from "./correctionsContext.ts";
 import { glossaryContext } from "./glossaryContext.ts";
 import { coachProvider } from "../src/shared/coachProvider.ts";
 import { field, stringField } from "../src/shared/json.ts";
@@ -100,9 +101,10 @@ function chatRequest(
   };
 }
 
-function messagesOf({ history, prompt, glossary }: Conversation): ChatMessages[] {
+function messagesOf({ history, prompt, glossary, corrections = [] }: Conversation): ChatMessages[] {
   const kept: ChatMessages[] = glossary.length === 0 ? [] : [{ role: "user", content: glossaryContext(glossary) }];
-  return [...kept, ...history.flatMap(messagesOfTurn), { role: "user", content: prompt }];
+  const corrected: ChatMessages[] = corrections.length === 0 ? [] : [{ role: "user", content: correctionsContext(corrections) }];
+  return [...kept, ...corrected, ...history.flatMap(messagesOfTurn), { role: "user", content: prompt }];
 }
 
 function messagesOfTurn({ prompt, reply }: Turn): ChatMessages[] {

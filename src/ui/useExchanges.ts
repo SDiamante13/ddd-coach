@@ -1,3 +1,4 @@
+import type { SentCorrection } from "../domain/board.ts";
 import { useState } from "react";
 import { askCoach } from "../api/askCoach.ts";
 import { historyBefore, turnsOf, type Conversation } from "../domain/conversation.ts";
@@ -18,9 +19,10 @@ type ExchangeCallbacks = {
   onRefused?: (prompt: Prompt) => void;
   onAccessLost?: () => void;
   glossary?: () => readonly KeptGlossaryRow[];
+  corrections?: () => readonly SentCorrection[];
 };
 
-export function useExchanges({ onRefused, onAccessLost, glossary = () => [] }: ExchangeCallbacks = {}) {
+export function useExchanges({ onRefused, onAccessLost, glossary = () => [], corrections = () => [] }: ExchangeCallbacks = {}) {
   const [exchanges, setExchanges] = useState<readonly Exchange[]>([]);
 
   async function ask(id: ExchangeId, conversation: Conversation) {
@@ -33,13 +35,13 @@ export function useExchanges({ onRefused, onAccessLost, glossary = () => [] }: E
   function send(prompt: Prompt) {
     const id = crypto.randomUUID() as ExchangeId;
     setExchanges((current) => [...current, submit(id, prompt)]);
-    void ask(id, { history: turnsOf(exchanges), prompt, glossary: glossary() });
+    void ask(id, { history: turnsOf(exchanges), prompt, glossary: glossary(), corrections: corrections() });
   }
 
   function retryFailed(failed: FailedExchange) {
     if (!canRetry(exchanges, failed.id)) return;
     setExchanges((current) => current.map((e) => (e.id === failed.id ? retry(e) : e)));
-    void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt, glossary: glossary() });
+    void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt, glossary: glossary(), corrections: corrections() });
   }
 
   return { exchanges, send, retry: retryFailed, clear: () => setExchanges([]) };

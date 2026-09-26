@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyAction, type BoardAction, emptyBoard, labelOf, type Provenance, struckWordsOf } from "./board.ts";
+import { applyAction, type BoardAction, emptyBoard, labelOf, type Provenance, sentCorrectionsOf, struckWordsOf } from "./board.ts";
 import { entityId } from "./entityId.ts";
 import type { ExchangeId } from "./exchange.ts";
 
@@ -50,5 +50,11 @@ describe("correcting a card (#95)", () => {
     const board = [add(PICKUP, "x1"), correct(PICKUP, FIXED), correct(PICKUP, "Carrier 3 picks up 7815 late.")].reduce(applyAction, emptyBoard);
 
     expect(board.cards[0]).toMatchObject({ text: "Carrier 3 picks up 7815 late.", correctedFrom: PICKUP });
+  });
+
+  it("sends each corrected card as the coach's original words and the visitor's, and nothing for untouched cards", () => {
+    const board = [add(PICKUP, "x1"), add("Billing issues a credit.", "x1"), correct(PICKUP, FIXED)].reduce(applyAction, emptyBoard);
+
+    expect(sentCorrectionsOf(board)).toEqual([{ was: PICKUP, now: FIXED }]);
   });
 });

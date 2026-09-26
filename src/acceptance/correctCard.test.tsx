@@ -1,6 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { CORRECTIONS_ENABLED } from "../shared/features.ts";
+import { addSwap, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -79,5 +80,39 @@ describe("Correcting a card (#95)", () => {
     await user.click(within(board()).getByRole("button", { name: "Correct this card" }));
 
     expect(within(board()).getByRole("textbox", { name: "Correct this event" })).toHaveFocus();
+  });
+
+  describe.skipIf(CORRECTIONS_ENABLED)("while the coach isn't told about corrections", () => {
+    it("claims only the board change, and sends the coach nothing about it", async () => {
+      const conversation = await onTheBoard();
+      await correctCard(conversation.user, GUESS, FIXED);
+
+      await conversation.send("And the next part.");
+
+      expect(screen.getByRole("status", { name: "Board correction" })).toHaveTextContent(/^Corrected on your board\.$/);
+      expect(conversation.server.bodyOf(1)).not.toHaveProperty("corrections");
+    });
+  });
+
+  describe.skipIf(!CORRECTIONS_ENABLED)("once the coach is told about corrections", () => {
+    it("says the coach's next turn uses the visitor's wording, and sends it with the next message", async () => {
+      const conversation = await onTheBoard();
+      await correctCard(conversation.user, GUESS, FIXED);
+
+      expect(screen.getByRole("status", { name: "Board correction" })).toHaveTextContent("Corrected on your board. The coach's next turn uses your wording.");
+      await conversation.send("And the next part.");
+      expect(conversation.server.bodyOf(1)).toMatchObject({ corrections: [{ was: GUESS, now: FIXED }] });
+    });
+
+    it("sends a correction typed with a real name with its swap applied", async () => {
+      const conversation = await onTheBoard();
+      await addSwap(conversation.user, "Acme Foods", "Customer B");
+      await correctCard(conversation.user, GUESS, "Ops asks Acme Foods before picking another carrier.");
+
+      await conversation.send("And the next part.");
+
+      expect(conversation.server.bodyOf(1)).toMatchObject({ corrections: [{ now: "Ops asks Customer B before picking another carrier." }] });
+      expect(cardItem("Ops asks Acme Foods")).toBeDefined();
+    });
   });
 });

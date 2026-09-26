@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
-import { GLOSSARY_ENABLED } from "../src/shared/features.ts";
+import { CORRECTIONS_ENABLED, GLOSSARY_ENABLED } from "../src/shared/features.ts";
 import { MAX_CONVERSATION_CHARS, parseChatRequest } from "./chatRequest.ts";
 
 function turns(count: number) {
@@ -78,5 +78,28 @@ describe("parseChatRequest, kept glossary (#100)", () => {
 
     expect(parseChatRequest(fits).ok).toBe(true);
     expect(parseChatRequest({ ...fits, glossary })).toEqual({ ok: false, reason: "tooLong" });
+  });
+});
+
+describe("parseChatRequest, board corrections (#95)", () => {
+  const correction = { was: "Ops chooses another carrier.", now: "Ops asks the customer first." };
+
+  it.skipIf(!CORRECTIONS_ENABLED)("reads the visitor's corrections sent with the message", () => {
+    const result = parseChatRequest({ message: "Next", history: [], corrections: [correction] });
+
+    expect(result.ok && result.conversation.corrections).toEqual([correction]);
+  });
+
+  it.skipIf(CORRECTIONS_ENABLED)("ignores corrections while the coach isn't told about them", () => {
+    const result = parseChatRequest({ message: "Next", history: [], corrections: [correction] });
+
+    expect(result.ok && result.conversation).not.toHaveProperty("corrections");
+  });
+
+  it.each([
+    ["more corrections than a board holds", Array.from({ length: 21 }, () => correction)],
+    ["a correction longer than a card holds", [{ ...correction, now: "x".repeat(301) }]],
+  ])("refuses %s as too long", (_case, corrections) => {
+    expect(parseChatRequest({ message: "Next", history: [], corrections })).toEqual({ ok: false, reason: "tooLong" });
   });
 });

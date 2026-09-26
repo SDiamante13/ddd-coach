@@ -87,3 +87,8 @@ export const labelOf = (card: EventCard): CardLabel => (card.correctedFrom !== u
 export function struckWordsOf(board: Board, card: EventCard): string | null {
   return card.correctedFrom !== undefined && card.correctedAt === board.latest ? card.correctedFrom : null;
 }
+
+export type SentCorrection = { was: string; now: string };
+
+export const sentCorrectionsOf = ({ cards }: Board): SentCorrection[] =>
+  cards.flatMap(({ correctedFrom, text }) => (correctedFrom === undefined ? [] : [{ was: correctedFrom, now: text }]));
