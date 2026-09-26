@@ -2,6 +2,7 @@ import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import { MAX_SENT_ROWS, type KeptGlossaryRow } from "../src/domain/glossary.ts";
 import { messageLength, parsePrompt, type Prompt } from "../src/domain/exchange.ts";
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { GLOSSARY_ENABLED } from "../src/shared/features.ts";
 import { field, stringField } from "../src/shared/json.ts";
 
 export type RejectionReason = "malformed" | "tooLong" | "messageTooLong" | "glossaryTooLong";
@@ -56,7 +57,7 @@ const GLOSSARY_TEXT = ["word", "holder", "meaning", "keptOn", "from"] as const;
 
 function readGlossary(body: unknown): KeptGlossaryRow[] | null {
   const glossary = field(body, "glossary");
-  if (glossary === undefined) return [];
+  if (!GLOSSARY_ENABLED || glossary === undefined) return [];
   if (!Array.isArray(glossary)) return null;
   const rows = glossary.map(readGlossaryRow);
   return rows.every((row) => row !== null) ? rows : null;

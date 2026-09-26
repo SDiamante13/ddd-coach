@@ -11,6 +11,7 @@ import { useClearConfirmation } from "./useClearConfirmation.ts";
 import { useComposerReserve } from "./useComposerReserve.ts";
 import { useGlossary } from "./useGlossary.ts";
 import { outgoingGlossary } from "../domain/glossary.ts";
+import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { useExchanges } from "./useExchanges.ts";
 import { useLogFollow } from "./useLogFollow.ts";
 import { useSwaps } from "./useSwaps.ts";
@@ -24,7 +25,7 @@ export function useComposer(unlock: Unlock) {
   const { exchanges, send, retry, clear } = useExchanges({
     onRefused: box.restore,
     onAccessLost: access.loseAccess,
-    glossary: () => outgoingGlossary(glossary.rows, box.swaps.swaps).sent,
+    glossary: () => (GLOSSARY_ENABLED ? outgoingGlossary(glossary.rows, box.swaps.swaps).sent : []),
   });
   const confirmation = useClearConfirmation(() => {
     clear();

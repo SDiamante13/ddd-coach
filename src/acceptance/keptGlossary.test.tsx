@@ -1,6 +1,7 @@
 import { cleanup, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
+import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { addSwap, startConversation } from "../test/appDriver.tsx";
 import { V11_EXAMPLE_REPLY } from "../test/v10Replies.ts";
 
@@ -29,7 +30,7 @@ async function openGlossary(user: Awaited<ReturnType<typeof startConversation>>[
   return screen.getByRole("table", { name: "Kept glossary" });
 }
 
-describe("Kept glossary", () => {
+describe.skipIf(!GLOSSARY_ENABLED)("Kept glossary", () => {
   it("keeps a reply's term rows, dated and sourced from the case its question names", async () => {
     const { user, log } = await exampleAnalysed();
 

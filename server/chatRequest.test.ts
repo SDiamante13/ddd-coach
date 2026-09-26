@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { GLOSSARY_ENABLED } from "../src/shared/features.ts";
 import { MAX_CONVERSATION_CHARS, parseChatRequest } from "./chatRequest.ts";
 
 function turns(count: number) {
@@ -49,13 +50,13 @@ describe("parseChatRequest", () => {
 describe("parseChatRequest, kept glossary (#100)", () => {
   const row = { word: "late", holder: "Carrier desk", meaning: "A missed pickup that can incur a carrier late fee.", source: "From thread", keptOn: "2026-09-25", from: "load 7731" };
 
-  it("reads the kept glossary rows sent with the message", () => {
+  it.skipIf(!GLOSSARY_ENABLED)("reads the kept glossary rows sent with the message", () => {
     const result = parseChatRequest({ message: "Next week's thread", history: [], glossary: [row] });
 
     expect(result.ok && result.conversation.glossary).toEqual([row]);
   });
 
-  it.each([
+  it.skipIf(!GLOSSARY_ENABLED).each([
     ["a glossary that isn't a list", "late"],
     ["a row without a meaning", [{ ...row, meaning: "" }]],
     ["a row with an unknown source", [{ ...row, source: "Rumour" }]],
@@ -71,7 +72,7 @@ describe("parseChatRequest, kept glossary (#100)", () => {
     expect(parseChatRequest({ message: "Next", history: [], glossary })).toEqual({ ok: false, reason: "glossaryTooLong" });
   });
 
-  it("counts the glossary toward the conversation's size", () => {
+  it.skipIf(!GLOSSARY_ENABLED)("counts the glossary toward the conversation's size", () => {
     const glossary = [{ ...row, meaning: "m".repeat(300) }];
     const fits = { message: "x".repeat(20_000), history: [{ prompt: "p".repeat(20_000), reply: "r".repeat(MAX_CONVERSATION_CHARS - 40_100) }] };
 

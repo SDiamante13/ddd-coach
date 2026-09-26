@@ -1,6 +1,7 @@
 import { parseReply, type ReplyBlock } from "../domain/replyBlocks.ts";
 import type { SwappedText } from "../domain/swaps.ts";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
+import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { UNSOURCED } from "../shared/replyLayout.ts";
 import { EventList } from "./EventList.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
@@ -23,7 +24,7 @@ export function ReplyView({ reply, restoreNames, onKeep }: { reply: string; rest
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
       {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
-      {blocks.some((block) => block.kind === "words") && <KeepButton reply={reply} onKeep={onKeep} />}
+      {GLOSSARY_ENABLED && blocks.some((block) => block.kind === "words") && <KeepButton reply={reply} onKeep={onKeep} />}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
+import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { AccessGate } from "./AccessGate.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
 import { ExchangeLog } from "./ExchangeLog.tsx";
@@ -59,7 +60,7 @@ function ComposerForm({ composer }: { composer: Composer }) {
         conversation={composer.conversation}
         onTryExample={box.tryExample}
       />
-      <GlossaryPanel {...composer.glossary} shown={(text) => box.restoreNames(text).text} />
+      {GLOSSARY_ENABLED && <GlossaryPanel {...composer.glossary} shown={(text) => box.restoreNames(text).text} />}
       <SwapPanel {...box.swaps} {...box.swapsPanel} thread={box.draft} />
       {!box.blank && <SentPreview swaps={box.swaps.swaps} draft={box.draft} glossary={composer.glossary.rows} />}
     </MessageForm>

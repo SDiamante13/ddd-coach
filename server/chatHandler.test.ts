@@ -6,6 +6,7 @@ import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import { COACH_GLOSSARY_TOO_LONG, COACH_OUT_OF_CREDIT, CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { GLOSSARY_ENABLED } from "../src/shared/features.ts";
 import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
 import { createAccessPass } from "./accessPass.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
@@ -73,7 +74,16 @@ function longestConversationOf(character: string, budget = MAX_CONVERSATION_CHAR
 }
 
 describe("chat handler", () => {
-  it("hands the coach the kept glossary sent with the message (#100)", async () => {
+  it.skipIf(GLOSSARY_ENABLED)("hands the coach no glossary while the glossary is off, even one a client sends", async () => {
+    const coach = echoCoach();
+    const row = { word: "late", holder: "Ops", meaning: "Late.", source: "From thread", keptOn: "2026-09-25", from: "load 7731" };
+
+    await handler({ createCoach: () => coach })(post(JSON.stringify({ message: "Next", history: [], glossary: [row] })));
+
+    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [] });
+  });
+
+  it.skipIf(!GLOSSARY_ENABLED)("hands the coach the kept glossary sent with the message (#100)", async () => {
     const coach = echoCoach();
     const row = { word: "late", holder: "Ops", meaning: "Late.", source: "From thread", keptOn: "2026-09-25", from: "load 7731" };
 
