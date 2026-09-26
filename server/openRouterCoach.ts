@@ -1,6 +1,6 @@
 import { OpenRouter } from "@openrouter/sdk";
 import type { RequestOptions } from "@openrouter/sdk/lib/sdks";
-import type { ChatAssistantMessage, ChatContentItems, ChatMessages } from "@openrouter/sdk/models";
+import type { ChatAssistantMessage, ChatContentItems, ChatMessages, ProviderPreferences } from "@openrouter/sdk/models";
 import type {
   SendChatCompletionRequestRequest,
   SendChatCompletionRequestResponse,
@@ -21,6 +21,7 @@ export type ChatClient = {
 
 const MAX_COMPLETION_TOKENS = 1_000;
 const WITHOUT_RETRIES: RequestOptions = { retries: { strategy: "none" } };
+const PINNED_ROUTING: ProviderPreferences = { order: ["openai"], allowFallbacks: false, dataCollection: "deny" };
 
 export function createOpenRouterCoach(
   config: CoachConfig,
@@ -73,6 +74,7 @@ function chatRequest(
       messages: [{ role: "system", content: instructions }, ...messagesOf(conversation)],
       stream: false,
       maxCompletionTokens: MAX_COMPLETION_TOKENS,
+      provider: PINNED_ROUTING,
       ...(reasoningEffort && { reasoning: { effort: reasoningEffort } }),
     },
   };

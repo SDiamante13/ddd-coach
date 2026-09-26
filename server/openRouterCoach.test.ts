@@ -109,11 +109,20 @@ describe("OpenRouter coach", () => {
             ],
             stream: false,
             maxCompletionTokens: 1000,
+            provider: { order: ["openai"], allowFallbacks: false, dataCollection: "deny" },
           },
         },
         { retries: { strategy: "none" } },
       ],
     ]);
+  });
+
+  it("pins routing to OpenAI with no fallback and no data collection, so the data notice stays true (#110)", async () => {
+    const { chat, requests } = fakeChat("Hi there");
+
+    await coachOn(chat).reply(verifiedConversationOf("A"));
+
+    expect(requests[0]?.[0].chatRequest.provider).toEqual({ order: ["openai"], allowFallbacks: false, dataCollection: "deny" });
   });
 
   it("asks for the configured reasoning effort", async () => {

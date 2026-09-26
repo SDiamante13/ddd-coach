@@ -39,6 +39,19 @@ describe("abEval", () => {
     expect(sent.map(promptOf)).toEqual(expected);
   });
 
+  it("routes every eval call the way production does, pinned to OpenAI (#110)", async () => {
+    const { chat } = fakeChat(replyByArm);
+    const providers: unknown[] = [];
+    const routed: ChatClient = { send: (request, options) => (providers.push(request.chatRequest.provider), chat.send(request, options)) };
+
+    await abEval(config, routed, { live, candidate, runs: 1, fixtures: ["greeting"] });
+
+    expect(providers).toEqual([
+      { order: ["openai"], allowFallbacks: false, dataCollection: "deny" },
+      { order: ["openai"], allowFallbacks: false, dataCollection: "deny" },
+    ]);
+  });
+
   it("tags each run with its arm, version, fixture and run number, and scores it against the fixture", async () => {
     const { chat } = fakeChat(replyByArm);
 
