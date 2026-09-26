@@ -1,3 +1,4 @@
+import { shortDate } from "./dates.ts";
 import type { Claim, ReplyBlock, WordRow } from "./replyBlocks.ts";
 
 export type RfcQuestion = { roles: string; text: string; sources: string[] };
@@ -12,9 +13,7 @@ export function rfcDocument(blocks: ReplyBlock[]): RfcDocument {
   };
 }
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-export const asOfLine = (asOf: Date): string => `As of ${asOf.getDate()} ${MONTHS[asOf.getMonth()]} ${asOf.getFullYear()}`;
+export const asOfLine = (asOf: Date): string => `As of ${shortDate(asOf)}`;
 
 export type TableRow = { term: string; team: string; meaning: string; source: string };
 
