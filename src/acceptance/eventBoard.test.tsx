@@ -47,7 +47,7 @@ describe("Event board", () => {
   it("replaces the reply's events list with a chip that takes the visitor to the board", async () => {
     const { user, log } = await replied(SECOND_BOARD_REPLY);
 
-    await user.click(within(log()).getByRole("button", { name: "← 3 events placed on the board" }));
+    await user.click(within(log()).getByRole("button", { name: "← 3 events on the board" }));
 
     expect(within(log()).queryByRole("list", { name: "Events, in order" })).not.toBeInTheDocument();
     expect(within(board()).getByRole("list", { name: "Events on the board" })).toHaveFocus();
@@ -162,6 +162,19 @@ describe("Event board", () => {
       expect(within(board()).queryByRole("note")).not.toBeInTheDocument();
       expect(marks(log)).toHaveLength(0);
       expect(cardButton("Carrier desk charges Carrier 3")).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("finds the line while a swap is on, and shows it with the real name, as the card does", async () => {
+      const conversation = await startConversation();
+      await addSwap(conversation.user, "Acme Foods", "Customer B");
+      const reply = "Events, in order\n1. From thread: Customer B billing issues a service credit for 7731.";
+      conversation.server.reply(await conversation.send("Thu 09:30  Acme Foods billing: issued a service credit for 7731"), 200, { reply, signature: "s" });
+      await within(board()).findByRole("list", { name: "Events on the board" });
+
+      await conversation.user.click(cardButton("Acme Foods billing issues"));
+
+      expect(within(board()).getByRole("note")).toHaveTextContent("Thu 09:30  Acme Foods billing: issued a service credit for 7731", { normalizeWhitespace: false });
+      expect(marks(conversation.log)).toHaveLength(1);
     });
 
     it("says a guess has no line in the paste", async () => {

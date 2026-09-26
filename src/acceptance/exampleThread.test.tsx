@@ -45,7 +45,7 @@ describe("Try an example thread", () => {
     await user.click(sendButton());
     expect(server.bodyOf(0)).toEqual({ message: EXAMPLE_THREAD, history: [] });
     server.reply(0, 200, { reply: "Events, in order\n1. From thread: Ops marks load 7731 late.", signature: "sig-A" });
-    await within(log()).findByRole("button", { name: "← 1 event placed on the board" });
+    await within(log()).findByRole("button", { name: "← 1 event on the board" });
     expect(queryTryExample()).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "New conversation" }));

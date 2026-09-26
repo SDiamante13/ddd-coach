@@ -16,7 +16,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     selected: selectedCard?.id ?? null,
     toggle,
     highlight,
-    highlightedLine: highlight && lineTextOf(highlight, exchanges),
+    highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
   };
 }
@@ -24,3 +24,5 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
 function lineTextOf({ exchangeId, start, end }: LineMatch, exchanges: readonly Exchange[]): string | null {
   return exchanges.find((exchange) => exchange.id === exchangeId)?.prompt.slice(start, end) ?? null;
 }
+
+const restoredLine = (line: string | null, restoreNames: RestoreNames): string | null => line && restoreNames(line).text;

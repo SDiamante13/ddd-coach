@@ -43,7 +43,7 @@ describe("boardOf", () => {
       replied("reply-1", GREETING_REPLY),
       replied("reply-2", PROSE_FOLLOW_UP_REPLY),
       pending("reply-3"),
-      fail(pending("reply-4"), { error: "The coach timed out.", retryable: true }),
+      fail(pending("reply-4"), { error: "The coach timed out.", remedy: "retry" }),
     ]);
     expect(board.cards).toEqual([]);
   });
