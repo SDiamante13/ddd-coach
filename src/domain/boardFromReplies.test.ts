@@ -10,6 +10,7 @@ import {
 } from "../test/boardReplies.ts";
 import { type Board, changeOf, previousTextOf, PROVENANCE_LABEL } from "./board.ts";
 import { boardOf } from "./boardFromReplies.ts";
+import { entityId } from "./entityId.ts";
 import { type Exchange, type ExchangeId, fail, type Prompt, reply, submit } from "./exchange.ts";
 
 const pending = (id: string) => submit(id as ExchangeId, "thread" as Prompt);
@@ -80,5 +81,21 @@ describe("boardOf", () => {
     const board = boardOf([...firstTwoReplies, replied("reply-3", restated)]);
     const card = board.cards[5]!;
     expect([card.text, previousTextOf(board, card), changeOf(board, card)]).toEqual(["The carrier REJECTS the booking!", null, null]);
+  });
+});
+
+describe("boardOf with the visitor's corrections (#95)", () => {
+  const GUESS = "Ops chooses another carrier and resubmits the booking.";
+  const FIXED = "Ops asks the customer before picking another carrier.";
+  const correction = { id: entityId("event", GUESS), text: FIXED, after: "reply-2" as ExchangeId };
+
+  it("applies a correction right after the reply it followed, so a later restatement can't undo it", () => {
+    const board = boardOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)], [correction]);
+
+    expect(board.cards.at(-1)).toMatchObject({ text: FIXED, correctedFrom: GUESS });
+  });
+
+  it("returns to the coach's wording when the correction is undone", () => {
+    expect(boardOf(firstTwoReplies, []).cards.at(-1)).toMatchObject({ text: GUESS });
   });
 });
