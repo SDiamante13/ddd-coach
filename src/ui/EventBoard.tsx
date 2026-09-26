@@ -52,6 +52,15 @@ function panToChanges(lane: HTMLOListElement | null): void {
 
 const CHANGE_TAG = { added: "JUST ADDED", updated: "UPDATED" } as const;
 
+function ChangeMark({ change }: { change: keyof typeof CHANGE_TAG }) {
+  return (
+    <>
+      <span className="card-ring" aria-hidden="true" />
+      <span className="card-tag">{CHANGE_TAG[change]}</span>
+    </>
+  );
+}
+
 function Card({ card, view, title }: { card: EventCard; view: BoardView; title: string }) {
   const change = changeOf(view.board, card);
   const pressed = view.selected === card.id;
@@ -62,7 +71,7 @@ function Card({ card, view, title }: { card: EventCard; view: BoardView; title: 
         <span className="card-kind">EVENT</span>
         <span className="card-source">{PROVENANCE_LABEL[card.provenance]}</span>
         <span className="card-title">{title}</span>
-        {change && <span className="card-tag">{CHANGE_TAG[change]}</span>}
+        {change && <ChangeMark key={`${change}-${view.board.latest}`} change={change} />}
       </button>
       {pressed && <CardNote id={noteId} provenance={card.provenance} line={view.highlightedLine} />}
     </li>

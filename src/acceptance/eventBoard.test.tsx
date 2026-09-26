@@ -68,6 +68,20 @@ describe("Event board", () => {
     expect(within(log()).getByRole("button", { name: /on the board/ })).toHaveTextContent(/^← 1 new on the board$/);
   });
 
+  it("restarts a card's mark when the next reply marks it again, so UPDATED shows after JUST ADDED", async () => {
+    const conversation = await replied(SECOND_BOARD_REPLY);
+    const guess = cards()[2]!;
+    const addedTag = guess.querySelector(".card-tag");
+    const addedRing = guess.querySelector(".card-ring");
+
+    await replyNext(conversation, THIRD_BOARD_REPLY, 3);
+
+    expect(guess.querySelector(".card-tag")).toHaveTextContent("UPDATED");
+    expect(guess.querySelector(".card-tag")).not.toBe(addedTag);
+    expect(guess.querySelector(".card-ring")).not.toBeNull();
+    expect(guess.querySelector(".card-ring")).not.toBe(addedRing);
+  });
+
   it("keeps every card in place across replies: a repeat stays one card, new events are just added, a restated guess is updated", async () => {
     const conversation = await replied(FIRST_BOARD_REPLY);
     const firstFive = cards();

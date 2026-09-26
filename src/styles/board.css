@@ -113,10 +113,17 @@ html {
   box-shadow: none;
 }
 
-[data-change] > .card {
-  outline: 2px dashed var(--color-coach);
-  outline-offset: 3px;
-  animation: settle-ring 300ms 3s forwards;
+.card {
+  position: relative;
+}
+
+.card-ring {
+  position: absolute;
+  inset: -7px;
+  border: 2px dashed var(--color-coach);
+  border-radius: 4px;
+  pointer-events: none;
+  animation: settle 300ms 3s forwards;
 }
 
 .card-tag {
@@ -140,11 +147,6 @@ html {
   }
 }
 
-@keyframes settle-ring {
-  to {
-    outline-color: transparent;
-  }
-}
 
 .board-ghost {
   flex: 0 0 var(--card-width);
@@ -215,10 +217,7 @@ ol[role="log"] mark {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-change] > .card {
-    animation: settle-ring 0s 3s forwards;
-  }
-
+  .card-ring,
   .card-tag {
     animation: settle 0s 3s forwards;
   }
