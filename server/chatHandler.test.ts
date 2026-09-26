@@ -176,7 +176,7 @@ describe("chat handler", () => {
     expect(await response.json()).toEqual({
       error:
         "That message couldn't be checked, so it was skipped. Send it again. " +
-        "If it keeps happening, copy the conversation and start a new one.",
+        "If it keeps happening, copy the conversation and start a new conversation.",
     });
     expect(coach.reply).not.toHaveBeenCalled();
   });
@@ -345,7 +345,7 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(413);
     expect(await response.json()).toEqual({
-      error: "This conversation is too long for the coach. Copy the conversation, then start a new one.",
+      error: "This conversation is too long for the coach. Copy the conversation, then start a new conversation.",
     });
     expect(coach.reply).not.toHaveBeenCalled();
   });

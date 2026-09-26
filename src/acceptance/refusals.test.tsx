@@ -36,7 +36,7 @@ describe("Refusals", () => {
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
       "That message couldn't be checked, so it was skipped. Send it again. " +
-        "If it keeps happening, copy the conversation and start a new one.",
+        "If it keeps happening, copy the conversation and start a new conversation.",
     );
     expect(within(log()).queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
   });
