@@ -27,6 +27,7 @@ type HandlerOverrides = {
   deadlineMs?: number;
   log?: CoachFailureLog;
   signingKey?: SigningKeyResult;
+  vetReply?: (reply: string) => string;
 };
 
 function handler(overrides: HandlerOverrides = {}) {
@@ -72,6 +73,17 @@ function longestConversationOf(character: string) {
 }
 
 describe("chat handler", () => {
+  it("vets the coach's reply before signing it, so the signature covers what the visitor sees (#58)", async () => {
+    const handle = handler({ vetReply: (reply) => reply.replace("Echo: ", "Vetted: ") });
+
+    const response = await handle(postMessage("Hello coach"));
+
+    const body = (await response.json()) as { reply: string; signature: string };
+    expect(body.reply).toBe("Vetted: Hello coach");
+    expect(body.signature).toBe(createTurnSigner(TEST_SIGNING_KEY).sign({ prompt: "Hello coach", reply: "Vetted: Hello coach" }));
+  });
+
+
   it("replies with the coach's answer to a posted message, signed", async () => {
     const handle = handler();
 

@@ -26,7 +26,8 @@ export type CoachFailureLog = (failure: CoachFailure) => void;
 
 const MISSED_DEADLINE: CoachFailure = { name: "Timeout", statusCode: undefined };
 
-type CoachCallDeps = { deadlineMs: number; log: CoachFailureLog };
+type VetReply = (reply: string) => string;
+type CoachCallDeps = { deadlineMs: number; log: CoachFailureLog; vetReply?: VetReply };
 type ReplyDeps = CoachCallDeps & { signer: TurnSigner };
 
 type ChatHandlerDeps = CoachCallDeps & {
@@ -85,12 +86,12 @@ function rejected(reason: Refusal): Response {
 async function replyFrom(
   coach: Coach,
   conversation: VerifiedConversation,
-  { deadlineMs, log, signer }: ReplyDeps,
+  { deadlineMs, log, signer, vetReply = asIs }: ReplyDeps,
 ): Promise<Response> {
   try {
     const reply = await withDeadline(coach.reply(conversation), deadlineMs);
     if (reply === TIMED_OUT) log(MISSED_DEADLINE);
-    return replied(reply, conversation.prompt, signer);
+    return replied(reply === TIMED_OUT ? reply : vetReply(reply), conversation.prompt, signer);
   } catch (error) {
     log(failureOf(error));
     return error instanceof CoachOutOfCredit ? coachOutOfCredit() : coachUnavailable();
@@ -106,6 +107,8 @@ function statusCodeOf(error: unknown): number | undefined {
   if (typeof error !== "object" || error === null || !("statusCode" in error)) return undefined;
   return typeof error.statusCode === "number" ? error.statusCode : undefined;
 }
+
+const asIs: VetReply = (reply) => reply;
 
 function replied(reply: string | typeof TIMED_OUT, prompt: string, signer: TurnSigner): Response {
   if (reply === TIMED_OUT) return coachTooSlow();
