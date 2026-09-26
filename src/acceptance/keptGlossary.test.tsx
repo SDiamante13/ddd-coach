@@ -2,7 +2,7 @@ import { cleanup, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
-import { addSwap, startConversation } from "../test/appDriver.tsx";
+import { addSwap, pasteInto, startConversation } from "../test/appDriver.tsx";
 import { V11_EXAMPLE_REPLY } from "../test/v10Replies.ts";
 
 beforeEach(() => {
@@ -118,7 +118,7 @@ describe.skipIf(!GLOSSARY_ENABLED)("Kept glossary", () => {
   it("lists in What's sent the kept rows that go with the next message", async () => {
     const { user, log, input } = await exampleAnalysed();
     await user.click(within(log()).getByRole("button", { name: "Keep these words" }));
-    await user.type(input(), "Next week's thread");
+    await pasteInto(user, input(), "Next week's thread");
 
     await user.click(screen.getByRole("button", { name: "Show what's sent" }));
 

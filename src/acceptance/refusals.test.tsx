@@ -8,7 +8,7 @@ import {
   COACH_UNVERIFIED,
 } from "../shared/chatContract.ts";
 import { ACCESS_REQUIRED } from "../shared/accessContract.ts";
-import { composerOf, renderApp, startConversation } from "../test/appDriver.tsx";
+import { composerOf, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -18,7 +18,7 @@ describe("Refusals", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "A very long message{Enter}");
+    await sendText(user, input(), "A very long message");
     server.reply(0, 413, { error: "This message is too long for the coach. Shorten it and send it again." });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
@@ -31,7 +31,7 @@ describe("Refusals", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
+    await sendText(user, input(), "Hello coach");
     server.reply(0, 400, { error: COACH_UNVERIFIED });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(
@@ -50,7 +50,7 @@ describe("Refusals", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Long one{Enter}");
+    await sendText(user, input(), "Long one");
     server.reply(0, status, { error });
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent(error);

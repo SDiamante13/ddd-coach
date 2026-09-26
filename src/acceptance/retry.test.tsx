@@ -1,6 +1,6 @@
 import { within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp } from "../test/appDriver.tsx";
+import { renderApp, sendText } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -10,7 +10,7 @@ describe("Retry", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
+    await sendText(user, input(), "Hello coach");
     server.reply(0, 502, { error: "The coach sent an empty reply. Try again." });
 
     const entry = await within(log()).findByRole("listitem");
@@ -23,7 +23,7 @@ describe("Retry", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
+    await sendText(user, input(), "Hello coach");
     server.reply(0, 502, { error: "The coach is unavailable." });
     await user.click(await within(log()).findByRole("button", { name: "Retry" }));
 
@@ -39,7 +39,7 @@ describe("Retry", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
+    await sendText(user, input(), "Hello coach");
     server.reply(0, 502, { error: "The coach is unavailable." });
     await user.click(await within(log()).findByRole("button", { name: "Retry" }));
 
@@ -49,11 +49,11 @@ describe("Retry", () => {
   it("disables Retry while another exchange is pending, then enables it once that settles", async () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
-    await user.type(input(), "First message{Enter}");
+    await sendText(user, input(), "First message");
     server.fail(0);
     const retryButton = await within(log()).findByRole("button", { name: "Retry" });
 
-    await user.type(input(), "Second message{Enter}");
+    await sendText(user, input(), "Second message");
     await user.click(retryButton);
 
     expect(retryButton).toBeDisabled();
@@ -67,7 +67,7 @@ describe("Retry", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
+    await sendText(user, input(), "Hello coach");
     server.fail(0);
 
     expect(await within(log()).findByRole("alert")).toHaveTextContent("Could not reach the coach.");

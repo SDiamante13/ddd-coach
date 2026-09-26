@@ -1,7 +1,7 @@
 import { cleanup, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_MESSAGE_TOO_LONG, MAX_MESSAGE_CHARS } from "../shared/chatContract.ts";
-import { addSwap, composerOf, formatCount, openSwaps, startConversation } from "../test/appDriver.tsx";
+import { addSwap, composerOf, formatCount, openSwaps, pasteInto, startConversation } from "../test/appDriver.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -45,7 +45,7 @@ describe("Swapping sensitive words", () => {
     const { user, server, input } = await startConversation();
     await addSwap(user, "Acme", "Customer A");
     await addSwap(user, "Laredo", "Lane 1");
-    await user.type(input(), "acme wants the Laredo lane");
+    await pasteInto(user, input(), "acme wants the Laredo lane");
 
     await user.click(screen.getByRole("button", { name: "Show what's sent" }));
 
@@ -60,7 +60,7 @@ describe("Swapping sensitive words", () => {
 
   it("shows the draft as it is in 'What's sent' when there are no swaps", async () => {
     const { user, input } = await startConversation();
-    await user.type(input(), "Acme is late");
+    await pasteInto(user, input(), "Acme is late");
 
     await user.click(screen.getByRole("button", { name: "Show what's sent" }));
 
@@ -79,7 +79,7 @@ describe("Swapping sensitive words", () => {
     expect(within(preview).getByText(fullText("Customer A"))).toBeVisible();
     expect(within(preview).getByText("1 swap applied")).toBeVisible();
 
-    await user.type(input(), " and ACME");
+    await pasteInto(user, input(), " and ACME");
     expect(within(preview).getByText(fullText("Customer A and Customer A"))).toBeVisible();
     expect(within(preview).getByText("2 swaps applied")).toBeVisible();
   });
@@ -229,7 +229,7 @@ describe("Swapping sensitive words", () => {
 
   it("warns while typing a placeholder the message already uses", async () => {
     const { user, input } = await startConversation();
-    await user.type(input(), "Maya asked dana to rebook");
+    await pasteInto(user, input(), "Maya asked dana to rebook");
     await openSwaps(user);
 
     await user.type(screen.getByRole("textbox", { name: "Replace" }), "Maya");
@@ -244,7 +244,7 @@ describe("Swapping sensitive words", () => {
   it("warns in 'What's sent' when a listed placeholder is already in the message", async () => {
     const { user, input } = await startConversation();
     await addSwap(user, "Maya", "Dana");
-    await user.type(input(), "Maya asked Dana to rebook");
+    await pasteInto(user, input(), "Maya asked Dana to rebook");
 
     await user.click(screen.getByRole("button", { name: "Show what's sent" }));
 
@@ -275,7 +275,7 @@ describe("Swapping sensitive words", () => {
     const { user, input } = await startConversation();
     await addSwap(user, "Acme", "Customer A");
     await addSwap(user, "Maya", "Person 1");
-    await user.type(input(), "Maya asked Person 1");
+    await pasteInto(user, input(), "Maya asked Person 1");
 
     await user.click(screen.getByRole("button", { name: "Show what's sent" }));
 

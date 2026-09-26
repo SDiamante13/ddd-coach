@@ -1,6 +1,6 @@
 import { fireEvent, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp } from "../test/appDriver.tsx";
+import { pasteInto, renderApp, sendText } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -47,7 +47,7 @@ describe("Sending a message", () => {
     stubFetch();
     const { user, input, log, sendButton } = await renderApp();
 
-    await user.type(input(), "Hello coach");
+    await pasteInto(user, input(), "Hello coach");
     await user.click(sendButton());
 
     expect(within(log()).getByText("Hello coach")).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe("Sending a message", () => {
     stubFetch();
     const { user, input, sendButton } = await renderApp();
 
-    await user.type(input(), "Hello coach");
+    await pasteInto(user, input(), "Hello coach");
     await user.click(sendButton());
 
     expect(input()).toHaveFocus();
@@ -81,7 +81,7 @@ describe("Sending a message", () => {
   ])("sends nothing on Enter while an input method is %s", async (_state, composition) => {
     const server = stubFetch();
     const { user, input } = await renderApp();
-    await user.type(input(), "Hello coach");
+    await pasteInto(user, input(), "Hello coach");
 
     fireEvent.keyDown(input(), { key: "Enter", ...composition });
 
@@ -119,8 +119,8 @@ describe("Sending a message", () => {
     const server = stubFetch();
     const { user, input, log, sendButton } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
-    await user.type(input(), "Again{Enter}");
+    await sendText(user, input(), "Hello coach");
+    await sendText(user, input(), "Again");
     await user.click(sendButton());
 
     expect(within(log()).getAllByRole("listitem")).toHaveLength(1);

@@ -1,6 +1,6 @@
 import { within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp } from "../test/appDriver.tsx";
+import { renderApp, sendText } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -44,7 +44,7 @@ describe("Message log", () => {
     const server = stubFetch();
     const { user, input, log } = await renderApp();
 
-    await user.type(input(), "Hello coach{Enter}");
+    await sendText(user, input(), "Hello coach");
     server.reply(0, 200, { reply: "<b>x</b>", signature: "sig-1" });
 
     expect(await within(log()).findByText("<b>x</b>")).toBeInTheDocument();

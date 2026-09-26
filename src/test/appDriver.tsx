@@ -12,6 +12,16 @@ export function composerOf(box: HTMLElement): HTMLFormElement {
   return form;
 }
 
+export async function pasteInto(user: UserEvent, box: HTMLElement, text: string) {
+  await user.click(box);
+  await user.paste(text);
+}
+
+export async function sendText(user: UserEvent, box: HTMLElement, text: string) {
+  await pasteInto(user, box, text);
+  await user.keyboard("{Enter}");
+}
+
 export async function renderApp() {
   if (!vi.isMockFunction(globalThis.fetch)) stubFetch();
   const user = userEvent.setup();
@@ -30,7 +40,7 @@ export async function startConversation() {
   const app = await renderApp();
 
   async function send(message: string): Promise<number> {
-    await app.user.type(app.input(), `${message}{Enter}`);
+    await sendText(app.user, app.input(), message);
     return server.pendingCount() - 1;
   }
 
@@ -68,7 +78,7 @@ export async function openSwaps(user: UserEvent) {
 
 export async function addSwap(user: UserEvent, from: string, to: string) {
   await openSwaps(user);
-  await user.type(screen.getByRole("textbox", { name: "Replace" }), from);
-  await user.type(screen.getByRole("textbox", { name: "With" }), to);
+  await pasteInto(user, screen.getByRole("textbox", { name: "Replace" }), from);
+  await pasteInto(user, screen.getByRole("textbox", { name: "With" }), to);
   await user.click(screen.getByRole("button", { name: "Add swap" }));
 }

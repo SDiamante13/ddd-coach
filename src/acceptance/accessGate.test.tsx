@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { TOO_MANY_TRIES } from "../api/access.ts";
 import { ACCESS_REQUIRED, ACCESS_WRONG_PASSWORD, UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { App } from "../App.tsx";
-import { openGate, startConversation } from "../test/appDriver.tsx";
+import { openGate, pasteInto, sendText, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 import { ACCESS_UNREACHABLE } from "../ui/AccessUnreachable.tsx";
 import { DATA_FLOW_NOTICE } from "../ui/DataFlowNotice.tsx";
@@ -28,7 +28,7 @@ describe("Access gate", () => {
   it("says a wrong password isn't right and keeps it in the field, flagged and focused", async () => {
     const { user, server, field } = await openGate();
 
-    await user.type(field(), "nope");
+    await pasteInto(user, field(), "nope");
     await user.click(screen.getByRole("button", { name: "Enter" }));
     expect(server.bodyOf(0)).toEqual({ password: "nope" });
     server.reply(0, 401, { error: ACCESS_WRONG_PASSWORD });
@@ -44,7 +44,7 @@ describe("Access gate", () => {
   it("disables the button while it checks the password", async () => {
     const { user, field } = await openGate();
 
-    await user.type(field(), "local-coach-dev{Enter}");
+    await sendText(user, field(), "local-coach-dev");
 
     expect(screen.getByRole("button", { name: "Checking…" })).toBeDisabled();
   });
@@ -52,7 +52,7 @@ describe("Access gate", () => {
   it("opens the coach on the right password, with the message box focused", async () => {
     const { user, server, field } = await openGate();
 
-    await user.type(field(), "local-coach-dev{Enter}");
+    await sendText(user, field(), "local-coach-dev");
     server.replyNoContent(0);
 
     expect(await screen.findByRole("textbox", { name: "Message" })).toHaveFocus();
@@ -62,7 +62,7 @@ describe("Access gate", () => {
   it("says the browser stays unlocked for 90 days after the right password", async () => {
     const { user, server, field } = await openGate();
 
-    await user.type(field(), "local-coach-dev{Enter}");
+    await sendText(user, field(), "local-coach-dev");
     server.replyNoContent(0);
 
     expect(await screen.findByRole("status")).toHaveTextContent(UNLOCKED_FOR);
@@ -78,7 +78,7 @@ describe("Access gate", () => {
   it("asks to wait a minute when the network has made too many tries", async () => {
     const { user, server, field } = await openGate();
 
-    await user.type(field(), "guess{Enter}");
+    await sendText(user, field(), "guess");
     server.replyText(0, 429, "Too Many Requests");
 
     expect(await screen.findByRole("alert")).toHaveTextContent(TOO_MANY_TRIES);
@@ -102,7 +102,7 @@ describe("Access gate", () => {
     server.reply(await send("Hello coach"), 401, { error: ACCESS_REQUIRED });
     const field = await screen.findByLabelText("Conference password");
 
-    await user.type(field, "local-coach-dev{Enter}");
+    await sendText(user, field, "local-coach-dev");
     expect(server.bodyOf(1)).toEqual({ password: "local-coach-dev" });
     server.replyNoContent(1);
 

@@ -1,6 +1,6 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { addSwap, openSwaps, startConversation } from "../test/appDriver.tsx";
+import { addSwap, openSwaps, pasteInto, startConversation } from "../test/appDriver.tsx";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -28,7 +28,7 @@ describe("Swaps panel", () => {
 
   it("heads the What's sent preview with a visible heading", async () => {
     const { user, input } = await startConversation();
-    await user.type(input(), "Acme Foods wants the lane re-rated.");
+    await pasteInto(user, input(), "Acme Foods wants the lane re-rated.");
 
     await user.click(screen.getByRole("button", { name: "Show what's sent" }));
 
