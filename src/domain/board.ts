@@ -15,11 +15,6 @@ export type Board = { readonly cards: readonly EventCard[]; readonly latest: Exc
 export type BoardAction = { type: "addEvent"; id: EntityId; text: string; provenance: Provenance; by: ExchangeId };
 export type CardChange = "added" | "updated" | null;
 
-export type RenameCard = { type: "renameCard"; id: EntityId; text: string }; // #95
-export type ConnectCards = { type: "connectCards"; from: EntityId; to: EntityId }; // #96
-export type AddQuestion = { type: "addQuestion"; id: string; text: string; about?: EntityId }; // #97
-export type LaterBoardAction = RenameCard | ConnectCards | AddQuestion;
-
 export const PROVENANCE_LABEL: Record<Provenance, "FROM THREAD" | "GUESS"> = { thread: "FROM THREAD", guess: "GUESS" };
 
 export const emptyBoard: Board = { cards: [], latest: null };
