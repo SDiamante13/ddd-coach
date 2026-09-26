@@ -2,32 +2,48 @@
 import { describe, expect, it } from "vitest";
 import { driftNamed, noFalseDrift, settledNotReAsked } from "./glossaryChecks.ts";
 
-const LATE = '- "late": Carrier desk here means a missed delivery appointment; you kept: a missed pickup (kept 25 Sep 2026 from load 7731).';
-const expectLate = { drift: ["late"], keptFrom: ["load 7731"] };
+const kept = (holder: string, meaning: string) => ({ word: "late", holder, meaning, source: "From thread" as const, keptOn: "2026-09-25", from: "load 7731" });
+const GLOSSARY = [kept("Carrier desk", "A missed pickup that can incur a carrier late fee."), kept("Ops (day desk)", "A truck not at pickup by the end of the pickup window.")];
+const LATE = '- "late": Carrier desk here means a missed delivery appointment; you kept: "A missed pickup that can incur a carrier late fee." (kept 25 Sep 2026 from load 7731).';
+const AGREEING = '- "late": Ops (day desk) here means a truck that misses the pickup window; you kept: "A truck not at pickup by the end of the pickup window." (kept 25 Sep 2026 from load 7731).';
+const expectLate = { drift: [{ word: "late", holder: "Carrier desk" }], keptFrom: ["load 7731"] };
 
 describe("driftNamed", () => {
-  it("passes a drift line for each expected word that names where it was kept", () => {
-    expect(driftNamed([LATE], expectLate)).toBe(true);
+  it("passes a drift line for each contradicted row that quotes it and names where it was kept", () => {
+    expect(driftNamed([LATE], expectLate, GLOSSARY)).toBe(true);
+  });
+
+  it("accepts the kept quote without its end stop", () => {
+    expect(driftNamed([LATE.replace('late fee."', 'late fee"')], expectLate, GLOSSARY)).toBe(true);
   });
 
   it("fails when an expected drift has no line", () => {
-    expect(driftNamed([], expectLate)).toBe(false);
+    expect(driftNamed([], expectLate, GLOSSARY)).toBe(false);
   });
 
   it("fails a drift line that doesn't say where the kept meaning came from", () => {
-    expect(driftNamed([LATE.replace("load 7731", "an earlier thread")], expectLate)).toBe(false);
+    expect(driftNamed([LATE.replace("load 7731", "an earlier thread")], expectLate, GLOSSARY)).toBe(false);
+  });
+
+  it.each([
+    ["quotes a kept row the thread agrees with", AGREEING],
+    ["paraphrases the contradicted row", LATE.replace('"A missed pickup that can incur a carrier late fee."', '"a missed pickup with a late fee"')],
+    ["doesn't quote the kept meaning", LATE.replace('"A missed pickup that can incur a carrier late fee."', "a missed pickup that can incur a carrier late fee")],
+  ])("fails a drift line that %s", (_case, line) => {
+    expect(driftNamed([line], expectLate, GLOSSARY)).toBe(false);
   });
 });
 
 describe("noFalseDrift", () => {
   it.each([
-    ["an expected drift", [LATE], expectLate, true],
-    ["no drift where none is expected", [], {}, true],
-    ["a drift on a word that didn't change", [LATE.replace('"late"', '"on time"')], expectLate, false],
-    ["any drift when no glossary was kept", [LATE], {}, false],
-    ["a drift line it can't read", ["- late changed a bit."], expectLate, false],
-  ])("judges %s", (_case, lines, expected, passes) => {
-    expect(noFalseDrift(lines, expected)).toBe(passes);
+    ["an expected drift", [LATE], expectLate, GLOSSARY, true],
+    ["no drift where none is expected", [], {}, [], true],
+    ["a drift at a kept row the thread agrees with", [LATE, AGREEING], expectLate, GLOSSARY, false],
+    ["a drift on a word that didn't change", [LATE.replace('"late"', '"on time"')], expectLate, GLOSSARY, false],
+    ["any drift when no glossary was kept", [LATE], {}, [], false],
+    ["a drift line it can't read", ["- late changed a bit."], expectLate, GLOSSARY, false],
+  ])("judges %s", (_case, lines, expected, glossary, passes) => {
+    expect(noFalseDrift(lines, expected, glossary)).toBe(passes);
   });
 });
 

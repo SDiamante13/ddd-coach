@@ -230,9 +230,11 @@ describe("hard checks", () => {
   });
 
   describe("kept glossary checks (#100)", () => {
-    const keptLate = { ...fixture, key: { ...fixture.key, expect: { ...fixture.key.expect, drift: ["late"], keptFrom: ["load 7731"] } } };
+    const glossary = [{ word: "late", holder: "Ops", meaning: "A missed pickup.", source: "From thread" as const, keptOn: "2026-09-25", from: "load 7731" }];
+    const drift = [{ word: "late", holder: "Ops" }];
+    const keptLate = { ...fixture, glossary, key: { ...fixture.key, expect: { ...fixture.key.expect, drift, keptFrom: ["load 7731"] } } };
     const driftSection =
-      'Changed since you kept it\n- "late": Ops here means a missed delivery appointment; you kept: a missed pickup (kept 25 Sep 2026 from load 7731).';
+      'Changed since you kept it\n- "late": Ops here means a missed delivery appointment; you kept: "A missed pickup." (kept 25 Sep 2026 from load 7731).';
     const withDrift = GOOD_REPLY.replace("\n\nQuestion for", `\n\n${driftSection}\n\nQuestion for`);
 
     it("fail drift named when the reply doesn't name the planted change", () => {

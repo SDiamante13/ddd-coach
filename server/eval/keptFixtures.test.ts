@@ -17,7 +17,7 @@ Words that don't match
 - Guess: Code has no POD field on the invoice release.
 
 Changed since you kept it
-- "late": Carrier desk here means a missed delivery appointment under the dedicated-lane contract; you kept: a missed pickup that can incur a carrier late fee (kept 25 Sep 2026 from load 7731).
+- "late": Carrier desk here means a missed delivery appointment under the dedicated-lane contract; you kept: "A missed pickup that can incur a carrier late fee." (kept 25 Sep 2026 from load 7731).
 
 Question for the billing lead and the ops lead, at Friday's ops sync: For load 7815, which POD releases the invoice: the signed paper from the receiver or the app photo from the driver?
 From thread: "a POD is the signed paper from the receiver"
@@ -38,7 +38,9 @@ Question for the billing lead and the account team lead, at Friday's ops sync: F
 From thread: "a rebill is a corrected invoice replacing the old one"
 From thread: "for us a rebill is when we reverse the credit we gave them"`;
 
-const STEADY_FALSE = STEADY_GOOD.replace("\n\nQuestion for", '\n\nChanged since you kept it\n- "late": Ops here means a truck not at the pickup by the end of the window; you kept: a truck not at pickup by the end of the pickup window (kept 25 Sep 2026 from load 7731).\n\nQuestion for');
+const STEADY_FALSE = STEADY_GOOD.replace("\n\nQuestion for", '\n\nChanged since you kept it\n- "late": Ops here means a truck not at the pickup by the end of the window; you kept: "A truck not at pickup by the end of the pickup window." (kept 25 Sep 2026 from load 7731).\n\nQuestion for');
+const AGREEING_LINE = '- "late": Ops (day desk) here means a truck that misses the end of the pickup window; you kept: "A truck not at pickup by the end of the pickup window." (kept 25 Sep 2026 from load 7731).';
+const DRIFT_AT_AGREEING_ROW = DRIFT_GOOD.replace("\n\nQuestion for", `\n${AGREEING_LINE}\n\nQuestion for`);
 const DRIFT_REASK = DRIFT_GOOD.replace("which POD releases the invoice", "does on time still mean the booked delivery appointment, and which POD releases the invoice");
 
 
@@ -47,6 +49,7 @@ describe("the kept-glossary fixtures (#100)", () => {
     ["a reply that names the planted drift and asks about the new POD split", "kept-drift", DRIFT_GOOD, []],
     ["a reply that re-asks the settled on time", "kept-drift", DRIFT_REASK, ["settled not re-asked"]],
     ["a reply that misses the planted drift", "kept-drift", DRIFT_GOOD.replace(/\n\nChanged since you kept it\n[^\n]+/, ""), ["drift named"]],
+    ["a reply that also flags a kept row the thread agrees with", "kept-drift", DRIFT_AT_AGREEING_ROW, ["no false drift"]],
     ["a control reply that uses every kept word as kept", "kept-steady", STEADY_GOOD, []],
     ["a control reply that calls a paraphrase a drift", "kept-steady", STEADY_FALSE, ["no false drift"]],
   ])("judge %s", (_case, fixture, reply, failures) => {

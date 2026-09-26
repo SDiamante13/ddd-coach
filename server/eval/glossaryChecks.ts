@@ -1,20 +1,33 @@
-export type GlossaryExpect = { drift?: string[]; keptFrom?: string[]; settled?: string[][] };
+import type { KeptGlossaryRow } from "../../src/domain/glossary.ts";
+
+export type ContradictedRow = { word: string; holder: string };
+export type GlossaryExpect = { drift?: ContradictedRow[]; keptFrom?: string[]; settled?: string[][] };
 
 const DRIFT_WORD = /^- ["“](.+?)["”]:/;
+const KEPT_QUOTE = /; you kept: ["“](.+?)["”]/;
 
-const driftWordOf = (line: string): string | undefined => DRIFT_WORD.exec(line)?.[1]?.toLowerCase();
+const withoutEndStop = (text: string): string => text.trim().replace(/\.$/, "");
 
-export function driftNamed(driftLines: readonly string[], { drift = [], keptFrom = [] }: GlossaryExpect): boolean {
-  return drift.every((word) =>
-    driftLines.some((line) => driftWordOf(line) === word.toLowerCase() && keptFrom.some((from) => line.includes(from))),
+function keptRowOf(line: string, glossary: readonly KeptGlossaryRow[]): KeptGlossaryRow | undefined {
+  const word = DRIFT_WORD.exec(line)?.[1]?.toLowerCase();
+  const quote = KEPT_QUOTE.exec(line)?.[1];
+  if (word === undefined || quote === undefined) return undefined;
+  return glossary.find((row) => row.word.toLowerCase() === word && withoutEndStop(row.meaning) === withoutEndStop(quote));
+}
+
+const isRow = (row: KeptGlossaryRow | undefined, { word, holder }: ContradictedRow): boolean =>
+  row?.word.toLowerCase() === word.toLowerCase() && row.holder === holder;
+
+export function driftNamed(driftLines: readonly string[], { drift = [], keptFrom = [] }: GlossaryExpect, glossary: readonly KeptGlossaryRow[]): boolean {
+  return drift.every((contradicted) =>
+    driftLines.some((line) => isRow(keptRowOf(line, glossary), contradicted) && keptFrom.some((from) => line.includes(from))),
   );
 }
 
-export function noFalseDrift(driftLines: readonly string[], { drift = [] }: GlossaryExpect): boolean {
-  const expected = drift.map((word) => word.toLowerCase());
+export function noFalseDrift(driftLines: readonly string[], { drift = [] }: GlossaryExpect, glossary: readonly KeptGlossaryRow[]): boolean {
   return driftLines.every((line) => {
-    const word = driftWordOf(line);
-    return word !== undefined && expected.includes(word);
+    const row = keptRowOf(line, glossary);
+    return drift.some((contradicted) => isRow(row, contradicted));
   });
 }
 
