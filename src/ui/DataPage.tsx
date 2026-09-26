@@ -1,10 +1,11 @@
 import { useId, type ReactNode } from "react";
+import { coachProvider } from "../shared/coachProvider.ts";
 
 export const DATA_PAGE_PATH = "/data";
 
 const POLICIES = [
-  { label: "OpenAI: how API data is used and kept", href: "https://developers.openai.com/api/docs/guides/your-data" },
-  { label: "OpenAI: privacy policy", href: "https://openai.com/policies/privacy-policy/" },
+  { label: `${coachProvider.name}: how API data is used and kept`, href: coachProvider.dataPolicyUrl },
+  { label: `${coachProvider.name}: privacy policy`, href: coachProvider.privacyPolicyUrl },
   { label: "OpenRouter: data collection", href: "https://openrouter.ai/docs/guides/privacy/data-collection" },
   { label: "OpenRouter: provider logging", href: "https://openrouter.ai/docs/guides/privacy/provider-logging" },
   { label: "OpenRouter: privacy policy", href: "https://openrouter.ai/privacy" },
@@ -30,8 +31,8 @@ function Routing() {
     <Section heading="Who handles it">
       <p>
         When you press Send, your browser sends your message, with your swaps applied, to our server, along with the
-        conversation so far. Our server passes it to OpenRouter, which routes it to a model provider. OpenRouter
-        currently routes it to OpenAI's own API.
+        conversation so far. Our server passes it to OpenRouter, which routes it to a model provider. Our server tells
+        OpenRouter to use only {coachProvider.name}'s own API, with no fallback to another provider.
       </p>
     </Section>
   );
@@ -40,7 +41,7 @@ function Routing() {
 function Retention() {
   return (
     <Section heading="How long it's kept">
-      <p>OpenAI may keep your messages and its replies for up to 30 days in abuse-monitoring logs.</p>
+      <p>{coachProvider.name} may keep your messages and its replies for up to 30 days in abuse-monitoring logs.</p>
       <p>
         OpenRouter doesn't store messages or replies unless the account opts in to logging, which is off by default.
         It keeps request metadata, such as token counts and latency, and may sample a few messages for anonymous
@@ -54,7 +55,7 @@ function Training() {
   return (
     <Section heading="Training">
       <p>
-        OpenAI doesn't use API data for training by default. OpenRouter uses messages and replies only if the account
+        {coachProvider.name} doesn't use API data for training by default. OpenRouter uses messages and replies only if the account
         opts in, which is off by default.
       </p>
     </Section>

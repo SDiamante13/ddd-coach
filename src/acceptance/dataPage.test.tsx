@@ -26,14 +26,14 @@ describe("Data page", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("says who handles a message: our server, then OpenRouter, which routes it to OpenAI", () => {
+  it("says who handles a message: our server, then OpenRouter, which is pinned to OpenAI with no fallback (#110)", () => {
     openDataPage();
 
     expect(section("Who handles it")).toHaveTextContent(
       "When you press Send, your browser sends your message, with your swaps applied, to our server, " +
         "along with the conversation so far. " +
         "Our server passes it to OpenRouter, which routes it to a model provider. " +
-        "OpenRouter currently routes it to OpenAI's own API.",
+        "Our server tells OpenRouter to use only OpenAI's own API, with no fallback to another provider.",
     );
   });
 

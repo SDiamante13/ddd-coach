@@ -7,6 +7,7 @@ import type {
 } from "@openrouter/sdk/models/operations";
 import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import { glossaryContext } from "./glossaryContext.ts";
+import { coachProvider } from "../src/shared/coachProvider.ts";
 import { field, stringField } from "../src/shared/json.ts";
 import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
@@ -21,7 +22,7 @@ export type ChatClient = {
 
 const MAX_COMPLETION_TOKENS = 1_000;
 const WITHOUT_RETRIES: RequestOptions = { retries: { strategy: "none" } };
-const PINNED_ROUTING: ProviderPreferences = { order: ["openai"], allowFallbacks: false, dataCollection: "deny" };
+const PINNED_ROUTING: ProviderPreferences = { order: [coachProvider.slug], allowFallbacks: false, dataCollection: "deny" };
 
 export function createOpenRouterCoach(
   config: CoachConfig,

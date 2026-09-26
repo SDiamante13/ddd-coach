@@ -1,4 +1,5 @@
 import { ChatRequestEffort } from "@openrouter/sdk/models";
+import { coachProvider } from "../src/shared/coachProvider.ts";
 
 export type ReasoningEffort = (typeof ChatRequestEffort)[keyof typeof ChatRequestEffort];
 export type CoachConfig = { apiKey: string; model: string; reasoningEffort?: ReasoningEffort };
@@ -27,6 +28,7 @@ export function readConfig(env: Env): ConfigResult {
   if (apiKey === undefined) return missing(API_KEY);
   const model = present(env[MODEL]);
   if (model === undefined) return missing(MODEL);
+  if (!model.startsWith(`${coachProvider.slug}/`)) return offProvider();
   return withReasoningEffort({ apiKey, model }, present(env[REASONING_EFFORT]) ?? DEFAULT_REASONING_EFFORT);
 }
 
@@ -41,6 +43,10 @@ function isReasoningEffort(value: string): value is ReasoningEffort {
 
 function unknownReasoningEffort(): ConfigResult {
   return { ok: false, error: `${REASONING_EFFORT} must be one of: ${REASONING_EFFORTS.join(", ")}.` };
+}
+
+function offProvider(): Misconfigured {
+  return { ok: false, error: `${MODEL} must be an ${coachProvider.slug}/ model, the provider the data notice names (coachProvider).` };
 }
 
 function present(value: string | undefined): string | undefined {

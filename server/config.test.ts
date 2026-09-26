@@ -2,13 +2,13 @@
 import { describe, expect, it } from "vitest";
 import { readAccessPassword, readApiKey, readConfig, readSigningKey, readTimeoutMs } from "./config.ts";
 
-const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
+const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "openai/test-model" };
 
 describe("readConfig", () => {
   it("reads the key and model, with no reasoning by default so a reasoning model can't spend the reply cap", () => {
     expect(readConfig(requiredEnv)).toEqual({
       ok: true,
-      config: { apiKey: "sk-or-test-key", model: "test/model", reasoningEffort: "none" },
+      config: { apiKey: "sk-or-test-key", model: "openai/test-model", reasoningEffort: "none" },
     });
   });
 
@@ -17,7 +17,7 @@ describe("readConfig", () => {
 
     expect(readConfig(env)).toEqual({
       ok: true,
-      config: { apiKey: "sk-or-test-key", model: "test/model", reasoningEffort: "low" },
+      config: { apiKey: "sk-or-test-key", model: "openai/test-model", reasoningEffort: "low" },
     });
   });
 
@@ -34,6 +34,13 @@ describe("readConfig", () => {
     expect(readConfig({ OPENROUTER_MODEL: "test/model" })).toEqual({
       ok: false,
       error: "OPENROUTER_API_KEY is not set.",
+    });
+  });
+
+  it("refuses a model from a provider other than the one the data notice names (#110)", () => {
+    expect(readConfig({ ...requiredEnv, OPENROUTER_MODEL: "anthropic/claude-sonnet" })).toEqual({
+      ok: false,
+      error: "OPENROUTER_MODEL must be an openai/ model, the provider the data notice names (coachProvider).",
     });
   });
 
