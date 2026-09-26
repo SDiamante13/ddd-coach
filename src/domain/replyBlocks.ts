@@ -82,4 +82,8 @@ function meaningOf(source: Source, claim: string): Meaning {
   return { source, holder, meaning: capitalised(meaning) };
 }
 
-const capitalised = (text: string): string => text.charAt(0).toUpperCase() + text.slice(1);
+const IDENTIFIER = /_|\w\.\w|\(\)|[a-z][A-Z]/;
+
+const startsWithIdentifier = (text: string): boolean => IDENTIFIER.test(text.split(/\s/, 1)[0]!);
+
+const capitalised = (text: string): string => (startsWithIdentifier(text) ? text : text.charAt(0).toUpperCase() + text.slice(1));

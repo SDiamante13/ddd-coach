@@ -17,6 +17,17 @@ describe("parseReply", () => {
     ]);
   });
 
+  it.each([
+    ["snake_case", "actual_pickup_at is after pickup_window_end."],
+    ["a dotted name", "booking.status is REBOOKED."],
+    ["a call", "rebook() inserts a new row."],
+    ["camelCase", "rebookedFromId points back to the old row."],
+  ])("keeps a meaning that starts with %s as written, so the identifier isn't mangled", (_case, meaning) => {
+    const reply = ["Words that don't match", '"late"', `- From thread: Code means ${meaning}`].join("\n");
+
+    expect(parseReply(reply)).toEqual([{ kind: "words", rows: [{ word: "late", meanings: [{ source: "From thread", holder: "Code", meaning }] }] }]);
+  });
+
   it("reads an events section as numbered claims with their source", () => {
     const reply = ["Events, in order", "1. From thread: The customer hits submit.", "2. Guess: Ops rebooks when the date changes."].join("\n");
 

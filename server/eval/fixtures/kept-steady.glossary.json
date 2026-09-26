@@ -42,7 +42,7 @@
   {
     "word": "late",
     "holder": "Code",
-    "meaning": "Actual_pickup_at is after pickup_window_end.",
+    "meaning": "actual_pickup_at is after pickup_window_end.",
     "source": "From thread",
     "keptOn": "2026-09-25",
     "from": "load 7731"
