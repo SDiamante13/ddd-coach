@@ -30,8 +30,8 @@ function Routing() {
     <Section heading="Who handles it">
       <p>
         When you press Send, your browser sends your message, with your swaps applied, to our server, along with the
-        conversation so far and any glossary rows you kept. Our server passes it to OpenRouter, which routes it to a
-        model provider. OpenRouter currently routes it to OpenAI's own API.
+        conversation so far. Our server passes it to OpenRouter, which routes it to a model provider. OpenRouter
+        currently routes it to OpenAI's own API.
       </p>
     </Section>
   );
@@ -64,7 +64,7 @@ function Training() {
 function ServerLogs() {
   return (
     <Section heading="What our server keeps">
-      <p>Nothing you type. Our server doesn't save messages, replies, swaps or glossary rows.</p>
+      <p>Nothing you type. Our server doesn't save messages or replies.</p>
       <p>
         Its logs record only the error name and status code when the coach fails or times out, and how many citations
         it removed from a reply because it couldn't verify them.
@@ -80,10 +80,7 @@ function InYourBrowser() {
         Your swaps are saved in this browser and never sent. The browser replaces each word with its placeholder
         before sending, and puts the real word back in the reply.
       </p>
-      <p>
-        Glossary rows you keep are saved in this browser too, and sent with each message so the coach can use them.
-        The conversation itself isn't saved: reloading or closing the tab clears it.
-      </p>
+      <p>The conversation itself isn't saved: reloading or closing the tab clears it.</p>
     </Section>
   );
 }

@@ -31,7 +31,7 @@ describe("Data page", () => {
 
     expect(section("Who handles it")).toHaveTextContent(
       "When you press Send, your browser sends your message, with your swaps applied, to our server, " +
-        "along with the conversation so far and any glossary rows you kept. " +
+        "along with the conversation so far. " +
         "Our server passes it to OpenRouter, which routes it to a model provider. " +
         "OpenRouter currently routes it to OpenAI's own API.",
     );
@@ -63,7 +63,7 @@ describe("Data page", () => {
     openDataPage();
 
     expect(section("What our server keeps")).toHaveTextContent(
-      "Nothing you type. Our server doesn't save messages, replies, swaps or glossary rows.",
+      "Nothing you type. Our server doesn't save messages or replies.",
     );
     expect(section("What our server keeps")).toHaveTextContent(
       "Its logs record only the error name and status code when the coach fails or times out, " +
@@ -80,13 +80,13 @@ describe("Data page", () => {
     );
   });
 
-  it("says kept glossary rows are saved here but sent, and the conversation isn't saved", () => {
+  it("says the conversation isn't saved", () => {
     openDataPage();
 
     expect(section("What stays in your browser")).toHaveTextContent(
-      "Glossary rows you keep are saved in this browser too, and sent with each message so the coach can use them. " +
-        "The conversation itself isn't saved: reloading or closing the tab clears it.",
+      "The conversation itself isn't saved: reloading or closing the tab clears it.",
     );
+    expect(screen.queryByText(/glossary/i)).not.toBeInTheDocument();
   });
 
   it("links the OpenAI and OpenRouter policies it cites", () => {
