@@ -1,8 +1,10 @@
 import { useId, useState, type ReactNode } from "react";
 import { applySwaps, placeholderClash, type SwapList, type SwappedText } from "../domain/swaps.ts";
 import { clashWarning } from "./clashWarning.ts";
+import { SentGlossary } from "./SentGlossary.tsx";
+import type { Glossary } from "../domain/glossary.ts";
 
-export function SentPreview({ swaps, draft }: { swaps: SwapList; draft: string }) {
+export function SentPreview({ swaps, draft, glossary }: { swaps: SwapList; draft: string; glossary: Glossary }) {
   const id = useId();
   const swapped = applySwaps(swaps, draft);
   const [open, setOpen] = useState(false);
@@ -16,6 +18,7 @@ export function SentPreview({ swaps, draft }: { swaps: SwapList; draft: string }
         <h2 id={`${id}-title`}>What's sent</h2>
         <p>{marked(swapped)}</p>
         <p>{appliedLine(swapped.spans.length)}</p>
+        <SentGlossary glossary={glossary} swaps={swaps} />
         {placeholdersIn(swaps, draft).map((placeholder) => (
           <p key={placeholder} className="warning">
             {clashWarning(placeholder, "in-thread", { swaps, thread: draft })}

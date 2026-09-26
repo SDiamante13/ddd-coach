@@ -1,6 +1,7 @@
 import type { Ref } from "react";
 import type { Exchange, FailedExchange } from "../domain/exchange.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
+import type { KeepReply } from "./useGlossary.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { ExchangeOutcome } from "./ExchangeOutcome.tsx";
 
@@ -12,6 +13,7 @@ type ExchangeLogProps = {
   onStartNew: () => void;
   logRef: Ref<HTMLOListElement>;
   restoreNames: RestoreNames;
+  onKeep: KeepReply;
 };
 
 export function ExchangeLog({ exchanges, logRef, ...outcome }: ExchangeLogProps) {

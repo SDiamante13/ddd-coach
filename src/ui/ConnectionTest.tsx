@@ -5,6 +5,7 @@ import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { NewReplyButton } from "./NewReplyButton.tsx";
 import { SentPreview } from "./SentPreview.tsx";
+import { GlossaryPanel } from "./GlossaryPanel.tsx";
 import { SwapPanel } from "./SwapPanel.tsx";
 import type { Unlock } from "./useAccess.ts";
 import { type Composer, useComposer } from "./useComposer.ts";
@@ -25,6 +26,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         onStartNew={composer.confirmation.ask}
         logRef={composer.follow.logRef}
         restoreNames={composer.box.restoreNames}
+        onKeep={composer.glossary.keepReply}
       />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}
       {justUnlocked && (
@@ -57,8 +59,9 @@ function ComposerForm({ composer }: { composer: Composer }) {
         conversation={composer.conversation}
         onTryExample={box.tryExample}
       />
+      <GlossaryPanel {...composer.glossary} shown={(text) => box.restoreNames(text).text} />
       <SwapPanel {...box.swaps} {...box.swapsPanel} thread={box.draft} />
-      {!box.blank && <SentPreview swaps={box.swaps.swaps} draft={box.draft} />}
+      {!box.blank && <SentPreview swaps={box.swaps.swaps} draft={box.draft} glossary={composer.glossary.rows} />}
     </MessageForm>
   );
 }

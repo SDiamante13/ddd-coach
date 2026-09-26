@@ -9,6 +9,8 @@ import type { Unlock } from "./useAccess.ts";
 import { useAccessRecovery } from "./useAccessRecovery.ts";
 import { useClearConfirmation } from "./useClearConfirmation.ts";
 import { useComposerReserve } from "./useComposerReserve.ts";
+import { useGlossary } from "./useGlossary.ts";
+import { outgoingGlossary } from "../domain/glossary.ts";
 import { useExchanges } from "./useExchanges.ts";
 import { useLogFollow } from "./useLogFollow.ts";
 import { useSwaps } from "./useSwaps.ts";
@@ -17,10 +19,12 @@ export type Composer = ReturnType<typeof useComposer>;
 
 export function useComposer(unlock: Unlock) {
   const box = useDraftBox();
+  const glossary = useGlossary();
   const access = useAccessRecovery(unlock, box.focus);
   const { exchanges, send, retry, clear } = useExchanges({
     onRefused: box.restore,
     onAccessLost: access.loseAccess,
+    glossary: () => outgoingGlossary(glossary.rows, box.swaps.swaps).sent,
   });
   const confirmation = useClearConfirmation(() => {
     clear();
@@ -34,7 +38,7 @@ export function useComposer(unlock: Unlock) {
     box.focus();
   };
   const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
-  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, busy: isBusy(exchanges) };
+  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, busy: isBusy(exchanges) };
 }
 
 function useDraftBox() {

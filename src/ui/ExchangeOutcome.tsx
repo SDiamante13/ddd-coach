@@ -2,6 +2,7 @@ import { isRefused, type Exchange, type FailedExchange } from "../domain/exchang
 import { COACH_TOO_LONG, COACH_UNVERIFIED } from "../shared/chatContract.ts";
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 import { ReplyView, type RestoreNames } from "./ReplyView.tsx";
+import type { KeepReply } from "./useGlossary.ts";
 
 const FIXED_BY_A_NEW_CONVERSATION: readonly string[] = [COACH_TOO_LONG, COACH_UNVERIFIED];
 
@@ -12,14 +13,15 @@ type ExchangeOutcomeProps = {
   conversation: () => string;
   onStartNew: () => void;
   restoreNames: RestoreNames;
+  onKeep: KeepReply;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames }: ExchangeOutcomeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
     case "replied":
-      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} />;
+      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} />;
     case "failed":
       return (
         <>

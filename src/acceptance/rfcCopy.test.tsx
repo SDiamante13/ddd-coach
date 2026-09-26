@@ -75,7 +75,7 @@ describe("Copy for your RFC", () => {
 
     await user.click(await within(log()).findByRole("button", { name: "Copy for your RFC" }));
 
-    expect(await within(log()).findByRole("status")).toHaveTextContent("Copied for your RFC. 1 row is still a guess.");
+    expect(await within(log()).findByText("Copied for your RFC. 1 row is still a guess.")).toHaveAttribute("role", "status");
   });
 
   it("says so when the clipboard refuses", async () => {

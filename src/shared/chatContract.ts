@@ -1,5 +1,6 @@
+import type { KeptGlossaryRow } from "../domain/glossary.ts";
 export type ChatTurn = { prompt: string; reply: string; signature: string };
-export type ChatRequestBody = { message: string; history: readonly ChatTurn[] };
+export type ChatRequestBody = { message: string; history: readonly ChatTurn[]; glossary?: readonly KeptGlossaryRow[] };
 export type ChatResponseBody = { reply: string; signature: string } | { error: string };
 
 export const MAX_MESSAGE_CHARS = 24_000;

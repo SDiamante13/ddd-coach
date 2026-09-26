@@ -3,14 +3,16 @@ import type { SwappedText } from "../domain/swaps.ts";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { EventList } from "./EventList.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
+import { KeepButton } from "./KeepButton.tsx";
 import { RfcCopyButton } from "./RfcCopyButton.tsx";
+import type { KeepReply } from "./useGlossary.ts";
 import { WordTable } from "./WordTable.tsx";
 
 export type RestoreNames = (text: string) => SwappedText;
 
 export const RESTORED_NOTE = "Names restored in this browser from your swaps.";
 
-export function ReplyView({ reply, restoreNames }: { reply: string; restoreNames: RestoreNames }) {
+export function ReplyView({ reply, restoreNames, onKeep }: { reply: string; restoreNames: RestoreNames; onKeep: KeepReply }) {
   const restored = restoreNames(reply);
   const blocks = displayOrder(parseReply(restored.text));
   return (
@@ -20,6 +22,7 @@ export function ReplyView({ reply, restoreNames }: { reply: string; restoreNames
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
       {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
+      {blocks.some((block) => block.kind === "words") && <KeepButton reply={reply} onKeep={onKeep} />}
     </div>
   );
 }
