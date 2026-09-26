@@ -3,7 +3,7 @@ import type { CoachConfig } from "../config.ts";
 import type { AbPlan, AbResult, AbRun, ArmPrompt } from "./abEval.ts";
 import type { AbReport } from "./abSummary.ts";
 import { abVerdict } from "./abVerdict.ts";
-import { keyShaOf, type KeyShas } from "./answerKeys.ts";
+import { fixtureShaOf, type KeyShas } from "./answerKeys.ts";
 import { loadFixture } from "./fixtures.ts";
 import { recordable } from "./recordable.ts";
 
@@ -41,7 +41,7 @@ export function abRecordOf({ model, reasoningEffort }: CoachConfig, plan: AbPlan
 }
 
 export function currentKeys(fixtures: readonly string[]): KeyShas {
-  return Object.fromEntries(fixtures.map((name) => [name, keyShaOf(loadFixture(name).key)]));
+  return Object.fromEntries(fixtures.map((name) => [name, fixtureShaOf(loadFixture(name))]));
 }
 
 export function reportOf(record: AbRecord): AbReport {

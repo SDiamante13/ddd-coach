@@ -4,6 +4,7 @@ import { fakeChat, type SentMessages } from "../test/fakeChat.ts";
 import type { ChatClient } from "../openRouterCoach.ts";
 import { abEval } from "./abEval.ts";
 import { loadFixture } from "./fixtures.ts";
+import { glossaryContext } from "../glossaryContext.ts";
 
 const config = { apiKey: "sk-or-test-key", model: "test/model" };
 const live = { version: 6, instructions: "LIVE INSTRUCTIONS" };
@@ -64,5 +65,14 @@ describe("abEval", () => {
     const result = await abEval(config, failingOn([3, 4], chat), { live, candidate, runs: 6, fixtures: ["greeting"] });
 
     expect({ finished: result.runs.length, aborted: result.aborted }).toEqual({ finished: 2, aborted: "BadGatewayResponseError 502" });
+  });
+
+  it("sends a fixture's kept glossary as the production coach does, in its own message after the system prompt (#100)", async () => {
+    const { chat, sent } = fakeChat(replyByArm);
+
+    await abEval(config, chat, { live, candidate, runs: 6, fixtures: ["kept-drift"] });
+
+    const { thread, glossary } = loadFixture("kept-drift");
+    expect(promptOf(sent[0]!)).toEqual([live.instructions, glossaryContext(glossary!), thread.trim()]);
   });
 });

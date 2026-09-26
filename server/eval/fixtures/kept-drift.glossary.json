@@ -1,0 +1,90 @@
+[
+  {
+    "word": "late",
+    "holder": "Account team",
+    "meaning": "Missing the delivery appointment the customer booked.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "late",
+    "holder": "Ops (day desk)",
+    "meaning": "A truck not at pickup by the end of the pickup window.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "late",
+    "holder": "Ops (night desk)",
+    "meaning": "An ETA past the delivery appointment, including before pickup.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "late",
+    "holder": "Carrier desk",
+    "meaning": "A missed pickup that can incur a carrier late fee.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "late",
+    "holder": "Billing",
+    "meaning": "A load included on the weekly late report.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "late",
+    "holder": "Code",
+    "meaning": "Actual_pickup_at is after pickup_window_end.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "weekly late report",
+    "holder": "Billing",
+    "meaning": "The basis for service credits and Customer D's Q3 on-time percentage.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "weekly late report",
+    "holder": "Account team",
+    "meaning": "The numbers it plans to use for Customer D's Q3 on-time percentage.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "weekly late report",
+    "holder": "Code",
+    "meaning": "The late_loads query based on missed pickup windows, not delivery appointments.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "on time",
+    "holder": "Account team",
+    "meaning": "Meeting the customer's booked delivery appointment.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  },
+  {
+    "word": "on time",
+    "holder": "Ops (day desk)",
+    "meaning": "A load can recover from a late pickup by delivering before the appointment.",
+    "source": "From thread",
+    "keptOn": "2026-09-25",
+    "from": "load 7731"
+  }
+]

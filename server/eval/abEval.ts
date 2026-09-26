@@ -48,7 +48,7 @@ function pairedOrder<T>(i: number, live: T, candidate: T): T[] {
 }
 
 async function scoredCall(config: CoachConfig, chat: ChatClient, { arm, name, fixture, i }: PlannedCall): Promise<AbRun> {
-  const asPasted = verifiedConversationOf(fixture.thread.trim());
+  const asPasted = verifiedConversationOf(fixture.thread.trim(), [], fixture.glossary ?? []);
   const label = `${arm.arm} v${arm.version} ${name} ${i}`;
   const measured = await measure(config, chat, label, asPasted, {}, arm.instructions);
   return { ...measured, arm: arm.arm, version: arm.version, fixture: name, i, ...scoreReply(measured.reply, measured.finishReason, fixture) };

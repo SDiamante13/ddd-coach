@@ -1,3 +1,4 @@
+import type { KeptGlossaryRow } from "../../src/domain/glossary.ts";
 import { endsSentence } from "../replyEnding.ts";
 import { admitsNotCovered, citesOneOf, citesVerbatim } from "./citationChecks.ts";
 import { driftNamed, noFalseDrift, settledNotReAsked, settledNotRelisted } from "./glossaryChecks.ts";
@@ -51,7 +52,7 @@ export type FixtureKey = {
     settled?: string[][];
   };
 };
-export type Fixture = { thread: string; key: FixtureKey };
+export type Fixture = { thread: string; key: FixtureKey; glossary?: KeptGlossaryRow[] };
 
 type Reply = { text: string; layout: ReplyLayout; words: CoachReply["words"]; finishReason: string | null; fixture: Fixture };
 type HardCheck = (reply: Reply) => boolean;

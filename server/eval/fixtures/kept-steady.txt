@@ -1,0 +1,18 @@
+Fictional thread for the eval. #late-loads, the week after load 7731, at a made-up freight broker. Every person, customer, carrier and load is invented.
+
+Mon 08:04  Ops day desk: morning. dock 4 scanner still working
+Mon 08:10  Carrier desk: Carrier 3 missed the pickup window on 7820 by an hour, charged them the late pickup fee as usual
+Mon 08:11  Ops day desk: 👍 marked late, truck wasn't at the pickup by the end of the window
+Mon 08:30  Dev: tracking page deploy at 11, 5 min
+Mon 08:31  Billing: not during the invoice run please
+Mon 08:32  Dev: 11:30 then
+Mon 09:15  Account team: reminder for the Q3 number: on time means we made the delivery appointment the customer booked
+Mon 10:40  Billing: 7820 is on the weekly late report, same as always
+Mon 11:05  Billing: I'm going to rebill Customer D for 7790, the accessorial was missing
+Mon 11:07  Account team: when you say rebill, do you mean a new invoice? for us a rebill is when we reverse the credit we gave them
+Mon 11:10  Billing: a rebill is a corrected invoice replacing the old one. credits are a separate thing
+Mon 11:12  Account team: our customer notes call the credit reversal a rebill, Customer D's AP team uses the word that way too
+Mon 12:30  Carrier desk: tacos?
+Mon 12:31  Dev: +1
+Tue 09:00  Dev: the invoices table has a rebill_of column pointing at the replaced invoice
+Tue 09:30  Account team: taking the 7790 rebill wording to Friday's ops sync, Customer D will ask

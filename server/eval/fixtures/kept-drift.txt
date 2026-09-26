@@ -1,0 +1,28 @@
+Fictional thread for the eval. #late-loads, the week after load 7731, at a made-up freight broker. Every person, customer, carrier and load is invented.
+
+Mon 08:04  Ops day desk: morning all. dock 4 scanner still fine 🎉
+Mon 08:06  Carrier desk: heads up, Carrier 3 signed the new dedicated-lane contract for the Customer D lanes, starts today
+Mon 08:07  Billing: 👍
+Mon 08:15  Dev: tracking page deploy at 11 again, 5 min
+Mon 08:16  Billing: not during the invoice run please
+Mon 08:17  Dev: 11:30 then
+Mon 09:12  Account team: welcome to the channel to our new starter from onboarding, shadowing us this week
+Mon 09:20  Carrier desk: under the dedicated-lane contract a carrier is late when it misses the delivery appointment, not the pickup. that's what they pay the late fee on now. a late pickup they make up on the road costs them nothing
+Mon 09:22  Ops day desk: huh ok, so we stop charging pickup fees on those lanes?
+Mon 09:23  Carrier desk: on the dedicated lanes, yes. everything else stays pickup
+Mon 10:05  Account team (answering the new starter): for Customer D, on time is still what it always was: we made the delivery appointment they booked
+Mon 10:06  Account team: that's the contract definition and it's what the Q3 number uses
+Mon 11:40  Ops night desk: handover: 7815 (Customer D) picked up 2h late, dock 2 queue, ETA still inside the appointment
+Mon 12:30  Carrier desk: tacos?
+Mon 12:31  Dev: +1
+Tue 08:30  Ops day desk: 7815 delivered 15 min before the appointment. POD is in the app
+Tue 08:45  Billing: can't invoice 7815 yet, no POD
+Tue 08:47  Ops day desk: it's in the app, the driver took the photo at the dock
+Tue 08:52  Billing: a POD is the signed paper from the receiver. the photo isn't a POD for the invoice, finance won't release it without the signature
+Tue 08:55  Ops day desk: for us the POD is the app photo, that's what closes the load on our board
+Tue 09:10  Carrier desk: Carrier 3 is asking whether 7815 counts as late under the new contract, the pickup was 2h late
+Tue 09:12  Dev: the late_loads query still only looks at pickup, it doesn't know about the dedicated-lane contract
+Tue 13:48  Dev: 2nd floor printer jammed again
+Tue 13:50  Billing: of course
+Wed 09:00  Account team: bringing 7815 and the POD question to Friday's ops sync
+Wed 09:02  Billing: need to know which POD releases the invoice before month end

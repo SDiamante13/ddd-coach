@@ -21,7 +21,7 @@ export async function fullEval(config: CoachConfig, chat: ChatClient, repeats: n
 type EvalCase = { name: string; fixture: Fixture; instructions: string };
 
 async function scoredRun(config: CoachConfig, chat: ChatClient, { name, fixture, instructions }: EvalCase, index: number): Promise<EvalRun> {
-  const asPasted = verifiedConversationOf(fixture.thread.trim());
+  const asPasted = verifiedConversationOf(fixture.thread.trim(), [], fixture.glossary ?? []);
   const measured = await measure(config, chat, `${name} ${index}`, asPasted, {}, instructions);
   return { ...measured, fixture: name, ...scoreReply(measured.reply, measured.finishReason, fixture) };
 }
