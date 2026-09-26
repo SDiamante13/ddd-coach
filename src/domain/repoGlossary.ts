@@ -1,10 +1,11 @@
 import { entityId } from "./entityId.ts";
+import { identifiersIn } from "./identifier.ts";
 import type { Source, WordRow } from "./replyBlocks.ts";
 import type { RfcDocument, RfcQuestion } from "./rfcExport.ts";
 
 export type RowStatus = { kind: "settled" } | { kind: "guess" } | { kind: "unsettled"; question: number };
 export type ContextRow = { context: string; meaning: string; source: Source; status: RowStatus };
-export type RepoTerm = { word: string; avoid: string[]; rows: ContextRow[] };
+export type RepoTerm = { word: string; avoid: string[]; identifiers: string[]; rows: ContextRow[] };
 export type RepoGlossary = { origin: string; terms: RepoTerm[]; questions: RfcQuestion[] };
 
 const REPLY_ORIGIN = "from one coach reply to a pasted thread";
@@ -23,6 +24,7 @@ export const unsettledTerms = ({ terms }: RepoGlossary): number => terms.filter(
 const termOf = (term: WordRow, questions: RfcQuestion[]): RepoTerm => ({
   word: term.word,
   avoid: sameMeaningWords(term),
+  identifiers: codeIdentifiers(term),
   rows: term.meanings.map(({ holder, meaning, source }) => ({
     ...{ context: holder || UNNAMED_CONTEXT, meaning, source },
     status: statusOf(term.word, source, questions),
@@ -41,6 +43,10 @@ function sameMeaningWords({ word, meanings }: WordRow): string[] {
   return [...new Set(pairs.flat().filter((each) => !sameWord(each, word)))];
 }
 
+const codeIdentifiers = ({ meanings }: WordRow): string[] => [
+  ...new Set(meanings.filter(({ holder, source }) => holder === "Code" && source === "From thread").flatMap(({ meaning }) => identifiersIn(meaning))),
+];
+
 function statusOf(word: string, source: Source, questions: RfcQuestion[]): RowStatus {
   if (source === "Guess") return { kind: "guess" };
   const asked = questions.findIndex(({ text }) => mentions(text, word));
@@ -57,5 +63,5 @@ const sameToken = (said: string | undefined, term: string): boolean => said === 
 
 function mentions(text: string, word: string): boolean {
   const [said, term] = [tokens(text), tokens(word)];
-  return said.some((_, start) => term.every((token, offset) => sameToken(said[start + offset], token)));
+  return term.length > 0 && said.some((_, start) => term.every((token, offset) => sameToken(said[start + offset], token)));
 }

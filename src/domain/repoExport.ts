@@ -1,6 +1,6 @@
-import { shortDate } from "./dates.ts";
-import { markdownTable, markdownText } from "./markdown.ts";
-import { isOpen, type RepoGlossary, type RepoTerm, type RowStatus } from "./repoGlossary.ts";
+import { claudeSection } from "./claudeSection.ts";
+import { codeSpan, markdownTable, markdownText } from "./markdown.ts";
+import type { RepoGlossary, RepoTerm, RowStatus } from "./repoGlossary.ts";
 import { asOfLine, questionLine, type RfcQuestion, sourceLine } from "./rfcExport.ts";
 
 const GLOSSARY_LABEL = "<!-- GLOSSARY.md: save this part as GLOSSARY.md at the root of your repo. -->";
@@ -64,42 +64,3 @@ function openQuestions(questions: RfcQuestion[]): string[] {
   ]);
   return ["## Open questions", "", ...items, ""];
 }
-
-const TODO_RULE =
-  "Don't name new code, columns or statuses after either reading. Leave a `TODO(glossary): <term>` at that one point, keep building the rest of the task, and say what you left open.";
-
-const NOTHING_UNSETTLED =
-  "- **Unsettled:** nothing in this export. If the task needs a meaning that isn't here, leave a `TODO(glossary): <term>` at that one point and ask.";
-
-export function claudeSection(glossary: RepoGlossary, asOf: Date): string {
-  return [
-    `## Domain language (from GLOSSARY.md, as of ${shortDate(asOf)})`,
-    "",
-    `- Use the terms in \`GLOSSARY.md\` exactly as defined. A term's meaning depends on the context in its row (${contextsOf(glossary).join(", ")}). Never merge meanings across contexts.`,
-    "- Build what's settled: a settled row is safe to build on and to name code after, in its own context.",
-    unsettledBullet(glossary.terms.flatMap(unsettledPoint)),
-    ...avoidBullet(glossary.terms.flatMap(avoidPoints)),
-    "- Don't introduce a new domain term. If you need a word that isn't in `GLOSSARY.md`, ask first.",
-    "",
-  ].join("\n");
-}
-
-const contextsOf = ({ terms }: RepoGlossary): string[] => [...new Set(terms.flatMap(({ rows }) => rows.map(({ context }) => markdownText(context))))];
-
-const unsettledBullet = (points: string[]): string =>
-  points.length === 0 ? NOTHING_UNSETTLED : `- **Unsettled, don't pick a side:** ${points.join("; ")}. ${TODO_RULE}`;
-
-const avoidPoints = ({ word, avoid }: RepoTerm): string[] => avoid.map((other) => `${codeSpan(other)} (write ${codeSpan(word)})`);
-
-const avoidBullet = (points: string[]): string[] =>
-  points.length === 0 ? [] : [`- **Don't use:** ${points.join(", ")}. The thread uses these for the same meaning as a term in \`GLOSSARY.md\`.`];
-
-function unsettledPoint({ word, rows }: RepoTerm): string[] {
-  const open = rows.filter(isOpen);
-  if (open.length === 0) return [];
-  return [`${codeSpan(word)} for ${open.map(({ context, status }) => `${markdownText(context)} (${openReason(status)})`).join(", ")}`];
-}
-
-const openReason = (status: RowStatus): string => (status.kind === "unsettled" ? `Q${status.question}` : "a guess");
-
-const codeSpan = (text: string): string => (text.includes("`") ? markdownText(text) : `\`${text}\``);

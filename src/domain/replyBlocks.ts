@@ -1,5 +1,6 @@
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { CITATION, EVENTS_HEADING, QUESTION, SOURCE_QUOTE, UNSOURCED, WORDS_HEADING } from "../shared/replyLayout.ts";
+import { looksLikeIdentifier } from "./identifier.ts";
 
 export type Source = "From thread" | "Guess";
 export type Claim = { source: Source; text: string };
@@ -82,8 +83,6 @@ function meaningOf(source: Source, claim: string): Meaning {
   return { source, holder, meaning: capitalised(meaning) };
 }
 
-const IDENTIFIER = /_|\w\.\w|\(\)|[a-z][A-Z]/;
-
-const startsWithIdentifier = (text: string): boolean => IDENTIFIER.test(text.split(/\s/, 1)[0]!);
+const startsWithIdentifier = (text: string): boolean => looksLikeIdentifier(text.split(/\s/, 1)[0]!);
 
 const capitalised = (text: string): string => (startsWithIdentifier(text) ? text : text.charAt(0).toUpperCase() + text.slice(1));
