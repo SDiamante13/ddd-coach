@@ -45,3 +45,37 @@ describe("parseChatRequest", () => {
     expect(parseChatRequest({ message: "M".repeat(MAX_MESSAGE_CHARS), history: [] }).ok).toBe(true);
   });
 });
+
+describe("parseChatRequest, kept glossary (#100)", () => {
+  const row = { word: "late", holder: "Carrier desk", meaning: "A missed pickup that can incur a carrier late fee.", source: "From thread", keptOn: "2026-09-25", from: "load 7731" };
+
+  it("reads the kept glossary rows sent with the message", () => {
+    const result = parseChatRequest({ message: "Next week's thread", history: [], glossary: [row] });
+
+    expect(result.ok && result.conversation.glossary).toEqual([row]);
+  });
+
+  it.each([
+    ["a glossary that isn't a list", "late"],
+    ["a row without a meaning", [{ ...row, meaning: "" }]],
+    ["a row with an unknown source", [{ ...row, source: "Rumour" }]],
+    ["a row kept on no real day", [{ ...row, keptOn: "yesterday" }]],
+  ])("refuses %s as malformed", (_case, glossary) => {
+    expect(parseChatRequest({ message: "Next", history: [], glossary })).toEqual({ ok: false, reason: "malformed" });
+  });
+
+  it.each([
+    ["more rows than are ever sent", Array.from({ length: 61 }, () => row)],
+    ["a field longer than a kept row holds", [{ ...row, meaning: "x".repeat(301) }]],
+  ])("refuses %s as a glossary too big to send", (_case, glossary) => {
+    expect(parseChatRequest({ message: "Next", history: [], glossary })).toEqual({ ok: false, reason: "glossaryTooLong" });
+  });
+
+  it("counts the glossary toward the conversation's size", () => {
+    const glossary = [{ ...row, meaning: "m".repeat(300) }];
+    const fits = { message: "x".repeat(20_000), history: [{ prompt: "p".repeat(20_000), reply: "r".repeat(MAX_CONVERSATION_CHARS - 40_100) }] };
+
+    expect(parseChatRequest(fits).ok).toBe(true);
+    expect(parseChatRequest({ ...fits, glossary })).toEqual({ ok: false, reason: "tooLong" });
+  });
+});

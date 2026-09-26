@@ -5,7 +5,7 @@ import type { Conversation } from "../src/domain/conversation.ts";
 import { CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
-import { COACH_OUT_OF_CREDIT, CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
+import { COACH_GLOSSARY_TOO_LONG, COACH_OUT_OF_CREDIT, CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
 import { MAX_CONVERSATION_CHARS, MAX_HISTORY_TURNS } from "./chatRequest.ts";
 import { createAccessPass } from "./accessPass.ts";
 import { MAX_BODY_BYTES } from "./requestBody.ts";
@@ -64,15 +64,35 @@ function bodyPaddedWith(pad: string): string {
   return JSON.stringify({ message: "Hello coach", history: [], pad });
 }
 
-function longestConversationOf(character: string) {
-  const side = Math.floor(MAX_CONVERSATION_CHARS / (2 * MAX_HISTORY_TURNS + 1));
+function longestConversationOf(character: string, budget = MAX_CONVERSATION_CHARS) {
+  const side = Math.floor(budget / (2 * MAX_HISTORY_TURNS + 1));
   const text = character.repeat(side);
   const history = Array.from({ length: MAX_HISTORY_TURNS }, () => signedTurn(text, text));
-  const message = character.repeat(MAX_CONVERSATION_CHARS - 2 * side * MAX_HISTORY_TURNS);
+  const message = character.repeat(budget - 2 * side * MAX_HISTORY_TURNS);
   return { history, message };
 }
 
 describe("chat handler", () => {
+  it("hands the coach the kept glossary sent with the message (#100)", async () => {
+    const coach = echoCoach();
+    const row = { word: "late", holder: "Ops", meaning: "Late.", source: "From thread", keptOn: "2026-09-25", from: "load 7731" };
+
+    await handler({ createCoach: () => coach })(post(JSON.stringify({ message: "Next", history: [], glossary: [row] })));
+
+    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [row] });
+  });
+
+  it("refuses a kept glossary too big to send with its own 413 (#100)", async () => {
+    const row = { word: "late", holder: "Ops", meaning: "Late.", source: "From thread", keptOn: "2026-09-25", from: "load 7731" };
+
+    const response = await handler()(post(JSON.stringify({ message: "Next", history: [], glossary: Array.from({ length: 61 }, () => row) })));
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({ error: COACH_GLOSSARY_TOO_LONG });
+    expect(COACH_GLOSSARY_TOO_LONG).toBe("Your kept glossary is too big to send. Remove some rows, then send again.");
+  });
+
+
   it("vets the coach's reply before signing it, so the signature covers what the visitor sees (#58)", async () => {
     const handle = handler({ vetReply: (reply) => reply.replace("Echo: ", "Vetted: ") });
 
@@ -361,6 +381,19 @@ describe("chat handler", () => {
     const { history, message } = longestConversationOf(character);
 
     const response = await handle(postMessage(message, history));
+
+    expect(response.status).toBe(200);
+  });
+
+  it("accepts the longest allowed conversation together with a full kept glossary in the costliest characters (#100)", async () => {
+    const worst = "\u0001";
+    const row = { word: worst.repeat(40), holder: worst.repeat(40), meaning: worst.repeat(40), source: "Guess", keptOn: "2026-09-25", from: worst.repeat(40) };
+    const glossary = Array.from({ length: 60 }, () => row);
+    const glossaryChars = glossary.reduce((total, each) => total + Object.values(each).join("").length, 0);
+    const { history, message } = longestConversationOf(worst, MAX_CONVERSATION_CHARS - glossaryChars);
+
+    const body = JSON.stringify({ message, history, glossary });
+    const response = await handler()(post(body));
 
     expect(response.status).toBe(200);
   });

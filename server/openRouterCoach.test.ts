@@ -12,6 +12,7 @@ import { CUT_SHORT_NOTE } from "../src/shared/chatContract.ts";
 import { CoachOutOfCredit } from "./coach.ts";
 import { verifiedConversationOf } from "./test/conversations.ts";
 import type { CoachConfig } from "./config.ts";
+import { glossaryContext } from "./glossaryContext.ts";
 import { createOpenRouterCoach, type ChatClient } from "./openRouterCoach.ts";
 
 const config = { apiKey: "sk-or-test-key", model: "test/model" };
@@ -68,6 +69,21 @@ function fakeChat(content: Content, finishReason: ChatFinishReasonEnum = "stop")
 }
 
 describe("OpenRouter coach", () => {
+  it("puts a kept glossary in its own user message right after the unchanged system message (#100)", async () => {
+    const { chat, requests } = fakeChat("Hi there");
+    const row = { word: "late", holder: "Ops", meaning: "Late.", source: "From thread" as const, keptOn: "2026-09-25", from: "load 7731" };
+
+    await coachOn(chat).reply(verifiedConversationOf("C", [{ prompt: "A", reply: "R1" }], [row]));
+
+    expect(requests[0]![0].chatRequest.messages).toEqual([
+      { role: "system", content: INSTRUCTIONS },
+      { role: "user", content: glossaryContext([row]) },
+      { role: "user", content: "A" },
+      { role: "assistant", content: "R1" },
+      { role: "user", content: "C" },
+    ]);
+  });
+
   it("sends the instructions as a system message, then the history as alternating turns before the prompt, capped and without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
     const conversation = verifiedConversationOf("C", [

@@ -1,5 +1,6 @@
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import {
+  COACH_GLOSSARY_TOO_LONG,
   COACH_MESSAGE_TOO_LONG,
   COACH_OUT_OF_CREDIT,
   COACH_TIMED_OUT,
@@ -75,6 +76,7 @@ const REJECTIONS: Record<Refusal, { error: string; status: number }> = {
   malformed: { error: "Send a message.", status: 400 },
   tooLong: { error: COACH_TOO_LONG, status: 413 },
   messageTooLong: { error: COACH_MESSAGE_TOO_LONG, status: 413 },
+  glossaryTooLong: { error: COACH_GLOSSARY_TOO_LONG, status: 413 },
   unverified: { error: COACH_UNVERIFIED, status: 400 },
 };
 

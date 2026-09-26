@@ -13,4 +13,5 @@ export const COACH_UNVERIFIED =
   "That message couldn't be checked, so it was skipped. Send it again. " +
   "If it keeps happening, copy the conversation and start a new one.";
 export const COACH_MESSAGE_TOO_LONG = "This message is too long for the coach. Shorten it and send it again.";
+export const COACH_GLOSSARY_TOO_LONG = "Your kept glossary is too big to send. Remove some rows, then send again.";
 export const CUT_SHORT_NOTE = '(Cut short at the length limit. Say "continue" for the rest.)';
