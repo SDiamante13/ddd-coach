@@ -375,3 +375,53 @@ ol[role="log"] mark {
     max-height: 40vh;
   }
 }
+
+/* #111: in the board margin the words table drops its Source column, and a guess keeps its GUESS tag in the Meaning cell. */
+.guess-tag {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  body:has(.event-board) .words :is(thead th:last-child, .source-cell) {
+    display: none;
+  }
+
+  body:has(.event-board) .words .guess-tag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 4px;
+    border: 1px dashed var(--color-warn);
+    border-radius: 2px;
+    font: 500 10px / 1.5 var(--font-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--color-warn);
+    vertical-align: 1px;
+  }
+}
+
+@media (min-width: 1024px) {
+  body:has(.event-board) .board-chip {
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  body:has(.event-board) ol[role="log"] > li > .reply {
+    flex-flow: row wrap;
+    align-items: center;
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
+  }
+
+  body:has(.event-board) ol[role="log"] > li > .reply > * {
+    flex: 1 1 100%;
+  }
+
+  body:has(.event-board) ol[role="log"] > li > .reply > :is(.board-chip, .rfc-copy) {
+    flex: 0 0 auto;
+    padding-inline: var(--space-3);
+  }
+
+  body:has(.event-board) .words {
+    font-size: var(--text-sm);
+  }
+}

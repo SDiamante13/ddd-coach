@@ -43,8 +43,16 @@ describe("Structured reply", () => {
       "WordTeamMeaningSource",
       "rebookOps (day desk)A date change with the same carrier is AMENDED.From thread",
       "Ops (night shift)Every change is REBOOKED.From thread",
-      "CodeCounts both rows of a rebook.Guess",
+      "CodeCounts both rows of a rebook.GUESSGuess",
     ]);
+  });
+
+  it("tags a guessed meaning GUESS inside its own cell, for the board margin's three-column table (#111)", async () => {
+    const { log } = await replyWith(LAID_OUT_REPLY);
+    const table = await within(log()).findByRole("table", { name: "Words that don't match" });
+
+    expect(within(table).getByRole("cell", { name: "Counts both rows of a rebook.GUESS" })).toBeInTheDocument();
+    expect(within(table).getByRole("cell", { name: "Every change is REBOOKED." })).toBeInTheDocument();
   });
 
   it("sets the question apart as a card with its roles and the two thread lines it joins", async () => {

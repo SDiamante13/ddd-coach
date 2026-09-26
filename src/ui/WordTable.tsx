@@ -62,8 +62,11 @@ function MeaningCells({
   return (
     <>
       <td>{holder}</td>
-      <td>{meaning}</td>
-      <td>
+      <td className="meaning-cell">
+        {meaning}
+        {source === "Guess" && <span className="guess-tag">GUESS</span>}
+      </td>
+      <td className="source-cell">
         <SourceChip source={source} />
       </td>
     </>
