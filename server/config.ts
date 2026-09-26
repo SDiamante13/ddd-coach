@@ -20,6 +20,8 @@ const DEFAULT_TIMEOUT_MS = 25_000;
 const DEFAULT_REASONING_EFFORT: ReasoningEffort = "none";
 const REASONING_EFFORTS: readonly string[] = Object.values(ChatRequestEffort);
 
+export const readApiKey = (env: Env): string | undefined => present(env[API_KEY]);
+
 export function readConfig(env: Env): ConfigResult {
   const apiKey = present(env[API_KEY]);
   if (apiKey === undefined) return missing(API_KEY);

@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { readAccessPassword, readConfig, readSigningKey, readTimeoutMs } from "./config.ts";
+import { readAccessPassword, readApiKey, readConfig, readSigningKey, readTimeoutMs } from "./config.ts";
 
 const requiredEnv = { OPENROUTER_API_KEY: "sk-or-test-key", OPENROUTER_MODEL: "test/model" };
 
@@ -99,5 +99,15 @@ describe("readAccessPassword", () => {
       ok: true,
       password: "tidal-lantern-quartz",
     });
+  });
+});
+
+describe("readApiKey (#health)", () => {
+  it.each([
+    [{ OPENROUTER_API_KEY: "sk-or-test-key" }, "sk-or-test-key"],
+    [{ OPENROUTER_API_KEY: "  " }, undefined],
+    [{}, undefined],
+  ])("reads %j as %s, needing no model", (env, key) => {
+    expect(readApiKey(env)).toBe(key);
   });
 });
