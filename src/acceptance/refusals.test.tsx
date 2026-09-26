@@ -8,7 +8,7 @@ import {
   COACH_UNVERIFIED,
 } from "../shared/chatContract.ts";
 import { ACCESS_REQUIRED } from "../shared/accessContract.ts";
-import { renderApp, startConversation } from "../test/appDriver.tsx";
+import { composerOf, renderApp, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -107,18 +107,18 @@ describe("Refusals", () => {
     const { server, user, log, send } = await startConversation();
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
 
-    await user.click(await within(log()).findByRole("button", { name: "Start a new one" }));
+    await user.click(await within(log()).findByRole("button", { name: "New conversation" }));
 
     const question = screen.getByRole("group", { name: "Clear this conversation?" });
     expect(within(question).getByRole("button", { name: "Keep" })).toHaveFocus();
   });
 
   it("moves focus to Keep from an unverifiable refusal even when the question is already open", async () => {
-    const { server, user, log, send } = await startConversation();
+    const { server, user, input, log, send } = await startConversation();
     server.reply(await send("A"), 400, { error: COACH_UNVERIFIED });
-    await user.click(await screen.findByRole("button", { name: "New conversation" }));
+    await user.click(await within(composerOf(input())).findByRole("button", { name: "New conversation" }));
 
-    await user.click(within(log()).getByRole("button", { name: "Start a new one" }));
+    await user.click(within(log()).getByRole("button", { name: "New conversation" }));
 
     expect(screen.getByRole("button", { name: "Keep" })).toHaveFocus();
   });
@@ -146,13 +146,13 @@ describe("Refusals", () => {
     await within(log()).findByRole("alert");
 
     expect(within(log()).getByRole("button", { name: "Copy the conversation" })).toBeInTheDocument();
-    expect(within(log()).queryByRole("button", { name: "Start a new one" })).not.toBeInTheDocument();
+    expect(within(log()).queryByRole("button", { name: "New conversation" })).not.toBeInTheDocument();
   });
 
-  it("offers to start a new one when the conversation itself is too long", async () => {
+  it("offers a new conversation when the conversation itself is too long", async () => {
     const { server, log, send } = await startConversation();
     server.reply(await send("A"), 413, { error: COACH_TOO_LONG });
 
-    expect(await within(log()).findByRole("button", { name: "Start a new one" })).toBeInTheDocument();
+    expect(await within(log()).findByRole("button", { name: "New conversation" })).toBeInTheDocument();
   });
 });

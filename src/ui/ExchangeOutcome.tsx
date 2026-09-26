@@ -47,7 +47,7 @@ function RefusalActions({ conversation, onStartNew }: RefusalActionsProps) {
       <CopyConversationButton text={conversation} />
       {onStartNew && (
         <button type="button" onClick={onStartNew}>
-          Start a new one
+          New conversation
         </button>
       )}
     </span>
