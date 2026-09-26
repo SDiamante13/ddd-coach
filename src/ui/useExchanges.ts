@@ -28,13 +28,13 @@ export function useExchanges({ onRefused, onAccessLost }: ExchangeCallbacks = {}
   function send(prompt: Prompt) {
     const id = crypto.randomUUID() as ExchangeId;
     setExchanges((current) => [...current, submit(id, prompt)]);
-    void ask(id, { history: turnsOf(exchanges), prompt });
+    void ask(id, { history: turnsOf(exchanges), prompt, glossary: [] });
   }
 
   function retryFailed(failed: FailedExchange) {
     if (!canRetry(exchanges, failed.id)) return;
     setExchanges((current) => current.map((e) => (e.id === failed.id ? retry(e) : e)));
-    void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt });
+    void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt, glossary: [] });
   }
 
   return { exchanges, send, retry: retryFailed, clear: () => setExchanges([]) };

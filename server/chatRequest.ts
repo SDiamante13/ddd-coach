@@ -33,7 +33,7 @@ function charactersIn({ history, prompt }: Conversation): number {
 function readConversation(body: unknown): Conversation | null {
   const prompt = promptField(body, "message");
   const history = readHistory(body);
-  return prompt === null || history === null ? null : { history, prompt };
+  return prompt === null || history === null ? null : { history, prompt, glossary: [] };
 }
 
 function readHistory(body: unknown): Turn[] | null {

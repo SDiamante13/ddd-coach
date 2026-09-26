@@ -114,7 +114,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("B", history));
 
     expect(response.status).toBe(200);
-    expect(coach.reply).toHaveBeenLastCalledWith({ history, prompt: "B" });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history, prompt: "B", glossary: [] });
   });
 
   const genuineA = signedTurn("A", "Echo: A");

@@ -15,7 +15,7 @@ describe("parseChatRequest", () => {
   it("reads the message and its history as a conversation", () => {
     expect(parseChatRequest({ message: " B ", history: [{ prompt: "A", reply: "R1" }] })).toEqual({
       ok: true,
-      conversation: { history: [{ prompt: "A", reply: "R1", signature: "" }], prompt: "B" },
+      conversation: { history: [{ prompt: "A", reply: "R1", signature: "" }], prompt: "B", glossary: [] },
     });
   });
 

@@ -1,7 +1,8 @@
 import type { Exchange, ExchangeId, Prompt, RepliedExchange } from "./exchange.ts";
+import type { KeptGlossaryRow } from "./glossary.ts";
 
 export type Turn = { prompt: Prompt; reply: string; signature: string };
-export type Conversation = { history: readonly Turn[]; prompt: Prompt };
+export type Conversation = { history: readonly Turn[]; prompt: Prompt; glossary: readonly KeptGlossaryRow[] };
 
 export function turnsOf(exchanges: readonly Exchange[]): Turn[] {
   return exchanges.filter(isReplied).map(({ prompt, reply, signature }) => ({ prompt, reply, signature }));
