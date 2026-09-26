@@ -4,7 +4,7 @@ The spec is issue #94's body. Its follow-ups are #95 (4b, correct and undo), #96
 
 The design:
 - DESIGNER's board system: `system-Components.png` and `system-Presence.png`.
-- **Layout B, "the board is the page"**, which Steven picked from `outputs/design/explore-07/`: `board-layouts.html?layout=B&state=1-4`, `explore07.mp4`, `B3.png` and `B4.png`.
+- **Layout B, "the board is the page"**, which the owner picked from `outputs/design/explore-07/`: `board-layouts.html?layout=B&state=1-4`, `explore07.mp4`, `B3.png` and `B4.png`.
 
 **Status:**
 - **Part A is done** on `modeling/4a-event-board`: `5ddc226`, `4ff0250`, `fdd2041`, `af01385`, `90caf87` and `504f155`, rebased onto main `3af9bf1`. The plan's own commits are `ff221e2` and `0191404`.
@@ -13,7 +13,7 @@ The design:
 - **#100 claims neither the App shell nor the right margin.** Both belong to this slice.
 - **`src/domain/entityId.ts` and its tests are FROZEN.** #100 copied them byte for byte from `63e938b`, so neither branch may change them.
 
-**Steven's decisions:**
+**The owner's decisions:**
 - 4a is "paste → cards". The one-sentence loop becomes its own later slice (a prompt change, A/B tested under #78).
 - One growing board, where exact repeats collapse by stable ID.
 - Layout B.
@@ -129,7 +129,7 @@ The design:
   - There's none before the first question.
 - **Its height** goes into `--pinned-reserve` through a ResizeObserver (same pattern as `useComposerReserve`), which `html` uses as `scroll-padding-top`.
 - **#89 follow:** `fitsAbove` and `inView` in `logFollow.ts` gain an optional `topInset` (default 0, so every existing test passes). `useLogFollow` passes the pinned card's bottom, so a tall reply lands on its start **below** the pinned question and above the composer.
-- **The latest reply's question card becomes "↑ pinned above"** (Steven's decision). Earlier replies keep their own cards, so the history stays readable, and RFC copy still exports every question.
+- **The latest reply's question card becomes "↑ pinned above"** (the owner's decision). Earlier replies keep their own cards, so the history stays readable, and RFC copy still exports every question.
 - **Test impact:** the `structuredReply.test.tsx` question-card cases now look for the card with `screen` (it's pinned outside the log) instead of `within(log())`. "Keeps the question card last" becomes "keeps the pinned-above chip last".
 
 **B-D6. Click a card → the source popover, and the margin scrolls to the line, highlighted.**
@@ -264,7 +264,7 @@ The design:
 - **`entityId.ts` is frozen.** Any need to change IDs goes to the Orchestrator, never into this branch.
 - **Card, popover and highlighted text are user material.** They render only as React text nodes.
 
-### Decided (Steven)
+### Decided (the owner)
 
 1. **The source line:** a local match labelled "closest line in your paste" (B-D6).
 2. **The latest question:** shown once, pinned, with a "↑ pinned above" chip in its reply (B-D4, B-D5).
