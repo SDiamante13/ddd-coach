@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { addSwap, startConversation } from "../test/appDriver.tsx";
+import { V11_EXAMPLE_REPLY } from "../test/v10Replies.ts";
 import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -121,6 +122,54 @@ describe("Event board", () => {
       await startConversation();
 
       expect(screen.queryByRole("complementary", { name: "Current question" })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("a card's closest line in the paste", () => {
+    const LATE_FEE_LINE = "Wed 08:10  Carrier desk: charged Carrier 3 the late pickup fee on 7731";
+    const cardButton = (title: string) => within(board()).getByRole("button", { name: new RegExp(title) });
+    const marks = (log: () => HTMLElement) => log().querySelectorAll("mark");
+
+    async function exampleOnTheBoard() {
+      const conversation = await startConversation();
+      await conversation.user.click(screen.getByRole("button", { name: "Try an example thread" }));
+      conversation.server.reply(await conversation.send(""), 200, { reply: V11_EXAMPLE_REPLY, signature: "sig-1" });
+      await within(board()).findByRole("list", { name: "Events on the board" });
+      return conversation;
+    }
+
+    it("opens beside the card and marks that line in the expanded paste", async () => {
+      const { user, log } = await exampleOnTheBoard();
+
+      await user.click(cardButton("Carrier desk charges Carrier 3"));
+
+      expect(cardButton("Carrier desk charges Carrier 3")).toHaveAttribute("aria-pressed", "true");
+      const note = within(board()).getByRole("note");
+      expect(note).toHaveTextContent("CLOSEST LINE IN YOUR PASTE");
+      expect(note).toHaveTextContent(LATE_FEE_LINE, { normalizeWhitespace: false });
+      expect([...marks(log)].map((mark) => mark.textContent)).toEqual([LATE_FEE_LINE]);
+    });
+
+    it.each([
+      ["pressing the card again", async (user: Conversation["user"], card: HTMLElement) => user.click(card)],
+      ["Escape", async (user: Conversation["user"]) => user.keyboard("{Escape}")],
+    ])("closes and clears the mark on %s", async (_case, close) => {
+      const { user, log } = await exampleOnTheBoard();
+      await user.click(cardButton("Carrier desk charges Carrier 3"));
+
+      await close(user, cardButton("Carrier desk charges Carrier 3"));
+
+      expect(within(board()).queryByRole("note")).not.toBeInTheDocument();
+      expect(marks(log)).toHaveLength(0);
+      expect(cardButton("Carrier desk charges Carrier 3")).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("says a guess has no line in the paste", async () => {
+      const { user } = await replied(SECOND_BOARD_REPLY);
+
+      await user.click(cardButton("Ops chooses another carrier"));
+
+      expect(within(board()).getByRole("note")).toHaveTextContent("The coach's guess: no line in your paste says this.");
     });
   });
 });

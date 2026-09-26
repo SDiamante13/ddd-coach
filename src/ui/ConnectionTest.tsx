@@ -1,6 +1,3 @@
-import { useMemo } from "react";
-import { boardOf } from "../domain/boardFromReplies.ts";
-import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { AccessGate } from "./AccessGate.tsx";
@@ -14,6 +11,7 @@ import { SentPreview } from "./SentPreview.tsx";
 import { GlossaryPanel } from "./GlossaryPanel.tsx";
 import { SwapPanel } from "./SwapPanel.tsx";
 import type { Unlock } from "./useAccess.ts";
+import { useBoardView } from "./useBoardView.ts";
 import { type Composer, useComposer } from "./useComposer.ts";
 
 type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
@@ -21,13 +19,12 @@ type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
-  const board = useMemo(() => boardOf(composer.exchanges), [composer.exchanges]);
-  const question = latestQuestionOf(composer.exchanges, (text) => composer.box.restoreNames(text).text);
+  const view = useBoardView(composer.exchanges, composer.box.restoreNames);
 
   return (
     <>
-      <EventBoard board={board} thinking={composer.busy} restoreNames={composer.box.restoreNames} />
-      <PinnedQuestion question={question} />
+      <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} />
+      <PinnedQuestion question={view.question} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}
@@ -37,7 +34,8 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         logRef={composer.follow.logRef}
         restoreNames={composer.box.restoreNames}
         onKeep={composer.glossary.keepReply}
-        pinnedQuestionOf={question?.exchangeId ?? null}
+        pinnedQuestionOf={view.question?.exchangeId ?? null}
+        highlight={view.highlight}
       />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}
       {justUnlocked && (
