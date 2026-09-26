@@ -1,3 +1,4 @@
+import { entityId } from "../../src/domain/entityId.ts";
 import type { KeptGlossaryRow } from "../../src/domain/glossary.ts";
 
 export type ContradictedRow = { word: string; holder: string };
@@ -6,13 +7,13 @@ export type GlossaryExpect = { drift?: ContradictedRow[]; keptFrom?: string[]; s
 const DRIFT_WORD = /^- ["“](.+?)["”]:/;
 const KEPT_QUOTE = /; you kept: ["“](.+?)["”]/;
 
-const withoutEndStop = (text: string): string => text.trim().replace(/\.$/, "");
+const sameMeaning = (kept: string, quoted: string): boolean => entityId("meaning", kept) === entityId("meaning", quoted);
 
 function keptRowOf(line: string, glossary: readonly KeptGlossaryRow[]): KeptGlossaryRow | undefined {
   const word = DRIFT_WORD.exec(line)?.[1]?.toLowerCase();
   const quote = KEPT_QUOTE.exec(line)?.[1];
   if (word === undefined || quote === undefined) return undefined;
-  return glossary.find((row) => row.word.toLowerCase() === word && withoutEndStop(row.meaning) === withoutEndStop(quote));
+  return glossary.find((row) => row.word.toLowerCase() === word && sameMeaning(row.meaning, quote));
 }
 
 const isRow = (row: KeptGlossaryRow | undefined, { word, holder }: ContradictedRow): boolean =>

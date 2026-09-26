@@ -13,8 +13,13 @@ describe("driftNamed", () => {
     expect(driftNamed([LATE], expectLate, GLOSSARY)).toBe(true);
   });
 
-  it("accepts the kept quote without its end stop", () => {
-    expect(driftNamed([LATE.replace('late fee."', 'late fee"')], expectLate, GLOSSARY)).toBe(true);
+  it.each([
+    ["without its end stop", '"A missed pickup that can incur a carrier late fee"'],
+    ["in another case", '"a missed pickup that can incur a Carrier late fee."'],
+    ["with other spacing", '"A missed pickup  that can\tincur a carrier late fee. "'],
+    ["in curly quotes, ending in other punctuation", "“A missed pickup that can incur a carrier late fee;”"],
+  ])("accepts the kept quote %s, normalised as entity ids are", (_case, quote) => {
+    expect(driftNamed([LATE.replace('"A missed pickup that can incur a carrier late fee."', quote)], expectLate, GLOSSARY)).toBe(true);
   });
 
   it("fails when an expected drift has no line", () => {
