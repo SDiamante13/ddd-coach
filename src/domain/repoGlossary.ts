@@ -1,3 +1,4 @@
+import { entityId } from "./entityId.ts";
 import type { Source, WordRow } from "./replyBlocks.ts";
 import type { RfcDocument, RfcQuestion } from "./rfcExport.ts";
 
@@ -24,7 +25,7 @@ const termOf = (term: WordRow, questions: RfcQuestion[]): RepoTerm => ({
   avoid: sameMeaningWords(term),
   rows: term.meanings.map(({ holder, meaning, source }) => ({
     ...{ context: holder || UNNAMED_CONTEXT, meaning, source },
-    status: statusOf(term, holder, source, questions),
+    status: statusOf(term.word, source, questions),
   })),
 });
 
@@ -40,20 +41,21 @@ function sameMeaningWords({ word, meanings }: WordRow): string[] {
   return [...new Set(pairs.flat().filter((each) => !sameWord(each, word)))];
 }
 
-function statusOf(term: WordRow, holder: string, source: Source, questions: RfcQuestion[]): RowStatus {
+function statusOf(word: string, source: Source, questions: RfcQuestion[]): RowStatus {
   if (source === "Guess") return { kind: "guess" };
-  const asked = questions.findIndex((question) => asksAbout(question, term, holder));
+  const asked = questions.findIndex(({ text }) => mentions(text, word));
   return asked < 0 ? { kind: "settled" } : { kind: "unsettled", question: asked + 1 };
 }
 
-function asksAbout({ roles, text }: RfcQuestion, term: WordRow, holder: string): boolean {
-  if (!mentions(text, term.word)) return false;
-  const asksTeam = (team: string) => team !== "" && mentions(roles, teamOf(team));
-  return asksTeam(holder) || !term.meanings.some((meaning) => asksTeam(meaning.holder));
+const tokens = (text: string): string[] =>
+  entityId("term", text)
+    .slice("term:".length)
+    .split(/[^\p{L}\p{N}_']+/u)
+    .filter(Boolean);
+
+const sameToken = (said: string | undefined, term: string): boolean => said === term || said === `${term}s`;
+
+function mentions(text: string, word: string): boolean {
+  const [said, term] = [tokens(text), tokens(word)];
+  return said.some((_, start) => term.every((token, offset) => sameToken(said[start + offset], token)));
 }
-
-const teamOf = (holder: string): string => holder.replace(/\s*\(.*\)\s*$/, "");
-
-const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const mentions = (text: string, phrase: string): boolean => new RegExp(`(^|\\W)${escapeRegExp(phrase)}($|\\W)`, "i").test(text);

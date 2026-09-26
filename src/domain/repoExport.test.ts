@@ -39,7 +39,7 @@ describe("claudeSection", () => {
         "",
         "- Use the terms in `GLOSSARY.md` exactly as defined. A term's meaning depends on the context in its row (Account team, Ops (day desk), Billing, Code). Never merge meanings across contexts.",
         "- Build what's settled: a settled row is safe to build on and to name code after, in its own context.",
-        "- **Unsettled, don't pick a side:** `late` for Account team (Q1), Billing (Q1); `on time` for Code (a guess). Don't name new code, columns or statuses after either reading. Leave a `TODO(glossary): <term>` at that one point, keep building the rest of the task, and say what you left open.",
+        "- **Unsettled, don't pick a side:** `late` for Account team (Q1), Ops (day desk) (Q1), Billing (Q1); `on time` for Code (a guess). Don't name new code, columns or statuses after either reading. Leave a `TODO(glossary): <term>` at that one point, keep building the rest of the task, and say what you left open.",
         "- Don't introduce a new domain term. If you need a word that isn't in `GLOSSARY.md`, ask first.",
         "",
       ].join("\n"),
@@ -139,25 +139,43 @@ describe("glossaryMarkdown", () => {
     );
   });
 
-  it("marks unsettled only the rows of the teams an open question about the term asks", () => {
+  it("marks every thread row of a term an open question names unsettled, even for a team it doesn't ask", () => {
     expect(glossaryMarkdown(glossaryOf(LATE), AS_OF)).toContain(
       [
         "| Account team | Missing the delivery appointment the customer booked. | From thread | **Unsettled**, see Q1 |",
-        "| Ops (day desk) | A truck not at pickup by the end of the pickup window. | From thread | Settled |",
+        "| Ops (day desk) | A truck not at pickup by the end of the pickup window. | From thread | **Unsettled**, see Q1 |",
         "| Billing | A load included on the weekly late report. | From thread | **Unsettled**, see Q1 |",
       ].join("\n"),
     );
   });
 
-  it("marks every thread row of a term unsettled when the question about it asks none of its teams", () => {
-    const asksCarrierDesk = `${WORDS}\n\nQuestion for the carrier desk lead, at the 27 Oct review: For load 48213, does a rebook keep the ref?`;
+  it("marks every thread row of 'on time' unsettled when Q1 asks about the 'on-time %', whichever teams it asks", () => {
+    const onTime = [
+      "Words that don't match",
+      '"on time"',
+      "- From thread: Account team means meeting the customer's booked delivery appointment.",
+      "- From thread: Ops (day desk) means a load can recover from a late pickup by delivering before the appointment.",
+      "",
+      "Question for the account team lead and the billing lead, at Friday's service review: For Customer D load 7731, which on-time % goes in the board pack: the delivery-appointment count or the pickup count?",
+    ].join("\n");
 
-    expect(glossaryMarkdown(glossaryOf(asksCarrierDesk), AS_OF)).toContain(
-      "| Ops (day desk) | A date change with the same carrier is AMENDED. | From thread | **Unsettled**, see Q1 |",
+    expect(glossaryMarkdown(glossaryOf(onTime), AS_OF)).toContain(
+      [
+        "| Account team | Meeting the customer's booked delivery appointment. | From thread | **Unsettled**, see Q1 |",
+        "| Ops (day desk) | A load can recover from a late pickup by delivering before the appointment. | From thread | **Unsettled**, see Q1 |",
+      ].join("\n"),
     );
   });
 
-  it("labels a row with no named team 'Team unclear', and never counts it as a team the question asks", () => {
+  it("counts a plural in the question as naming the term, but not a longer word that starts with it", () => {
+    const booking = ["Words that don't match", '"booking"', "- From thread: Finance means a load it can invoice.", '"book"', "- From thread: Ops means to take a load."].join("\n");
+    const markdown = glossaryMarkdown(glossaryOf(`${booking}\n\nQuestion for the finance lead: For load 48213, how many bookings does it count?`), AS_OF);
+
+    expect(markdown).toContain("| Finance | A load it can invoice. | From thread | **Unsettled**, see Q1 |");
+    expect(markdown).toContain("| Ops | To take a load. | From thread | Settled |");
+  });
+
+  it("labels a row with no named team 'Team unclear'", () => {
     const unnamed = [
       "Words that don't match",
       '"rebook"',
