@@ -8,6 +8,7 @@ export type EventCard = {
   readonly text: string;
   readonly previousText?: string;
   readonly provenance: Provenance;
+  readonly previousProvenance?: Provenance;
   readonly placedBy: ExchangeId;
   readonly changedBy: ExchangeId;
 };
@@ -35,7 +36,9 @@ function placed({ id, text, provenance, by }: BoardAction): EventCard {
 }
 
 function restatement(card: EventCard, { text, provenance, by }: BoardAction): EventCard {
-  if (provenance !== card.provenance) return { ...card, text, previousText: undefined, provenance, changedBy: by };
+  if (provenance !== card.provenance) {
+    return { ...card, text, previousText: undefined, provenance, previousProvenance: card.provenance, changedBy: by };
+  }
   return wording(text) === wording(card.text) ? card : { ...card, text };
 }
 
@@ -43,9 +46,15 @@ const wording = (text: string): string => text.replace(/\s+/g, " ").trim();
 
 export function changeOf(board: Board, card: EventCard): CardChange {
   if (card.placedBy === board.latest) return "added";
-  return card.changedBy === board.latest ? "updated" : null;
+  return changedByLatest(board, card) ? "updated" : null;
 }
 
 export function previousTextOf(board: Board, card: EventCard): string | null {
-  return card.changedBy === board.latest ? (card.previousText ?? null) : null;
+  return changedByLatest(board, card) ? (card.previousText ?? null) : null;
 }
+
+export function previousProvenanceOf(board: Board, card: EventCard): Provenance | null {
+  return changedByLatest(board, card) ? (card.previousProvenance ?? null) : null;
+}
+
+const changedByLatest = (board: Board, card: EventCard): boolean => card.changedBy === board.latest;
