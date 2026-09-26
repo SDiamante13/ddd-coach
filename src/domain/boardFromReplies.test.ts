@@ -75,14 +75,10 @@ describe("boardOf", () => {
     expect(marks(board).every((mark) => mark === null)).toBe(true);
   });
 
-  it("shows a card's previous words when a later reply restates the event in other words", () => {
+  it("quietly takes a later reply's wording for a card when it differs only in case or punctuation", () => {
     const restated = "Events, in order\n1. From thread: The carrier REJECTS the booking!";
     const board = boardOf([...firstTwoReplies, replied("reply-3", restated)]);
     const card = board.cards[5]!;
-    expect([card.text, previousTextOf(board, card), changeOf(board, card)]).toEqual([
-      "The carrier REJECTS the booking!",
-      "The carrier rejects the booking.",
-      "updated",
-    ]);
+    expect([card.text, previousTextOf(board, card), changeOf(board, card)]).toEqual(["The carrier REJECTS the booking!", null, null]);
   });
 });

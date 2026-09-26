@@ -8,6 +8,7 @@ import {
   type BoardAction,
   changeOf,
   emptyBoard,
+  type EventCard,
   previousTextOf,
   type Provenance,
   PROVENANCE_LABEL,
@@ -59,12 +60,10 @@ describe("applyAction", () => {
     expect(repeated).toEqual({ cards: first.cards, latest: "reply-2" });
   });
 
-  it("rewords a card in place, keeping its previous words, when a later reply restates it differently", () => {
+  it("quietly takes the newer wording when a later reply restates an event in another case or punctuation", () => {
     const first = applyAction(emptyBoard, addEvent("Customer submits a bkg.", "thread", "reply-1"));
-    const reworded = applyAction(first, addEvent("Customer submits a BKG!", "thread", "reply-2"));
-    expect(reworded.cards).toEqual([
-      { ...first.cards[0], text: "Customer submits a BKG!", previousText: "Customer submits a bkg.", changedBy: "reply-2" },
-    ]);
+    const restated = applyAction(first, addEvent("Customer submits a BKG!", "thread", "reply-2"));
+    expect(restated.cards).toStrictEqual([{ ...first.cards[0], text: "Customer submits a BKG!" }]);
   });
 
   it("updates a card in place when a later reply gives its event a new provenance", () => {
@@ -104,23 +103,29 @@ describe("changeOf", () => {
 });
 
 describe("previousTextOf", () => {
-  const reworded = [
-    addEvent("Customer submits a bkg.", "thread", "reply-1"),
-    addEvent("Customer submits a BKG!", "thread", "reply-2"),
-  ];
+  const renamedBy = (by: string): EventCard => ({
+    id: entityId("event", "Customer submits a booking."),
+    kind: "event",
+    text: "Customer submits a booking.",
+    previousText: "Customer submits a bkg.",
+    provenance: "thread",
+    placedBy: "reply-1" as ExchangeId,
+    changedBy: by as ExchangeId,
+  });
+  const renamedIn = (by: string): Board => ({ cards: [renamedBy(by)], latest: by as ExchangeId });
 
-  it("gives a card's previous words while the reply that reworded it is the latest", () => {
-    const board = reworded.reduce(applyAction, emptyBoard);
+  it("gives a renamed card's previous words while the reply that renamed it is the latest", () => {
+    const board = renamedIn("reply-2");
     expect(previousTextOf(board, board.cards[0]!)).toBe("Customer submits a bkg.");
   });
 
   it("gives no previous words once a later reply only repeats the card", () => {
-    const board = [...reworded, addEvent("Customer submits a BKG!", "thread", "reply-3")].reduce(applyAction, emptyBoard);
+    const board = applyAction(renamedIn("reply-2"), addEvent("Customer submits a booking.", "thread", "reply-3"));
     expect(previousTextOf(board, board.cards[0]!)).toBeNull();
   });
 
   it("gives no previous words when a later reply only changes the card's provenance", () => {
-    const board = [...reworded, addEvent("Customer submits a BKG!", "guess", "reply-3")].reduce(applyAction, emptyBoard);
+    const board = applyAction(renamedIn("reply-2"), addEvent("Customer submits a booking.", "guess", "reply-3"));
     expect(previousTextOf(board, board.cards[0]!)).toBeNull();
   });
 });

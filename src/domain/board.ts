@@ -35,10 +35,8 @@ function placed({ id, text, provenance, by }: BoardAction): EventCard {
 }
 
 function restatement(card: EventCard, { text, provenance, by }: BoardAction): EventCard {
-  const reworded = wording(text) !== wording(card.text);
-  if (!reworded && provenance === card.provenance) return card;
-  const words = reworded ? { text, previousText: card.text } : { previousText: undefined };
-  return { ...card, ...words, provenance, changedBy: by };
+  if (provenance !== card.provenance) return { ...card, text, previousText: undefined, provenance, changedBy: by };
+  return wording(text) === wording(card.text) ? card : { ...card, text };
 }
 
 const wording = (text: string): string => text.replace(/\s+/g, " ").trim();
