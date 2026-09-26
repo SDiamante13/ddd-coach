@@ -266,7 +266,7 @@ type Glossary = readonly KeptRow[];
 **Prompt:**
 
 13. v14 content assertions (red), then the `KEPT_GLOSSARY` block and the snapshot.
-14. **The paid A/B** (below), then record it. If it ships, set `LIVE_INSTRUCTIONS_VERSION` to 13 in the recording commit and hand off to deploy.
+14. **The paid A/B** (below), then record it. If it ships, set `LIVE_INSTRUCTIONS_VERSION` to 14 in the recording commit and hand off to deploy.
 
 ## Testing at $0 with fakes
 - **Acceptance:** `stubFetch` plus `sendAndReply` with the recorded v11 reply and a hand-written, labelled v14-shaped drift reply. localStorage is jsdom's and is cleared in `afterEach`. The clock is injected for `keptOn`.
