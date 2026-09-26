@@ -17,14 +17,15 @@ type ExchangeLogProps = {
   onKeep: KeepReply;
   pinnedQuestionOf: ExchangeId | null;
   highlight: LineMatch | null;
+  newCardsOf: (id: ExchangeId) => number;
 };
 
-export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, ...outcome }: ExchangeLogProps) {
+export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, newCardsOf, ...outcome }: ExchangeLogProps) {
   return (
     <ol role="log" ref={logRef}>
       {exchanges.map((exchange) => (
         <ExchangeEntry key={exchange.id} exchange={exchange} highlight={highlight?.exchangeId === exchange.id ? highlight : null}>
-          <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} />
+          <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} newCards={newCardsOf(exchange.id)} />
         </ExchangeEntry>
       ))}
     </ol>

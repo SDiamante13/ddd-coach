@@ -1,6 +1,7 @@
 import { useMemo } from "react";
+import { cardsPlacedBy } from "../domain/board.ts";
 import { boardOf } from "../domain/boardFromReplies.ts";
-import type { Exchange } from "../domain/exchange.ts";
+import type { Exchange, ExchangeId } from "../domain/exchange.ts";
 import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { lineOfCard, type LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
@@ -13,6 +14,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const highlight = selectedCard ? lineOfCard(selectedCard, exchanges) : null;
   return {
     board,
+    newCardsOf: (id: ExchangeId) => cardsPlacedBy(board, id),
     selected: selectedCard?.id ?? null,
     toggle,
     highlight,

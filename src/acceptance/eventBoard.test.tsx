@@ -47,10 +47,19 @@ describe("Event board", () => {
   it("replaces the reply's events list with a chip that takes the visitor to the board", async () => {
     const { user, log } = await replied(SECOND_BOARD_REPLY);
 
-    await user.click(within(log()).getByRole("button", { name: "← 3 events on the board" }));
+    await user.click(within(log()).getByRole("button", { name: "← 3 new on the board" }));
 
     expect(within(log()).queryByRole("list", { name: "Events, in order" })).not.toBeInTheDocument();
     expect(within(board()).getByRole("list", { name: "Events on the board" })).toHaveFocus();
+  });
+
+  it("counts on the chip only the cards a reply added, and how many of its events were already there", async () => {
+    const conversation = await replied(FIRST_BOARD_REPLY);
+
+    await replyNext(conversation, SECOND_BOARD_REPLY, 7);
+
+    const chips = within(conversation.log()).getAllByRole("button", { name: /on the board/ }).map((chip) => chip.textContent);
+    expect(chips).toEqual(["← 5 new on the board", "← 2 new on the board · 1 already there"]);
   });
 
   it("keeps every card in place across replies: a repeat stays one card, new events are just added, a restated guess is updated", async () => {

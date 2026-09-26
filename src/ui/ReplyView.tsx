@@ -15,15 +15,16 @@ export type RestoreNames = (text: string) => SwappedText;
 
 export const RESTORED_NOTE = "Names restored in this browser from your swaps.";
 
-type ReplyViewProps = { reply: string; restoreNames: RestoreNames; onKeep: KeepReply; questionPinned: boolean };
+type ReplyViewProps = { reply: string; restoreNames: RestoreNames; onKeep: KeepReply; questionPinned: boolean; newCards: number };
+type PartProps = { block: ReplyBlock; questionPinned: boolean; newCards: number };
 
-export function ReplyView({ reply, restoreNames, onKeep, questionPinned }: ReplyViewProps) {
+export function ReplyView({ reply, restoreNames, onKeep, questionPinned, newCards }: ReplyViewProps) {
   const restored = restoreNames(reply);
   const blocks = displayOrder(parseReply(restored.text));
   return (
     <div className="reply">
       {blocks.map((block, index) => (
-        <ReplyPart key={index} block={block} questionPinned={questionPinned} />
+        <ReplyPart key={index} block={block} questionPinned={questionPinned} newCards={newCards} />
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
       {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
@@ -41,10 +42,10 @@ function displayOrder(blocks: ReplyBlock[]): ReplyBlock[] {
   return [...blocks.filter((block) => !LAST_KINDS.includes(block.kind)), ...LAST_KINDS.flatMap(lastOf)];
 }
 
-function ReplyPart({ block, questionPinned }: { block: ReplyBlock; questionPinned: boolean }) {
+function ReplyPart({ block, questionPinned, newCards }: PartProps) {
   switch (block.kind) {
     case "events":
-      return <EventsOnBoard count={block.items.length} />;
+      return <EventsOnBoard events={block.items.length} added={newCards} />;
     case "words":
       return <WordTable rows={block.rows} />;
     case "question":
