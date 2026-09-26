@@ -1,4 +1,5 @@
 import { shortDate } from "./dates.ts";
+import { markdownTable, markdownText } from "./markdown.ts";
 import type { Claim, ReplyBlock, WordRow } from "./replyBlocks.ts";
 
 export type RfcQuestion = { roles: string; text: string; sources: string[] };
@@ -36,7 +37,7 @@ export function copiedMessage(guesses: number): string {
 }
 
 export function toMarkdown(document: RfcDocument, asOf: Date): string {
-  const sections = [markdownTable(document.words), markdownQuestions(document.questions), markdownEvents(document.events)];
+  const sections = [wordsTable(document.words), markdownQuestions(document.questions), markdownEvents(document.events)];
   return [asOfLine(asOf), "", ...sections.flat(), ...(document.cut ? [CUT_LINE] : [])].join("\n");
 }
 
@@ -61,21 +62,10 @@ function markdownQuestions(questions: RfcQuestion[]): string[] {
   return ["## Open questions", "", ...items, ""];
 }
 
-const markdownText = (text: string): string => text.replace(/[\\`[\]<>]/g, (char) => `\\${char}`);
-
-const markdownCell = (text: string): string => markdownText(text).replace(/\|/g, "\\|");
-
-function markdownTable(words: WordRow[]): string[] {
+function wordsTable(words: WordRow[]): string[] {
   if (words.length === 0) return [];
-  const row = (cells: string[]) => `| ${cells.map(markdownCell).join(" | ")} |`;
-  return [
-    "## Words that don't match",
-    "",
-    row(["Term", "Team", "Meaning", "Source"]),
-    "|---|---|---|---|",
-    ...tableRows(words).map(({ term, team, meaning, source }) => row([term, team, meaning, source])),
-    "",
-  ];
+  const rows = tableRows(words).map(({ term, team, meaning, source }) => [term, team, meaning, source]);
+  return ["## Words that don't match", "", ...markdownTable(["Term", "Team", "Meaning", "Source"], rows), ""];
 }
 
 export function toHtml(document: RfcDocument, asOf: Date): string {
