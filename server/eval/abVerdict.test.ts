@@ -57,6 +57,7 @@ describe("abVerdict", () => {
   it.each([
     ["same meaning not split", { hardFailures: ["same meaning not split"] }],
     ["no merged split", { hardFailures: ["no merged split"] }],
+    ["sourced or general practice, until v15 targets it (#99)", { hardFailures: ["sourced or general practice"] }],
     ["sameMeaningNamed", { soft: { sameMeaningNamed: false } }],
     ["jointRoles", { soft: { jointRoles: false } }],
   ])("ships when only the reported-only %s drops", (_check, miss) => {

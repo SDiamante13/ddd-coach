@@ -5,7 +5,7 @@ export type Tally = { passed: number; total: number };
 export type ShipBar = ReturnType<typeof shipBar>;
 type FixtureTallies = ReturnType<typeof fixtureTallies>;
 
-export const REPORTED_ONLY_HARD: readonly string[] = ["same meaning not split", "no merged split", "settled not relisted"];
+export const REPORTED_ONLY_HARD: readonly string[] = ["same meaning not split", "no merged split", "settled not relisted", "sourced or general practice"];
 
 const EVERY_RUN_SCORES = ["split", "codeLine", "questionSpansThread"] as const;
 const TALLIED_SCORES = [...EVERY_RUN_SCORES, "sameMeaningNamed"] as const;
