@@ -1,6 +1,7 @@
 import { parseReply, type ReplyBlock } from "../domain/replyBlocks.ts";
 import type { SwappedText } from "../domain/swaps.ts";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
+import { UNSOURCED } from "../shared/replyLayout.ts";
 import { EventList } from "./EventList.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
 import { KeepButton } from "./KeepButton.tsx";
@@ -27,7 +28,7 @@ export function ReplyView({ reply, restoreNames, onKeep }: { reply: string; rest
   );
 }
 
-const LAST_KINDS: readonly ReplyBlock["kind"][] = ["question", "cut"];
+const LAST_KINDS: readonly ReplyBlock["kind"][] = ["citation", "unsourced", "question", "cut"];
 
 const isAnalysis = (block: ReplyBlock): boolean => block.kind === "words" || block.kind === "question";
 
@@ -52,6 +53,8 @@ function ReplyPart({ block }: { block: ReplyBlock }) {
       );
     case "citation":
       return <Citation title={block.title} />;
+    case "unsourced":
+      return <p className="citation">{UNSOURCED}</p>;
     case "text":
       return <p>{block.text}</p>;
   }

@@ -10,18 +10,47 @@ const GROUNDED_REPLY = [
   "Paste a thread when you have one and I'll show where your teams' contexts meet.",
 ].join("\n");
 
-async function askedAboutBoundedContexts() {
+async function askedAboutBoundedContexts(reply = GROUNDED_REPLY) {
   const conversation = await startConversation();
-  conversation.server.reply(await conversation.send("What's a bounded context?"), 200, { reply: GROUNDED_REPLY, signature: "sig-1" });
+  conversation.server.reply(await conversation.send("What's a bounded context?"), 200, { reply, signature: "sig-1" });
   await within(conversation.log()).findByText(/A bounded context is/);
   return conversation;
 }
+
+const replyParts = (log: HTMLElement): string[] => [...(log.querySelector(".reply")?.children ?? [])].map((part) => part.textContent ?? "");
 
 describe("Citations", () => {
   it("shows the Reference section a DDD answer draws on as a citation", async () => {
     const { log } = await askedAboutBoundedContexts();
 
     expect(log().querySelector("cite")).toHaveTextContent('Evans, Domain-Driven Design Reference (2015), "Bounded Context"');
+  });
+
+  it("shows the Source line last, under the whole answer, even when the coach writes more after it", async () => {
+    const { log } = await askedAboutBoundedContexts();
+
+    expect(replyParts(log())).toEqual([
+      "A bounded context is the part of a system where one model, and its words, apply without ambiguity.",
+      "Paste a thread when you have one and I'll show where your teams' contexts meet.",
+      'Source Evans, Domain-Driven Design Reference (2015), "Bounded Context"',
+    ]);
+  });
+
+  it("shows the guard's General practice label on its own, where the Source line would be, not joined to the next line", async () => {
+    const { log } = await askedAboutBoundedContexts(
+      [
+        "A bounded context is where one model applies.",
+        "",
+        "General practice: not from the Reference.",
+        "Paste a thread when you have one.",
+      ].join("\n"),
+    );
+
+    expect(replyParts(log())).toEqual([
+      "A bounded context is where one model applies.",
+      "Paste a thread when you have one.",
+      "General practice: not from the Reference.",
+    ]);
   });
 
   it("leaves citations out of Copy the conversation, since they are never copied", async () => {

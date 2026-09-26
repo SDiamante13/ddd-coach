@@ -18,4 +18,6 @@ const withoutCitations = (reply: string): string =>
   reply
     .split("\n")
     .filter((line) => !CITATION.test(line.trim()))
-    .join("\n");
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trimEnd();

@@ -3,6 +3,7 @@ export const WORDS_HEADING = "Words that don't match";
 export const DRIFT_HEADING = "Changed since you kept it";
 export const QUESTION = /^Question for ([^:]+): (.+\?)$/;
 export const SOURCE_QUOTE = /^From thread: ["“](.+)["”]$/;
+export const UNSOURCED = "General practice: not from the Reference.";
 export const CITATION = /^Source: Evans, Domain-Driven Design Reference \(2015\), ["“](.+?)["”]\.?$/;
 
 const NUMBERED = /^\d+\. /;

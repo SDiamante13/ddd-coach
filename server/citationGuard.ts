@@ -1,11 +1,10 @@
-import { CITATION } from "../src/shared/replyLayout.ts";
+import { CITATION, UNSOURCED } from "../src/shared/replyLayout.ts";
 import { DDD_REFERENCE } from "./knowledge/dddReference.ts";
 import { referenceTitles } from "./knowledge/sections.ts";
 
 export type VettedReply = { reply: string; dropped: string[] };
 
 const SOURCE_LINE = /^Source:/;
-export const UNSOURCED = "General practice: not from the Reference.";
 
 export function dropUnknownCitations(reply: string, titles: readonly string[]): VettedReply {
   const lines = reply.split("\n");
