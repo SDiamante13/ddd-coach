@@ -12,10 +12,12 @@ export function isFollowing({ newestEntryBottom, composerTop }: LogGeometry): bo
 
 const TOP_GAP_PX = 16;
 
-export function fitsAbove({ height, composerTop }: { height: number; composerTop: number }): boolean {
-  return height <= composerTop - TOP_GAP_PX;
+type Band = { composerTop: number; topInset?: number };
+
+export function fitsAbove({ height, composerTop, topInset = 0 }: Band & { height: number }): boolean {
+  return height <= composerTop - topInset - TOP_GAP_PX;
 }
 
-export function inView({ top, bottom, composerTop }: { top: number; bottom: number; composerTop: number }): boolean {
-  return top >= 0 && bottom <= composerTop;
+export function inView({ top, bottom, composerTop, topInset = 0 }: Band & { top: number; bottom: number }): boolean {
+  return top >= topInset && bottom <= composerTop;
 }

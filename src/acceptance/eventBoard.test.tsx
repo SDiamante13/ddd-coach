@@ -99,4 +99,28 @@ describe("Event board", () => {
     expect(within(board()).getByText("Events from your paste land here, left to right, in order.")).toBeInTheDocument();
     expect(within(board()).queryByRole("list", { name: "Events on the board" })).not.toBeInTheDocument();
   });
+
+  describe("the current question", () => {
+    const pinned = () => screen.getByRole("complementary", { name: "Current question" });
+    const entries = (log: () => HTMLElement) => within(log()).getAllByRole("listitem").filter((item) => item.parentElement === log());
+
+    it("pins the latest question once, above the conversation, and leaves earlier questions in their replies", async () => {
+      const conversation = await replied(SECOND_BOARD_REPLY);
+      await replyNext(conversation, THIRD_BOARD_REPLY, 3);
+      const [first, second] = entries(conversation.log);
+
+      expect(within(pinned()).getByRole("region", { name: "Question" })).toHaveTextContent("Does a resubmitted booking keep its number?");
+      expect(within(first!).getByRole("region", { name: "Question" })).toHaveTextContent("Who picks the next carrier after a rejection?");
+      expect(within(second!).queryByRole("region", { name: "Question" })).not.toBeInTheDocument();
+
+      await conversation.user.click(within(second!).getByRole("button", { name: "↑ pinned above" }));
+      expect(pinned()).toHaveFocus();
+    });
+
+    it("pins nothing before the first question", async () => {
+      await startConversation();
+
+      expect(screen.queryByRole("complementary", { name: "Current question" })).not.toBeInTheDocument();
+    });
+  });
 });

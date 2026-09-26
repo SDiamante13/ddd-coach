@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { boardOf } from "../domain/boardFromReplies.ts";
+import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { AccessGate } from "./AccessGate.tsx";
@@ -8,6 +9,7 @@ import { EventBoard } from "./EventBoard.tsx";
 import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { NewReplyButton } from "./NewReplyButton.tsx";
+import { PinnedQuestion } from "./PinnedQuestion.tsx";
 import { SentPreview } from "./SentPreview.tsx";
 import { GlossaryPanel } from "./GlossaryPanel.tsx";
 import { SwapPanel } from "./SwapPanel.tsx";
@@ -20,10 +22,12 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
   const board = useMemo(() => boardOf(composer.exchanges), [composer.exchanges]);
+  const question = latestQuestionOf(composer.exchanges, (text) => composer.box.restoreNames(text).text);
 
   return (
     <>
       <EventBoard board={board} thinking={composer.busy} restoreNames={composer.box.restoreNames} />
+      <PinnedQuestion question={question} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}
@@ -33,6 +37,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         logRef={composer.follow.logRef}
         restoreNames={composer.box.restoreNames}
         onKeep={composer.glossary.keepReply}
+        pinnedQuestionOf={question?.exchangeId ?? null}
       />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}
       {justUnlocked && (

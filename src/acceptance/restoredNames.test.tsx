@@ -71,7 +71,7 @@ describe("Restoring real names", () => {
     ].join("\n");
     const { log } = await swappedConversation(reply);
     const table = await within(log()).findByRole("table", { name: "Words that don't match" });
-    const card = within(log()).getByRole("region", { name: "Question" });
+    const card = screen.getByRole("region", { name: "Question" });
 
     expect(within(table).getByText("A Acme Foods load once it's invoiceable.")).toBeInTheDocument();
     expect(within(card).getByText("For Acme Foods's load 48213, which count includes the new row?")).toBeInTheDocument();

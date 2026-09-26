@@ -43,3 +43,19 @@ describe("inView", () => {
     expect(inView({ top, bottom, composerTop: 400 })).toBe(expected);
   });
 });
+
+describe("below a pinned question (#94)", () => {
+  it.each([
+    [284, true],
+    [285, false],
+  ])("fits an outcome %i px tall between a question pinned down to 100 px and a composer at 400 px", (height, fits) => {
+    expect(fitsAbove({ height, composerTop: 400, topInset: 100 })).toBe(fits);
+  });
+
+  it.each([
+    [100, true],
+    [99, false],
+  ])("sees an outcome starting at %i px as in view only below a question pinned down to 100 px", (top, expected) => {
+    expect(inView({ top, bottom: 300, composerTop: 400, topInset: 100 })).toBe(expected);
+  });
+});

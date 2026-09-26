@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "re
 import type { Exchange, ExchangeId } from "../domain/exchange.ts";
 import { fitsAbove, inView, isFollowing, revealOptions } from "./logFollow.ts";
 import { prefersReducedMotion } from "./motion.ts";
+import { PINNED_QUESTION_ID } from "./PinnedQuestion.tsx";
 
 export function useLogFollow(newest: Exchange | undefined, composer: () => Element | null) {
   const logRef = useRef<HTMLOListElement>(null);
@@ -82,12 +83,17 @@ function nothingToMove(outcome: Element | null | undefined, composer: Element | 
   if (!outcome) return true;
   if (!composer) return false;
   const { top, bottom } = outcome.getBoundingClientRect();
-  return inView({ top, bottom, composerTop: composer.getBoundingClientRect().top });
+  return inView({ top, bottom, composerTop: composer.getBoundingClientRect().top, topInset: pinnedBottom() });
 }
 
 function fitsAboveComposer(outcome: Element | null | undefined, composer: Element | null): boolean {
   if (!outcome || !composer) return true;
-  return fitsAbove({ height: outcome.getBoundingClientRect().height, composerTop: composer.getBoundingClientRect().top });
+  const { height } = outcome.getBoundingClientRect();
+  return fitsAbove({ height, composerTop: composer.getBoundingClientRect().top, topInset: pinnedBottom() });
+}
+
+function pinnedBottom(): number {
+  return Math.max(0, document.getElementById(PINNED_QUESTION_ID)?.getBoundingClientRect().bottom ?? 0);
 }
 
 function newestOutcomeOf(log: HTMLOListElement | null): Element | null | undefined {

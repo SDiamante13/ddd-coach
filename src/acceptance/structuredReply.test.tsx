@@ -1,4 +1,4 @@
-import { within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { startConversation } from "../test/appDriver.tsx";
@@ -48,8 +48,8 @@ describe("Structured reply", () => {
   });
 
   it("sets the question apart as a card with its roles and the two thread lines it joins", async () => {
-    const { log } = await replyWith(LAID_OUT_REPLY);
-    const card = await within(log()).findByRole("region", { name: "Question" });
+    await replyWith(LAID_OUT_REPLY);
+    const card = await screen.findByRole("region", { name: "Question" });
 
     expect(within(card).getByText("Question for the ops lead and the finance controller, at the 27 Oct review")).toBeInTheDocument();
     expect(within(card).getByText("For load 48213, which count includes the old row, the new row, or neither?")).toBeInTheDocument();
@@ -59,12 +59,12 @@ describe("Structured reply", () => {
     ]);
   });
 
-  it("keeps the question card last when the model writes a line after it", async () => {
+  it("keeps the pinned-above chip last when the model writes a line after the question", async () => {
     const { log } = await replyWith(`${LAID_OUT_REPLY}\nHope this helps with the review.`);
-    const card = await within(log()).findByRole("region", { name: "Question" });
+    const chip = await within(log()).findByRole("button", { name: "↑ pinned above" });
 
     const stray = within(log()).getByText("Hope this helps with the review.");
-    expect(stray.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(stray.compareDocumentPosition(chip) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows the parts a cut reply has, then the cut-short note", async () => {

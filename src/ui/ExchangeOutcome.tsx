@@ -14,14 +14,15 @@ type ExchangeOutcomeProps = {
   onStartNew: () => void;
   restoreNames: RestoreNames;
   onKeep: KeepReply;
+  questionPinned: boolean;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep }: ExchangeOutcomeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, questionPinned }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
     case "replied":
-      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} />;
+      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} questionPinned={questionPinned} />;
     case "failed":
       return (
         <>
