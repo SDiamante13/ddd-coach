@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { parseCoachReply } from "./replyLayout.ts";
+import { parseCoachReply, parseLayout } from "./replyLayout.ts";
 
 const REPLY = [
   "Events, in order",
@@ -30,5 +30,13 @@ describe("parseCoachReply", () => {
 
   it("returns nothing when a part is missing", () => {
     expect(parseCoachReply(REPLY.replace("Words that don't match", "Words"))).toBeNull();
+  });
+});
+
+describe("parseLayout", () => {
+  it("reads any line between Words and the question as a word line, so a stray line still meets the labels check", () => {
+    const stray = REPLY.replace("\n\nQuestion for", "\nNo other word is used in different ways.\n\nQuestion for");
+
+    expect(parseLayout(stray).wordLines).toContain("No other word is used in different ways.");
   });
 });

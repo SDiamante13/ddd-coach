@@ -28,9 +28,9 @@ export type CoachReply = {
 export function parseLayout(reply: string): ReplyLayout {
   const lines = reply.split("\n").map((line) => line.trim());
   const positions = [lines.indexOf(EVENTS_HEADING), lines.indexOf(WORDS_HEADING), lines.findIndex(isQuestion)];
-  const [events = -1, words = -1, question = -1] = positions;
-  const eventLines = between(lines, events, words);
-  const wordLines = between(lines, words, question);
+  const [events = -1, words = -1] = positions;
+  const eventLines = between(lines, events, sectionEnd(events, positions));
+  const wordLines = between(lines, words, sectionEnd(words, positions));
   return {
     lines,
     inOrder: isAscending(positions),
@@ -64,6 +64,11 @@ export const isSourceQuote = (line: string): boolean => SOURCE_QUOTE.test(line);
 export const isNumbered = (line: string): boolean => NUMBERED.test(line);
 export const hasSourceLabel = (claim: string): boolean => SOURCE_LABEL.test(claim);
 export const withoutSourceLabel = (claim: string): string => claim.replace(SOURCE_LABEL, "");
+
+function sectionEnd(start: number, boundaries: number[]): number {
+  const later = boundaries.filter((at) => at > start);
+  return later.length === 0 ? -1 : Math.min(...later);
+}
 
 function isAscending(positions: number[]): boolean {
   return positions.every((at, i) => at >= 0 && (i === 0 || at > (positions[i - 1] ?? 0)));
