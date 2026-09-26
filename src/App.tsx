@@ -3,10 +3,15 @@ import { AccessUnreachable } from "./ui/AccessUnreachable.tsx";
 import { Attribution } from "./ui/Attribution.tsx";
 import { ConnectionTest } from "./ui/ConnectionTest.tsx";
 import { DataFlowNotice } from "./ui/DataFlowNotice.tsx";
+import { DATA_PAGE_PATH, DataPage } from "./ui/DataPage.tsx";
 import { PurposeLine } from "./ui/PurposeLine.tsx";
 import { useAccess } from "./ui/useAccess.ts";
 
 export function App() {
+  return window.location.pathname === DATA_PAGE_PATH ? <DataPage /> : <Coach />;
+}
+
+function Coach() {
   return (
     <>
       <main>

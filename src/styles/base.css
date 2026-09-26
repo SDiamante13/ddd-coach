@@ -63,7 +63,8 @@ main > .notice {
   font-weight: 400;
 }
 
-.notice a {
+.notice a,
+.data-page a {
   color: var(--color-coach-strong);
   text-underline-offset: 0.15em;
 }
@@ -757,4 +758,38 @@ table.words {
 
 .reply .citation cite {
   font-style: normal;
+}
+
+.data-page {
+  max-width: calc(60ch + 2 * var(--gutter));
+}
+
+.data-page > a {
+  align-self: flex-start;
+  font-size: var(--text-sm);
+}
+
+.data-page section {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.data-page h2 {
+  margin: 0 0 var(--space-2);
+  font: 600 var(--text-md) / var(--leading-tight) var(--font-display);
+}
+
+.data-page p,
+.data-page ul {
+  margin: 0;
+}
+
+.data-page p + p {
+  margin-top: var(--space-3);
+}
+
+.data-page ul {
+  padding-left: var(--space-5);
 }
