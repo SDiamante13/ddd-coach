@@ -7,7 +7,7 @@ The design:
 - **Layout B, "the board is the page"**, which Steven picked from `outputs/design/explore-07/`: `board-layouts.html?layout=B&state=1-4`, `explore07.mp4`, `B3.png` and `B4.png`.
 
 **Status:**
-- **Part A is done** on `modeling/4a-event-board`: `5ddc226`, `4ff0250`, `fdd2041` and `af01385`, rebased onto main `3af9bf1`. The plan's own commit is `ff221e2`.
+- **Part A is done** on `modeling/4a-event-board`: `5ddc226`, `4ff0250`, `fdd2041`, `af01385`, `90caf87` and `504f155`, rebased onto main `3af9bf1`. The plan's own commits are `ff221e2` and `0191404`.
 - **Part B below is final.**
 - The branch now includes #86, #89, #6, #58 and #100's glossary work. **Rebase again before handoff.**
 - **#100 claims neither the App shell nor the right margin.** Both belong to this slice.
@@ -17,6 +17,9 @@ The design:
 - 4a is "paste → cards". The one-sentence loop becomes its own later slice (a prompt change, A/B tested under #78).
 - One growing board, where exact repeats collapse by stable ID.
 - Layout B.
+- **The source line** is a local match, labelled "closest line in your paste" (B-D6). It's never called "source", and a per-event quote from the model isn't needed for 4a.
+- **The latest question is shown once, pinned.** The latest reply's own question card is replaced by a "↑ pinned above" chip (B-D4, B-D5).
+- **Below 1024 px the page stacks,** with the board above the conversation, per #26's desktop-first rule (B-D1). There's no drawer.
 
 ## Goal fit
 
@@ -31,15 +34,17 @@ The design:
 **What's built:**
 - `src/domain/board.ts`:
   - the types `Board`, `EventCard` (`id`, `text`, `previousText?`, `provenance`, `placedBy`, `changedBy`), `BoardAction` (`addEvent`), `Provenance` and `CardChange`;
-  - `applyAction`, `changeOf`, `previousTextOf` and `PROVENANCE_LABEL`;
-  - the later actions (`renameCard`, `connectCards`, `addQuestion`) as types only.
+  - `applyAction`, `changeOf`, `previousTextOf` and `PROVENANCE_LABEL`.
+  - The later action types were dropped until #95–#97 need them (`90caf87`).
 - `src/domain/boardFromReplies.ts`: `boardOf(exchanges)` and `eventActionsOf(reply, by)`, built on #64's `parseReply`.
 - `src/domain/entityId.ts` (frozen): `entityId(kind, text)`, which normalises case, spacing, curly quotes and trailing punctuation.
 
 **Behaviour covered by tests:**
 - exact repeats collapse;
 - a restated guess becomes FROM THREAD in place;
-- a reworded restatement keeps `previousText` for the struck-through UPDATED state;
+- a restatement that differs only in case, punctuation or quotes quietly takes the newer wording, with no mark;
+- only a provenance change marks a card UPDATED;
+- `previousText` is kept for #95's renames (`504f155`);
 - greetings, prose, pending and failed exchanges add nothing;
 - fast-check properties: idempotence, unique IDs, first-appearance order, and replay.
 
@@ -100,7 +105,7 @@ The design:
   - **Guess:** "Coach's idea", a paler `--color-card-event-guess` fill (the one new token, `#f9d4ae`), a dashed `--color-warn` border, no shadow and the label `GUESS`. A guess never passes for agreement.
 - **"Then" arrows:** ink, with an arrowhead, drawn in CSS (`li + li::before`). They're decorative, and the `<ol>` carries the order.
 - **JUST ADDED:** `changeOf === "added"` gives a dashed `--color-coach` ring and a `JUST ADDED` tag.
-- **UPDATED:** `changeOf === "updated"` gives the same treatment with an `UPDATED` tag. When `previousTextOf` is set, the old words show struck through under the new title (`<del>`), matching the sheet's "Renamed" state.
+- **UPDATED:** `changeOf === "updated"` (a provenance change, such as a guess restated from the thread) gives the same treatment with an `UPDATED` tag. The sheet's struck-through "Renamed" state arrives with #95's `renameCard`, not in 4a.
 - **The fade:** both marks fade after about 3 s in pure CSS (`animation: settle 300ms 3s forwards`, ending at `visibility: hidden`).
 - **Reduced motion:** no fade and no smooth scroll. The marks still show, then go.
 - **Selected:** the sheet's ink ring (B-D6).
@@ -108,7 +113,10 @@ The design:
   - titles: `--font-display` at weight 600, 17 px, line-height 1.18;
   - labels and tags: `--font-label` at weight 500, 11 px, uppercase, `--tracking-label`.
 
-**B-D4. ReplyView: one tiny swap only.** `ReplyView` is crowded already: the table, the question card, #102's Source and General-practice footer, and perhaps #100's drift list. So this slice changes one import and one `case` line, and nothing else. In `ReplyPart`, `case "events"` returns `<EventsOnBoard count={block.items.length} />` instead of `<EventList …/>`.
+**B-D4. ReplyView: two tiny swaps only.** `ReplyView` is crowded already: the table, the question card, #102's Source and General-practice footer, and perhaps #100's drift list. So this slice changes two `case` lines, their imports, and one boolean prop, `questionPinned`, and nothing else.
+- In `ReplyPart`, `case "events"` returns `<EventsOnBoard count={block.items.length} />` instead of `<EventList …/>`.
+- `case "question"` returns `<PinnedAboveChip />` ("↑ pinned above", which focuses the pinned card) when `questionPinned`, and `<QuestionCard …/>` otherwise.
+- `ExchangeLog` works out which exchange is the latest with a question, and threads `questionPinned` through `ExchangeOutcome` to `ReplyView`.
 - That's a button reading "← 5 events placed on the board" ("1 event" when there's one). It moves focus to the board's list.
 - `EventList.tsx` is deleted, since `ReplyView` was its only user.
 - The words table, question card, citations, RFC copy and Keep are all untouched.
@@ -116,12 +124,13 @@ The design:
 
 **B-D5. The question is pinned at the top of the margin, never covered and never scrolled away.**
 - **`PinnedQuestion`** (`src/ui/PinnedQuestion.tsx`) renders the **latest** replied exchange's question block, restored (via a pure `latestQuestionOf(exchanges)`). It's `position: sticky; top: 0` in the margin.
-  - It's an `<aside aria-label="Current question">`, deliberately not "Question", so existing `region "Question"` queries still find exactly one.
+  - It's an `<aside aria-label="Current question">` wrapping the existing `QuestionCard`. The latest reply now shows a chip instead of its card, so `region "Question"` stays unique.
   - It has `max-height: 40vh` with internal scroll, so at 577 px it can't eat the margin.
   - There's none before the first question.
 - **Its height** goes into `--pinned-reserve` through a ResizeObserver (same pattern as `useComposerReserve`), which `html` uses as `scroll-padding-top`.
 - **#89 follow:** `fitsAbove` and `inView` in `logFollow.ts` gain an optional `topInset` (default 0, so every existing test passes). `useLogFollow` passes the pinned card's bottom, so a tall reply lands on its start **below** the pinned question and above the composer.
-- **The latest reply's own question card stays in the reply,** so earlier questions stay in the history. The duplication is for the latest question only. DESIGNER should confirm it.
+- **The latest reply's question card becomes "↑ pinned above"** (Steven's decision). Earlier replies keep their own cards, so the history stays readable, and RFC copy still exports every question.
+- **Test impact:** the `structuredReply.test.tsx` question-card cases now look for the card with `screen` (it's pinned outside the log) instead of `within(log())`. "Keeps the question card last" becomes "keeps the pinned-above chip last".
 
 **B-D6. Click a card → the source popover, and the margin scrolls to the line, highlighted.**
 - **Selection:** at most one card, held in `useBoardSelection()` in `ConnectionTest`. A card toggles on click, Enter or Space, and Escape clears it. The selected card gets the sheet's "Selected" ink ring.
@@ -145,7 +154,7 @@ The design:
 - **The canned replies:**
   1. `V11_EXAMPLE_REPLY`: real v11, to "Try an example".
   2. A **hand-written**, v11-shaped reply on the same example thread: it repeats one event, adds one `From thread:` event and one `Guess:` event, and asks a new question.
-  3. A hand-written reply that restates that guess as `From thread:` in different words, to show `UPDATED` with struck-through old words.
+  3. A hand-written reply that restates that guess word for word as `From thread:`, to show `UPDATED`.
 
   They live in `src/test/boardDemoReplies.ts`, each labelled.
 - **`vite.config.ts`:** the plugin is included only when `COACH_FIXTURES === "1"`.
@@ -165,13 +174,17 @@ The design:
   - each shows `EVENT`, then `FROM THREAD` or `GUESS`, then its restored title;
   - each is marked `JUST ADDED`;
   - the header reads "N events · G guess" (plural "guesses").
-- **B4 — the board is stable.** Given a board, when a later reply repeats one event, adds two and restates a guess from the thread in new words, then:
+- **B4 — the board is stable.** Given a board, when a later reply repeats one event, adds two and restates a guess from the thread, then:
   - every existing card is **the same DOM element** (checked with `toBe`);
   - the repeat is still one card;
   - the new ones are marked `JUST ADDED`;
-  - the restated card reads `FROM THREAD`, is marked `UPDATED`, and shows its old words struck through.
+  - the restated card reads `FROM THREAD` and is marked `UPDATED`, in place.
 - **B5 — the chip replaces the list.** Given a laid-out reply, then it shows "← N events placed on the board" and no events list, and pressing the chip focuses the board. The words table, question card, RFC copy and Keep still render, and `rfcCopy` and `keptGlossary` pass unedited.
-- **B6 — the question is pinned.** Given two laid-out replies, then "Current question" shows the second reply's question at the top of the margin, and each reply still holds its own question card.
+- **B6 — the question is pinned, once.** Given two laid-out replies, then:
+  - "Current question" shows the second reply's question at the top of the margin;
+  - the second reply shows "↑ pinned above" where its card was, and pressing it focuses the pinned card;
+  - the first reply keeps its own question card;
+  - the second reply's RFC copy still includes its question.
 - **B7 — click to the source line.**
   - Given the example thread and its reply, when the visitor presses a FROM THREAD card whose words appear on one thread line, then:
     - the card is `aria-pressed="true"`;
@@ -188,6 +201,16 @@ The design:
   - with more than 5 cards, the lane pans horizontally inside the board and never wraps, and the window has no horizontal scroll;
   - at 390 px the fallback stack has no page-level horizontal scroll.
 - **B11 — motion, checked in the browser.** The marks fade after about 3 s. With `agent-browser set media light reduced-motion`, there's no fade and no smooth scroll, and the marks still appear and then go.
+- **B13 — every composer panel works in the margin, checked in the browser at 1280×577 and 1280×800.** Given a laid-out reply with its question pinned, when the visitor opens each of these in turn:
+  - "Your swaps", then adds a swap;
+  - "What's sent", with a 20k-character draft;
+  - "Glossary (N)", after pressing "Keep these words";
+
+  then, for each one:
+  - it opens inside the 360 px margin;
+  - `main.scrollWidth <= main.clientWidth`, and the window has no horizontal scroll;
+  - its controls can be reached and used (Tab to them, or scroll the composer's own overflow);
+  - the composer's `getBoundingClientRect` never intersects the pinned question card's.
 - **B12 — fixture mode never ships.** `npm run demo:board` answers three sends, and `dist/` has 0 occurrences of `board-demo-fixture`.
 
 ### Test order (outside-in, `tdd`, one failure per turn)
@@ -196,7 +219,7 @@ The design:
    - `src/domain/sourceLine.test.ts`: exact line, reworded line, below threshold, a guess never matched, a tie goes to the placing prompt. Plus fast-check properties: the result is always a slice of a prompt (`prompt.slice(start, end)` is one whole line), matching is deterministic, and a line identical to the event always matches.
    - `boardSummary`, `latestQuestionOf`;
    - `logFollow.test.ts` gains `topInset` cases, and the existing cases stay unchanged.
-2. **Styles:** `board.css` and the one token. B10 and B11 go to the verifier in the browser, since jsdom can't check layout.
+2. **Styles:** `board.css` and the one token. B10, B11 and B13 go to the verifier in the browser, since jsdom can't check layout.
 3. **Fixture mode last** (B12).
 4. **Before handoff:** rebase onto main, then run `bin/check.sh` green. The slice ends here. The Orchestrator's git-agent rebases and fast-forward merges, then its deployer and verifier take over.
 
@@ -210,13 +233,13 @@ The design:
    - one card is a dashed GUESS;
    - the board pans to the new cards;
    - the pinned question changes.
-5. **Third send.** The guess turns FROM THREAD and UPDATED, with its old words struck through.
-6. **Layout checks at 1280×577 and 1280×800** (B10), run with `eval` over the `getBoundingClientRect`s during the take. Check 390 px too.
+5. **Third send.** The guess turns FROM THREAD and UPDATED, in place.
+6. **Layout checks at 1280×577 and 1280×800** (B10), then open each composer panel at both sizes (B13), all run with `eval` over the `getBoundingClientRect`s during the take. Check 390 px too.
 7. **Reduced motion, outside the recording** (B11).
 8. **Output:**
    - `outputs/demos/slice-94.mp4`;
    - `slice-94.png` at 1280×800 during step 4;
-   - `slice-94.md` with the B10 and B11 numbers and the B12 grep.
+   - `slice-94.md` with the B10, B11 and B13 numbers and the B12 grep.
 
 ### Out of scope
 
@@ -237,20 +260,20 @@ The design:
   - the demo checks B7 against the real example thread.
 - **A pinned question at 577 px plus the composer** leaves a short margin. `max-height: 40vh`, plus `topInset` in `logFollow`, keeps "lands on its start" true. B10 checks it.
 - **`logFollow.ts` and `useLogFollow.ts` belong to #89.** The change is an optional parameter defaulting to 0, and every existing test stays unedited.
-- **Rebase friction:** `ReplyView.tsx` has a one-line swap, and `ExchangeLog`, `ExchangeEntry` and `PromptText` each gain one optional prop. Rebase first, and keep each edit one line where possible.
+- **Rebase friction:** `ReplyView.tsx` has two `case` swaps and one prop. `ExchangeLog`, `ExchangeOutcome`, `ExchangeEntry` and `PromptText` each gain one optional prop. Rebase again before handoff, and keep each edit one line where possible.
 - **`entityId.ts` is frozen.** Any need to change IDs goes to the Orchestrator, never into this branch.
 - **Card, popover and highlighted text are user material.** They render only as React text nodes.
 
-### Open questions for Steven
+### Decided (Steven)
 
-1. **The source line:** ship a local "closest line in your paste" match (this plan, $0), or wait for per-event quotes from the model (a prompt change under #78, paid)?
-2. **The latest question** shows twice, pinned and in its reply. Keep that, or hide the latest reply's card while it's pinned (a second `ReplyView` edit)?
-3. **Below 1024 px:** is the stacked fallback enough, or should narrow widths get layout B's margin as a drawer?
+1. **The source line:** a local match labelled "closest line in your paste" (B-D6).
+2. **The latest question:** shown once, pinned, with a "↑ pinned above" chip in its reply (B-D4, B-D5).
+3. **Below 1024 px:** stacked, per #26 (B-D1).
 
 ### Builder commits (Part B estimate: 5, plus sweeper ACN commits)
 
-1. `feat`: `EventBoard` beside `ExchangeLog`, with the empty, thinking and card states, the summary, stable DOM, JUST ADDED and UPDATED with struck-through words, the `ReplyView` chip swap, restored names, and a new conversation (B1–B5, B8, B9).
-2. `feat`: the pinned current question, with `--pinned-reserve` and the `logFollow` `topInset` (B6).
+1. `feat`: `EventBoard` beside `ExchangeLog`, with the empty, thinking and card states, the summary, stable DOM, JUST ADDED and UPDATED, the `ReplyView` events chip, restored names, and a new conversation (B1–B5, B8, B9).
+2. `feat`: the pinned current question, with the "↑ pinned above" chip, `--pinned-reserve` and the `logFollow` `topInset` (B6).
 3. `feat`: selecting a card opens the closest-line popover and highlights the line in the paste (B7).
-4. `feat`: the layout B page and motion (B10, B11).
+4. `feat`: the layout B page and motion, and the composer panels fitted to the 360 px margin (B10, B11, B13).
 5. `chore`: dev-only fixture mode `npm run demo:board` (B12).
