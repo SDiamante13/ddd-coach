@@ -8,6 +8,7 @@ pathfinder plan → builder test + code → committer `feat` commit → sweeper 
 
 One working tree; agents run sequentially so builder and sweeper never edit concurrently.
 
+- **Stage at request time.** A main-tree builder runs `git add <exact files>` when it sends a commit request, freezing the snapshot; it may keep editing the working tree but doesn't touch the index until the hash comes back. The committer gates and commits the staged snapshot only.
 - **Commit requests are final.** Once a request is sent to committer, never withdraw or hold it; fix forward with a follow-up commit (holds and commits crossed twice in slice 2a).
 - **`netlify dev` hot-reloads functions on every save.** Do multi-file renames in one atomic edit, or the shared dev server crashes.
 - **zsh history modifiers.** In `git show $SHA:server/...`, zsh reads `:s`/`:w`/`:h` after a bare variable as modifiers and mangles the path. Always brace it: `"${SHA}:path"`.
