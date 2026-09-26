@@ -1,0 +1,598 @@
+<meta charset="utf-8">
+<title>Priya Raman Interview 09</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground: #eef0f4;
+  --surface: #ffffff;
+  --ink: #1b2130;
+  --ink-soft: #4a5368;
+  --ink-faint: #7b849a;
+  --rule: #d6dae3;
+  --event: #f5a043;
+  --event-ink: #3d2303;
+  --hotspot: #ea5f92;
+  --hotspot-ink: #3e0a1d;
+  --actor: #f4d451;
+  --actor-ink: #3a2f02;
+  --command: #6fb1ea;
+  --command-ink: #07243d;
+  --policy: #b995e6;
+  --policy-ink: #2a1147;
+  --mark: rgba(245, 160, 67, .28);
+  --shadow: 0 1px 0 rgba(27, 33, 48, .06), 0 8px 18px -10px rgba(27, 33, 48, .35);
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #12151d;
+    --surface: #1a1f2b;
+    --ink: #e7e9ef;
+    --ink-soft: #b3b9c8;
+    --ink-faint: #818aa0;
+    --rule: #2c3343;
+    --mark: rgba(245, 160, 67, .22);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #12151d;
+  --surface: #1a1f2b;
+  --ink: #e7e9ef;
+  --ink-soft: #b3b9c8;
+  --ink-faint: #818aa0;
+  --rule: #2c3343;
+  --mark: rgba(245, 160, 67, .22);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .3), 0 10px 22px -12px rgba(0, 0, 0, .8);
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.62;
+  padding-inline: 20px;
+  padding-block: 0 80px;
+}
+.page { max-width: 1080px; margin-inline: auto; display: grid; gap: 72px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--command); outline-offset: 3px; border-radius: 4px; }
+
+/* Masthead */
+.masthead { padding-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; align-items: start; }
+.masthead h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: .98; font-weight: 800; margin-top: 14px; }
+.masthead h1 em { font-style: normal; color: var(--hotspot); }
+.dek { font-size: 19px; color: var(--ink-soft); max-width: 58ch; margin-top: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip {
+  font-family: var(--mono); font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--rule); color: var(--ink-soft); background: var(--surface);
+}
+.chip.warn { border-color: var(--hotspot); color: var(--hotspot); }
+
+.sticky {
+  position: relative;
+  padding: 18px 18px 20px;
+  box-shadow: var(--shadow);
+  border-radius: 2px;
+  font-family: var(--display);
+}
+.actor { background: var(--actor); color: var(--actor-ink); transform: rotate(1.4deg); margin-top: 10px; }
+.actor .label { color: var(--actor-ink); opacity: .7; }
+.actor h2 { font-size: 30px; font-weight: 800; margin-top: 4px; }
+.actor dl { margin: 12px 0 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.35; }
+.actor dt { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .65; }
+.actor dd { margin: 0 0 4px; font-weight: 500; }
+
+/* One-thing */
+.one-thing {
+  display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 32px;
+  border-top: 2px solid var(--ink); padding-top: 24px;
+}
+.one-thing blockquote {
+  margin: 0; font-family: var(--display); font-weight: 500;
+  font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; text-wrap: balance;
+}
+.one-thing blockquote strong { font-weight: 800; background: linear-gradient(transparent 58%, var(--mark) 58%); }
+.one-thing cite { display: block; margin-top: 14px; font-style: normal; }
+
+/* Section heads */
+.section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.section-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; }
+
+/* Board */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 12px; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+.swatch.event { background: var(--event); }
+.swatch.hotspot { background: var(--hotspot); transform: rotate(45deg) scale(.82); }
+.swatch.weak { border: 2px dashed var(--ink-faint); }
+.board {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px;
+  padding: 28px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.board .sticky { display: grid; align-content: start; gap: 10px; font-size: 15.5px; line-height: 1.32; font-weight: 500; }
+.board .sticky:nth-child(odd) { transform: rotate(-.8deg); }
+.board .sticky:nth-child(3n) { transform: rotate(.9deg); }
+.board .sticky .n { font-family: var(--mono); font-size: 11px; opacity: .65; }
+.board .sticky b { font-weight: 800; }
+.board .sticky .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.board .sticky .tags span {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em;
+  padding: 2px 6px; border: 1px solid currentColor; border-radius: 2px; opacity: .8;
+}
+.s-event { background: var(--event); color: var(--event-ink); }
+.s-hotspot { background: var(--hotspot); color: var(--hotspot-ink); }
+.s-neutral { background: var(--command); color: var(--command-ink); }
+.weak { outline: 2px dashed var(--ink-faint); outline-offset: 5px; filter: saturate(.7); }
+
+/* Transcript */
+.transcript { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: grid; gap: 4px; }
+.toc a {
+  font-family: var(--mono); font-size: 12.5px; text-decoration: none; color: var(--ink-soft);
+  padding: 6px 10px; border-left: 2px solid var(--rule);
+}
+.toc a:hover { color: var(--ink); border-left-color: var(--event); }
+.parts { display: grid; gap: 56px; }
+.part-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+.part-head .tab {
+  font-family: var(--display); font-weight: 800; font-size: 15px;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  background: var(--policy); color: var(--policy-ink); border-radius: 2px; transform: rotate(-3deg);
+}
+.part-head h3 { font-size: 24px; font-weight: 700; }
+.part-head .aside { font-family: var(--body); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.qa { display: grid; gap: 30px; }
+.q { font-family: var(--mono); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
+.q .num { color: var(--ink-faint); }
+.a { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--actor); color: var(--actor-ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 13px;
+}
+.a p { max-width: 64ch; }
+.a p + p { margin-top: 12px; }
+mark { background: linear-gradient(transparent 55%, var(--mark) 55%); color: inherit; padding: 0 1px; }
+.stage { font-style: italic; color: var(--ink-faint); font-size: 15px; margin-bottom: 20px; }
+
+/* Challenges */
+.challenges { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.challenge {
+  display: grid; grid-template-columns: 22px minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  padding: 20px 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.challenge .dot { width: 14px; height: 14px; margin-top: 6px; background: var(--hotspot); transform: rotate(45deg); border-radius: 2px; }
+.challenge h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.challenge .ref { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+.challenge p { color: var(--ink-soft); font-size: 16px; }
+
+/* Suggestions */
+.suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 24px; display: grid; gap: 14px; align-content: start;
+}
+.card header { display: flex; align-items: flex-start; gap: 14px; }
+.card .cmd {
+  flex: none; font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--command); color: var(--command-ink); padding: 5px 8px; border-radius: 2px;
+}
+.card h3 { font-size: 20px; font-weight: 700; line-height: 1.25; }
+.card .where { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); margin-top: 4px; }
+.card dl { margin: 0; display: grid; gap: 10px; font-size: 15.5px; }
+.card dt { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+.card dd { margin: 2px 0 0; }
+
+/* Next questions */
+.next { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+.next li {
+  font-family: var(--display); font-weight: 500; font-size: 17px; line-height: 1.35;
+  padding: 16px 18px; border: 2px dashed var(--rule); border-radius: 4px;
+}
+.next li::before { content: "?"; font-weight: 800; color: var(--hotspot); margin-right: 8px; }
+
+footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--ink-faint); font-size: 14.5px; max-width: 70ch; }
+
+@media (max-width: 900px) {
+  .masthead { grid-template-columns: 1fr; }
+  .actor { max-width: 320px; }
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 20px; }
+  .transcript { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; flex-wrap: wrap; }
+  .toc a { border-left: 0; border-bottom: 2px solid var(--rule); }
+  .one-thing { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; padding-inline: 16px; }
+  .page { gap: 56px; }
+  .board { grid-template-columns: 1fr; }
+  .suggestions { grid-template-columns: 1fr; }
+  .challenge { grid-template-columns: 18px minmax(0, 1fr); }
+  .challenge p { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Exploration verdict */
+.verdict { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.col {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 20px 22px 22px; display: grid; gap: 16px; align-content: start;
+  border-top: 6px solid var(--event);
+}
+.col.change { border-top-color: var(--command); }
+.col.cut { border-top-color: var(--hotspot); }
+.col-head { display: flex; align-items: center; gap: 12px; }
+.col-head .tag {
+  font-family: var(--display); font-weight: 800; font-size: 14px; padding: 4px 10px; border-radius: 2px;
+  background: var(--event); color: var(--event-ink); transform: rotate(-2deg);
+}
+.col.change .tag { background: var(--command); color: var(--command-ink); }
+.col.cut .tag { background: var(--hotspot); color: var(--hotspot-ink); }
+.col-head .count { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.col li { display: grid; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule); }
+.col li:first-child { border-top: 0; padding-top: 0; }
+.col li b { font-family: var(--display); font-weight: 700; font-size: 16.5px; line-height: 1.3; }
+.col li q { font-size: 14.5px; line-height: 1.45; color: var(--ink-soft); font-style: italic; }
+@media (max-width: 900px) {
+  .verdict { grid-template-columns: 1fr; }
+}
+</style>
+
+<main class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="label">Synthetic ICP interview 09 · concept: Exploration 08 (Words lane, drift on the board)</div>
+      <h1>“I can't check <em>an absence.</em>”</h1>
+      <p class="dek">A week after her RFC went out, the tech lead looked at the kept glossary on the board. That's a Words lane with a dated source on every row, a “≠” row for drift from a new thread, and a coach line that says “5 settled · not re-asked”. She wants the promise. She counted the chips, checked the two quotes, and found the count off by one and the drift pinned to the wrong row.</p>
+      <div class="chips">
+        <span class="chip warn">Synthetic · hypotheses only</span>
+        <span class="chip">22 questions</span>
+        <span class="chip">Concept only · stills g1–g5</span>
+        <span class="chip">#109 · #100 · #90</span>
+        <span class="chip warn">#77 · relapse</span>
+        <span class="chip">#6 · frozen</span>
+        <span class="chip">No paid calls · $0</span>
+      </div>
+    </div>
+    <aside class="sticky actor" aria-label="Persona">
+      <div class="label">Actor</div>
+      <h2>Priya Raman</h2>
+      <dl>
+        <div><dt>Role</dt><dd>Senior backend engineer, acting tech lead, 8 yrs</dd></div>
+        <div><dt>Company</dt><dd>Logistics SaaS, 40 engineers</dd></div>
+        <div><dt>Job</dt><dd>Booking RFC out Fri 30 Oct; section 4 glossary typed by hand into Confluence</dd></div>
+        <div><dt>Since 07</dt><dd>Maya edited two glossary rows unannounced; the “tender” rename thread opened Monday</dd></div>
+      </dl>
+    </aside>
+  </header>
+
+  <section class="one-thing" aria-labelledby="probe1-label">
+    <div class="label" id="probe1-label">Probe 1 · the “≠” drift row: finding or error?</div>
+    <div>
+      <blockquote><strong>Error at a glance, finding once read, mislinked once checked.</strong> Alert red plus “not kept” reads as a failed save. The “Differs from … settled 8 Oct” line and the two quotes make it a finding. But the new line (“same ref”) agrees with the row it's linked to. The true finding is that the settled row has no scope.</blockquote>
+      <cite class="label">“If I'd trusted the ≠, I'd have raised it as nights breaking Maya's rule, and Maya would have said ‘that's what I wrote’.”</cite>
+    </div>
+  </section>
+
+  <section class="one-thing" aria-labelledby="probe2-label">
+    <div class="label" id="probe2-label">Probe 2 · does “5 settled · not re-asked” build trust?</div>
+    <div>
+      <blockquote><strong>Not as designed. Yes if it opens and adds up.</strong> The page has 4 settled chips, and the retired row is counted as the fifth. “Not re-asked” can't tell <strong>checked and holds</strong> from <strong>not in this thread</strong>, while the GUESS sticky sits on finance's settled row.</blockquote>
+      <cite class="label">“‘Not re-asked’ is the right promise.” · “Two words a row, and I'd stop counting.”</cite>
+    </div>
+  </section>
+
+  <section class="one-thing" aria-labelledby="one-thing-label">
+    <div class="label" id="one-thing-label">If she could have one thing</div>
+    <div>
+      <blockquote>“<strong>Make every claim openable.</strong> The ≠ quotes the words it differs from, and ‘5 settled’ opens to five rows with two words each. I check line by line anyway. Give me the lines.”</blockquote>
+      <cite class="label">Priya, Q22. What would bring her back: a drift check against her own Confluence table, pasted in “as of today”, not a copy kept in the browser.</cite>
+    </div>
+  </section>
+
+  <section aria-labelledby="insights">
+    <div class="section-head">
+      <h2 id="insights">Insights board</h2>
+      <div class="legend" aria-label="Legend">
+        <span><i class="swatch event"></i>supports roadmap</span>
+        <span><i class="swatch hotspot"></i>hotspot: contradicts roadmap</span>
+        <span><i class="swatch weak"></i>weak signal</span>
+      </div>
+    </div>
+    <div class="board">
+      <div class="sticky s-hotspot">
+        <span class="n">01</span>
+        <span><b>The ≠ row points at the wrong row.</b> “Rebooked 48877 … same ref” agrees with “Same booking, marked REBOOKED”. The conflict is with Dana's struck rule and the settled row's missing scope.</span>
+        <div class="tags"><span>verified in source</span><span>#109 · #100</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">02</span>
+        <span><b>“5 settled” is 4 settled + 1 retired.</b> “Not re-asked” is an absence she can't check. She'd trust “holds · line” or “not in this thread” for each row.</span>
+        <div class="tags"><span>verified in source</span><span>#109 · #90</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">03</span>
+        <span><b>The labels hide the desk again.</b> “Ops, current practice” is nights (Maya). “Dana's sheet · Retired” misquotes Dana and retires the day desk's live practice.</span>
+        <div class="tags"><span>grounded 03b · 07</span><span>#77</span></div>
+      </div>
+      <div class="sticky s-hotspot">
+        <span class="n">04</span>
+        <span><b>The default button embarrasses the desk owner.</b> She'd DM Maya before raising it at the review. “Update” must take a source and strike the old row, and “Not a change” must be remembered.</span>
+        <div class="tags"><span>medium</span><span>#90</span></div>
+      </div>
+      <div class="sticky s-event">
+        <span class="n">05</span>
+        <span><b>The export is her Friday, minus three stale bits.</b> A real table with sources. But Status loses its date, the drifted row still says “Settled”, and the retired row loses its source.</span>
+        <div class="tags"><span>grounded 02 · 05c</span><span>#6 frozen</span></div>
+      </div>
+      <div class="sticky s-event weak">
+        <span class="n">06</span>
+        <span><b>The moat is the drift check, not the storage.</b> “Kept in this browser” is a fifth copy on the laptop she wiped. She'd come back to check the tender thread against her Confluence table.</span>
+        <div class="tags"><span>stated</span><span>#91 · #100</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="misreads-h">
+    <div class="section-head">
+      <h2 id="misreads-h">Exploration 08: what she'd keep, change, distrust</h2>
+      <span class="label">Stills g1–g5 · glossary-board.html ?state=1–5</span>
+    </div>
+    <div class="verdict">
+      <div class="col keep">
+        <div class="col-head"><span class="tag">Keep</span><span class="count">4 items</span></div>
+        <ul>
+          <li><b>A dated, real source on every row</b><q>That's the first glossary tool I've seen that does that without me asking.</q></li>
+          <li><b>Drift inside the term, not in a separate list</b><q>It's a finding: this thread says something that my settled row doesn't.</q></li>
+          <li><b>Two quotes under the drift question</b><q>That's what I asked for last time: the two lines, printed under the question.</q></li>
+          <li><b>Export as a real table, retired rows kept as history</b><q>That's forty minutes of my Friday.</q></li>
+        </ul>
+      </div>
+      <div class="col change">
+        <div class="col-head"><span class="tag">Change</span><span class="count">5 items</span></div>
+        <ul>
+          <li><b>Style drift as an open question, not an alert. “Not kept” → “New in this thread · not in your glossary yet”</b><q>My first read was that it failed to save.</q></li>
+          <li><b>“Differs from” quotes the clause it contradicts, or says “your row doesn't cover lane changes”</b><q>Same ref, same booking. Those two agree.</q></li>
+          <li><b>Desk names: “Ops, nights (Maya)”, not “current practice”</b><q>It's view B with a nicer name.</q></li>
+          <li><b>Add “Ask the owner first”, and don't make the review the default</b><q>The default button is the one that embarrasses Maya.</q></li>
+          <li><b>Export: “Settled 8 Oct · raised 14 Oct”, and keep the retired row's source</b><q>The question changed and the cell didn't.</q></li>
+        </ul>
+      </div>
+      <div class="col cut">
+        <div class="col-head"><span class="tag">Distrust</span><span class="count">4 items</span></div>
+        <ul>
+          <li><b>“5 settled” (off by one) and “not re-asked” (checked or skipped?)</b><q>I can't check an absence.</q></li>
+          <li><b>“Dana's sheet · Retired · A new booking for any change”</b><q>That's Dana misquoted and then struck through, on the same line.</q></li>
+          <li><b>“Settled · 29 Sep” sourced to a Slack line, with no one named as settling it</b><q>A Slack line isn't a settlement.</q></li>
+          <li><b>“Kept in this browser”</b><q>So this is a fifth copy, and it goes stale the first time Maya touches the page.</q></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="transcript" aria-labelledby="transcript-h">
+    <nav class="toc" aria-label="Transcript parts">
+      <h2 id="transcript-h" class="label" style="font-family: var(--mono); margin-bottom: 10px;">Transcript</h2>
+      <a href="#part-a">A · Since 07</a>
+      <a href="#part-b">B · Board at rest</a>
+      <a href="#part-c">C · The ≠ row</a>
+      <a href="#part-d">D · 5 settled</a>
+      <a href="#part-e">E · Decide, export</a>
+      <a href="#part-f">F · Close</a>
+    </nav>
+    <div class="parts">
+      <div id="part-a">
+        <div class="part-head"><span class="tab">A</span><h3>Since interview 07</h3><span class="aside">Wed 28 Oct → Wed 4 Nov</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q1</span><span>The RFC went out Friday. Where does the glossary live now?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Section 4 of the Confluence page. It's a table I typed: term, team, meaning, and a source column, because Marcus asked for one. Eleven rows. Maya has already edited two of them in the page, on Monday, and didn't tell me. I found out because I checked the page history. <mark>It's been right for four days, and I'm already not the only one editing it.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q2</span><span>Any other copies?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>My text file on the work laptop, which is now behind Confluence by Maya's two edits. The Claude chat from September, which is behind by about a month. That's the same as in September, when it was right in two places and wrong in two. The difference is that now there's one I trust, the Confluence page, because it has history.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q3</span><span>And the tender thread?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's started. Carrier integrations want “tender” to mean the EDI 204 we send, and ops use it for the phone call to the carrier too. It's the same shape as booking. I haven't pasted it anywhere, because it's a fresh sanitizing job.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-b">
+        <div class="part-head"><span class="tab">B</span><h3>The board at rest</h3><span class="aside">still g1</span></div>
+        <p class="stage">She read g1 for about ninety seconds without speaking.</p>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q4</span><span>What is this screen to you?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>My section 4, on the board. Term cards, one row per team, a date and a source on every row. <mark>Every row has a source. That's the first glossary tool I've seen that does that without me asking.</mark> “late” isn't ours, though. Account team, contract §4: that's your example thread. I'll ignore it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q5</span><span>Anything you'd check first?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“Ops, Dana's sheet, retired 8 Oct”. Retired by whom? The day desk still works off Dana's sheet. They did on the 28th, when I read your three replies. And “A new booking for any change” isn't what Dana said. She told me at the end of September that a same-carrier date change is AMENDED and only a lane change is a new booking. <mark>That's Dana misquoted and then struck through, on the same line.</mark> If that went into the RFC, the day desk would read it as their sheet being wrong, and it isn't even their sheet.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q6</span><span>And “Ops, current practice”?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>That's the night desk. Maya wrote it, and Maya runs nights. Calling it “current practice” makes it sound like all of Ops. <mark>It's view B with a nicer name.</mark> Last time I asked you for “Ops, night desk” instead of letters. This is the same problem again, a label that hides which desk.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q7</span><span>“Kept in this browser”?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Which browser? This is my personal laptop. I wiped every sanitized copy off it on the 22nd. The real glossary is in Confluence, and Maya edits it. <mark>So this is a fifth copy, and it goes stale the first time Maya touches the page.</mark> The per-card “Kept 8 Oct” date helps: I can see how old it is. But nothing tells me it's older than Confluence.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-c">
+        <div class="part-head"><span class="tab">C</span><h3>Probe 1: the “≠” drift row</h3><span class="aside">still g3</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q8</span><span>First impression of the row with the ≠. Don't read it closely yet.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Red, dashed, “not kept”. <mark>My first read was that it failed to save.</mark> Dashed red is what our Retool screens do for a validation error. “Not kept” reads like “we couldn't keep this”. The ≠ I didn't see as “not equal” at first. It looked like an icon for “blocked”.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q9</span><span>Now read it.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>“Differs from ‘Ops, current practice’, settled 8 Oct”. OK, that line turns it around. It's a finding: this thread says something that my settled row doesn't. And the question card has both lines under it, the new one and the kept one. <mark>That's what I asked for last time: the two lines, printed under the question.</mark> I'd check them in ten seconds.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q10</span><span>Check them.</span></div>
+            <p class="stage">She read the two quotes, then the settled row, then the retired row.</p>
+            <div class="a"><span class="avatar">PR</span><div><p>It doesn't hold. The night desk line says “rebooked 48877 onto the Laredo lane, same ref”. The settled row says “Same booking, marked REBOOKED”. <mark>Same ref, same booking. Those two agree.</mark> The settled row never says what changes it covers: dates, lanes, carriers. So there's nothing about a lane change for it to differ from. What the night desk line really contradicts is Dana's rule, that a lane change is a new booking, and that's the row you've struck out. The coach's question knows this. “Or is that a new booking under current practice?” But the row it points at doesn't say it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q11</span><span>So finding or error?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>A finding, but not the one it's labelled as. The real finding is that my settled row is missing its scope. That's worth knowing before the 27th, because Tom would have found it in the room. But I only got there by reading line by line, and the arrow points at the wrong row. <mark>If I'd trusted the ≠, I'd have raised it as nights breaking Maya's rule, and Maya would have said “that's what I wrote”.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q12</span><span>What would make it read as a finding at a glance?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Three things. Don't make it red like an error. The open chips are pink, so make it look like an open question, which is what it is. Say “new in this thread, not in your glossary yet” instead of “not kept”. And make “Differs from” quote the words it differs from, not the row's name. If there are no words to quote, say “your row doesn't cover lane changes”. That's still a finding, and it's the true one.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-d">
+        <div class="part-head"><span class="tab">D</span><h3>Probe 2: “5 settled · not re-asked”</h3><span class="aside">still g3</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q13</span><span>“1 drift · 5 settled · not re-asked”. Does that make you trust it more?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>The idea, yes. The best thing about the 27th was that nobody asked what a booking is. Something that won't reopen a settled word is something I'd want. What I've dreaded since July is a tool that re-asks the same question every Sunday. <mark>“Not re-asked” is the right promise.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q14</span><span>And the chip itself?</span></div>
+            <p class="stage">She counted the green chips on g3.</p>
+            <div class="a"><span class="avatar">PR</span><div><p>Four. Finance and Ops under booking, current practice and Code under rebook. The header says five settled and so does the coach. <mark>The fifth is Dana's retired row, counted as settled.</mark> So the first number I checked is wrong. That's the whole problem with a count. I can't click it, so I count by hand, and it's off by one.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q15</span><span>Suppose the count were right.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Then I'd want to know what “not re-asked” means. Did it check finance's row and find it holds, or did it not look? The third sticky is “Finance invoices both rows?”, which is finance's “booking = invoiceable” row sitting right there, and the chip says it wasn't re-asked. Was that a check, or a skip? <mark>“Not re-asked” is a claim about something that didn't happen, and I can't check an absence.</mark> It's the summary problem again. Show me the board, not a summary of it.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q16</span><span>What would build trust?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Let me open it, with one line per row. “Holds: thread line 22:14 says invoiceable at POD.” Or “Not in this thread.” Two words each. Then “5 settled” means something, because I can see which kind of five it is. Five holds is great. Five not-mentioned is just silence. <mark>Two words a row, and I'd stop counting.</mark></p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-e">
+        <div class="part-head"><span class="tab">E</span><h3>Deciding and exporting</h3><span class="aside">stills g4, g5</span></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q17</span><span>The three buttons. Which would you press?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Not the blue one. “Raise at the review” puts nights' practice in front of finance before I've asked Maya about it. It's her desk. I'd DM her first. Half the time the answer is “yes, Laredo's a special case” and it never needs a room. There's no button for “ask the owner first”. <mark>The default button is the one that embarrasses Maya.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q18</span><span>“Update the kept row”?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>One click that rewrites a row Maya wrote, with no source for the new version? No. If I update it, the new row needs its own source and date, and the old one should be struck the way Dana's is, not overwritten. “Not a change” worries me too. If I press it, will the next thread flag the same thing again? It should remember, and say so.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q19</span><span>The export.</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>It's the table I typed by hand, as a real table, with dates and sources in every row. <mark>That's forty minutes of my Friday.</mark> Three things stop me pasting it as is. The rebook row still says “Settled” with no date, while open question 1 says nights disagree. By the rule from 15 October, one check has to update the cell, the question and the line. Here the question changed and the cell didn't, so the cell is stale the moment I paste it. It should read “Settled 8 Oct · raised 14 Oct”.</p><p>Second, the board said “Settled · 8 Oct” and the export dropped the date, which is the part Marcus reads. Third, the retired row's source is now “Retired 8 Oct 2026”. Where it came from has been replaced by when it died. I'd want both.</p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q20</span><span>The struck-through row in the RFC?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>For history, I like it. But not with Dana's name on a meaning she didn't hold, in a doc the day desk reads. Put the history under the table, with the right quote.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="part-f">
+        <div class="part-head"><span class="tab">F</span><h3>Close</h3></div>
+        <div class="qa">
+          <div>
+            <div class="q"><span class="num">Q21</span><span>Would a Words lane like this change what you do with the tender thread?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>If it could start from my Confluence section 4, yes. I'd paste the table in, as of today, then the tender thread, and see what drifts. That's the one job nothing else does. Company Claude would happily re-answer “what is a booking” every time. What it won't do is tell me that nights now use tender for the phone call when my table says EDI. <mark>The drift check is the part I'd come back for. The kept copy in a browser is the part I don't trust.</mark></p></div></div>
+          </div>
+          <div>
+            <div class="q"><span class="num">Q22</span><span>The one thing to change?</span></div>
+            <div class="a"><span class="avatar">PR</span><div><p>Make every claim openable: the ≠ quotes the words it differs from, and “5 settled” opens to five rows with two words each. I check line by line anyway. Give me the lines.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="challenges-h">
+    <div class="section-head">
+      <h2 id="challenges-h">Roadmap hotspots</h2>
+      <span class="label">Assumptions this interview challenges</span>
+    </div>
+    <div class="challenges">
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A “≠” linked to a row is self-explaining</h3><div class="ref">#109 · #100</div></div>
+        <p>Keep the ≠ inside the term and the two quotes under the question. Style it as an open question, not an alert, and rename “not kept”. “Differs from” must quote a clause. Add a #100 gate case where the new line agrees with the linked row's words but breaks its unstated scope: the expected output is “row doesn't cover X”.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>A count of settled rows builds trust</h3><div class="ref">#109 · #90</div></div>
+        <p>Only if it's right and it opens. Fix the count (retired rows are not settled) and add an acceptance check that the count equals the settled chips. Each settled row shows “holds · &lt;line&gt;” or “not in this thread”.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>“Settled” needs no owner</h3><div class="ref">#90 · M1</div></div>
+        <p>A Slack line isn't a settlement. “Settled by &lt;owner&gt;, &lt;date&gt;”, as Marcus asked: doubt labels are credible when owned and dated.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Raising drift at the review is the natural default</h3><div class="ref">#90</div></div>
+        <p>Add “Ask the owner first”. “Update the kept row” requires a source and strikes the old row. “Not a change” is remembered and says so.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Desk names are solved once #77 lands</h3><div class="ref">#77</div></div>
+        <p>“Current practice” and “Dana's sheet” are new desk-hiding labels. Group names must be desk names in the kept glossary too, in their own words (“nights”).</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>Keeping the glossary in the browser is the moat</h3><div class="ref">#91 · #100</div></div>
+        <p>For her, the pull is the drift check against her own Confluence table. A paste-in “as of today” is the entry point. Browser storage alone reads as another stale copy.</p>
+      </div>
+      <div class="challenge">
+        <i class="dot"></i>
+        <div><h3>The export is ready for the RFC</h3><div class="ref">#6 (frozen)</div></div>
+        <p>These notes are logged but not acted on. When #6 unfreezes, Status carries a date, a raised row updates its cell (05c rule), and retired rows keep their source.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="next-h">
+    <div class="section-head">
+      <h2 id="next-h">Questions for the next interview</h2>
+      <span class="label">Synthetic follow-ups · #70 questions stay reserved</span>
+    </div>
+    <ul class="next">
+      <li>If #109 ships with an openable “settled”, does she still count chips by hand? How long does opening the list take?</li>
+      <li>Her Confluence section 4 plus the tender thread: is the first drift flag true when checked line by line?</li>
+      <li>Does “Ask the owner first” get used, and does Maya accept a flagged row in a DM?</li>
+      <li>For #70: “Here's your glossary and a new thread. Which flag would you check first, and did it hold?”</li>
+    </ul>
+  </section>
+
+  <footer>
+    A composite persona played by an AI agent, from the ICP avatar in <code>outputs/market-research/icp-avatar.md</code>. She reacted to the DESIGNER's Exploration 08 (<code>outputs/design/explore-08/</code>, <code>glossary-board.html ?state=1–5</code>, stills g1–g5), a concept with mock data. The settled-count and drift-quote findings were checked against that page's source. Her Confluence page, Maya's edits, the tender thread and her reactions are synthetic. Use these findings to decide what to ask real DDD practitioners. They are not evidence on their own.
+  </footer>
+
+</main>
