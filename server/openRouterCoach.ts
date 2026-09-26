@@ -9,7 +9,7 @@ import type { Conversation, Turn } from "../src/domain/conversation.ts";
 import { glossaryContext } from "./glossaryContext.ts";
 import { coachProvider } from "../src/shared/coachProvider.ts";
 import { field, stringField } from "../src/shared/json.ts";
-import { CoachOutOfCredit, type Coach } from "./coach.ts";
+import { CoachBusy, CoachKeyRejected, CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { CoachConfig } from "./config.ts";
 import { endOnCompleteLine } from "./replyEnding.ts";
 
@@ -35,12 +35,27 @@ export function createOpenRouterCoach(
   };
 }
 
+const UNAUTHORIZED = 401;
 const PAYMENT_REQUIRED = 402;
+const IN_FLIGHT_BUDGET_SOURCE = "openrouter_in_flight_budget";
 const SPENT_BUDGET_SOURCES: readonly (string | undefined)[] = ["openrouter_key_limit", "openrouter_credits"];
 
 function asCoachError(error: unknown): never {
   if (isBudgetSpent(error)) throw new CoachOutOfCredit();
+  if (statusCodeOf(error) === UNAUTHORIZED) throw new CoachKeyRejected();
+  const retryAfterSeconds = inFlightRetryAfterOf(error);
+  if (retryAfterSeconds !== undefined) throw new CoachBusy(retryAfterSeconds);
   throw error;
+}
+
+function inFlightRetryAfterOf(error: unknown): number | undefined {
+  if (!isPaymentRequired(error) || limitSourceOf(error) !== IN_FLIGHT_BUDGET_SOURCE) return undefined;
+  return retryAfterSecondsOf(field(error, "headers"));
+}
+
+function retryAfterSecondsOf(headers: unknown): number | undefined {
+  const value = headers instanceof Headers ? headers.get("Retry-After") : null;
+  return value !== null && /^\d+$/.test(value.trim()) ? Number(value) : undefined;
 }
 
 function isBudgetSpent(error: unknown): boolean {
@@ -61,7 +76,11 @@ function parsedOrNull(text: string | undefined): unknown {
 }
 
 function isPaymentRequired(error: unknown): boolean {
-  return typeof error === "object" && error !== null && "statusCode" in error && error.statusCode === PAYMENT_REQUIRED;
+  return statusCodeOf(error) === PAYMENT_REQUIRED;
+}
+
+function statusCodeOf(error: unknown): unknown {
+  return field(error, "statusCode");
 }
 
 function chatRequest(

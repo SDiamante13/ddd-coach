@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createChatHandler, type CoachFailureLog } from "./chatHandler.ts";
 import type { Conversation } from "../src/domain/conversation.ts";
-import { CoachOutOfCredit, type Coach } from "./coach.ts";
+import { CoachBusy, CoachOutOfCredit, type Coach } from "./coach.ts";
 import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import { COACH_GLOSSARY_TOO_LONG, COACH_OUT_OF_CREDIT, CUT_SHORT_NOTE, MAX_MESSAGE_CHARS } from "../src/shared/chatContract.ts";
@@ -98,7 +98,7 @@ describe("chat handler", () => {
     const response = await handler()(post(JSON.stringify({ message: "Next", history: [], glossary: Array.from({ length: 61 }, () => row) })));
 
     expect(response.status).toBe(413);
-    expect(await response.json()).toEqual({ error: COACH_GLOSSARY_TOO_LONG });
+    expect(await response.json()).toEqual({ error: COACH_GLOSSARY_TOO_LONG, reason: "glossary_too_long" });
     expect(COACH_GLOSSARY_TOO_LONG).toBe("Your kept glossary is too big to send. Remove some rows, then send again.");
   });
 
@@ -177,6 +177,7 @@ describe("chat handler", () => {
       error:
         "That message couldn't be checked, so it was skipped. Send it again. " +
         "If it keeps happening, copy the conversation and start a new conversation.",
+      reason: "unverified",
     });
     expect(coach.reply).not.toHaveBeenCalled();
   });
@@ -210,7 +211,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(500);
-    expect(await response.json()).toEqual({ error: "OPENROUTER_API_KEY is not set." });
+    expect(await response.json()).toEqual({ error: "OPENROUTER_API_KEY is not set.", reason: "unavailable" });
     expect(createCoach).not.toHaveBeenCalled();
   });
 
@@ -222,7 +223,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(500);
-    expect(await response.json()).toEqual({ error: "COACH_SIGNING_KEY is not set." });
+    expect(await response.json()).toEqual({ error: "COACH_SIGNING_KEY is not set.", reason: "unavailable" });
     expect(createCoach).not.toHaveBeenCalled();
   });
 
@@ -234,11 +235,21 @@ describe("chat handler", () => {
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(500);
-    expect(await response.json()).toEqual({ error: "ACCESS_PASSWORD is not set." });
+    expect(await response.json()).toEqual({ error: "ACCESS_PASSWORD is not set.", reason: "unavailable" });
     expect(createCoach).not.toHaveBeenCalled();
   });
 
-  it("hides provider failure details behind a generic 502", async () => {
+  it("checks access config first, then the signing key, then the provider, as unlock and session do (#74)", async () => {
+    const access: AccessPasswordResult = { ok: false, error: "ACCESS_PASSWORD is not set." };
+    const signingKey: SigningKeyResult = { ok: false, error: "COACH_SIGNING_KEY is not set." };
+    const config: ConfigResult = { ok: false, error: "OPENROUTER_API_KEY is not set." };
+    const request = () => postMessage("Hello coach");
+
+    expect((await (await handler({ access, signingKey, config })(request())).json()).error).toBe("ACCESS_PASSWORD is not set.");
+    expect((await (await handler({ signingKey, config })(request())).json()).error).toBe("COACH_SIGNING_KEY is not set.");
+  });
+
+  it("hides provider failure details behind a generic 502 whose reason is unavailable (#74)", async () => {
     const failingCoach = (): Coach => ({
       reply: () => Promise.reject(new Error("Unauthorized: bad key sk-or-test-key")),
     });
@@ -248,7 +259,7 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(502);
     const body = await response.text();
-    expect(JSON.parse(body)).toEqual({ error: "The coach is unavailable. Try again." });
+    expect(JSON.parse(body)).toEqual({ error: "The coach is unavailable. Try again.", reason: "unavailable" });
     expect(body).not.toContain("sk-or-test-key");
   });
 
@@ -275,8 +286,22 @@ describe("chat handler", () => {
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({ error: COACH_OUT_OF_CREDIT });
+    expect(await response.json()).toEqual({ error: COACH_OUT_OF_CREDIT, reason: "credit_exhausted" });
     expect(log).toHaveBeenCalledWith({ name: "CoachOutOfCredit", statusCode: 402 });
+  });
+
+  it("says when to try again, as reason unavailable, when the coach is briefly busy (#74)", async () => {
+    const busyCoach = (): Coach => ({ reply: () => Promise.reject(new CoachBusy(20)) });
+
+    const response = await handler({ createCoach: busyCoach })(postMessage("Hello coach"));
+
+    expect(response.status).toBe(502);
+    expect(response.headers.get("Retry-After")).toBe("20");
+    expect(await response.json()).toEqual({
+      error: "The coach is unavailable. Try again in 20 s.",
+      reason: "unavailable",
+      retryAfterSeconds: 20,
+    });
   });
 
   it("gives up with a 504 when the coach does not answer before the deadline", async () => {
@@ -286,7 +311,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(504);
-    expect(await response.json()).toEqual({ error: "The coach took too long. Try a shorter question or Retry." });
+    expect(await response.json()).toEqual({ error: "The coach took too long. Try a shorter question or Retry.", reason: "timed_out" });
   });
 
   it("logs a missed deadline as a Timeout", async () => {
@@ -306,7 +331,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("Hello coach"));
 
     expect(response.status).toBe(502);
-    expect(await response.json()).toEqual({ error: "The coach sent an empty reply. Try again." });
+    expect(await response.json()).toEqual({ error: "The coach sent an empty reply. Try again.", reason: "empty_reply" });
   });
 
   it("rejects a body that is not JSON as a bad request", async () => {
@@ -346,6 +371,7 @@ describe("chat handler", () => {
     expect(response.status).toBe(413);
     expect(await response.json()).toEqual({
       error: "This conversation is too long for the coach. Copy the conversation, then start a new conversation.",
+      reason: "conversation_too_long",
     });
     expect(coach.reply).not.toHaveBeenCalled();
   });
@@ -357,7 +383,10 @@ describe("chat handler", () => {
     const response = await handle(postMessage("M".repeat(MAX_MESSAGE_CHARS + 1)));
 
     expect(response.status).toBe(413);
-    expect(await response.json()).toEqual({ error: "This message is too long for the coach. Shorten it and send it again." });
+    expect(await response.json()).toEqual({
+      error: "This message is too long for the coach. Shorten it and send it again.",
+      reason: "message_too_long",
+    });
     expect(coach.reply).not.toHaveBeenCalled();
   });
 
@@ -368,7 +397,10 @@ describe("chat handler", () => {
     const response = await handle(post(paddedBodyOf(MAX_BODY_BYTES + 1)));
 
     expect(response.status).toBe(413);
-    expect(await response.json()).toEqual({ error: "This message is too long for the coach. Shorten it and send it again." });
+    expect(await response.json()).toEqual({
+      error: "This message is too long for the coach. Shorten it and send it again.",
+      reason: "message_too_long",
+    });
     expect(coach.reply).not.toHaveBeenCalled();
   });
 
@@ -424,6 +456,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage(42));
 
     expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "Send a message.", reason: "malformed" });
   });
 
   const [validExp = "", validMac = ""] = validAccessCookie.slice("coach_access=".length).split(".");
@@ -445,8 +478,14 @@ describe("chat handler", () => {
     const response = await handle(post(JSON.stringify({ message: "Hello coach", history: [] }), cookie));
 
     expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: ACCESS_REQUIRED });
+    expect(await response.json()).toEqual({ error: ACCESS_REQUIRED, reason: "access_expired" });
     expect(createCoach).not.toHaveBeenCalled();
+  });
+
+  it("keeps a refusal for missing access out of caches (#74)", async () => {
+    const response = await handler()(post(JSON.stringify({ message: "Hello coach", history: [] }), null));
+
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
   });
 
   it("refuses a request without access before reading its body", async () => {

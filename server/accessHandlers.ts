@@ -5,7 +5,7 @@ import type { AccessPasswordResult, SigningKeyResult } from "./config.ts";
 import { readJsonWithin } from "./requestBody.ts";
 
 export type AccessDeps = { access: AccessPasswordResult; signingKey: SigningKeyResult; now: () => Date };
-type Gatekeeper = { ok: true; pass: AccessPass; password: string } | { ok: false; error: string };
+type Gatekeeper = { ok: true; pass: AccessPass; password: string; signingKey: string } | { ok: false; error: string };
 
 const MAX_UNLOCK_BYTES = 1024;
 const NO_STORE = { "Cache-Control": "no-store" };
@@ -31,10 +31,11 @@ export function createSessionHandler(deps: AccessDeps) {
   };
 }
 
-function gatekeeperOf({ access, signingKey }: AccessDeps): Gatekeeper {
+export function gatekeeperOf({ access, signingKey }: Omit<AccessDeps, "now">): Gatekeeper {
   if (!access.ok) return access;
   if (!signingKey.ok) return signingKey;
-  return { ok: true, pass: createAccessPass(signingKey.key, access.password), password: access.password };
+  const pass = createAccessPass(signingKey.key, access.password);
+  return { ok: true, pass, password: access.password, signingKey: signingKey.key };
 }
 
 async function passwordIn(request: Request): Promise<string | undefined> {

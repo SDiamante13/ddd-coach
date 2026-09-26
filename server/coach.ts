@@ -12,3 +12,21 @@ export class CoachOutOfCredit extends Error {
     super("The coach's usage budget is spent.");
   }
 }
+
+export class CoachKeyRejected extends Error {
+  override name = "CoachKeyRejected";
+  readonly statusCode = 401;
+
+  constructor() {
+    super("The provider rejected the coach's API key: it has expired or is invalid.");
+  }
+}
+
+export class CoachBusy extends Error {
+  override name = "CoachBusy";
+  readonly statusCode = 402;
+
+  constructor(readonly retryAfterSeconds: number) {
+    super("The coach's in-flight budget is briefly used up.");
+  }
+}

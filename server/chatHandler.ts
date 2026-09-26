@@ -1,17 +1,21 @@
 import { ACCESS_REQUIRED } from "../src/shared/accessContract.ts";
 import {
+  COACH_EMPTY_REPLY,
   COACH_GLOSSARY_TOO_LONG,
+  COACH_MALFORMED,
   COACH_MESSAGE_TOO_LONG,
   COACH_OUT_OF_CREDIT,
   COACH_TIMED_OUT,
   COACH_TOO_LONG,
   COACH_UNAVAILABLE,
   COACH_UNVERIFIED,
+  coachUnavailableFor,
+  type ChatFailureReason,
   type ChatResponseBody,
 } from "../src/shared/chatContract.ts";
 import { parseChatRequest, type RejectionReason } from "./chatRequest.ts";
-import { CoachOutOfCredit, type Coach } from "./coach.ts";
-import { createAccessPass } from "./accessPass.ts";
+import { CoachBusy, CoachOutOfCredit, type Coach } from "./coach.ts";
+import { gatekeeperOf } from "./accessHandlers.ts";
 import type { AccessPasswordResult, CoachConfig, ConfigResult, SigningKeyResult } from "./config.ts";
 import { TIMED_OUT, withDeadline } from "./deadline.ts";
 import { MAX_BODY_BYTES, readJsonWithin } from "./requestBody.ts";
@@ -25,6 +29,7 @@ import {
 export type CoachFailure = { name: string; statusCode: number | undefined };
 export type CoachFailureLog = (failure: CoachFailure) => void;
 
+const NO_STORE = { "Cache-Control": "no-store" };
 const MISSED_DEADLINE: CoachFailure = { name: "Timeout", statusCode: undefined };
 
 type VetReply = (reply: string) => string;
@@ -42,12 +47,11 @@ type ChatHandlerDeps = CoachCallDeps & {
 export function createChatHandler({ access, now, config, createCoach, signingKey, ...deps }: ChatHandlerDeps) {
   return async (request: Request): Promise<Response> => {
     if (request.method !== "POST") return methodNotAllowed();
+    const gatekeeper = gatekeeperOf({ access, signingKey });
+    if (!gatekeeper.ok) return misconfigured(gatekeeper.error);
     if (!config.ok) return misconfigured(config.error);
-    if (!signingKey.ok) return misconfigured(signingKey.error);
-    if (!access.ok) return misconfigured(access.error);
-    const pass = createAccessPass(signingKey.key, access.password);
-    if (!pass.admits(request.headers.get("Cookie"), now())) return accessRequired();
-    const signer = createTurnSigner(signingKey.key);
+    if (!gatekeeper.pass.admits(request.headers.get("Cookie"), now())) return accessRequired();
+    const signer = createTurnSigner(gatekeeper.signingKey);
     const received = await readJsonWithin(request, MAX_BODY_BYTES);
     if (!received.ok) return rejected("messageTooLong");
     const parsed = parseChatRequest(received.body);
@@ -63,26 +67,26 @@ function methodNotAllowed(): Response {
 }
 
 function accessRequired(): Response {
-  return respond({ error: ACCESS_REQUIRED }, { status: 401 });
+  return respond({ error: ACCESS_REQUIRED, reason: "access_expired" }, { status: 401, headers: NO_STORE });
 }
 
 function misconfigured(error: string): Response {
-  return respond({ error }, { status: 500 });
+  return respond({ error, reason: "unavailable" }, { status: 500 });
 }
 
 type Refusal = RejectionReason | "unverified";
 
-const REJECTIONS: Record<Refusal, { error: string; status: number }> = {
-  malformed: { error: "Send a message.", status: 400 },
-  tooLong: { error: COACH_TOO_LONG, status: 413 },
-  messageTooLong: { error: COACH_MESSAGE_TOO_LONG, status: 413 },
-  glossaryTooLong: { error: COACH_GLOSSARY_TOO_LONG, status: 413 },
-  unverified: { error: COACH_UNVERIFIED, status: 400 },
+const REJECTIONS: Record<Refusal, { error: string; status: number; reason: ChatFailureReason }> = {
+  malformed: { error: COACH_MALFORMED, status: 400, reason: "malformed" },
+  tooLong: { error: COACH_TOO_LONG, status: 413, reason: "conversation_too_long" },
+  messageTooLong: { error: COACH_MESSAGE_TOO_LONG, status: 413, reason: "message_too_long" },
+  glossaryTooLong: { error: COACH_GLOSSARY_TOO_LONG, status: 413, reason: "glossary_too_long" },
+  unverified: { error: COACH_UNVERIFIED, status: 400, reason: "unverified" },
 };
 
 function rejected(reason: Refusal): Response {
-  const { error, status } = REJECTIONS[reason];
-  return respond({ error }, { status });
+  const { status, ...body } = REJECTIONS[reason];
+  return respond(body, { status });
 }
 
 async function replyFrom(
@@ -96,8 +100,14 @@ async function replyFrom(
     return replied(reply === TIMED_OUT ? reply : vetReply(reply), conversation.prompt, signer);
   } catch (error) {
     log(failureOf(error));
-    return error instanceof CoachOutOfCredit ? coachOutOfCredit() : coachUnavailable();
+    return failedReply(error);
   }
+}
+
+function failedReply(error: unknown): Response {
+  if (error instanceof CoachOutOfCredit) return coachOutOfCredit();
+  if (error instanceof CoachBusy) return coachBusy(error.retryAfterSeconds);
+  return coachUnavailable();
 }
 
 function failureOf(error: unknown): CoachFailure {
@@ -119,19 +129,24 @@ function replied(reply: string | typeof TIMED_OUT, prompt: string, signer: TurnS
 }
 
 function coachTooSlow(): Response {
-  return respond({ error: COACH_TIMED_OUT }, { status: 504 });
+  return respond({ error: COACH_TIMED_OUT, reason: "timed_out" }, { status: 504 });
 }
 
 function emptyReply(): Response {
-  return respond({ error: "The coach sent an empty reply. Try again." }, { status: 502 });
+  return respond({ error: COACH_EMPTY_REPLY, reason: "empty_reply" }, { status: 502 });
 }
 
 function coachOutOfCredit(): Response {
-  return respond({ error: COACH_OUT_OF_CREDIT }, { status: 503 });
+  return respond({ error: COACH_OUT_OF_CREDIT, reason: "credit_exhausted" }, { status: 503 });
+}
+
+function coachBusy(retryAfterSeconds: number): Response {
+  const body = { error: coachUnavailableFor(retryAfterSeconds), reason: "unavailable", retryAfterSeconds } as const;
+  return respond(body, { status: 502, headers: { "Retry-After": String(retryAfterSeconds) } });
 }
 
 function coachUnavailable(): Response {
-  return respond({ error: COACH_UNAVAILABLE }, { status: 502 });
+  return respond({ error: COACH_UNAVAILABLE, reason: "unavailable" }, { status: 502 });
 }
 
 function respond(body: ChatResponseBody, init?: ResponseInit): Response {

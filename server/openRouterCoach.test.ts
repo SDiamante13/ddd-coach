@@ -6,10 +6,11 @@ import {
   BadGatewayResponseError,
   OpenRouterDefaultError,
   PaymentRequiredResponseError,
+  UnauthorizedResponseError,
 } from "@openrouter/sdk/models/errors";
 import { describe, expect, it } from "vitest";
 import { CUT_SHORT_NOTE } from "../src/shared/chatContract.ts";
-import { CoachOutOfCredit } from "./coach.ts";
+import { CoachBusy, CoachKeyRejected, CoachOutOfCredit } from "./coach.ts";
 import { verifiedConversationOf } from "./test/conversations.ts";
 import type { CoachConfig } from "./config.ts";
 import { glossaryContext } from "./glossaryContext.ts";
@@ -39,20 +40,21 @@ const PROVIDER_TEXT = "Insufficient credits for key sk-or-test-key";
 
 type ErrorBody = { code: number; message: string; metadata?: Record<string, string> };
 
-function httpMetaOf(error: ErrorBody) {
-  return rawHttpMetaOf(error.code, JSON.stringify({ error }));
+function httpMetaOf(error: ErrorBody, headers: Record<string, string> = {}) {
+  return rawHttpMetaOf(error.code, JSON.stringify({ error }), headers);
 }
 
-function rawHttpMetaOf(status: number, body: string) {
-  return { response: new Response(body, { status }), request: new Request("https://openrouter.ai/api/v1/chat"), body };
+function rawHttpMetaOf(status: number, body: string, headers: Record<string, string> = {}) {
+  const response = new Response(body, { status, headers });
+  return { response, request: new Request("https://openrouter.ai/api/v1/chat"), body };
 }
 
 function paymentRequiredBody(limitSource: string): ErrorBody {
   return { code: 402, message: PROVIDER_TEXT, metadata: { limit_source: limitSource, remedy_hint: PROVIDER_TEXT } };
 }
 
-function paymentRequired(error: ErrorBody): PaymentRequiredResponseError {
-  return new PaymentRequiredResponseError({ error }, httpMetaOf(error));
+function paymentRequired(error: ErrorBody, headers: Record<string, string> = {}): PaymentRequiredResponseError {
+  return new PaymentRequiredResponseError({ error }, httpMetaOf(error, headers));
 }
 
 function failingChat(error: Error): ChatClient {
@@ -170,11 +172,35 @@ describe("OpenRouter coach", () => {
 
   it.each([
     ["a briefly exhausted in-flight budget", paymentRequired(paymentRequiredBody("openrouter_in_flight_budget"))],
+    [
+      "an in-flight budget whose Retry-After is a date",
+      paymentRequired(paymentRequiredBody("openrouter_in_flight_budget"), { "Retry-After": "Wed, 21 Oct 2026 07:28:00 GMT" }),
+    ],
     ["an unknown limit source", paymentRequired(paymentRequiredBody("openrouter_new_limit"))],
     ["no limit source", paymentRequired({ code: 402, message: PROVIDER_TEXT })],
     ["a body that is not JSON", new OpenRouterDefaultError(PROVIDER_TEXT, rawHttpMetaOf(402, "<html>Payment Required</html>"))],
   ])("passes a 402 for %s through as a failure worth retrying", async (_case, error) => {
     await expect(coachOn(failingChat(error)).reply(verifiedConversationOf("Hello coach"))).rejects.toBe(error);
+  });
+
+  it("reports a briefly exhausted in-flight budget as busy for the provider's Retry-After seconds (#74)", async () => {
+    const error = paymentRequired(paymentRequiredBody("openrouter_in_flight_budget"), { "Retry-After": "20" });
+
+    const failure = await coachOn(failingChat(error)).reply(verifiedConversationOf("Hello coach")).catch((e: unknown) => e);
+
+    expect(failure).toBeInstanceOf(CoachBusy);
+    expect((failure as CoachBusy).retryAfterSeconds).toBe(20);
+  });
+
+  it("names an expired or invalid provider key as its own failure, without the provider's text (#74, #103)", async () => {
+    const error = { code: 401, message: PROVIDER_TEXT };
+    const unauthorized = new UnauthorizedResponseError({ error }, httpMetaOf(error));
+
+    const failure = await coachOn(failingChat(unauthorized)).reply(verifiedConversationOf("Hello coach")).catch((e: unknown) => e);
+
+    expect(failure).toBeInstanceOf(CoachKeyRejected);
+    expect(failure).toMatchObject({ name: "CoachKeyRejected", statusCode: 401 });
+    expect(String((failure as Error).message)).not.toContain(PROVIDER_TEXT);
   });
 
   it("passes any other provider failure through unchanged", async () => {
