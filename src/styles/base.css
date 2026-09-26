@@ -734,12 +734,14 @@ table.words {
   color: var(--color-ink-muted);
 }
 
-/* #6: Copy for your RFC, under a laid-out reply. */
-.reply .rfc-copy {
+/* #6: Copy for your RFC, and #113: Copy for your repo, under a laid-out reply. */
+.reply .rfc-copy,
+.reply .repo-copy {
   align-self: flex-start;
 }
 
-.reply .rfc-status:not(:empty) {
+.reply .rfc-status:not(:empty),
+.reply .repo-status:not(:empty) {
   margin-top: calc(-1 * var(--space-2));
   font-size: var(--text-sm);
   color: var(--color-ink-muted);

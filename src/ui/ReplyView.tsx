@@ -8,6 +8,7 @@ import { EventsOnBoard } from "./EventsOnBoard.tsx";
 import { PinnedAboveChip } from "./PinnedQuestion.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
 import { KeepButton } from "./KeepButton.tsx";
+import { RepoCopyButton } from "./RepoCopyButton.tsx";
 import { RfcCopyButton } from "./RfcCopyButton.tsx";
 import type { KeepReply } from "./useGlossary.ts";
 import { WordTable } from "./WordTable.tsx";
@@ -29,6 +30,7 @@ export function ReplyView({ reply, restoreNames, onKeep, questionPinned, newCard
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
       {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
+      {blocks.some((block) => block.kind === "words") && <RepoCopyButton blocks={blocks} />}
       {GLOSSARY_ENABLED && blocks.some((block) => block.kind === "words") && <KeepButton reply={reply} onKeep={onKeep} />}
     </div>
   );
