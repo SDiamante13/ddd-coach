@@ -19,7 +19,27 @@ describe("health handler", () => {
     const response = await health(upstream(200, { data: { limit: null, usage: 1.2, limit_remaining: null } }))(get());
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, upstream: 200, reason: null });
+    expect(await response.json()).toEqual({ ok: true, status: "ok", detail: null });
+  });
+
+  it("warns of a key that expires within a week (7 days), still ok, so a monitor can alert before chat breaks", async () => {
+    const today = () => Date.parse("2026-09-25T00:00:00Z");
+    const keyInfo = { data: { limit_remaining: null, expires_at: "2026-10-02T00:00:00Z" } };
+
+    const response = await health(upstream(200, keyInfo), KEY, today)(get());
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true, status: "key_expiring", detail: null });
+  });
+
+  it.each([
+    ["more than a week away", "2026-10-02T00:00:01Z"],
+    ["not set", null],
+  ])("reports ok for a key whose expiry is %s", async (_case, expiresAt) => {
+    const today = () => Date.parse("2026-09-25T00:00:00Z");
+    const keyInfo = { data: { limit_remaining: null, expires_at: expiresAt } };
+
+    expect(await (await health(upstream(200, keyInfo), KEY, today)(get())).json()).toEqual({ ok: true, status: "ok", detail: null });
   });
 
   it("checks the server's key against OpenRouter's free key endpoint", async () => {
@@ -32,18 +52,18 @@ describe("health handler", () => {
     });
   });
 
-  it("reports an expired key as expired, as a 503 an uptime monitor can alert on", async () => {
+  it("reports an expired key as invalid, detailed as expired, with a 503 an uptime monitor can alert on", async () => {
     const response = await health(upstream(401, { error: { code: 401, message: "API key expired" } }))(get());
 
     expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({ ok: false, upstream: 401, reason: "expired" });
+    expect(await response.json()).toEqual({ ok: false, status: "key_invalid", detail: "expired" });
   });
 
   it.each([
-    ["an unknown key", 401, { error: { code: 401, message: "User not found." } }, { ok: false, upstream: 401, reason: "invalid" }],
-    ["a key out of credit", 402, { error: { code: 402, message: "Insufficient credits" } }, { ok: false, upstream: 402, reason: "credit" }],
-    ["a key with no limit left", 200, { data: { limit: 5, usage: 5, limit_remaining: 0 } }, { ok: false, upstream: 200, reason: "credit" }],
-    ["an OpenRouter outage", 500, { error: { code: 500, message: "Internal error" } }, { ok: false, upstream: 500, reason: null }],
+    ["an unknown key", 401, { error: { code: 401, message: "User not found." } }, { ok: false, status: "key_invalid", detail: null }],
+    ["a key out of credit", 402, { error: { code: 402, message: "Insufficient credits" } }, { ok: false, status: "key_invalid", detail: "credit" }],
+    ["a key with no limit left", 200, { data: { limit: 5, usage: 5, limit_remaining: 0 } }, { ok: false, status: "key_invalid", detail: "credit" }],
+    ["an OpenRouter outage as unreachable", 500, { error: { code: 500, message: "Internal error" } }, { ok: false, status: "provider_unreachable", detail: null }],
   ])("reports %s", async (_case, status, body, expected) => {
     expect(await (await health(upstream(status, body))(get())).json()).toEqual(expected);
   });
@@ -53,16 +73,16 @@ describe("health handler", () => {
 
     const response = await createHealthHandler({ apiKey: undefined, fetch, now: () => 0 })(get());
 
-    expect(await response.json()).toEqual({ ok: false, upstream: null, reason: "invalid" });
+    expect(await response.json()).toEqual({ ok: false, status: "key_invalid", detail: "missing" });
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("reports an unreachable OpenRouter without a status", async () => {
+  it("reports an OpenRouter it can't reach as unreachable", async () => {
     const unreachable = vi.fn(async () => {
       throw new TypeError("fetch failed");
     });
 
-    expect(await (await health(unreachable)(get())).json()).toEqual({ ok: false, upstream: null, reason: null });
+    expect(await (await health(unreachable)(get())).json()).toEqual({ ok: false, status: "provider_unreachable", detail: null });
   });
 
   it("asks OpenRouter at most once a minute, so it can't be used as a proxy", async () => {

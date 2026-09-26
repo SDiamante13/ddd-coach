@@ -1,0 +1,25 @@
+name: health
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: GET /api/health must report ok
+        run: |
+          set -euo pipefail
+          body=$(curl -sS --max-time 20 --retry 2 https://ddd-coach.netlify.app/api/health)
+          echo "$body"
+          status=$(jq -r '.status // "unknown"' <<<"$body")
+          case "$status" in
+            ok) ;;
+            key_expiring) echo "::error::OpenRouter key expires within 7 days; rotate it and redeploy"; exit 1 ;;
+            *) echo "::error::Health is $status"; exit 1 ;;
+          esac
