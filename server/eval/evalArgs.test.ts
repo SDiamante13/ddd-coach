@@ -5,13 +5,13 @@ import { LIVE_INSTRUCTIONS_VERSION } from "./promptVersions.ts";
 
 describe("abArgsOf", () => {
   it("runs a candidate against the live version six times per arm with no target by default", () => {
-    expect(abArgsOf(["--ab", "9"])).toEqual({ candidate: 9, live: LIVE_INSTRUCTIONS_VERSION, runs: 6, target: null });
+    expect(abArgsOf(["--ab", "9"])).toEqual({ candidate: 9, live: LIVE_INSTRUCTIONS_VERSION, runs: 6, target: null, fixtures: null });
   });
 
   it("reads the live version, the runs per arm and a comma list of targets", () => {
     const argv = ["--ab", "8", "--live", "6", "--runs", "8", "--target", "greeting,rebook-notes:split labels"];
 
-    expect(abArgsOf(argv)).toEqual({ candidate: 8, live: 6, runs: 8, target: ["greeting", "rebook-notes:split labels"] });
+    expect(abArgsOf(argv)).toEqual({ candidate: 8, live: 6, runs: 8, target: ["greeting", "rebook-notes:split labels"], fixtures: null });
   });
 
   it("rejects fewer than six runs per arm", () => {
@@ -25,5 +25,9 @@ describe("abArgsOf", () => {
     ["an empty target", ["--ab", "8", "--target", ""], "--target needs a value"],
   ])("rejects %s", (_case, argv, message) => {
     expect(() => abArgsOf(argv)).toThrow(message);
+  });
+
+  it("runs only the fixtures named with --fixtures, such as extra control runs (#100)", () => {
+    expect(abArgsOf(["--ab", "14", "--live", "13", "--fixtures", "kept-steady"])?.fixtures).toEqual(["kept-steady"]);
   });
 });

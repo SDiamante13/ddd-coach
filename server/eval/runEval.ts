@@ -62,7 +62,7 @@ type AbRunPlan = AbPlan & { target: string[] | null };
 function abPlanOf(args: AbArgs): AbRunPlan {
   const live = { version: args.live, instructions: instructionsOf(args.live) };
   const candidate = { version: args.candidate, instructions: instructionsOf(args.candidate) };
-  return { live, candidate, runs: args.runs, fixtures: FIXTURE_NAMES, target: args.target };
+  return { live, candidate, runs: args.runs, fixtures: args.fixtures ?? FIXTURE_NAMES, target: args.target };
 }
 
 async function runAb(config: CoachConfig, chat: OpenRouter["chat"], plan: AbRunPlan): Promise<void> {

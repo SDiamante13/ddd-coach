@@ -1,6 +1,6 @@
 import { LIVE_INSTRUCTIONS_VERSION } from "./promptVersions.ts";
 
-export type AbArgs = { candidate: number; live: number; runs: number; target: string[] | null };
+export type AbArgs = { candidate: number; live: number; runs: number; target: string[] | null; fixtures: string[] | null };
 
 const DEFAULT_RUNS = 6;
 const MIN_RUNS = 6;
@@ -17,6 +17,7 @@ export function abArgsOf(argv: readonly string[]): AbArgs | null {
     live: numberOf("--live") ?? LIVE_INSTRUCTIONS_VERSION,
     runs: atLeast(MIN_RUNS, "--runs", numberOf("--runs") ?? DEFAULT_RUNS),
     target: valueOf("--target")?.split(",") ?? null,
+    fixtures: valueOf("--fixtures")?.split(",") ?? null,
   };
 }
 
