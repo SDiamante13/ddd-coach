@@ -4,9 +4,13 @@ import { field, stringField } from "../shared/json.ts";
 
 export const SESSION_VERSION = 1;
 
-export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly VisitorAction[]; savedAt: string | null };
+export type Viewport = { x: number; y: number; zoom: number };
 
-export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null };
+export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly VisitorAction[]; savedAt: string | null; viewport: Viewport | null };
+
+export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null, viewport: null };
+
+const ZOOM = { min: 0.5, max: 1.5 };
 
 const RELOADED_BEFORE_REPLY = "The page reloaded before the coach answered.";
 
@@ -15,7 +19,13 @@ export function sessionOf(stored: unknown): Session {
   const visitorActions = field(stored, "visitorActions");
   const valid =
     field(stored, "version") === SESSION_VERSION && everyIs(exchanges, isExchange) && everyIs(visitorActions, isVisitorAction);
-  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored) } : EMPTY_SESSION;
+  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")) } : EMPTY_SESSION;
+}
+
+function viewportOf(stored: unknown): Viewport | null {
+  const [x, y, zoom] = ["x", "y", "zoom"].map((key) => field(stored, key));
+  const numbers = [x, y, zoom].every((value) => typeof value === "number" && Number.isFinite(value));
+  return numbers && (zoom as number) >= ZOOM.min && (zoom as number) <= ZOOM.max ? { x: x as number, y: y as number, zoom: zoom as number } : null;
 }
 
 function savedAtOf(stored: unknown): string | null {

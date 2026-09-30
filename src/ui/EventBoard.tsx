@@ -3,6 +3,7 @@ import "../styles/board.css";
 import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
 import { PickedUpLine } from "./PickedUpLine.tsx";
+import type { Viewport } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 export { BOARD_LANE_ID } from "./BoardFlow.tsx";
@@ -21,13 +22,16 @@ export type BoardView = {
   atRest: boolean;
   releasePan: () => void;
 };
-type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; pickedUpAt?: string | null };
+export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void };
+type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session?: BoardSession };
 
-export function EventBoard({ view, thinking, restoreNames, pickedUpAt = null }: EventBoardProps) {
+const NO_SESSION: BoardSession = { pickedUpAt: null, viewport: null, keepViewport: () => {} };
+
+export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION }: EventBoardProps) {
   const empty = view.board.cards.length === 0 && !thinking;
   return (
     <section className="event-board" aria-label="Event board">
-      <PickedUpLine savedAt={pickedUpAt} />
+      <PickedUpLine savedAt={session.pickedUpAt} />
       {empty ? (
         <p className="board-empty">Events from your paste land here, left to right, in order.</p>
       ) : (
@@ -35,7 +39,7 @@ export function EventBoard({ view, thinking, restoreNames, pickedUpAt = null }: 
           <p className="board-header">
             <span className="board-label">Timeline · Events</span> <span>{boardSummary(view.board)}</span>
           </p>
-          <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} />
+          <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} />
         </>
       )}
     </section>

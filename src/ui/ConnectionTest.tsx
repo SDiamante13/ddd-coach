@@ -24,7 +24,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
 
   return (
     <>
-      <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} pickedUpAt={composer.restorePoint.savedAt} />
+      <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} session={composer.board} />
       <PinnedQuestion question={view.question} />
       <ExchangeLog
         exchanges={composer.exchanges}

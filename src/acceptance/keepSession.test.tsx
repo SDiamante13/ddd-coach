@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_UNVERIFIED } from "../shared/chatContract.ts";
 import { addSwap, composerOf, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
-import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
+import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -233,5 +233,24 @@ describe("Keeping the session across a reload (#5)", () => {
 
       expect(screen.queryByText(/Picked up where you left off/)).not.toBeInTheDocument();
     });
+  });
+
+  it("lands on the board where you left it, at the same pan and zoom (#124)", async () => {
+    const onBoard = { ...REPLIED, reply: FIRST_BOARD_REPLY };
+    stored({ version: 1, exchanges: [onBoard], visitorActions: [], viewport: { x: -300, y: 16, zoom: 1.25 } });
+
+    await renderApp();
+
+    expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-300px,16px) scale(1.25)" });
+  });
+
+  it("starts the board at its beginning when the stored pan and zoom are out of range", async () => {
+    const onBoard = { ...REPLIED, reply: FIRST_BOARD_REPLY };
+    stored({ version: 1, exchanges: [onBoard], visitorActions: [], viewport: { x: -300, y: 16, zoom: 9 } });
+
+    await renderApp();
+
+    expect(screen.getByText(/Customer submits a bkg/)).toBeInTheDocument();
+    expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,16px) scale(1)" });
   });
 });

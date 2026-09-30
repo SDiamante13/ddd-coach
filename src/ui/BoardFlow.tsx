@@ -5,7 +5,7 @@ import type { EventCard } from "../domain/board.ts";
 import type { EntityId } from "../domain/entityId.ts";
 import { titleOf } from "./linkLines.ts";
 import { BoardCard } from "./BoardCard.tsx";
-import type { BoardView } from "./EventBoard.tsx";
+import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { NewEventsChip } from "./NewEventsChip.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
@@ -34,7 +34,7 @@ const GhostNode = () => <div className="ghost-card" />;
 
 const NODE_TYPES = { event: EventNode, ghost: GhostNode };
 
-type LaneProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames };
+type LaneProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session: BoardSession };
 
 function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | GhostNodeType)[] {
   const { cards } = view.board;
@@ -106,7 +106,8 @@ function Lane(props: LaneProps) {
         nodes={nodes}
         edges={edges}
         nodeTypes={NODE_TYPES}
-        defaultViewport={{ x: LANE_INSET, y: 16, zoom: 1 }}
+        defaultViewport={props.session.viewport ?? START_VIEWPORT}
+        onMoveEnd={(_event, viewport) => props.session.keepViewport(viewport)}
         nodesDraggable={false}
         onConnect={({ source, target }) => props.view.connect(source as EntityId, target as EntityId)}
         isValidConnection={({ source, target }) => source !== target}
@@ -126,6 +127,7 @@ function Lane(props: LaneProps) {
 }
 
 const keepPointerEvents = () => {};
+const START_VIEWPORT = { x: LANE_INSET, y: 16, zoom: 1 };
 
 function asList(root: HTMLDivElement | null): void {
   root?.querySelector(".react-flow")?.removeAttribute("role");
