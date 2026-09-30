@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
@@ -87,5 +87,45 @@ describe("Linking two cards (#96)", () => {
     await waitFor(() => expect(screen.getByRole("status", { name: "Board changes" })).toHaveTextContent("Already linked."));
     await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
     expect(linkEdge()).not.toBeInTheDocument();
+  });
+
+  describe("clearing 'Board changes' so a repeat is read again (#124)", () => {
+    const announcer = () => screen.getByRole("status", { name: "Board changes" });
+
+    it("clears it when the coach's next reply lands", async () => {
+      const conversation = await onTheBoard();
+      await connectFromKeyboard(conversation.user);
+      await waitFor(() => expect(announcer()).not.toBeEmptyDOMElement());
+
+      conversation.server.reply(await conversation.send("And the next part."), 200, { reply: THIRD_BOARD_REPLY, signature: "sig-2" });
+      await within(conversation.log()).findAllByRole("button", { name: /on the board/ });
+
+      expect(announcer()).toBeEmptyDOMElement();
+    });
+
+    it("clears it on New conversation", async () => {
+      const { user } = await onTheBoard();
+      await connectFromKeyboard(user);
+      await waitFor(() => expect(announcer()).not.toBeEmptyDOMElement());
+
+      await user.click(screen.getByRole("button", { name: "New conversation" }));
+      await user.click(screen.getByRole("button", { name: "Clear" }));
+
+      expect(announcer()).toBeEmptyDOMElement();
+    });
+
+    it("clears it 5 seconds after the message", async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const { user } = await onTheBoard();
+      await connectFromKeyboard(user);
+      await waitFor(() => expect(announcer()).not.toBeEmptyDOMElement());
+
+      act(() => vi.advanceTimersByTime(4900));
+      expect(announcer()).not.toBeEmptyDOMElement();
+      act(() => vi.advanceTimersByTime(100));
+
+      expect(announcer()).toBeEmptyDOMElement();
+      vi.useRealTimers();
+    });
   });
 });
