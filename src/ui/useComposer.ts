@@ -12,11 +12,8 @@ import { useClearConfirmation } from "./useClearConfirmation.ts";
 import { useComposerReserve } from "./useComposerReserve.ts";
 import { useGlossary } from "./useGlossary.ts";
 import { outgoingGlossary } from "../domain/glossary.ts";
-import { CORRECTIONS_ENABLED, GLOSSARY_ENABLED } from "../shared/features.ts";
-import { sentCorrectionsOf } from "../domain/board.ts";
-import { boardOf } from "../domain/boardFromReplies.ts";
-import { useVisitorActions } from "./useVisitorActions.ts";
-import { useExchanges } from "./useExchanges.ts";
+import { GLOSSARY_ENABLED } from "../shared/features.ts";
+import { useKeptConversation } from "./useKeptConversation.ts";
 import { useLogFollow } from "./useLogFollow.ts";
 import { useSwaps } from "./useSwaps.ts";
 
@@ -25,17 +22,15 @@ export type Composer = ReturnType<typeof useComposer>;
 export function useComposer(unlock: Unlock) {
   const box = useDraftBox();
   const glossary = useGlossary();
-  const edits = useVisitorActions(box.outgoing);
   const access = useAccessRecovery(unlock, box.focus);
-  const { exchanges, send, retry, clear } = useExchanges({
+  const { exchanges, send, retry, clear, edits } = useKeptConversation({
+    outgoing: box.outgoing,
     onRefused: box.restore,
     onAccessLost: access.loseAccess,
     glossary: () => (GLOSSARY_ENABLED ? outgoingGlossary(glossary.rows, box.swaps.swaps).sent : []),
-    corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(exchanges, edits.actions)) : []),
   });
   const confirmation = useClearConfirmation((startWith) => {
     clear();
-    edits.clear();
     if (startWith === undefined) box.focus();
     else box.startWith(startWith);
   });

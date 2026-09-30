@@ -20,10 +20,11 @@ type ExchangeCallbacks = {
   onAccessLost?: () => void;
   glossary?: () => readonly KeptGlossaryRow[];
   corrections?: () => readonly SentCorrection[];
+  initial?: readonly Exchange[];
 };
 
-export function useExchanges({ onRefused, onAccessLost, glossary = () => [], corrections = () => [] }: ExchangeCallbacks = {}) {
-  const [exchanges, setExchanges] = useState<readonly Exchange[]>([]);
+export function useExchanges({ onRefused, onAccessLost, glossary = () => [], corrections = () => [], initial = [] }: ExchangeCallbacks = {}) {
+  const [exchanges, setExchanges] = useState<readonly Exchange[]>(initial);
 
   async function ask(id: ExchangeId, conversation: Conversation) {
     const result = await askCoach(conversation);
