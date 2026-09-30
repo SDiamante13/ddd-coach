@@ -1,6 +1,6 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { addSwap, startConversation } from "../test/appDriver.tsx";
 import { QUESTION_PASTE, QUESTION_REPLY } from "../test/questionReplies.ts";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
@@ -53,5 +53,17 @@ describe("The open question on the board (#97)", () => {
     await user.click(within(pinned).getByRole("button", { name: "On the board ↖ linked to 2 events" }));
 
     expect(document.activeElement).toBe(board().querySelector(".hotspot-card"));
+  });
+
+  it("links through your swaps and shows the question with your real names", async () => {
+    const conversation = await startConversation();
+    await addSwap(conversation.user, "Customer D", "Globex");
+    const reply = QUESTION_REPLY.replaceAll("Customer D", "Globex")
+      .replace("Does a late pickup earn the credit?", "Does Globex keep the credit?")
+      .replace('"issued Globex a service credit for 7731"', '"Globex credit"');
+    conversation.server.reply(await conversation.send(QUESTION_PASTE), 200, { reply, signature: "sig-1" });
+    await within(board()).findByRole("list", { name: "Events on the board" });
+
+    expect(onBoard().at(-1)).toHaveAccessibleName("Open question: Does Customer D keep the credit?, relates to Event 1 and Event 2");
   });
 });
