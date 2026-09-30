@@ -577,6 +577,11 @@ body:has(.event-board) .pinned-question .question-card {
   left: 38%;
 }
 
+.board-lane .react-flow__node:has(.card[aria-pressed="true"]) .react-flow__handle.link-handle:not(.link-in) {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .board-lane .react-flow__handle.link-in {
   left: 62%;
   pointer-events: all;
