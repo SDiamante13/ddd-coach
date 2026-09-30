@@ -80,11 +80,13 @@ describe("Data page", () => {
     );
   });
 
-  it("says the conversation isn't saved", () => {
+  it("says the browser keeps the conversation and board until New conversation clears them (#5)", () => {
     openDataPage();
 
     expect(section("What stays in your browser")).toHaveTextContent(
-      "The conversation itself isn't saved: reloading or closing the tab clears it.",
+      "This browser keeps your conversation and board, with your corrections and links, until you start a new conversation. " +
+        "“New conversation” clears the conversation and board; your word swaps, with real names, stay until you delete them. " +
+        "Nothing is stored on our server.",
     );
     expect(screen.queryByText(/glossary/i)).not.toBeInTheDocument();
   });

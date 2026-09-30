@@ -81,7 +81,11 @@ function InYourBrowser() {
         Your swaps are saved in this browser and never sent. The browser replaces each word with its placeholder
         before sending, and puts the real word back in the reply.
       </p>
-      <p>The conversation itself isn't saved: reloading or closing the tab clears it.</p>
+      <p>
+        This browser keeps your conversation and board, with your corrections and links, until you start a new
+        conversation. “New conversation” clears the conversation and board; your word swaps, with real names, stay
+        until you delete them. Nothing is stored on our server.
+      </p>
     </Section>
   );
 }
