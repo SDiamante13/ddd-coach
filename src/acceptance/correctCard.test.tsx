@@ -40,6 +40,19 @@ describe("Correcting a card (#95)", () => {
     expect(loggedLine()).toHaveTextContent(LOGGED);
   });
 
+  it("announces a correction once, in one live region, and its undo", async () => {
+    const { user } = await onTheBoard();
+
+    await correctCard(user, GUESS, FIXED);
+
+    const announcer = screen.getByRole("status", { name: "Board changes" });
+    expect(announcer).toHaveTextContent(LOGGED);
+    expect(screen.getAllByRole("status").filter((region) => region.textContent?.includes("You corrected"))).toEqual([announcer]);
+
+    await user.click(within(cardItem(FIXED)).getByRole("button", { name: "Undo" }));
+    expect(announcer).toHaveTextContent("Correction undone.");
+  });
+
   it("leaves the card as it was on Escape", async () => {
     const { user } = await onTheBoard();
     await user.dblClick(within(cardItem(GUESS)).getByRole("button"));

@@ -1,6 +1,7 @@
 import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { AccessGate } from "./AccessGate.tsx";
+import { BoardAnnouncer } from "./BoardAnnouncer.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
 import { EventBoard } from "./EventBoard.tsx";
 import { ExchangeLog } from "./ExchangeLog.tsx";
@@ -39,6 +40,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         countsOf={view.countsOf}
         correctionsOf={view.correctionsOf}
       />
+      <BoardAnnouncer message={view.announcement} />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}
       {justUnlocked && (
         <p role="status" className="unlocked">

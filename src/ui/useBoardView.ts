@@ -8,12 +8,14 @@ import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { lineOfCard, type LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 import type { CorrectionLine } from "./CorrectionLines.tsx";
+import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useCorrections } from "./useCorrections.ts";
 
 export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, fixes: ReturnType<typeof useCorrections>) {
   const board = useMemo(() => boardOf(exchanges, fixes.corrections), [exchanges, fixes.corrections]);
   const counts = useMemo(() => replyCountsOf(exchanges, fixes.corrections), [exchanges, fixes.corrections]);
+  const edits = useAnnouncedEdits(board, fixes, restoreNames);
   const { selected, toggle } = useBoardSelection();
   const selectedCard = board.cards.find((card) => card.id === selected);
   const highlight = selectedCard ? lineOfCard(selectedCard, exchanges) : null;
@@ -22,8 +24,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     countsOf: (id: ExchangeId): ReplyCounts => counts.get(id) ?? NO_EVENTS,
     selected: selectedCard?.id ?? null,
     toggle,
-    correct: (id: EntityId, text: string) => board.latest && fixes.correct(id, text, board.latest),
-    undo: fixes.undo,
+    ...edits,
     undoable: undoableOf(board, fixes.corrections.at(-1)),
     correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames),
     highlight,

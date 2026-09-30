@@ -65,7 +65,7 @@ describe("Access gate", () => {
     await sendText(user, field(), "local-coach-dev");
     server.replyNoContent(0);
 
-    expect(await screen.findByRole("status")).toHaveTextContent(UNLOCKED_FOR);
+    expect(await screen.findByText(UNLOCKED_FOR)).toHaveAttribute("role", "status");
     expect(UNLOCKED_FOR).toBe("This browser stays unlocked for 90 days.");
   });
 
