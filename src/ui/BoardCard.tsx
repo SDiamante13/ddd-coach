@@ -44,7 +44,7 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
 function CardFace({ card, view, title, restoreNames }: BoardCardProps & { title: string }) {
   const struck = struckWordsOf(view.board, card);
   const titleRef = useRef<HTMLSpanElement>(null);
-  const overflowing = useOverflow(titleRef, title);
+  const overflowing = useOverflow(titleRef, title, view.selected === card.id);
   return (
     <>
       <span className="card-kind">EVENT</span>
@@ -73,12 +73,12 @@ function WasLine({ words, collapsed }: { words: string; collapsed: boolean }) {
   );
 }
 
-function useOverflow(ref: RefObject<HTMLElement | null>, text: string): boolean {
+function useOverflow(ref: RefObject<HTMLElement | null>, text: string, unclamped: boolean): boolean {
   const [overflowing, setOverflowing] = useState(false);
   useLayoutEffect(() => {
     const element = ref.current;
     setOverflowing(element !== null && element.scrollHeight > element.clientHeight + 1);
-  }, [ref, text]);
+  }, [ref, text, unclamped]);
   return overflowing;
 }
 

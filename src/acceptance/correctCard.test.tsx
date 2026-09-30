@@ -81,6 +81,23 @@ describe("Correcting a card (#95)", () => {
       expect(within(was).getByText("…")).toHaveAttribute("aria-hidden", "true");
       expect(within(was).getByText(GUESS)).toHaveClass("visually-hidden");
     });
+
+    it("shows the old words again when selecting the card unclamps her words (#124)", async () => {
+      const clamped = (element: HTMLElement) => element.classList.contains("card-title") && element.closest(".card")?.getAttribute("aria-pressed") !== "true";
+      vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(function (this: HTMLElement) {
+        return clamped(this) ? 200 : 0;
+      });
+      vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(function (this: HTMLElement) {
+        return clamped(this) ? 80 : 0;
+      });
+      const { user } = await onTheBoard();
+      await correctCard(user, GUESS, FIXED);
+
+      await user.click(within(cardItem(FIXED)).getByRole("button", { name: /YOU SAID/ }));
+
+      const was = cardItem(FIXED).querySelector(".card-was")! as HTMLElement;
+      expect(within(was).getByText(GUESS)).not.toHaveClass("visually-hidden");
+    });
   });
 
   it("leaves the card as it was on Escape", async () => {
