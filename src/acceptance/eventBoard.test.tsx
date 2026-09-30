@@ -44,6 +44,17 @@ describe("Event board", () => {
     expect(within(board()).getByText("3 events · 1 guess")).toBeInTheDocument();
   });
 
+  it("names each card with its place in the timeline, in timeline order, for screen readers and the keyboard (#96)", async () => {
+    await replied(SECOND_BOARD_REPLY);
+
+    const buttons = cards().map((card) => within(card).getByRole("button"));
+    expect(buttons.map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Event 1 of 3, FROM THREAD: Customer submits a bkg on the portal.",
+      "Event 2 of 3, FROM THREAD: The carrier rejects the booking.",
+      "Event 3 of 3, GUESS: Ops chooses another carrier and resubmits the booking.",
+    ]);
+  });
+
   it("replaces the reply's events list with a chip that takes the visitor to the board", async () => {
     const { user, log } = await replied(SECOND_BOARD_REPLY);
 

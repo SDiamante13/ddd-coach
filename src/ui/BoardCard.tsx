@@ -7,8 +7,9 @@ import type { RestoreNames } from "./ReplyView.tsx";
 const CHANGE_TAG = { added: "JUST ADDED", updated: "UPDATED" } as const;
 
 type BoardCardProps = { card: EventCard; view: BoardView; restoreNames: RestoreNames };
+export type CardPlace = { index: number; total: number };
 
-export function BoardCard({ card, view, restoreNames }: BoardCardProps) {
+export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & { place: CardPlace }) {
   const [editing, setEditing] = useState(false);
   const change = changeOf(view.board, card);
   const pressed = view.selected === card.id;
@@ -19,15 +20,15 @@ export function BoardCard({ card, view, restoreNames }: BoardCardProps) {
     setEditing(false);
   };
   return (
-    <li data-card-id={card.id} data-source={card.correctedFrom === undefined ? card.provenance : "you"} data-change={change ?? undefined}>
+    <div className="board-card nopan nodrag" data-card-id={card.id} data-source={card.correctedFrom === undefined ? card.provenance : "you"} data-change={change ?? undefined}>
       {editing && <CardEditor initial={title} onKeep={keep} onCancel={() => setEditing(false)} />}
-      <button type="button" className="card" aria-hidden={editing || undefined} tabIndex={editing ? -1 : undefined} aria-pressed={pressed} aria-describedby={pressed ? noteId : undefined} onClick={() => view.toggle(card.id)} onDoubleClick={() => setEditing(true)}>
+      <button type="button" className="card" aria-label={`Event ${place.index} of ${place.total}, ${labelOf(card)}: ${title}`} aria-hidden={editing || undefined} tabIndex={editing ? -1 : undefined} aria-pressed={pressed} aria-describedby={pressed ? noteId : undefined} onClick={() => view.toggle(card.id)} onDoubleClick={() => setEditing(true)}>
         <CardFace card={card} view={view} title={title} restoreNames={restoreNames} />
         {change && <ChangeMark key={`${change}-${view.board.latest}`} change={change} />}
       </button>
       {view.undoable === card.id && <UndoPill onUndo={view.undo} />}
       {pressed && !editing && <CardNote id={noteId} provenance={card.provenance} line={view.highlightedLine} onCorrect={() => setEditing(true)} />}
-    </li>
+    </div>
   );
 }
 

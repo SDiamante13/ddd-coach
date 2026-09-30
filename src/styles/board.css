@@ -3,6 +3,7 @@
 html {
   --margin-width: 360px;
   --card-width: 156px;
+  --card-height: 120px;
   scroll-padding-top: var(--pinned-reserve, 0px);
 }
 
@@ -31,45 +32,35 @@ html {
 }
 
 .board-lane {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  gap: 40px;
-  margin: 0;
-  padding: var(--space-3) calc(300px - var(--card-width)) 11rem var(--space-2);
-  list-style: none;
-  overflow-x: auto;
+  position: relative;
+  height: 24rem;
 }
 
-.board-lane:focus-visible {
+.board-lane .react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke: var(--color-ink);
+  --xy-edge-stroke-width: 2;
+  --xy-attribution-background-color: transparent;
+}
+
+.board-lane .react-flow__nodes:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
 
-.board-lane > li {
+.board-lane .react-flow__node {
+  cursor: default;
+}
+
+.board-lane .react-flow__handle {
+  top: 60px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.board-card {
   position: relative;
-  flex: 0 0 var(--card-width);
-}
-
-.board-lane > li + li::before,
-.board-lane > li + li::after {
-  content: "";
-  position: absolute;
-  top: 50px;
-}
-
-.board-lane > li + li::before {
-  left: -34px;
-  width: 24px;
-  height: 2px;
-  background: var(--color-ink);
-}
-
-.board-lane > li + li::after {
-  left: -12px;
-  margin-top: -5px;
-  border: 6px solid transparent;
-  border-left-color: var(--color-ink);
+  width: var(--card-width);
 }
 
 .card {
@@ -148,9 +139,9 @@ html {
 }
 
 
-.board-ghost {
-  flex: 0 0 var(--card-width);
-  height: 102px;
+.board-ghost .ghost-card {
+  width: var(--card-width);
+  height: var(--card-height);
   border: 2px dashed var(--color-line-strong);
   border-radius: 2px;
 }
@@ -257,6 +248,10 @@ ol[role="log"] mark {
     padding: calc(var(--space-7) + 3rem) var(--gutter) 0;
     border-right: 1px solid var(--color-line);
     overflow: hidden;
+  }
+
+  body:has(.event-board) .board-lane {
+    height: calc(100dvh - var(--space-7) - 3rem - 2.5rem);
   }
 
   body:has(.event-board) .keyhint {
@@ -522,17 +517,8 @@ ol[role="log"] mark {
 }
 
 /* #117: clamp titles at 4 lines (full text on select), one card height per row, JUST ADDED on the ring. */
-.board-lane {
-  align-items: stretch;
-}
-
-.board-lane > li {
-  display: flex;
-  flex-direction: column;
-}
-
-.board-lane > li > .card {
-  flex: 1 0 auto;
+.board-card > .card {
+  min-height: var(--card-height);
 }
 
 .card-title {
