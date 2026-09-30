@@ -10,7 +10,8 @@ const GUESS = "Ops chooses another carrier and resubmits the booking.";
 const board = () => screen.getByRole("region", { name: "Event board" });
 const cardButton = (title: string) => within(board()).getByRole("button", { name: new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
 const linkEdge = () => within(board()).queryByRole("img", { name: `Link from “${FIRST}” to “${GUESS}”` });
-const linkLine = () => within(screen.getByRole("log")).queryByText(`You connected “${FIRST}” → “${GUESS}”`);
+const LOGGED = "You connected “Customer submits a bkg on the…” → “Ops chooses another carrier and resubmits…”";
+const linkLine = () => within(screen.getByRole("log")).queryByText(LOGGED);
 
 async function onTheBoard() {
   const conversation = await startConversation();
@@ -108,7 +109,7 @@ describe("Linking two cards (#96)", () => {
       await user.click(within(board()).getByRole("button", { name: `Link to “${FIXED}”` }));
 
       expect(await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument();
-      expect(within(screen.getByRole("log")).getByText(`You connected “${FIRST}” → “${FIXED}”`)).toBeInTheDocument();
+      expect(within(screen.getByRole("log")).getByText("You connected “Customer submits a bkg on the…” → “Ops asks the customer before picking…”")).toBeInTheDocument();
     });
 
     it("keeps a link to a guess when you then correct it, naming it by your words", async () => {

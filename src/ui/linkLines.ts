@@ -8,6 +8,13 @@ export type LinkLine = { from: string; to: string; undoable: boolean };
 
 export const linkLineText = ({ from, to }: { from: string; to: string }): string => `You connected “${from}” → “${to}”`;
 
+const LOGGED_TITLE_WORDS = 6;
+
+export function clampWords(text: string, max = LOGGED_TITLE_WORDS): string {
+  const words = text.split(/\s+/).filter(Boolean);
+  return words.length <= max ? text : `${words.slice(0, max).join(" ")}…`;
+}
+
 export const titleOf = (board: Board, id: EntityId, restoreNames: RestoreNames): string =>
   restoreNames(board.cards.find((card) => card.id === id)?.text ?? "").text;
 
