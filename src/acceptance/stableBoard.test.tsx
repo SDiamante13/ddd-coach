@@ -7,7 +7,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 const board = () => screen.getByRole("region", { name: "Event board" });
 const cards = () => within(within(board()).getByRole("list", { name: "Events on the board" })).getAllByRole("listitem");
-const newChip = () => within(board()).queryByRole("button", { name: /new events? on the right/ });
+const newChip = () => within(board()).queryByRole("button", { name: /^Show the / });
 
 async function onTheBoard() {
   const conversation = await startConversation();
@@ -58,5 +58,17 @@ describe("A board that holds still once you've touched it this turn (#124)", () 
     await screen.findAllByText(/Does a resubmitted booking keep its number/);
 
     expect(newChip()).not.toBeInTheDocument();
+  });
+
+  it("says updated, not new, when the reply only changed cards already there", async () => {
+    const conversation = await onTheBoard();
+    await nextReply(conversation);
+    await conversation.user.click(within(board()).getByRole("button", { name: /Customer submits a bkg/ }));
+
+    conversation.server.reply(await conversation.send("And the last part."), 200, { reply: THIRD_BOARD_REPLY, signature: "sig-3" });
+    await screen.findAllByText(/Does a resubmitted booking keep its number/);
+
+    expect(newChip()).toHaveTextContent("1 updated ▸");
+    expect(newChip()).toHaveAccessibleName("Show the 1 updated event");
   });
 });

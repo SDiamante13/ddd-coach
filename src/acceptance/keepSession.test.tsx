@@ -170,7 +170,7 @@ describe("Keeping the session across a reload (#5)", () => {
       await reload();
 
       expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
-      expect(within(board()).queryByRole("button", { name: /new events? on the right/ })).not.toBeInTheDocument();
+      expect(within(board()).queryByRole("button", { name: /^Show the / })).not.toBeInTheDocument();
       expect(within(board()).getByRole("button", { name: "Undo" })).toBeInTheDocument();
     });
 
