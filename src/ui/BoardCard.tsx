@@ -1,3 +1,4 @@
+import { Handle, Position } from "@xyflow/react";
 import { type KeyboardEvent, type RefObject, useLayoutEffect, useRef, useState } from "react";
 import { changeOf, type EventCard, labelOf, struckWordsOf } from "../domain/board.ts";
 import { CardNote } from "./CardNote.tsx";
@@ -26,6 +27,8 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
         <CardFace card={card} view={view} title={title} restoreNames={restoreNames} />
         {change && <ChangeMark key={`${change}-${view.board.latest}`} change={change} />}
       </button>
+      <Handle id="link-out" type="source" position={Position.Bottom} className="link-handle" aria-label="Drag to link this card" />
+      <Handle id="link-in" type="target" position={Position.Bottom} className="link-handle link-in" />
       {view.undoable === card.id && <UndoPill onUndo={view.undo} />}
       {pressed && !editing && (
         <CardNote

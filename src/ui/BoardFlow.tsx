@@ -26,8 +26,6 @@ function EventNode({ data: { card, view, restoreNames, index, total } }: NodePro
       <Handle id="then-in" type="target" position={Position.Left} isConnectable={false} />
       <BoardCard card={card} view={view} restoreNames={restoreNames} place={{ index, total }} />
       <Handle id="then-out" type="source" position={Position.Right} isConnectable={false} />
-      <Handle id="link-out" type="source" position={Position.Bottom} className="link-handle" aria-label="Drag to link this card" />
-      <Handle id="link-in" type="target" position={Position.Bottom} className="link-handle link-in" />
     </>
   );
 }

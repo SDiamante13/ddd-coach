@@ -148,7 +148,7 @@ html {
 
 .card-note {
   position: absolute;
-  top: calc(100% + var(--space-2));
+  top: calc(100% + 22px);
   left: 0;
   z-index: 2;
   width: min(280px, 80vw);
@@ -565,7 +565,7 @@ body:has(.event-board) .pinned-question .question-card {
 /* #96: visitor-drawn links. The link handle shows on hover or focus; links are drawn in coach blue; "Just drawn" settles after 3 s. */
 .board-lane .react-flow__handle.link-handle {
   top: auto;
-  bottom: -6px;
+  bottom: -12px;
   width: 12px;
   height: 12px;
   border: 2px solid var(--color-surface);
@@ -580,11 +580,6 @@ body:has(.event-board) .pinned-question .question-card {
 
 .board-lane .react-flow__handle.link-handle:not(.link-in) {
   left: 38%;
-}
-
-.board-lane .react-flow__node:has(.card[aria-pressed="true"]) .react-flow__handle.link-handle:not(.link-in) {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .board-lane .react-flow__handle.link-in {
