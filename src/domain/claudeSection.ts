@@ -13,6 +13,9 @@ const EXACT_TERMS =
 
 const BY_CONTEXT = "- A term's meaning depends on its context; never merge meanings across contexts.";
 
+const DEFINITIONS_NOT_RULES =
+  "- Meanings say what a word refers to; they are definitions, not business rules to implement. Never write an unsettled reading's condition into code as if it were settled.";
+
 export function claudeSection(glossary: RepoGlossary, asOf: Date): string {
   return [
     "## Domain language (from GLOSSARY.md)",
@@ -23,6 +26,7 @@ export function claudeSection(glossary: RepoGlossary, asOf: Date): string {
     "",
     EXACT_TERMS,
     BY_CONTEXT,
+    DEFINITIONS_NOT_RULES,
     unsettledBullet(glossary.terms.flatMap(unsettledPoint)),
     ...avoidBullet(glossary.terms.flatMap(avoidPoints)),
     "",

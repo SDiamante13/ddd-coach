@@ -46,6 +46,7 @@ describe("claudeSection", () => {
         "",
         "- Use these exact terms in specs, tickets, code names, filenames and the API surface. Never abbreviate or rename them; if something has no name, ask instead of coining one.",
         "- A term's meaning depends on its context; never merge meanings across contexts.",
+        "- Meanings say what a word refers to; they are definitions, not business rules to implement. Never write an unsettled reading's condition into code as if it were settled.",
         "- **Unsettled, don't pick a side:** `late` (Q1); `on time` for Code (a guess). Don't name code, columns or statuses after either reading. Leave a `TODO(glossary): <term>` at that one point, keep building everything else, and say what you left open.",
         "",
       ].join("\n"),
@@ -66,6 +67,22 @@ describe("claudeSection", () => {
 
     expect(section).toContain("- `weekly late report` for Billing, Code; in code `late_loads`, `actual_pickup_at`, `pickup_window_end`\n");
     expect(section).toContain("- `on time` for Account team\n");
+  });
+
+  it.each([
+    ["the Booking class, one row per request", "`Booking`"],
+    ["class Booking, one row per request", "`Booking`"],
+    ["the Booking class via rebooked_from_id", "`Booking`, `rebooked_from_id`"],
+  ])("keeps a bare class name its Code row names from the thread: %s (#118)", (codeMeaning, inCode) => {
+    const booking = ['Words that don\'t match', '"booking"', "- From thread: Ops means a customer request.", `- From thread: Code means ${codeMeaning}.`].join("\n");
+
+    expect(claudeSection(glossaryOf(booking), AS_OF)).toContain(`- \`booking\` for Ops, Code; in code ${inCode}\n`);
+  });
+
+  it("doesn't take an ordinary capitalised word in a Code row for a class (#118)", () => {
+    const booking = ['Words that don\'t match', '"booking"', "- From thread: Code means a row Customer D can see."].join("\n");
+
+    expect(claudeSection(glossaryOf(booking), AS_OF)).toContain("- `booking` for Code\n");
   });
 
   it("stays within 15 lines for any reply the coach may send, up to its 4 words", () => {
