@@ -1,11 +1,13 @@
-import { act, cleanup, screen, within } from "@testing-library/react";
+import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
+import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_UNVERIFIED } from "../shared/chatContract.ts";
-import { addSwap, composerOf, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
+import { addSwap, composerOf, pasteInto, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -28,6 +30,17 @@ const SESSION_KEY = "ddd-coach.session.v1";
 const REPLIED = { id: "e1", prompt: "Here is our thread.", status: "replied", reply: "R1", signature: "sig-1" };
 const stored = (session: object) => localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 
+async function correctCard(user: UserEvent, from: string, to: string) {
+  await user.dblClick(within(cardItem(from)!).getByRole("button"));
+  const field = within(board()).getByRole("textbox", { name: "Correct this event" });
+  await user.clear(field);
+  await pasteInto(user, field, to);
+  await user.keyboard("{Enter}");
+  await waitFor(() => expect(cardItem(to)).toHaveTextContent(`YOU SAID${to}`));
+}
+
+const linkNamed = (from: string, to: string) => within(board()).findByRole("img", { name: `Link from “${from}” to “${to}”` });
+
 async function reload() {
   cleanup();
   return renderApp();
@@ -40,20 +53,17 @@ describe("Keeping the session across a reload (#5)", () => {
 
     const { log } = await reload();
 
-    expect(within(log()).getByText("Here is our thread.")).toBeInTheDocument();
+    expect(await within(log()).findByText("Here is our thread.")).toBeInTheDocument();
     expect(within(log()).getByText("R1")).toBeInTheDocument();
   });
 
   it("keeps a corrected card after a reload", async () => {
     const { user } = await onTheBoard();
-    await user.dblClick(within(cardItem(GUESS)!).getByRole("button"));
-    const field = within(board()).getByRole("textbox", { name: "Correct this event" });
-    await user.clear(field);
-    await user.type(field, `${FIXED}{Enter}`);
+    await correctCard(user, GUESS, FIXED);
 
     await reload();
 
-    expect(cardItem(FIXED)).toHaveTextContent(`YOU SAID${FIXED}`);
+    await waitFor(() => expect(cardItem(FIXED)).toHaveTextContent(`YOU SAID${FIXED}`));
   });
 
   it("keeps a link between cards after a reload", async () => {
@@ -61,11 +71,11 @@ describe("Keeping the session across a reload (#5)", () => {
     await user.click(within(cardItem(FIRST)!).getByRole("button"));
     await user.click(within(board()).getByRole("button", { name: "Connect to…" }));
     await user.click(within(board()).getByRole("button", { name: `Link to “${GUESS}”` }));
-    await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${GUESS}”` });
+    await linkNamed(FIRST, GUESS);
 
     await reload();
 
-    expect(within(board()).getByRole("img", { name: `Link from “${FIRST}” to “${GUESS}”` })).toBeInTheDocument();
+    expect(await linkNamed(FIRST, GUESS)).toBeInTheDocument();
   });
 
   it("forgets the conversation and board after New conversation, but keeps the swaps", async () => {
@@ -162,30 +172,22 @@ describe("Keeping the session across a reload (#5)", () => {
     it("marks no card JUST ADDED after a reload, but keeps Undo for your correction", async () => {
       const { user } = await onTheBoard();
       expect(within(board()).getAllByText("JUST ADDED").length).toBeGreaterThan(0);
-      await user.dblClick(within(cardItem(GUESS)!).getByRole("button"));
-      const field = within(board()).getByRole("textbox", { name: "Correct this event" });
-      await user.clear(field);
-      await user.type(field, `${FIXED}{Enter}`);
+      await correctCard(user, GUESS, FIXED);
 
       await reload();
 
+      expect(await within(board()).findByRole("button", { name: "Undo" })).toBeInTheDocument();
       expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
       expect(within(board()).queryByRole("button", { name: /^Show the / })).not.toBeInTheDocument();
-      expect(within(board()).getByRole("button", { name: "Undo" })).toBeInTheDocument();
     });
 
     it("shows a restored correction's log line settled, and rings only a new one", async () => {
       const { user } = await onTheBoard();
-      await user.dblClick(within(cardItem(GUESS)!).getByRole("button"));
-      const field = within(board()).getByRole("textbox", { name: "Correct this event" });
-      await user.clear(field);
-      await user.type(field, `${FIXED}{Enter}`);
+      await correctCard(user, GUESS, FIXED);
 
       const { user: after } = await reload();
-      await after.dblClick(within(cardItem(FIRST)!).getByRole("button"));
-      const again = within(board()).getByRole("textbox", { name: "Correct this event" });
-      await after.clear(again);
-      await after.type(again, "Customer books on the portal.{Enter}");
+      await waitFor(() => expect(cardItem(FIRST)).toBeDefined());
+      await correctCard(after, FIRST, "Customer books on the portal.");
 
       const lineAbout = (words: string) => [...document.querySelectorAll("p.correction-line")].find((line) => line.textContent?.includes(words));
       expect(lineAbout(FIXED)).toHaveAttribute("data-settled");
@@ -201,6 +203,7 @@ describe("Keeping the session across a reload (#5)", () => {
 
       await reload();
 
+      await linkNamed(FIRST, GUESS);
       expect(within(board()).queryByText("Just drawn")).not.toBeInTheDocument();
       expect(within(board()).getByRole("img", { name: /^Link from/ }).querySelector("path")!.getAttribute("marker-end")).toContain("--color-ink");
       expect(document.querySelector("p.correction-line")).toHaveAttribute("data-settled");
@@ -222,11 +225,11 @@ describe("Keeping the session across a reload (#5)", () => {
       vi.useFakeTimers({ shouldAdvanceTime: true });
       stored({ version: 1, exchanges: [REPLIED], visitorActions: [], savedAt });
       await renderApp();
+      await screen.findByText(/Picked up where you left off/);
 
-      act(() => vi.advanceTimersByTime(5000));
+      await act(() => vi.advanceTimersByTimeAsync(5000));
 
-      expect(screen.queryByText(/Picked up where you left off/)).not.toBeInTheDocument();
-      vi.useRealTimers();
+      await waitFor(() => expect(screen.queryByText(/Picked up where you left off/)).not.toBeInTheDocument());
     });
 
     it("says nothing on a fresh start", async () => {

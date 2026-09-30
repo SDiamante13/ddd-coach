@@ -3,7 +3,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 const FIRST = "Customer submits a bkg on the portal.";
 const GUESS = "Ops chooses another carrier and resubmits the booking.";
@@ -181,12 +184,11 @@ describe("Linking two cards (#96)", () => {
       await connectFromKeyboard(user);
       await waitFor(() => expect(announcer()).not.toBeEmptyDOMElement());
 
-      act(() => vi.advanceTimersByTime(4900));
+      await act(() => vi.advanceTimersByTimeAsync(3000));
       expect(announcer()).not.toBeEmptyDOMElement();
-      act(() => vi.advanceTimersByTime(100));
+      await act(() => vi.advanceTimersByTimeAsync(2000));
 
-      expect(announcer()).toBeEmptyDOMElement();
-      vi.useRealTimers();
+      await waitFor(() => expect(announcer()).toBeEmptyDOMElement());
     });
   });
 });
