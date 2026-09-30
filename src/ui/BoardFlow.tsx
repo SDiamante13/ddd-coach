@@ -5,6 +5,7 @@ import type { EventCard } from "../domain/board.ts";
 import type { EntityId } from "../domain/entityId.ts";
 import { titleOf } from "./linkLines.ts";
 import { BoardCard } from "./BoardCard.tsx";
+import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { NewEventsChip } from "./NewEventsChip.tsx";
@@ -118,8 +119,8 @@ function Lane(props: LaneProps) {
         panOnScroll
         zoomOnScroll={false}
         zoomOnDoubleClick={false}
-        minZoom={0.5}
-        maxZoom={1.5}
+        minZoom={BOARD_ZOOM.min}
+        maxZoom={BOARD_ZOOM.max}
       />
       <NewEventsChip events={newEvents} />
     </div>

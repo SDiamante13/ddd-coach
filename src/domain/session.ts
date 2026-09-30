@@ -10,7 +10,7 @@ export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly
 
 export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null, viewport: null };
 
-const ZOOM = { min: 0.5, max: 1.5 };
+export const BOARD_ZOOM = { min: 0.5, max: 1.5 } as const;
 
 const RELOADED_BEFORE_REPLY = "The page reloaded before the coach answered.";
 
@@ -25,7 +25,7 @@ export function sessionOf(stored: unknown): Session {
 function viewportOf(stored: unknown): Viewport | null {
   const [x, y, zoom] = ["x", "y", "zoom"].map((key) => field(stored, key));
   const numbers = [x, y, zoom].every((value) => typeof value === "number" && Number.isFinite(value));
-  return numbers && (zoom as number) >= ZOOM.min && (zoom as number) <= ZOOM.max ? { x: x as number, y: y as number, zoom: zoom as number } : null;
+  return numbers && (zoom as number) >= BOARD_ZOOM.min && (zoom as number) <= BOARD_ZOOM.max ? { x: x as number, y: y as number, zoom: zoom as number } : null;
 }
 
 function savedAtOf(stored: unknown): string | null {
