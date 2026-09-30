@@ -46,7 +46,7 @@ describe("claudeSection", () => {
         "",
         "- Use these exact terms in specs, tickets, code names, filenames and the API surface. Never abbreviate or rename them; if something has no name, ask instead of coining one.",
         "- A term's meaning depends on its context; never merge meanings across contexts.",
-        "- Meanings say what a word refers to; they are definitions, not business rules to implement. Never write an unsettled reading's condition into code as if it were settled.",
+        "- Meanings say what a word refers to; they are definitions, not business rules to implement; ordinary integrity checks (idempotency, nulls, duplicates) still apply. Never write an unsettled reading's condition into code as if it were settled.",
         "- **Unsettled, don't pick a side:** `late` (Q1); `on time` for Code (a guess). Don't name code, columns or statuses after either reading. Leave a `TODO(glossary): <term>` at that one point, keep building everything else, and say what you left open.",
         "",
       ].join("\n"),
