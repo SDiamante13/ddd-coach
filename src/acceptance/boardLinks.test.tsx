@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
@@ -23,6 +23,7 @@ async function connectFromKeyboard(user: Awaited<ReturnType<typeof onTheBoard>>[
   await user.click(cardButton(FIRST));
   await user.click(within(board()).getByRole("button", { name: "Connect to…" }));
   await user.click(within(board()).getByRole("button", { name: `Link to “${GUESS}”` }));
+  await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${GUESS}”` });
 }
 
 describe("Linking two cards (#96)", () => {
@@ -72,9 +73,9 @@ describe("Linking two cards (#96)", () => {
     await connectFromKeyboard(user);
 
     const announcer = screen.getByRole("status", { name: "Board changes" });
-    expect(announcer).toHaveTextContent(`You connected “${FIRST}” → “${GUESS}”`);
+    await waitFor(() => expect(announcer).toHaveTextContent(`You connected “${FIRST}” → “${GUESS}”`));
     await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
-    expect(announcer).toHaveTextContent("Link undone.");
+    await waitFor(() => expect(announcer).toHaveTextContent("Link undone."));
   });
 
   it("records nothing for a link that already exists, so one Undo takes the link back", async () => {
@@ -83,7 +84,7 @@ describe("Linking two cards (#96)", () => {
 
     await user.click(within(board()).getByRole("button", { name: `Link to “${GUESS}”` }));
 
-    expect(screen.getByRole("status", { name: "Board changes" })).toHaveTextContent("Already linked.");
+    await waitFor(() => expect(screen.getByRole("status", { name: "Board changes" })).toHaveTextContent("Already linked."));
     await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
     expect(linkEdge()).not.toBeInTheDocument();
   });
