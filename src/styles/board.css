@@ -662,3 +662,26 @@ ol[role="log"] > li > p.correction-line {
     animation: line-rest 0s 3s forwards;
   }
 }
+
+/* #124: once the visitor has touched the board this turn, new events wait behind a chip instead of a pan. */
+.new-events-chip {
+  position: absolute;
+  top: 152px;
+  right: var(--space-4);
+  z-index: 5;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-coach);
+  border-radius: var(--radius-pill);
+  background: var(--color-coach);
+  color: var(--color-on-coach);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.new-events-chip:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}

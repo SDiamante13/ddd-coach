@@ -1,15 +1,33 @@
 import { useReactFlow } from "@xyflow/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { type Board, changeOf } from "../domain/board.ts";
+import type { ExchangeId } from "../domain/exchange.ts";
 import { LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { prefersReducedMotion } from "./motion.ts";
 
-export function usePanToChanges(board: Board): void {
+type Offer = { index: number; count: number; at: ExchangeId | null };
+export type NewEvents = { count: number; reveal: () => void } | null;
+
+export function usePanToChanges(board: Board, held: boolean, release: () => void): NewEvents {
   const flow = useReactFlow();
-  useEffect(() => {
-    const index = board.cards.findIndex((card) => changeOf(board, card) !== null);
-    if (index < 0) return;
+  const [offer, setOffer] = useState<Offer | null>(null);
+  const panTo = (index: number) => {
     const { y, zoom } = flow.getViewport();
     void flow.setViewport({ x: LANE_INSET - lanePosition(index).x * zoom, y, zoom }, { duration: prefersReducedMotion() ? 0 : 300 });
+  };
+  useEffect(() => {
+    const changed = board.cards.flatMap((card, index) => (changeOf(board, card) === null ? [] : [index]));
+    release();
+    if (changed.length === 0) return;
+    if (held) setOffer({ index: changed[0]!, count: changed.length, at: board.latest });
+    else panTo(changed[0]!);
   }, [board.latest]);
+  if (offer === null || offer.at !== board.latest) return null;
+  return {
+    count: offer.count,
+    reveal: () => {
+      panTo(offer.index);
+      setOffer(null);
+    },
+  };
 }

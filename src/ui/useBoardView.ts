@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { type Board, struckWordsOf } from "../domain/board.ts";
 import { boardOf, replyCountsOf, type VisitorAction } from "../domain/boardFromReplies.ts";
 import type { ReplyCounts } from "../domain/replyChip.ts";
@@ -18,14 +18,23 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
   const { selected, toggle } = useBoardSelection();
+  const [panHeld, setPanHeld] = useState(false);
+  const touching = <A extends unknown[]>(act: (...args: A) => void) => (...args: A) => {
+    setPanHeld(true);
+    act(...args);
+  };
   const selectedCard = board.cards.find((card) => card.id === selected);
   const highlight = selectedCard ? lineOfCard(selectedCard, exchanges) : null;
   return {
     board,
     countsOf: (id: ExchangeId): ReplyCounts => counts.get(id) ?? NO_EVENTS,
     selected: selectedCard?.id ?? null,
-    toggle,
     ...announced,
+    toggle: touching(toggle),
+    correct: touching(announced.correct),
+    connect: touching(announced.connect),
+    panHeld,
+    releasePan: () => setPanHeld(false),
     linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames),
     justDrawn: justDrawnOf(board, edits.actions),
     undoable: undoableOf(board, edits.actions.at(-1)),

@@ -7,6 +7,7 @@ import { titleOf } from "./linkLines.ts";
 import { BoardCard } from "./BoardCard.tsx";
 import type { BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
+import { NewEventsChip } from "./NewEventsChip.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
@@ -99,7 +100,7 @@ function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
   const nodes = useMemo(() => nodesOf(props), [props]);
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props)], [props]);
-  usePanToChanges(props.view.board);
+  const newEvents = usePanToChanges(props.view.board, props.view.panHeld, props.view.releasePan);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
     <div ref={root} className="board-lane">
@@ -121,6 +122,7 @@ function Lane(props: LaneProps) {
         minZoom={0.5}
         maxZoom={1.5}
       />
+      <NewEventsChip events={newEvents} />
     </div>
   );
 }

@@ -16,6 +16,8 @@ export type BoardView = {
   undo: () => void;
   undoable: EntityId | null;
   highlightedLine: string | null;
+  panHeld: boolean;
+  releasePan: () => void;
 };
 type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames };
 
