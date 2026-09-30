@@ -20,7 +20,7 @@ type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
-  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.fixes);
+  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits);
 
   return (
     <>
@@ -39,6 +39,8 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         highlight={view.highlight}
         countsOf={view.countsOf}
         correctionsOf={view.correctionsOf}
+        linksOf={view.linksOf}
+        onUndo={view.undo}
       />
       <BoardAnnouncer message={view.announcement} />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}

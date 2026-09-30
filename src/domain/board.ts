@@ -14,19 +14,28 @@ export type EventCard = {
   readonly correctedFrom?: string;
   readonly correctedAt?: ExchangeId | null;
 };
-export type Board = { readonly cards: readonly EventCard[]; readonly latest: ExchangeId | null };
+export type Link = { readonly from: EntityId; readonly to: EntityId };
+export type Board = { readonly cards: readonly EventCard[]; readonly links: readonly Link[]; readonly latest: ExchangeId | null };
 export type AddEvent = { type: "addEvent"; id: EntityId; text: string; provenance: Provenance; by: ExchangeId };
 export type CorrectCard = { type: "correctCard"; id: EntityId; text: string };
-export type BoardAction = AddEvent | CorrectCard;
+export type ConnectCards = { type: "connectCards"; from: EntityId; to: EntityId };
+export type BoardAction = AddEvent | CorrectCard | ConnectCards;
 export type CardChange = "added" | "updated" | null;
 
 export const PROVENANCE_LABEL: Record<Provenance, "FROM THREAD" | "GUESS"> = { thread: "FROM THREAD", guess: "GUESS" };
 
-export const emptyBoard: Board = { cards: [], latest: null };
+export const emptyBoard: Board = { cards: [], links: [], latest: null };
 
 export function applyAction(board: Board, action: BoardAction): Board {
   if (action.type === "correctCard") return { ...board, cards: board.cards.map((card) => correctedCard(card, action, board.latest)) };
-  return { cards: cardsAfter(board.cards, action), latest: action.by };
+  if (action.type === "connectCards") return { ...board, links: linksAfter(board, action) };
+  return { ...board, cards: cardsAfter(board.cards, action), latest: action.by };
+}
+
+function linksAfter({ cards, links }: Board, { from, to }: ConnectCards): readonly Link[] {
+  const onBoard = (id: EntityId) => cards.some((card) => card.id === id);
+  const known = links.some((link) => link.from === from && link.to === to);
+  return from === to || known || !onBoard(from) || !onBoard(to) ? links : [...links, { from, to }];
 }
 
 function correctedCard(card: EventCard, { id, text }: CorrectCard, latest: ExchangeId | null): EventCard {

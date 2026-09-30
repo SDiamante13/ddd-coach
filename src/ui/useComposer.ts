@@ -15,7 +15,7 @@ import { outgoingGlossary } from "../domain/glossary.ts";
 import { CORRECTIONS_ENABLED, GLOSSARY_ENABLED } from "../shared/features.ts";
 import { sentCorrectionsOf } from "../domain/board.ts";
 import { boardOf } from "../domain/boardFromReplies.ts";
-import { useCorrections } from "./useCorrections.ts";
+import { useVisitorActions } from "./useVisitorActions.ts";
 import { useExchanges } from "./useExchanges.ts";
 import { useLogFollow } from "./useLogFollow.ts";
 import { useSwaps } from "./useSwaps.ts";
@@ -25,17 +25,17 @@ export type Composer = ReturnType<typeof useComposer>;
 export function useComposer(unlock: Unlock) {
   const box = useDraftBox();
   const glossary = useGlossary();
-  const fixes = useCorrections(box.outgoing);
+  const edits = useVisitorActions(box.outgoing);
   const access = useAccessRecovery(unlock, box.focus);
   const { exchanges, send, retry, clear } = useExchanges({
     onRefused: box.restore,
     onAccessLost: access.loseAccess,
     glossary: () => (GLOSSARY_ENABLED ? outgoingGlossary(glossary.rows, box.swaps.swaps).sent : []),
-    corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(exchanges, fixes.corrections)) : []),
+    corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(exchanges, edits.actions)) : []),
   });
   const confirmation = useClearConfirmation((startWith) => {
     clear();
-    fixes.clear();
+    edits.clear();
     if (startWith === undefined) box.focus();
     else box.startWith(startWith);
   });
@@ -48,7 +48,7 @@ export function useComposer(unlock: Unlock) {
   };
   const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
   const pastedThread = pastedThreadOf(exchanges, box.restoreNames);
-  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, fixes, pastedThread, busy: isBusy(exchanges) };
+  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, edits, pastedThread, busy: isBusy(exchanges) };
 }
 
 function pastedThreadOf(exchanges: readonly Exchange[], restoreNames: (text: string) => SwappedText): string | undefined {

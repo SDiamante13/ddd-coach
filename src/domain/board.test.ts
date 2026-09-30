@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { entityId } from "./entityId.ts";
 import type { ExchangeId } from "./exchange.ts";
 import {
+  type AddEvent,
   applyAction,
   type Board,
   boardSummary,
@@ -16,7 +17,7 @@ import {
   PROVENANCE_LABEL,
 } from "./board.ts";
 
-const addEvent = (text: string, provenance: Provenance, by: string): BoardAction => ({
+const addEvent = (text: string, provenance: Provenance, by: string): AddEvent => ({
   type: "addEvent",
   id: entityId("event", text),
   text,
@@ -36,7 +37,7 @@ const boardAction = fc
   .map(([text, provenance, by]) => addEvent(text, provenance, by));
 const boardActions = fc.array(boardAction, { maxLength: 12 });
 const boardOfActions = (actions: readonly BoardAction[]) => actions.reduce(applyAction, emptyBoard);
-const idsInFirstAppearanceOrder = (actions: readonly BoardAction[]) => [...new Set(actions.map((action) => action.id))];
+const idsInFirstAppearanceOrder = (actions: readonly AddEvent[]) => [...new Set(actions.map((action) => action.id))];
 
 describe("applyAction", () => {
   it("places a new event as a card placed and changed by its reply", () => {
@@ -52,6 +53,7 @@ describe("applyAction", () => {
           changedBy: "reply-1",
         },
       ],
+      links: [],
       latest: "reply-1",
     });
   });
@@ -59,7 +61,7 @@ describe("applyAction", () => {
   it("leaves the cards as they are when a later reply repeats an event, spacing aside, and marks that reply latest", () => {
     const first = applyAction(emptyBoard, addEvent("Customer submits a bkg.", "thread", "reply-1"));
     const repeated = applyAction(first, addEvent(" Customer submits  a bkg.", "thread", "reply-2"));
-    expect(repeated).toEqual({ cards: first.cards, latest: "reply-2" });
+    expect(repeated).toEqual({ cards: first.cards, links: [], latest: "reply-2" });
   });
 
   it("quietly takes the newer wording when a later reply restates an event in another case or punctuation", () => {
@@ -76,6 +78,7 @@ describe("applyAction", () => {
     const confirmed = applyAction(guessed, addEvent("Ops chooses another carrier.", "thread", "reply-2"));
     expect(confirmed).toEqual({
       cards: [{ ...guessed.cards[0], provenance: "thread", previousProvenance: "guess", changedBy: "reply-2" }, guessed.cards[1]],
+      links: [],
       latest: "reply-2",
     });
   });
@@ -114,7 +117,7 @@ describe("previousTextOf", () => {
     placedBy: "reply-1" as ExchangeId,
     changedBy: by as ExchangeId,
   });
-  const renamedIn = (by: string): Board => ({ cards: [renamedBy(by)], latest: by as ExchangeId });
+  const renamedIn = (by: string): Board => ({ cards: [renamedBy(by)], links: [], latest: by as ExchangeId });
 
   it("gives a renamed card's previous words while the reply that renamed it is the latest", () => {
     const board = renamedIn("reply-2");

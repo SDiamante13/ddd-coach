@@ -87,7 +87,7 @@ describe("boardOf", () => {
 describe("boardOf with the visitor's corrections (#95)", () => {
   const GUESS = "Ops chooses another carrier and resubmits the booking.";
   const FIXED = "Ops asks the customer before picking another carrier.";
-  const correction = { id: entityId("event", GUESS), text: FIXED, after: "reply-2" as ExchangeId };
+  const correction = { kind: "correct" as const, id: entityId("event", GUESS), text: FIXED, after: "reply-2" as ExchangeId };
 
   it("applies a correction right after the reply it followed, so a later restatement can't undo it", () => {
     const board = boardOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)], [correction]);
@@ -119,11 +119,27 @@ describe("replyCountsOf (#95)", () => {
 describe("replyCountsOf with a corrected card (#121)", () => {
   it("counts a restated corrected card as already there with the visitor's wording kept", () => {
     const GUESS = "Ops chooses another carrier and resubmits the booking.";
-    const correction = { id: entityId("event", GUESS), text: "Ops asks the customer first.", after: "reply-2" as ExchangeId };
+    const correction = { kind: "correct" as const, id: entityId("event", GUESS), text: "Ops asks the customer first.", after: "reply-2" as ExchangeId };
 
     const counts = replyCountsOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)], [correction]);
 
     expect(counts.get("reply-3" as ExchangeId)).toEqual({ added: 0, updated: 0, already: 1, kept: 1 });
     expect(counts.get("reply-2" as ExchangeId)).toMatchObject({ kept: 0 });
+  });
+});
+
+describe("boardOf with the visitor's links (#96)", () => {
+  const FIRST = entityId("event", "Customer submits a bkg on the portal.");
+  const GUESS = entityId("event", "Ops chooses another carrier and resubmits the booking.");
+  const link = { kind: "connect" as const, from: FIRST, to: GUESS, after: "reply-2" as ExchangeId };
+
+  it("replays a link right after the reply it followed, and keeps it through later replies", () => {
+    const board = boardOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)], [link]);
+
+    expect(board.links).toEqual([{ from: FIRST, to: GUESS }]);
+  });
+
+  it("drops the link when it's undone", () => {
+    expect(boardOf(firstTwoReplies, []).links).toEqual([]);
   });
 });

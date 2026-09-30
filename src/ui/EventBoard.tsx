@@ -1,4 +1,4 @@
-import { type Board, boardSummary } from "../domain/board.ts";
+import { type Board, boardSummary, type Link } from "../domain/board.ts";
 import "../styles/board.css";
 import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
@@ -11,6 +11,8 @@ export type BoardView = {
   selected: EntityId | null;
   toggle: (id: EntityId) => void;
   correct: (id: EntityId, text: string) => void;
+  connect: (from: EntityId, to: EntityId) => void;
+  justDrawn: Link | null;
   undo: () => void;
   undoable: EntityId | null;
   highlightedLine: string | null;

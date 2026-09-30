@@ -27,7 +27,16 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
         {change && <ChangeMark key={`${change}-${view.board.latest}`} change={change} />}
       </button>
       {view.undoable === card.id && <UndoPill onUndo={view.undo} />}
-      {pressed && !editing && <CardNote id={noteId} provenance={card.provenance} line={view.highlightedLine} onCorrect={() => setEditing(true)} />}
+      {pressed && !editing && (
+        <CardNote
+          id={noteId}
+          provenance={card.provenance}
+          line={view.highlightedLine}
+          onCorrect={() => setEditing(true)}
+          others={view.board.cards.filter(({ id }) => id !== card.id).map(({ id, text }) => ({ id, title: restoreNames(text).text }))}
+          onLink={(to) => view.connect(card.id, to)}
+        />
+      )}
     </div>
   );
 }

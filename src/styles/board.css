@@ -554,3 +554,71 @@ body:has(.event-board) .pinned-question .question-card {
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
   mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
 }
+
+/* #96: visitor-drawn links. The link handle shows on hover or focus; links are drawn in coach blue; "Just drawn" settles after 3 s. */
+.board-lane .react-flow__handle.link-handle {
+  top: auto;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--color-surface);
+  background: var(--color-coach);
+}
+
+.board-lane .react-flow__node:is(:hover, :focus-within) .react-flow__handle.link-handle:not(.link-in) {
+  opacity: 1;
+  pointer-events: all;
+  cursor: crosshair;
+}
+
+.board-lane .react-flow__handle.link-handle:not(.link-in) {
+  left: 38%;
+}
+
+.board-lane .react-flow__handle.link-in {
+  left: 62%;
+  pointer-events: all;
+}
+
+.board-lane .link-edge .react-flow__edge-path {
+  stroke: var(--color-coach);
+  stroke-width: 2.5;
+}
+
+.board-lane .just-drawn .react-flow__edge-textwrapper {
+  animation: settle 300ms 3s forwards;
+}
+
+.board-lane .react-flow__edge-textbg {
+  fill: var(--color-surface);
+}
+
+.board-lane .react-flow__edge-text {
+  fill: var(--color-coach);
+  font: 500 11px / 1 var(--font-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.link-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-height: 10rem;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.link-options button {
+  min-height: 32px;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-lane .just-drawn .react-flow__edge-textwrapper {
+    animation: settle 0s 3s forwards;
+  }
+}
