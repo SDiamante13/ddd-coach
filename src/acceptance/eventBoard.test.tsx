@@ -215,6 +215,18 @@ describe("Event board", () => {
       expect(marks(conversation.log)).toHaveLength(1);
     });
 
+    it("keeps working when the browser's scrollIntoView returns a promise, as newer Chrome does", async () => {
+      const scrollIntoView = vi.spyOn(Element.prototype, "scrollIntoView").mockImplementation(() => Promise.resolve() as unknown as void);
+      const { user, log } = await exampleOnTheBoard();
+
+      await user.click(cardButton("Carrier desk charges Carrier 3"));
+      await user.keyboard("{Escape}");
+
+      expect(marks(log)).toHaveLength(0);
+      expect(board()).toBeInTheDocument();
+      scrollIntoView.mockRestore();
+    });
+
     it("says a guess has no line in the paste", async () => {
       const { user } = await replied(SECOND_BOARD_REPLY);
 

@@ -29,7 +29,9 @@ export function PromptText({ prompt, highlight = null }: PromptTextProps) {
 
 function HighlightedPrompt({ prompt, highlight: { start, end } }: { prompt: string; highlight: LineMatch }) {
   const mark = useRef<HTMLElement>(null);
-  useEffect(() => mark.current?.scrollIntoView({ block: "center" }), [start, end]);
+  useEffect(() => {
+    mark.current?.scrollIntoView({ block: "center" });
+  }, [start, end]);
   return (
     <p>
       {prompt.slice(0, start)}
