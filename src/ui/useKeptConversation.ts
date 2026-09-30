@@ -22,19 +22,20 @@ export function useKeptConversation({ outgoing, ...callbacks }: KeptConversation
   const [kept] = useState(keptSession);
   const [restorePoint] = useState(() => restorePointOf(kept));
   const [viewport, keepViewport] = useState(kept.viewport);
+  const [saving, setSaving] = useState(true);
   const edits = useVisitorActions(outgoing, kept.visitorActions);
   const chat = useExchanges({
     ...callbacks,
     corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(chat.exchanges, edits.actions)) : []),
     initial: kept.exchanges,
   });
-  useEffect(() => keepSession({ exchanges: chat.exchanges, visitorActions: edits.actions, viewport }), [chat.exchanges, edits.actions, viewport]);
+  useEffect(() => setSaving(keepSession({ exchanges: chat.exchanges, visitorActions: edits.actions, viewport })), [chat.exchanges, edits.actions, viewport]);
   const clear = () => {
     chat.clear();
     edits.clear();
     keepViewport(null);
   };
-  return { ...chat, edits, clear, restorePoint, viewport, keepViewport };
+  return { ...chat, edits, clear, restorePoint, viewport, keepViewport, saving };
 }
 
 const restorePointOf = (kept: Session): RestorePoint => ({

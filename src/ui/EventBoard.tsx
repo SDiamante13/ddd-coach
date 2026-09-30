@@ -22,15 +22,22 @@ export type BoardView = {
   atRest: boolean;
   releasePan: () => void;
 };
-export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void };
+export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void; saving: boolean };
+
+export const NOT_SAVING = "This browser isn't saving your session, so a reload will lose the conversation and board.";
 type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session?: BoardSession };
 
-const NO_SESSION: BoardSession = { pickedUpAt: null, viewport: null, keepViewport: () => {} };
+const NO_SESSION: BoardSession = { pickedUpAt: null, viewport: null, keepViewport: () => {}, saving: true };
 
 export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION }: EventBoardProps) {
   const empty = view.board.cards.length === 0 && !thinking;
   return (
     <section className="event-board" aria-label="Event board">
+      {!session.saving && (
+        <p className="not-saving" role="status">
+          {NOT_SAVING}
+        </p>
+      )}
       <PickedUpLine savedAt={session.pickedUpAt} />
       {empty ? (
         <p className="board-empty">Events from your paste land here, left to right, in order.</p>

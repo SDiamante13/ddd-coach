@@ -709,3 +709,13 @@ ol[role="log"] > li > p.correction-line[data-settled] {
     animation: none;
   }
 }
+
+/* #124: when storage is blocked or full, say plainly that a reload will lose the session. */
+.not-saving {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-warn);
+  background: var(--color-warn-tint);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+}

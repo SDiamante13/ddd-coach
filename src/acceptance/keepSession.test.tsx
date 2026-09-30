@@ -253,4 +253,23 @@ describe("Keeping the session across a reload (#5)", () => {
     expect(screen.getByText(/Customer submits a bkg/)).toBeInTheDocument();
     expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,16px) scale(1)" });
   });
+
+  it("says so when this browser can't save the session, and keeps working (#124)", async () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Full", "QuotaExceededError");
+    });
+
+    const { sendAndReply, log } = await startConversation();
+    await sendAndReply("Here is our thread.", "R1", "sig-1");
+
+    expect(screen.getByText("This browser isn't saving your session, so a reload will lose the conversation and board.")).toBeVisible();
+    expect(within(log()).getByText("R1")).toBeInTheDocument();
+  });
+
+  it("says nothing about saving when this browser saves the session", async () => {
+    const { sendAndReply } = await startConversation();
+    await sendAndReply("Here is our thread.", "R1", "sig-1");
+
+    expect(screen.queryByText(/isn't saving your session/)).not.toBeInTheDocument();
+  });
 });

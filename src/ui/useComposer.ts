@@ -23,7 +23,7 @@ export function useComposer(unlock: Unlock) {
   const box = useDraftBox();
   const glossary = useGlossary();
   const access = useAccessRecovery(unlock, box.focus);
-  const { exchanges, send, retry, clear, edits, restorePoint, viewport, keepViewport } = useKeptConversation({
+  const { exchanges, send, retry, clear, edits, restorePoint, viewport, keepViewport, saving } = useKeptConversation({
     outgoing: box.outgoing,
     onRefused: box.restore,
     onAccessLost: access.loseAccess,
@@ -43,7 +43,7 @@ export function useComposer(unlock: Unlock) {
   };
   const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
   const pastedThread = pastedThreadOf(exchanges, box.restoreNames);
-  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, edits, restorePoint, board: { pickedUpAt: restorePoint.savedAt, viewport, keepViewport }, pastedThread, busy: isBusy(exchanges) };
+  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, edits, restorePoint, board: { pickedUpAt: restorePoint.savedAt, viewport, keepViewport, saving }, pastedThread, busy: isBusy(exchanges) };
 }
 
 function pastedThreadOf(exchanges: readonly Exchange[], restoreNames: (text: string) => SwappedText): string | undefined {
