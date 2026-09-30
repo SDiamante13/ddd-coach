@@ -55,6 +55,20 @@ describe("Event board", () => {
     ]);
   });
 
+  it("lifts a selected card over the board without moving the others (#96)", async () => {
+    const { user } = await replied(SECOND_BOARD_REPLY);
+    const nodeOf = (card: HTMLElement) => card.closest<HTMLElement>(".react-flow__node")!;
+    const placesBefore = cards().map((card) => nodeOf(card).style.transform);
+
+    await user.click(within(cards()[1]!).getByRole("button"));
+
+    const [first, selected, third] = cards().map((card) => nodeOf(card));
+    expect(Number(selected!.style.zIndex)).toBeGreaterThan(Number(first!.style.zIndex));
+    expect(first!.style.zIndex).toBe(third!.style.zIndex);
+    expect(cards().map((card) => nodeOf(card).style.transform)).toEqual(placesBefore);
+    expect(cards().map((card) => [nodeOf(card).style.width, nodeOf(card).style.height])).toEqual(Array(3).fill(["156px", "120px"]));
+  });
+
   it("replaces the reply's events list with a chip that takes the visitor to the board", async () => {
     const { user, log } = await replied(SECOND_BOARD_REPLY);
 

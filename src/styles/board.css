@@ -622,3 +622,8 @@ body:has(.event-board) .pinned-question .question-card {
     animation: settle 0s 3s forwards;
   }
 }
+
+/* #96: a selected card lifts over the board; its slot, the row and the Then arrows stay where they are. */
+.board-card > .card[aria-pressed="true"] {
+  box-shadow: 0 0 0 3px var(--color-ink), 0 18px 32px -12px rgb(0 0 0 / 0.55);
+}

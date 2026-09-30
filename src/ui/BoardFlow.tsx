@@ -6,12 +6,14 @@ import type { EntityId } from "../domain/entityId.ts";
 import { titleOf } from "./linkLines.ts";
 import { BoardCard } from "./BoardCard.tsx";
 import type { BoardView } from "./EventBoard.tsx";
-import { LANE_INSET, lanePosition } from "./boardLayout.ts";
+import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { usePanToChanges } from "./usePanToChanges.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 export const BOARD_LANE_ID = "event-board-lane";
 const GHOST_SLOTS = [1, 2, 3];
+const LIFTED = 10;
+const SLOT = { width: CARD_WIDTH, height: CARD_HEIGHT };
 
 type EventData = { card: EventCard; view: BoardView; restoreNames: RestoreNames; index: number; total: number };
 type EventNodeType = Node<EventData, "event">;
@@ -41,11 +43,13 @@ function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | 
     id: card.id,
     type: "event",
     position: lanePosition(index),
+    ...SLOT,
+    zIndex: view.selected === card.id ? LIFTED : 0,
     ariaRole: "listitem",
     data: { card, view, restoreNames, index: index + 1, total: cards.length },
   }));
   const ghosts: GhostNodeType[] = thinking
-    ? GHOST_SLOTS.map((slot) => ({ id: `ghost-${slot}`, type: "ghost", className: "board-ghost", position: lanePosition(cards.length + slot - 1), data: {}, domAttributes: { "aria-hidden": true } }))
+    ? GHOST_SLOTS.map((slot) => ({ id: `ghost-${slot}`, type: "ghost", className: "board-ghost", position: lanePosition(cards.length + slot - 1), ...SLOT, data: {}, domAttributes: { "aria-hidden": true } }))
     : [];
   return [...events, ...ghosts];
 }
@@ -58,7 +62,7 @@ const thenEdgesOf = (cards: readonly EventCard[]): Edge[] =>
     sourceHandle: "then-out",
     targetHandle: "then-in",
     type: "straight",
-    markerEnd: { type: MarkerType.ArrowClosed },
+    markerEnd: { type: MarkerType.ArrowClosed, color: "var(--color-ink)" },
     className: "then-edge",
     domAttributes: { "aria-hidden": true },
   }));
@@ -74,7 +78,7 @@ const linkEdgesOf = ({ view, restoreNames }: LaneProps): Edge[] =>
     type: "smoothstep",
     pathOptions: { offset: 28, borderRadius: 16 },
     className: isJustDrawn(view, from, to) ? "link-edge just-drawn" : "link-edge",
-    markerEnd: { type: MarkerType.ArrowClosed },
+    markerEnd: { type: MarkerType.ArrowClosed, color: "var(--color-coach)" },
     ariaLabel: `Link from “${titleOf(view.board, from, restoreNames)}” to “${titleOf(view.board, to, restoreNames)}”`,
   }));
 

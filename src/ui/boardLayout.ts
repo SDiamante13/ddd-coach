@@ -1,3 +1,5 @@
+export const CARD_WIDTH = 156;
+export const CARD_HEIGHT = 120;
 export const CARD_STEP = 196;
 export const LANE_INSET = 8;
 
