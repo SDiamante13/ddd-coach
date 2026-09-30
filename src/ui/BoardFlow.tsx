@@ -11,6 +11,7 @@ import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout
 import { NewEventsChip } from "./NewEventsChip.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
+import { useRevealQuestion } from "./useRevealQuestion.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 export const BOARD_LANE_ID = "event-board-lane";
@@ -101,6 +102,7 @@ function Lane(props: LaneProps) {
   const nodes = useMemo(() => nodesOf(props), [props]);
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
   const newEvents = usePanToChanges(props.view);
+  useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
     <div ref={root} className="board-lane">

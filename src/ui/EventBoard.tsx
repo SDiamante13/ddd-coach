@@ -22,6 +22,8 @@ export type BoardView = {
   panHeld: boolean;
   atRest: boolean;
   hotspot: Hotspot | null;
+  questionReveals: number;
+  revealQuestion: () => void;
   releasePan: () => void;
 };
 export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void; saving: boolean };

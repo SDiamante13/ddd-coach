@@ -12,7 +12,7 @@ export function QuestionNode({ data: { hotspot, fresh } }: NodeProps<QuestionNod
   return (
     <>
       <Handle id="relates-in" type="target" position={Position.Top} isConnectable={false} />
-      <div className="card hotspot-card">
+      <div className="card hotspot-card" tabIndex={-1}>
         <span className="card-kind">QUESTION</span>
         <span className="card-source">OPEN</span>
         <span className="card-title">{hotspot.text}</span>
@@ -29,7 +29,7 @@ export function QuestionNode({ data: { hotspot, fresh } }: NodeProps<QuestionNod
 
 export function questionNodesOf(view: BoardView): QuestionNodeType[] {
   const { hotspot, board } = view;
-  if (hotspot === null || board.cards.length === 0) return [];
+  if (hotspot === null) return [];
   const fresh = hotspot.askedIn === board.latest && !view.atRest;
   return [{ id: hotspot.id, type: "question", position: placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh } }];
 }
@@ -42,7 +42,7 @@ function placeOf({ links }: Hotspot, { board }: BoardView) {
 }
 
 export const relatesEdgesOf = ({ hotspot, board }: BoardView): Edge[] =>
-  hotspot === null || board.cards.length === 0
+  hotspot === null
     ? []
     : hotspot.links.map((link) => ({
         id: `relates-${link}`,

@@ -45,4 +45,13 @@ describe("The open question on the board (#97)", () => {
 
     expect(onBoard().map((item) => item.getAttribute("aria-label") ?? "")).not.toContainEqual(expect.stringMatching(/^Open question/));
   });
+
+  it("takes you from the pinned question to its hotspot on the board", async () => {
+    const { user } = await asked();
+    const pinned = screen.getByRole("complementary", { name: "Current question" });
+
+    await user.click(within(pinned).getByRole("button", { name: "On the board ↖ linked to 2 events" }));
+
+    expect(document.activeElement).toBe(board().querySelector(".hotspot-card"));
+  });
 });

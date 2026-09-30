@@ -9,7 +9,7 @@ export type Hotspot = { id: EntityId; text: string; links: readonly EntityId[]; 
 
 export function hotspotOf(exchanges: readonly Exchange[], board: Board, restoreNames: RestoreNames): Hotspot | null {
   const asked = latestQuestionOf(exchanges);
-  if (asked === null) return null;
+  if (asked === null || board.cards.length === 0) return null;
   return { id: entityId("question", asked.text), text: restoreNames(asked.text).text, links: questionLinksOf(asked, board, exchanges), askedIn: asked.exchangeId };
 }
 

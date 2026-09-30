@@ -23,6 +23,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const announced = useAnnouncedEdits(board, edits, restoreNames);
   const { selected, toggle } = useBoardSelection();
   const [panHeld, setPanHeld] = useState(false);
+  const [questionReveals, setQuestionReveals] = useState(0);
   const touching = <A extends unknown[]>(act: (...args: A) => void) => (...args: A) => {
     setPanHeld(true);
     act(...args);
@@ -48,6 +49,8 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
     hotspot: hotspotOf(exchanges, board, restoreNames),
+    questionReveals,
+    revealQuestion: () => setQuestionReveals((count) => count + 1),
   };
 }
 
