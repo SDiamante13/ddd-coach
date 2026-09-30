@@ -53,6 +53,7 @@ Template: the latest `outputs/demos/*-deploy.md` (e.g. `117-121-118-deploy.md`).
 - Output: `outputs/demos/slice-NN.{mp4,png,md}`. Skip the GIF (git history keeps every byte forever); make one only if asked, and keep it under 1 MB.
 - Never reload or open mid-recording: the recorder silently stops capturing. Split with `record stop`/`start` and join with ffmpeg concat.
 - Recording ignores `set viewport`, so take the 1280×800 PNG outside the recording. If `record stop` fails with "ffmpeg wait failed", retry it.
+- Demo highlights use magenta, a colour the app never uses, and every report says which marks are overlays. An orange pointer ring was once mistaken for app styling and drove a design change (#123).
 - Injected overlays (captions, spy panels) need `pointer-events:none` and body padding so they don't hide results or catch clicks.
 - Mid-script, use CSS selectors or `form.requestSubmit()` instead of `@eN` refs, which go stale. Avoid `wait --fn` (it hangs past the tool timeout).
 - Always give `screenshot` an absolute path: a relative path lands in the repo root.
