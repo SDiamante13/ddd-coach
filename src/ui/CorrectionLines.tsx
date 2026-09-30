@@ -1,6 +1,6 @@
 import { CORRECTIONS_ENABLED } from "../shared/features.ts";
 
-export type CorrectionLine = { was: string; now: string };
+export type CorrectionLine = { was: string; now: string; settled?: boolean };
 
 const NEXT_TURN = ". The coach's next turn uses your wording.";
 
@@ -8,7 +8,7 @@ export const correctionLineText = ({ was, now }: CorrectionLine): string => `You
 
 export function CorrectionLines({ lines }: { lines: readonly CorrectionLine[] }) {
   return lines.map((line, index) => (
-    <p key={index} className="correction-line">
+    <p key={index} className="correction-line" data-settled={line.settled || undefined}>
       {correctionLineText(line)}
     </p>
   ));

@@ -98,7 +98,7 @@ function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
   const nodes = useMemo(() => nodesOf(props), [props]);
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props)], [props]);
-  const newEvents = usePanToChanges(props.view.board, props.view.panHeld, props.view.releasePan);
+  const newEvents = usePanToChanges(props.view);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
     <div ref={root} className="board-lane">

@@ -12,8 +12,11 @@ import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useVisitorActions } from "./useVisitorActions.ts";
+import type { RestorePoint } from "./useKeptConversation.ts";
 
-export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>) {
+const FRESH: RestorePoint = { turn: null, actions: 0 };
+
+export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, restorePoint = FRESH) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
@@ -35,22 +38,28 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     connect: touching(announced.connect),
     panHeld,
     releasePan: () => setPanHeld(false),
-    linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames),
-    justDrawn: justDrawnOf(board, edits.actions),
+    linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames, restorePoint.actions),
+    justDrawn: edits.actions.length > restorePoint.actions ? justDrawnOf(board, edits.actions) : null,
+    atRest: restorePoint.turn !== null && board.latest === restorePoint.turn,
     undoable: undoableOf(board, edits.actions.at(-1)),
-    correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames),
+    correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames, keptCorrection(edits.actions, restorePoint)),
     highlight,
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
   };
 }
 
-function correctionLinesOf(board: Board, id: ExchangeId, restoreNames: RestoreNames): CorrectionLine[] {
+function correctionLinesOf(board: Board, id: ExchangeId, restoreNames: RestoreNames, settled: (card: EntityId) => boolean): CorrectionLine[] {
   const restored = (text: string) => restoreNames(text).text;
-  return board.cards.flatMap(({ correctedFrom, correctedAt, text }) =>
-    correctedFrom !== undefined && correctedAt === id ? [{ was: restored(correctedFrom), now: restored(text) }] : [],
+  return board.cards.flatMap(({ id: card, correctedFrom, correctedAt, text }) =>
+    correctedFrom !== undefined && correctedAt === id ? [{ was: restored(correctedFrom), now: restored(text), settled: settled(card) }] : [],
   );
 }
+
+const keptCorrection =
+  (actions: readonly VisitorAction[], { actions: kept }: RestorePoint) =>
+  (card: EntityId): boolean =>
+    actions.reduce((last, action, index) => (action.kind === "correct" && action.id === card ? index : last), -1) < kept;
 
 const NO_EVENTS: ReplyCounts = { added: 0, updated: 0, already: 0 };
 

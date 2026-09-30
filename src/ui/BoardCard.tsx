@@ -12,7 +12,7 @@ export type CardPlace = { index: number; total: number };
 
 export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & { place: CardPlace }) {
   const [editing, setEditing] = useState(false);
-  const change = changeOf(view.board, card);
+  const change = view.atRest ? null : changeOf(view.board, card);
   const pressed = view.selected === card.id;
   const noteId = `note-${card.id}`;
   const title = restoreNames(card.text).text;

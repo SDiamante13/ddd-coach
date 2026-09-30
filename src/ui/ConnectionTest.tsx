@@ -20,7 +20,7 @@ type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
-  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits);
+  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits, composer.restorePoint);
 
   return (
     <>

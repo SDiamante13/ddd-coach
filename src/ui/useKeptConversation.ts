@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { sentCorrectionsOf } from "../domain/board.ts";
 import { boardOf } from "../domain/boardFromReplies.ts";
-import type { Prompt } from "../domain/exchange.ts";
+import type { ExchangeId, Prompt } from "../domain/exchange.ts";
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
 import { CORRECTIONS_ENABLED } from "../shared/features.ts";
 import { keepSession, keptSession } from "./sessionStore.ts";
 import { useExchanges } from "./useExchanges.ts";
 import { useVisitorActions } from "./useVisitorActions.ts";
+
+export type RestorePoint = { turn: ExchangeId | null; actions: number };
 
 type KeptConversationOptions = {
   outgoing: (text: string) => string;
@@ -17,6 +19,7 @@ type KeptConversationOptions = {
 
 export function useKeptConversation({ outgoing, ...callbacks }: KeptConversationOptions) {
   const [kept] = useState(keptSession);
+  const [restorePoint] = useState<RestorePoint>(() => ({ turn: boardOf(kept.exchanges, kept.visitorActions).latest, actions: kept.visitorActions.length }));
   const edits = useVisitorActions(outgoing, kept.visitorActions);
   const chat = useExchanges({
     ...callbacks,
@@ -28,5 +31,5 @@ export function useKeptConversation({ outgoing, ...callbacks }: KeptConversation
     chat.clear();
     edits.clear();
   };
-  return { ...chat, edits, clear };
+  return { ...chat, edits, clear, restorePoint };
 }

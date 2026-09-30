@@ -157,4 +157,52 @@ describe("Keeping the session across a reload (#5)", () => {
 
     expect(composerOf(input())).toHaveAttribute("data-resting");
   });
+
+  describe("the restored board at rest (#124)", () => {
+    it("marks no card JUST ADDED after a reload, but keeps Undo for your correction", async () => {
+      const { user } = await onTheBoard();
+      expect(within(board()).getAllByText("JUST ADDED").length).toBeGreaterThan(0);
+      await user.dblClick(within(cardItem(GUESS)!).getByRole("button"));
+      const field = within(board()).getByRole("textbox", { name: "Correct this event" });
+      await user.clear(field);
+      await user.type(field, `${FIXED}{Enter}`);
+
+      await reload();
+
+      expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
+      expect(within(board()).queryByRole("button", { name: /new events? on the right/ })).not.toBeInTheDocument();
+      expect(within(board()).getByRole("button", { name: "Undo" })).toBeInTheDocument();
+    });
+
+    it("shows a restored correction's log line settled, and rings only a new one", async () => {
+      const { user } = await onTheBoard();
+      await user.dblClick(within(cardItem(GUESS)!).getByRole("button"));
+      const field = within(board()).getByRole("textbox", { name: "Correct this event" });
+      await user.clear(field);
+      await user.type(field, `${FIXED}{Enter}`);
+
+      const { user: after } = await reload();
+      await after.dblClick(within(cardItem(FIRST)!).getByRole("button"));
+      const again = within(board()).getByRole("textbox", { name: "Correct this event" });
+      await after.clear(again);
+      await after.type(again, "Customer books on the portal.{Enter}");
+
+      const lineAbout = (words: string) => [...document.querySelectorAll("p.correction-line")].find((line) => line.textContent?.includes(words));
+      expect(lineAbout(FIXED)).toHaveAttribute("data-settled");
+      expect(lineAbout("Customer books on the portal.")).not.toHaveAttribute("data-settled");
+    });
+
+    it("draws a restored link in ink, not as Just drawn", async () => {
+      const { user } = await onTheBoard();
+      await user.click(within(cardItem(FIRST)!).getByRole("button"));
+      await user.click(within(board()).getByRole("button", { name: "Connect to…" }));
+      await user.click(within(board()).getByRole("button", { name: `Link to “${GUESS}”` }));
+      await within(board()).findByText("Just drawn");
+
+      await reload();
+
+      expect(within(board()).queryByText("Just drawn")).not.toBeInTheDocument();
+      expect(document.querySelector("p.correction-line")).toHaveAttribute("data-settled");
+    });
+  });
 });

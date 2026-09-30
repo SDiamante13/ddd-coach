@@ -4,7 +4,7 @@ import type { EntityId } from "../domain/entityId.ts";
 import type { ExchangeId } from "../domain/exchange.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
-export type LinkLine = { from: string; to: string; undoable: boolean };
+export type LinkLine = { from: string; to: string; undoable: boolean; settled: boolean };
 
 export const linkLineText = ({ from, to }: { from: string; to: string }): string => `You connected “${from}” → “${to}”`;
 
@@ -25,9 +25,10 @@ export function justDrawnOf(board: Board, actions: readonly VisitorAction[]): Li
   return last?.kind === "connect" && last.after === board.latest && onBoard(board, last) ? { from: last.from, to: last.to } : null;
 }
 
-export function linkLinesOf(board: Board, actions: readonly VisitorAction[], id: ExchangeId, restoreNames: RestoreNames): LinkLine[] {
+export function linkLinesOf(board: Board, actions: readonly VisitorAction[], id: ExchangeId, restoreNames: RestoreNames, keptActions = 0): LinkLine[] {
   const last = actions.at(-1);
+  const settled = (link: Connection) => actions.indexOf(link) < keptActions;
   return actions
     .filter((action): action is Connection => action.kind === "connect" && action.after === id && onBoard(board, action))
-    .map((link) => ({ from: titleOf(board, link.from, restoreNames), to: titleOf(board, link.to, restoreNames), undoable: link === last }));
+    .map((link) => ({ from: titleOf(board, link.from, restoreNames), to: titleOf(board, link.to, restoreNames), undoable: link === last, settled: settled(link) }));
 }

@@ -646,6 +646,11 @@ ol[role="log"] > li > p.correction-line {
   animation: line-rest 300ms 3s forwards;
 }
 
+ol[role="log"] > li > p.correction-line[data-settled] {
+  border-color: transparent;
+  animation: none;
+}
+
 @keyframes line-rest {
   to {
     border-color: transparent;
