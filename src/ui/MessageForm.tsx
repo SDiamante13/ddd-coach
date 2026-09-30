@@ -15,19 +15,20 @@ type MessageFormProps = {
   boxRef?: Ref<HTMLTextAreaElement>;
   notice?: ReactNode;
   outgoing?: (draft: string) => string;
+  restsAtStart?: boolean;
 };
 
 const asTyped = (draft: string) => draft;
 
 export function MessageForm(props: MessageFormProps) {
-  const { busy, draft, onDraftChange, onSend, children, boxRef, notice, outgoing = asTyped } = props;
+  const { busy, draft, onDraftChange, onSend, children, boxRef, notice, outgoing = asTyped, restsAtStart = false } = props;
   const id = useId();
   const keyHint = !hasTouchPointer();
   const sent = outgoing(draft);
   const length = messageLength(sent);
   const limit = draftLimit(length, MAX_MESSAGE_CHARS);
   const over = limit === "over";
-  const rest = useRestAfterSend();
+  const rest = useRestAfterSend(restsAtStart);
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -65,8 +66,8 @@ export function MessageForm(props: MessageFormProps) {
   );
 }
 
-function useRestAfterSend() {
-  const [resting, setResting] = useState(false);
+function useRestAfterSend(restsAtStart: boolean) {
+  const [resting, setResting] = useState(restsAtStart);
   const end = () => setResting(false);
   return {
     resting,

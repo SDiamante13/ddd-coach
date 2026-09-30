@@ -1,5 +1,5 @@
 import type { VisitorAction } from "./boardFromReplies.ts";
-import { type Exchange, parsePrompt, type Remedy } from "./exchange.ts";
+import { type Exchange, fail, parsePrompt, type Remedy } from "./exchange.ts";
 import { field, stringField } from "../shared/json.ts";
 
 export const SESSION_VERSION = 1;
@@ -8,13 +8,18 @@ export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly
 
 export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [] };
 
+const RELOADED_BEFORE_REPLY = "The page reloaded before the coach answered.";
+
 export function sessionOf(stored: unknown): Session {
   const exchanges = field(stored, "exchanges");
   const visitorActions = field(stored, "visitorActions");
   const valid =
     field(stored, "version") === SESSION_VERSION && everyIs(exchanges, isExchange) && everyIs(visitorActions, isVisitorAction);
-  return valid ? { exchanges, visitorActions } : EMPTY_SESSION;
+  return valid ? { exchanges: exchanges.map(unanswered), visitorActions } : EMPTY_SESSION;
 }
+
+const unanswered = (exchange: Exchange): Exchange =>
+  exchange.status === "pending" ? fail(exchange, { error: RELOADED_BEFORE_REPLY, remedy: "retry" }) : exchange;
 
 function everyIs<T>(value: unknown, guard: (item: unknown) => item is T): value is T[] {
   return Array.isArray(value) && value.every(guard);

@@ -63,6 +63,7 @@ function ComposerForm({ composer }: { composer: Composer }) {
       onDraftChange={box.setDraft}
       onSend={composer.submit}
       outgoing={box.outgoing}
+      restsAtStart={composer.exchanges.length > 0}
       boxRef={box.boxRef}
       notice={follow.newReply && <NewReplyButton onReveal={follow.revealNewest} />}
     >

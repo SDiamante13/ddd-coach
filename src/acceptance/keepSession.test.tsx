@@ -1,6 +1,8 @@
 import { cleanup, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { addSwap, renderApp, startConversation } from "../test/appDriver.tsx";
+import { COACH_UNVERIFIED } from "../shared/chatContract.ts";
+import { addSwap, composerOf, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
+import { stubFetch } from "../test/fetchStub.ts";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => {
@@ -121,5 +123,38 @@ describe("Keeping the session across a reload (#5)", () => {
     await sendAndReply("Here is our thread.", "R1", "sig-1");
 
     expect(within(log()).getByText("R1")).toBeInTheDocument();
+  });
+
+  it("brings back a message still waiting at the reload as a failure you can retry", async () => {
+    const { send, server } = await startConversation();
+    await send("Here is our thread.");
+
+    const { log, user } = await reload();
+
+    expect(within(log()).getByRole("alert")).toHaveTextContent("The page reloaded before the coach answered.");
+    await user.click(within(log()).getByRole("button", { name: "Retry" }));
+    expect(server.bodyOf(1)).toEqual({ message: "Here is our thread.", history: [] });
+  });
+
+  it("offers New conversation when the server no longer trusts the restored history", async () => {
+    stored({ version: 1, exchanges: [REPLIED], visitorActions: [] });
+    const server = stubFetch();
+    const { user, input, log } = await renderApp();
+
+    await sendText(user, input(), "And 48102?");
+    expect(server.bodyOf(0)).toMatchObject({ history: [{ signature: "sig-1" }] });
+    server.reply(0, 400, { error: COACH_UNVERIFIED, reason: "unverified" });
+
+    expect(await within(log()).findByRole("alert")).toHaveTextContent(COACH_UNVERIFIED);
+    expect(within(log()).getByRole("button", { name: "New conversation" })).toBeEnabled();
+  });
+
+  it("rests the composer after a reload, as after Send, so the log doesn't jump under a click", async () => {
+    const { sendAndReply } = await startConversation();
+    await sendAndReply("Here is our thread.", "R1", "sig-1");
+
+    const { input } = await reload();
+
+    expect(composerOf(input())).toHaveAttribute("data-resting");
   });
 });
