@@ -6,10 +6,15 @@ export const looksLikeIdentifier = (token: string): boolean => IDENTIFIER.test(t
 
 const bare = (token: string): string => token.replace(/^[^\w]+|[^\w()]+$/g, "");
 
-const namesAClass = (tokens: readonly string[], index: number): boolean =>
-  CLASS_NAME.test(tokens[index]!) && [tokens[index - 1], tokens[index + 1]].some((next) => next !== undefined && CLASS_WORD.test(next));
+function classNamedAt(tokens: readonly string[], index: number): string[] {
+  if (!CLASS_WORD.test(tokens[index]!)) return [];
+  const [before, after] = [tokens[index - 1], tokens[index + 1]];
+  if (after !== undefined && CLASS_NAME.test(after)) return [after];
+  return before !== undefined && CLASS_NAME.test(before) ? [before] : [];
+}
 
 export const identifiersIn = (text: string): string[] => {
   const tokens = text.split(/\s+/).map(bare);
-  return [...new Set(tokens.filter((token, index) => looksLikeIdentifier(token) || namesAClass(tokens, index)))];
+  const named = tokens.flatMap((token, index) => (looksLikeIdentifier(token) ? [token] : classNamedAt(tokens, index)));
+  return [...new Set(named)];
 };
