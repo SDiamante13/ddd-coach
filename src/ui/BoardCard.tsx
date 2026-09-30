@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from "react";
+import { type KeyboardEvent, type RefObject, useLayoutEffect, useRef, useState } from "react";
 import { changeOf, type EventCard, labelOf, struckWordsOf } from "../domain/board.ts";
 import { CardNote } from "./CardNote.tsx";
 import type { BoardView } from "./EventBoard.tsx";
@@ -43,14 +43,43 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
 
 function CardFace({ card, view, title, restoreNames }: BoardCardProps & { title: string }) {
   const struck = struckWordsOf(view.board, card);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const overflowing = useOverflow(titleRef, title);
   return (
     <>
       <span className="card-kind">EVENT</span>
       <span className="card-source">{labelOf(card)}</span>
-      <span className="card-title">{title}</span>
-      {struck && <s className="card-was">{restoreNames(struck).text}</s>}
+      <span ref={titleRef} className="card-title">
+        {title}
+      </span>
+      {struck && <WasLine words={restoreNames(struck).text} collapsed={overflowing} />}
     </>
   );
+}
+
+function WasLine({ words, collapsed }: { words: string; collapsed: boolean }) {
+  return (
+    <span className="card-was">
+      was:{" "}
+      {collapsed ? (
+        <>
+          <span aria-hidden="true">…</span>
+          <s className="visually-hidden">{words}</s>
+        </>
+      ) : (
+        <s>{words}</s>
+      )}
+    </span>
+  );
+}
+
+function useOverflow(ref: RefObject<HTMLElement | null>, text: string): boolean {
+  const [overflowing, setOverflowing] = useState(false);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    setOverflowing(element !== null && element.scrollHeight > element.clientHeight + 1);
+  }, [ref, text]);
+  return overflowing;
 }
 
 function UndoPill({ onUndo }: { onUndo: () => void }) {

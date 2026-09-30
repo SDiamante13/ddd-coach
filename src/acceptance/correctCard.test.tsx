@@ -53,6 +53,36 @@ describe("Correcting a card (#95)", () => {
     expect(announcer).toHaveTextContent("Correction undone.");
   });
 
+  describe("her words win the space (#123)", () => {
+    afterEach(() => vi.restoreAllMocks());
+
+    it("keeps the coach's old words to one struck line after 'was:'", async () => {
+      const { user } = await onTheBoard();
+
+      await correctCard(user, GUESS, FIXED);
+
+      const was = cardItem(FIXED).querySelector(".card-was")!;
+      expect(was).toHaveTextContent(`was: ${GUESS}`);
+      expect(within(was as HTMLElement).getByText(GUESS).tagName).toBe("S");
+    });
+
+    it("collapses the old words to 'was: …' when her words alone overflow the card, keeping them for screen readers", async () => {
+      vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("card-title") ? 200 : 0;
+      });
+      vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("card-title") ? 80 : 0;
+      });
+      const { user } = await onTheBoard();
+
+      await correctCard(user, GUESS, FIXED);
+
+      const was = cardItem(FIXED).querySelector(".card-was")! as HTMLElement;
+      expect(within(was).getByText("…")).toHaveAttribute("aria-hidden", "true");
+      expect(within(was).getByText(GUESS)).toHaveClass("visually-hidden");
+    });
+  });
+
   it("leaves the card as it was on Escape", async () => {
     const { user } = await onTheBoard();
     await user.dblClick(within(cardItem(GUESS)).getByRole("button"));
