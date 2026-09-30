@@ -6,7 +6,10 @@ import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../tes
 afterEach(() => vi.unstubAllGlobals());
 
 const board = () => screen.getByRole("region", { name: "Event board" });
-const cards = () => within(within(board()).getByRole("list", { name: "Events on the board" })).getAllByRole("listitem");
+const cards = () =>
+  within(within(board()).getByRole("list", { name: "Events on the board" }))
+    .getAllByRole("listitem")
+    .filter((item) => !item.getAttribute("aria-label")?.startsWith("Open question"));
 const newChip = () => within(board()).queryByRole("button", { name: /^Show the / });
 
 async function onTheBoard() {

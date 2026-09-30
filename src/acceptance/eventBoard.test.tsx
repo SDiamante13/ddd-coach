@@ -7,7 +7,10 @@ import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../tes
 afterEach(() => vi.unstubAllGlobals());
 
 const board = () => screen.getByRole("region", { name: "Event board" });
-const cards = () => within(within(board()).getByRole("list", { name: "Events on the board" })).getAllByRole("listitem");
+const cards = () =>
+  within(within(board()).getByRole("list", { name: "Events on the board" }))
+    .getAllByRole("listitem")
+    .filter((item) => !item.getAttribute("aria-label")?.startsWith("Open question"));
 
 type Conversation = Awaited<ReturnType<typeof startConversation>>;
 
@@ -41,7 +44,7 @@ describe("Event board", () => {
       "EVENTFROM THREADThe carrier rejects the booking.JUST ADDED",
       "EVENTGUESSOps chooses another carrier and resubmits the booking.JUST ADDED",
     ]);
-    expect(within(board()).getByText("3 events · 1 guess")).toBeInTheDocument();
+    expect(within(board()).getByText("3 events · 1 guess · 1 open question")).toBeInTheDocument();
   });
 
   it("names each card with its place in the timeline, in timeline order, for screen readers and the keyboard (#96)", async () => {

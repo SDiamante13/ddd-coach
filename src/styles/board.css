@@ -723,3 +723,16 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   color: var(--color-ink);
   font-size: var(--text-sm);
 }
+
+/* #97: the coach's open question sits under the row as a pink hotspot, dotted to the events it joins. */
+.hotspot-card {
+  background: var(--color-card-question);
+  cursor: default;
+}
+
+.board-lane .relates-edge .react-flow__edge-path {
+  stroke: var(--color-card-question);
+  stroke-width: 2;
+  stroke-dasharray: 2 5;
+  stroke-linecap: round;
+}

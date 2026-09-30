@@ -9,6 +9,7 @@ import { lineOfCard, type LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 import type { CorrectionLine } from "./CorrectionLines.tsx";
 import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
+import { hotspotOf } from "./hotspot.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useVisitorActions } from "./useVisitorActions.ts";
@@ -46,6 +47,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     highlight,
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
+    hotspot: hotspotOf(exchanges, board, restoreNames),
   };
 }
 

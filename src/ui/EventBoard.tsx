@@ -3,6 +3,7 @@ import "../styles/board.css";
 import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
 import { PickedUpLine } from "./PickedUpLine.tsx";
+import type { Hotspot } from "./hotspot.ts";
 import type { Viewport } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
@@ -20,6 +21,7 @@ export type BoardView = {
   highlightedLine: string | null;
   panHeld: boolean;
   atRest: boolean;
+  hotspot: Hotspot | null;
   releasePan: () => void;
 };
 export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void; saving: boolean };
@@ -44,7 +46,7 @@ export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION 
       ) : (
         <>
           <p className="board-header">
-            <span className="board-label">Timeline · Events</span> <span>{boardSummary(view.board)}</span>
+            <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
           </p>
           <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} />
         </>

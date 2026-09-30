@@ -9,6 +9,7 @@ import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { NewEventsChip } from "./NewEventsChip.tsx";
+import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
@@ -33,11 +34,11 @@ function EventNode({ data: { card, view, restoreNames, index, total } }: NodePro
 
 const GhostNode = () => <div className="ghost-card" />;
 
-const NODE_TYPES = { event: EventNode, ghost: GhostNode };
+const NODE_TYPES = { event: EventNode, ghost: GhostNode, question: QuestionNode };
 
 type LaneProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session: BoardSession };
 
-function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | GhostNodeType)[] {
+function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | GhostNodeType | QuestionNodeType)[] {
   const { cards } = view.board;
   const events: EventNodeType[] = cards.map((card, index) => ({
     id: card.id,
@@ -51,7 +52,7 @@ function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | 
   const ghosts: GhostNodeType[] = thinking
     ? GHOST_SLOTS.map((slot) => ({ id: `ghost-${slot}`, type: "ghost", className: "board-ghost", position: lanePosition(cards.length + slot - 1), ...SLOT, data: {}, domAttributes: { "aria-hidden": true } }))
     : [];
-  return [...events, ...ghosts];
+  return [...events, ...questionNodesOf(view), ...ghosts];
 }
 
 const thenEdgesOf = (cards: readonly EventCard[]): Edge[] =>
@@ -98,7 +99,7 @@ export function BoardFlow(props: LaneProps) {
 function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
   const nodes = useMemo(() => nodesOf(props), [props]);
-  const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props)], [props]);
+  const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
   const newEvents = usePanToChanges(props.view);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
