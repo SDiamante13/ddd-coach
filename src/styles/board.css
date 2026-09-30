@@ -520,3 +520,44 @@ ol[role="log"] mark {
   color: var(--color-ink-muted);
   font-size: var(--text-sm);
 }
+
+/* #117: clamp titles at 4 lines (full text on select), one card height per row, JUST ADDED on the ring. */
+.board-lane {
+  align-items: stretch;
+}
+
+.board-lane > li {
+  display: flex;
+  flex-direction: column;
+}
+
+.board-lane > li > .card {
+  flex: 1 0 auto;
+}
+
+.card-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+.card[aria-pressed="true"] .card-title {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+}
+
+.card .card-tag {
+  position: absolute;
+  top: -16px;
+  left: -7px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--color-coach);
+  color: var(--color-on-coach);
+  font-size: 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
