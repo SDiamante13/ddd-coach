@@ -562,7 +562,7 @@ body:has(.event-board) .pinned-question .question-card {
   mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
 }
 
-/* #96: visitor-drawn links. The link handle shows on hover or focus; links are drawn in coach blue; "Just drawn" settles after 3 s. */
+/* #96: visitor-drawn links. The link handle shows on hover or focus; links rest in ink and show coach blue only while "Just drawn" (#124). */
 .board-lane .react-flow__handle.link-handle {
   top: auto;
   bottom: -12px;
@@ -588,8 +588,12 @@ body:has(.event-board) .pinned-question .question-card {
 }
 
 .board-lane .link-edge .react-flow__edge-path {
-  stroke: var(--color-coach);
+  stroke: var(--color-ink);
   stroke-width: 2.5;
+}
+
+.board-lane .link-edge.just-drawn .react-flow__edge-path {
+  stroke: var(--color-coach);
 }
 
 .board-lane .just-drawn .react-flow__edge-textwrapper {

@@ -202,6 +202,7 @@ describe("Keeping the session across a reload (#5)", () => {
       await reload();
 
       expect(within(board()).queryByText("Just drawn")).not.toBeInTheDocument();
+      expect(within(board()).getByRole("img", { name: /^Link from/ }).querySelector("path")!.getAttribute("marker-end")).toContain("--color-ink");
       expect(document.querySelector("p.correction-line")).toHaveAttribute("data-settled");
     });
   });

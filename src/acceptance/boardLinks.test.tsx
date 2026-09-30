@@ -77,6 +77,18 @@ describe("Linking two cards (#96)", () => {
     expect(within(board()).queryByText("Just drawn")).not.toBeInTheDocument();
   });
 
+  it("draws a link in coach blue only while it's Just drawn, then in ink (#124)", async () => {
+    const conversation = await onTheBoard();
+    await connectFromKeyboard(conversation.user);
+    const arrowhead = () => linkEdge()!.querySelector("path")!.getAttribute("marker-end");
+    expect(arrowhead()).toContain("--color-coach");
+
+    conversation.server.reply(await conversation.send("And the next part."), 200, { reply: THIRD_BOARD_REPLY, signature: "sig-2" });
+    await within(conversation.log()).findAllByRole("button", { name: /on the board/ });
+
+    expect(arrowhead()).toContain("--color-ink");
+  });
+
   it("announces a new link and its undo in the one 'Board changes' region", async () => {
     const { user } = await onTheBoard();
 

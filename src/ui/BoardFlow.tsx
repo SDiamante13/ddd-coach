@@ -80,7 +80,7 @@ const linkEdgesOf = ({ view, restoreNames }: LaneProps): Edge[] =>
     type: "smoothstep",
     pathOptions: { offset: LINK_DROP + LINK_STACK * index, borderRadius: 16 },
     className: isJustDrawn(view, from, to) ? "link-edge just-drawn" : "link-edge",
-    markerEnd: { type: MarkerType.ArrowClosed, color: "var(--color-coach)" },
+    markerEnd: { type: MarkerType.ArrowClosed, color: isJustDrawn(view, from, to) ? "var(--color-coach)" : "var(--color-ink)" },
     ariaLabel: `Link from “${titleOf(view.board, from, restoreNames)}” to “${titleOf(view.board, to, restoreNames)}”`,
   }));
 
