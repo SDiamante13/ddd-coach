@@ -14,7 +14,7 @@ import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useVisitorActions } from "./useVisitorActions.ts";
 import type { RestorePoint } from "./useKeptConversation.ts";
 
-const FRESH: RestorePoint = { turn: null, actions: 0 };
+const FRESH: RestorePoint = { turn: null, actions: 0, savedAt: null };
 
 export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, restorePoint = FRESH) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);

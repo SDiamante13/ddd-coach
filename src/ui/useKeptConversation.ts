@@ -8,7 +8,7 @@ import { keepSession, keptSession } from "./sessionStore.ts";
 import { useExchanges } from "./useExchanges.ts";
 import { useVisitorActions } from "./useVisitorActions.ts";
 
-export type RestorePoint = { turn: ExchangeId | null; actions: number };
+export type RestorePoint = { turn: ExchangeId | null; actions: number; savedAt: string | null };
 
 type KeptConversationOptions = {
   outgoing: (text: string) => string;
@@ -19,7 +19,11 @@ type KeptConversationOptions = {
 
 export function useKeptConversation({ outgoing, ...callbacks }: KeptConversationOptions) {
   const [kept] = useState(keptSession);
-  const [restorePoint] = useState<RestorePoint>(() => ({ turn: boardOf(kept.exchanges, kept.visitorActions).latest, actions: kept.visitorActions.length }));
+  const [restorePoint] = useState<RestorePoint>(() => ({
+    turn: boardOf(kept.exchanges, kept.visitorActions).latest,
+    actions: kept.visitorActions.length,
+    savedAt: kept.exchanges.length > 0 ? kept.savedAt : null,
+  }));
   const edits = useVisitorActions(outgoing, kept.visitorActions);
   const chat = useExchanges({
     ...callbacks,

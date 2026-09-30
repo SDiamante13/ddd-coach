@@ -1,4 +1,4 @@
-import { cleanup, screen, within } from "@testing-library/react";
+import { act, cleanup, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_UNVERIFIED } from "../shared/chatContract.ts";
 import { addSwap, composerOf, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
@@ -203,6 +203,35 @@ describe("Keeping the session across a reload (#5)", () => {
 
       expect(within(board()).queryByText("Just drawn")).not.toBeInTheDocument();
       expect(document.querySelector("p.correction-line")).toHaveAttribute("data-settled");
+    });
+  });
+
+  describe("the picked-up line (#124)", () => {
+    const savedAt = new Date(2026, 8, 29, 14, 5).toISOString();
+
+    it("says when you left off", async () => {
+      stored({ version: 1, exchanges: [REPLIED], visitorActions: [], savedAt });
+
+      await renderApp();
+
+      expect(screen.getByText("Picked up where you left off · 29 Sep 2026, 14:05")).toBeInTheDocument();
+    });
+
+    it("fades out after 5 seconds", async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      stored({ version: 1, exchanges: [REPLIED], visitorActions: [], savedAt });
+      await renderApp();
+
+      act(() => vi.advanceTimersByTime(5000));
+
+      expect(screen.queryByText(/Picked up where you left off/)).not.toBeInTheDocument();
+      vi.useRealTimers();
+    });
+
+    it("says nothing on a fresh start", async () => {
+      await renderApp();
+
+      expect(screen.queryByText(/Picked up where you left off/)).not.toBeInTheDocument();
     });
   });
 });

@@ -4,9 +4,9 @@ import { field, stringField } from "../shared/json.ts";
 
 export const SESSION_VERSION = 1;
 
-export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly VisitorAction[] };
+export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly VisitorAction[]; savedAt: string | null };
 
-export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [] };
+export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null };
 
 const RELOADED_BEFORE_REPLY = "The page reloaded before the coach answered.";
 
@@ -15,7 +15,12 @@ export function sessionOf(stored: unknown): Session {
   const visitorActions = field(stored, "visitorActions");
   const valid =
     field(stored, "version") === SESSION_VERSION && everyIs(exchanges, isExchange) && everyIs(visitorActions, isVisitorAction);
-  return valid ? { exchanges: exchanges.map(unanswered), visitorActions } : EMPTY_SESSION;
+  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored) } : EMPTY_SESSION;
+}
+
+function savedAtOf(stored: unknown): string | null {
+  const savedAt = stringField(stored, "savedAt");
+  return savedAt !== undefined && !Number.isNaN(Date.parse(savedAt)) ? savedAt : null;
 }
 
 const unanswered = (exchange: Exchange): Exchange =>

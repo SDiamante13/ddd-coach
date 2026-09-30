@@ -2,6 +2,7 @@ import { type Board, boardSummary, type Link } from "../domain/board.ts";
 import "../styles/board.css";
 import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
+import { PickedUpLine } from "./PickedUpLine.tsx";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 export { BOARD_LANE_ID } from "./BoardFlow.tsx";
@@ -20,12 +21,13 @@ export type BoardView = {
   atRest: boolean;
   releasePan: () => void;
 };
-type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames };
+type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; pickedUpAt?: string | null };
 
-export function EventBoard({ view, thinking, restoreNames }: EventBoardProps) {
+export function EventBoard({ view, thinking, restoreNames, pickedUpAt = null }: EventBoardProps) {
   const empty = view.board.cards.length === 0 && !thinking;
   return (
     <section className="event-board" aria-label="Event board">
+      <PickedUpLine savedAt={pickedUpAt} />
       {empty ? (
         <p className="board-empty">Events from your paste land here, left to right, in order.</p>
       ) : (

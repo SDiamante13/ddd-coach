@@ -4,4 +4,6 @@ export const shortDate = (date: Date): string => `${date.getDate()} ${MONTHS[dat
 
 const pad = (value: number): string => String(value).padStart(2, "0");
 
+export const clockTime = (date: Date): string => `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+
 export const isoDay = (date: Date): string => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

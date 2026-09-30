@@ -685,3 +685,27 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   box-shadow: var(--focus-ring);
   outline: none;
 }
+
+/* #124: after a reload, one quiet line says when the session was left, and fades by 5 s. */
+.picked-up {
+  margin: 0 0 var(--space-3);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  animation: picked-up-fade 5s forwards;
+}
+
+@keyframes picked-up-fade {
+  80% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .picked-up {
+    animation: none;
+  }
+}

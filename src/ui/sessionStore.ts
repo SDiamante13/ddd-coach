@@ -2,9 +2,9 @@ import { EMPTY_SESSION, type Session, SESSION_VERSION, sessionOf } from "../doma
 
 const KEY = "ddd-coach.session.v1";
 
-export function keepSession(session: Session): void {
+export function keepSession(session: Omit<Session, "savedAt">): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ version: SESSION_VERSION, ...session }));
+    localStorage.setItem(KEY, JSON.stringify({ version: SESSION_VERSION, ...session, savedAt: new Date().toISOString() }));
   } catch {
     return;
   }
