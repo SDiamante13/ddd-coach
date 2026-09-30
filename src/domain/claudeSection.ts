@@ -11,7 +11,7 @@ const NOTHING_UNSETTLED =
 const EXACT_TERMS =
   "- Use these exact terms in specs, tickets, code names, filenames and the API surface. Never abbreviate or rename them; if something has no name, ask instead of coining one.";
 
-const BY_CONTEXT = "- A term's meaning depends on its context; never merge meanings across contexts.";
+const BY_CONTEXT = "- A term's meaning depends on its context; never merge meanings across contexts. Build every settled meaning in each context that uses it, giving each context its own result; only Unsettled points wait.";
 
 const DEFINITIONS_NOT_RULES =
   "- Meanings say what a word refers to; they are definitions, not business rules to implement; ordinary integrity checks (idempotency, nulls, duplicates) still apply. Never write an unsettled reading's condition into code as if it were settled.";
