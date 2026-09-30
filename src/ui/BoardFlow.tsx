@@ -67,8 +67,11 @@ const thenEdgesOf = (cards: readonly EventCard[]): Edge[] =>
     domAttributes: { "aria-hidden": true },
   }));
 
+const LINK_DROP = 28;
+const LINK_STACK = 12;
+
 const linkEdgesOf = ({ view, restoreNames }: LaneProps): Edge[] =>
-  view.board.links.map(({ from, to }) => ({
+  view.board.links.map(({ from, to }, index) => ({
     ...(isJustDrawn(view, from, to) && { label: "Just drawn" }),
     id: `link-${from}-${to}`,
     source: from,
@@ -76,7 +79,7 @@ const linkEdgesOf = ({ view, restoreNames }: LaneProps): Edge[] =>
     sourceHandle: "link-out",
     targetHandle: "link-in",
     type: "smoothstep",
-    pathOptions: { offset: 28, borderRadius: 16 },
+    pathOptions: { offset: LINK_DROP + LINK_STACK * index, borderRadius: 16 },
     className: isJustDrawn(view, from, to) ? "link-edge just-drawn" : "link-edge",
     markerEnd: { type: MarkerType.ArrowClosed, color: "var(--color-coach)" },
     ariaLabel: `Link from “${titleOf(view.board, from, restoreNames)}” to “${titleOf(view.board, to, restoreNames)}”`,

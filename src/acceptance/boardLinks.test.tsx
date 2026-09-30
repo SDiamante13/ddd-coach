@@ -123,6 +123,21 @@ describe("Linking two cards (#96)", () => {
     });
   });
 
+  it("runs each further link 12 px lower, so stacked links don't share a line (#124)", async () => {
+    const SECOND = "The carrier rejects the booking.";
+    const { user } = await onTheBoard();
+    await connectFromKeyboard(user);
+    await user.click(within(board()).getByRole("button", { name: `Link to “${SECOND}”` }));
+    await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${SECOND}”` });
+
+    const depth = (to: string) => {
+      const path = within(board()).getByRole("img", { name: `Link from “${FIRST}” to “${to}”` }).querySelector("path")!;
+      const ys = [...path.getAttribute("d")!.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map(([, , y]) => Number(y));
+      return Math.max(...ys);
+    };
+    expect(depth(SECOND) - depth(GUESS)).toBe(12);
+  });
+
   describe("clearing 'Board changes' so a repeat is read again (#124)", () => {
     const announcer = () => screen.getByRole("status", { name: "Board changes" });
 
