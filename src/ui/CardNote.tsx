@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type RefObject, useLayoutEffect, useRef, useState } from "react";
 import type { Provenance } from "../domain/board.ts";
 import type { EntityId } from "../domain/entityId.ts";
 
@@ -6,8 +6,10 @@ export type LinkOption = { id: EntityId; title: string };
 type CardNoteProps = { id: string; provenance: Provenance; line: string | null; onCorrect: () => void; others: readonly LinkOption[]; onLink: (to: EntityId) => void };
 
 export function CardNote({ id, provenance, line, onCorrect, others, onLink }: CardNoteProps) {
+  const noteRef = useRef<HTMLDivElement>(null);
+  const align = useAlignInsideBoard(noteRef);
   return (
-    <div id={id} role="note" className="card-note">
+    <div ref={noteRef} id={id} role="note" className="card-note" data-align={align}>
       {provenance === "guess" ? (
         <p>The coach's guess: no line in your paste says this.</p>
       ) : line === null ? (
@@ -48,4 +50,13 @@ function LinkChooser({ others, onLink }: { others: readonly LinkOption[]; onLink
       )}
     </>
   );
+}
+
+function useAlignInsideBoard(ref: RefObject<HTMLElement | null>): "end" | undefined {
+  const [align, setAlign] = useState<"end">();
+  useLayoutEffect(() => {
+    const lane = ref.current?.closest(".board-lane");
+    if (ref.current && lane && ref.current.getBoundingClientRect().right > lane.getBoundingClientRect().right) setAlign("end");
+  }, [ref]);
+  return align;
 }

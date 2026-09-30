@@ -160,6 +160,11 @@ html {
   font-size: var(--text-sm);
 }
 
+.card-note[data-align="end"] {
+  right: 0;
+  left: auto;
+}
+
 .card-note p {
   margin: 0;
 }

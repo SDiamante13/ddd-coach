@@ -259,5 +259,19 @@ describe("Event board", () => {
 
       expect(within(board()).getByRole("note")).toHaveTextContent("The coach's guess: no line in your paste says this.");
     });
+
+    it("opens the note toward the board when it would run past the board's right edge (#124)", async () => {
+      const rect = (left: number, right: number) => ({ left, right, top: 0, bottom: 100, x: left, y: 0, width: right - left, height: 100, toJSON: () => ({}) });
+      vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
+        if (this.classList.contains("card-note")) return rect(900, 1180);
+        return this.classList.contains("board-lane") ? rect(0, 1000) : rect(0, 0);
+      });
+      const { user } = await replied(SECOND_BOARD_REPLY);
+
+      await user.click(cardButton("Ops chooses another carrier"));
+
+      expect(within(board()).getByRole("note")).toHaveAttribute("data-align", "end");
+      vi.restoreAllMocks();
+    });
   });
 });
