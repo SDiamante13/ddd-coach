@@ -7,6 +7,7 @@ import type { Exchange, ExchangeId } from "../domain/exchange.ts";
 import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { lineOfCard, type LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
+import type { CorrectionLine } from "./CorrectionLines.tsx";
 import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useCorrections } from "./useCorrections.ts";
 
@@ -24,10 +25,18 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     correct: (id: EntityId, text: string) => board.latest && fixes.correct(id, text, board.latest),
     undo: fixes.undo,
     undoable: undoableOf(board, fixes.corrections.at(-1)),
+    correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames),
     highlight,
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
   };
+}
+
+function correctionLinesOf(board: Board, id: ExchangeId, restoreNames: RestoreNames): CorrectionLine[] {
+  const restored = (text: string) => restoreNames(text).text;
+  return board.cards.flatMap(({ correctedFrom, correctedAt, text }) =>
+    correctedFrom !== undefined && correctedAt === id ? [{ was: restored(correctedFrom), now: restored(text) }] : [],
+  );
 }
 
 const NO_EVENTS: ReplyCounts = { added: 0, updated: 0, already: 0 };

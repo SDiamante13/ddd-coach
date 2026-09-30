@@ -9,6 +9,8 @@ afterEach(() => vi.unstubAllGlobals());
 const GUESS = "Ops chooses another carrier and resubmits the booking.";
 const FIXED = "Ops asks the customer before picking another carrier.";
 const board = () => screen.getByRole("region", { name: "Event board" });
+const LOGGED = `You corrected a sticky: “${GUESS}” → “${FIXED}”`;
+const loggedLine = () => screen.queryByText((_content, element) => element?.classList.contains("correction-line") === true);
 const cardItem = (words: string) => within(board()).getAllByRole("listitem").find((item) => item.textContent?.includes(words))!;
 
 async function onTheBoard() {
@@ -35,7 +37,7 @@ describe("Correcting a card (#95)", () => {
     expect(within(card).getByText("YOU SAID")).toBeInTheDocument();
     expect(within(card).getByText(GUESS).tagName).toBe("S");
     expect(within(card).getByRole("button", { name: "Undo" })).toBeInTheDocument();
-    expect(screen.getByRole("status", { name: "Board correction" })).toHaveTextContent("Corrected on your board.");
+    expect(loggedLine()).toHaveTextContent(LOGGED);
   });
 
   it("leaves the card as it was on Escape", async () => {
@@ -56,7 +58,7 @@ describe("Correcting a card (#95)", () => {
 
     expect(within(cardItem(GUESS)).getByText("GUESS")).toBeInTheDocument();
     expect(within(board()).queryByRole("button", { name: "Undo" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("status", { name: "Board correction" })).not.toBeInTheDocument();
+    expect(loggedLine()).not.toBeInTheDocument();
   });
 
   it("keeps YOU SAID after the next turn, which drops the struck words and Undo", async () => {
@@ -70,6 +72,7 @@ describe("Correcting a card (#95)", () => {
     expect(within(card).getByText("YOU SAID")).toBeInTheDocument();
     expect(within(card).queryByText(GUESS)).not.toBeInTheDocument();
     expect(within(card).queryByRole("button", { name: "Undo" })).not.toBeInTheDocument();
+    expect(within(conversation.log()).getAllByRole("button", { name: /on the board/ }).at(-1)).toHaveTextContent("← 1 already on the board · your wording kept");
   });
 
   it("can be corrected from the keyboard, through the card's note", async () => {
@@ -91,7 +94,7 @@ describe("Correcting a card (#95)", () => {
     conversation.server.reply(await conversation.send("Here is our #booking-split thread again."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-3" });
     await within(board()).findByRole("list", { name: "Events on the board" });
     expect(within(board()).queryByText("YOU SAID")).not.toBeInTheDocument();
-    expect(screen.queryByRole("status", { name: "Board correction" })).not.toBeInTheDocument();
+    expect(loggedLine()).not.toBeInTheDocument();
 
     await correctCard(conversation.user, "The carrier rejects the booking.", "The carrier turns the booking down.");
     await conversation.user.click(within(cardItem("The carrier turns the booking down.")).getByRole("button", { name: "Undo" }));
@@ -106,7 +109,7 @@ describe("Correcting a card (#95)", () => {
 
       await conversation.send("And the next part.");
 
-      expect(screen.getByRole("status", { name: "Board correction" })).toHaveTextContent(/^Corrected on your board\.$/);
+      expect(loggedLine()).toHaveTextContent(new RegExp(`^${LOGGED.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
       expect(conversation.server.bodyOf(1)).not.toHaveProperty("corrections");
     });
   });
@@ -116,7 +119,7 @@ describe("Correcting a card (#95)", () => {
       const conversation = await onTheBoard();
       await correctCard(conversation.user, GUESS, FIXED);
 
-      expect(screen.getByRole("status", { name: "Board correction" })).toHaveTextContent("Corrected on your board. The coach's next turn uses your wording.");
+      expect(loggedLine()).toHaveTextContent(`${LOGGED}. The coach's next turn uses your wording.`);
       await conversation.send("And the next part.");
       expect(conversation.server.bodyOf(1)).toMatchObject({ corrections: [{ was: GUESS, now: FIXED }] });
     });

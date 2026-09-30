@@ -2,7 +2,6 @@ import { UNLOCKED_FOR } from "../shared/accessContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { AccessGate } from "./AccessGate.tsx";
 import { ComposerActions } from "./ComposerActions.tsx";
-import { CorrectionNote } from "./CorrectionNote.tsx";
 import { EventBoard } from "./EventBoard.tsx";
 import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
@@ -38,8 +37,8 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         pinnedQuestionOf={view.question?.exchangeId ?? null}
         highlight={view.highlight}
         countsOf={view.countsOf}
+        correctionsOf={view.correctionsOf}
       />
-      <CorrectionNote shown={view.undoable !== null} />
       {access.accessLost && <AccessGate onUnlock={access.unlockAgain} />}
       {justUnlocked && (
         <p role="status" className="unlocked">

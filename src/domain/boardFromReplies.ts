@@ -1,4 +1,4 @@
-import { applyAction, type Board, type BoardAction, emptyBoard, type Provenance } from "./board.ts";
+import { applyAction, type Board, type BoardAction, emptyBoard, keptWordingCount, type Provenance } from "./board.ts";
 import { type EntityId, entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId } from "./exchange.ts";
 import type { ReplyCounts } from "./replyChip.ts";
@@ -22,18 +22,18 @@ export function replyCountsOf(exchanges: readonly Exchange[], corrections: reado
   exchanges.reduce((board, exchange) => {
     if (exchange.status !== "replied") return board;
     const events = eventActionsOf(exchange.reply, exchange.id);
-    const after = [...events, ...correctionsAfter(exchange.id, corrections)].reduce(applyAction, board);
-    counts.set(exchange.id, countsOf(after, exchange.id, events));
-    return after;
+    const afterEvents = events.reduce(applyAction, board);
+    counts.set(exchange.id, countsOf(afterEvents, exchange.id, events));
+    return correctionsAfter(exchange.id, corrections).reduce(applyAction, afterEvents);
   }, emptyBoard);
   return counts;
 }
 
-function countsOf({ cards }: Board, by: ExchangeId, events: readonly BoardAction[]): ReplyCounts {
-  const added = cards.filter((card) => card.placedBy === by).length;
-  const updated = cards.filter((card) => card.changedBy === by && card.placedBy !== by).length;
-  const distinct = new Set(events.map((event) => event.id)).size;
-  return { added, updated, already: Math.max(distinct - added - updated, 0) };
+function countsOf(board: Board, by: ExchangeId, events: readonly BoardAction[]): ReplyCounts {
+  const added = board.cards.filter((card) => card.placedBy === by).length;
+  const updated = board.cards.filter((card) => card.changedBy === by && card.placedBy !== by).length;
+  const ids = [...new Set(events.map((event) => event.id))];
+  return { added, updated, already: Math.max(ids.length - added - updated, 0), kept: keptWordingCount(board, ids) };
 }
 
 const correctionsAfter = (by: ExchangeId, corrections: readonly Correction[]): BoardAction[] =>

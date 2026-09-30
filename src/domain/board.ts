@@ -44,6 +44,9 @@ function cardsAfter(cards: readonly EventCard[], action: AddEvent): readonly Eve
 const answersTo = (card: EventCard, id: EntityId): boolean =>
   card.id === id || (card.correctedFrom !== undefined && entityId("event", card.text) === id);
 
+export const keptWordingCount = ({ cards }: Board, ids: readonly EntityId[]): number =>
+  cards.filter((card) => card.correctedFrom !== undefined && ids.some((id) => answersTo(card, id))).length;
+
 function placed({ id, text, provenance, by }: AddEvent): EventCard {
   return { id, kind: "event", text, provenance, placedBy: by, changedBy: by };
 }

@@ -9,6 +9,8 @@ describe("chipLabel (#95)", () => {
     [{ added: 0, updated: 1, already: 0 }, "← 1 updated on the board"],
     [{ added: 0, updated: 1, already: 2 }, "← 1 updated on the board · 2 already there"],
     [{ added: 0, updated: 0, already: 3 }, "← 3 already on the board"],
+    [{ added: 0, updated: 0, already: 1, kept: 1 }, "← 1 already on the board · your wording kept"],
+    [{ added: 1, updated: 0, already: 1, kept: 1 }, "← 1 new on the board · 1 already there · your wording kept"],
   ])("words %j as %s", (counts, label) => {
     expect(chipLabel(counts)).toBe(label);
   });

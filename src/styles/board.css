@@ -561,3 +561,10 @@ ol[role="log"] mark {
   line-height: 1.4;
   white-space: nowrap;
 }
+
+/* #121: the pinned card fades out at the bottom of its scroll area instead of cutting a quote mid-line. */
+body:has(.event-board) .pinned-question .question-card {
+  padding-bottom: 24px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+}

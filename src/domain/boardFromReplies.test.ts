@@ -104,14 +104,26 @@ describe("replyCountsOf (#95)", () => {
   it("counts per reply what it added, updated and found already there, and keeps earlier replies' counts", () => {
     const counts = replyCountsOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)]);
 
-    expect(counts.get("reply-1" as ExchangeId)).toEqual({ added: 5, updated: 0, already: 0 });
-    expect(counts.get("reply-2" as ExchangeId)).toEqual({ added: 2, updated: 0, already: 1 });
-    expect(counts.get("reply-3" as ExchangeId)).toEqual({ added: 0, updated: 1, already: 0 });
+    expect(counts.get("reply-1" as ExchangeId)).toEqual({ added: 5, updated: 0, already: 0, kept: 0 });
+    expect(counts.get("reply-2" as ExchangeId)).toEqual({ added: 2, updated: 0, already: 1, kept: 0 });
+    expect(counts.get("reply-3" as ExchangeId)).toEqual({ added: 0, updated: 1, already: 0, kept: 0 });
   });
 
   it("counts an event a reply lists twice once", () => {
     const counts = replyCountsOf([replied("reply-1", "Events, in order\n1. From thread: Ops rebooks.\n2. From thread: ops rebooks")]);
 
-    expect(counts.get("reply-1" as ExchangeId)).toEqual({ added: 1, updated: 0, already: 0 });
+    expect(counts.get("reply-1" as ExchangeId)).toEqual({ added: 1, updated: 0, already: 0, kept: 0 });
+  });
+});
+
+describe("replyCountsOf with a corrected card (#121)", () => {
+  it("counts a restated corrected card as already there with the visitor's wording kept", () => {
+    const GUESS = "Ops chooses another carrier and resubmits the booking.";
+    const correction = { id: entityId("event", GUESS), text: "Ops asks the customer first.", after: "reply-2" as ExchangeId };
+
+    const counts = replyCountsOf([...firstTwoReplies, replied("reply-3", THIRD_BOARD_REPLY)], [correction]);
+
+    expect(counts.get("reply-3" as ExchangeId)).toEqual({ added: 0, updated: 0, already: 1, kept: 1 });
+    expect(counts.get("reply-2" as ExchangeId)).toMatchObject({ kept: 0 });
   });
 });
