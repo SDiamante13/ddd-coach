@@ -32,10 +32,14 @@ export function applyAction(board: Board, action: BoardAction): Board {
   return { ...board, cards: cardsAfter(board.cards, action), latest: action.by };
 }
 
-function linksAfter({ cards, links }: Board, { from, to }: ConnectCards): readonly Link[] {
+export function canLink({ cards, links }: Board, from: EntityId, to: EntityId): boolean {
   const onBoard = (id: EntityId) => cards.some((card) => card.id === id);
   const known = links.some((link) => link.from === from && link.to === to);
-  return from === to || known || !onBoard(from) || !onBoard(to) ? links : [...links, { from, to }];
+  return from !== to && !known && onBoard(from) && onBoard(to);
+}
+
+function linksAfter(board: Board, { from, to }: ConnectCards): readonly Link[] {
+  return canLink(board, from, to) ? [...board.links, { from, to }] : board.links;
 }
 
 function correctedCard(card: EventCard, { id, text }: CorrectCard, latest: ExchangeId | null): EventCard {

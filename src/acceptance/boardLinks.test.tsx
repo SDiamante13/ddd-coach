@@ -76,4 +76,15 @@ describe("Linking two cards (#96)", () => {
     await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
     expect(announcer).toHaveTextContent("Link undone.");
   });
+
+  it("records nothing for a link that already exists, so one Undo takes the link back", async () => {
+    const { user } = await onTheBoard();
+    await connectFromKeyboard(user);
+
+    await user.click(within(board()).getByRole("button", { name: `Link to “${GUESS}”` }));
+
+    expect(screen.getByRole("status", { name: "Board changes" })).toHaveTextContent("Already linked.");
+    await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
+    expect(linkEdge()).not.toBeInTheDocument();
+  });
 });
