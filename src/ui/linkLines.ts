@@ -6,6 +6,8 @@ import type { RestoreNames } from "./ReplyView.tsx";
 
 export type LinkLine = { from: string; to: string; undoable: boolean };
 
+export const linkLineText = ({ from, to }: { from: string; to: string }): string => `You connected “${from}” → “${to}”`;
+
 export const titleOf = (board: Board, id: EntityId, restoreNames: RestoreNames): string =>
   restoreNames(board.cards.find((card) => card.id === id)?.text ?? "").text;
 

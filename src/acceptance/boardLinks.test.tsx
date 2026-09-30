@@ -10,7 +10,7 @@ const GUESS = "Ops chooses another carrier and resubmits the booking.";
 const board = () => screen.getByRole("region", { name: "Event board" });
 const cardButton = (title: string) => within(board()).getByRole("button", { name: new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
 const linkEdge = () => within(board()).queryByRole("img", { name: `Link from “${FIRST}” to “${GUESS}”` });
-const linkLine = () => screen.queryByText(`You connected “${FIRST}” → “${GUESS}”`);
+const linkLine = () => within(screen.getByRole("log")).queryByText(`You connected “${FIRST}” → “${GUESS}”`);
 
 async function onTheBoard() {
   const conversation = await startConversation();
@@ -64,5 +64,16 @@ describe("Linking two cards (#96)", () => {
     await within(conversation.log()).findAllByRole("button", { name: /on the board/ });
 
     expect(within(board()).queryByText("Just drawn")).not.toBeInTheDocument();
+  });
+
+  it("announces a new link and its undo in the one 'Board changes' region", async () => {
+    const { user } = await onTheBoard();
+
+    await connectFromKeyboard(user);
+
+    const announcer = screen.getByRole("status", { name: "Board changes" });
+    expect(announcer).toHaveTextContent(`You connected “${FIRST}” → “${GUESS}”`);
+    await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
+    expect(announcer).toHaveTextContent("Link undone.");
   });
 });

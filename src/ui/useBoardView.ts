@@ -26,7 +26,6 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     selected: selectedCard?.id ?? null,
     toggle,
     ...announced,
-    connect: (from: EntityId, to: EntityId) => board.latest && edits.connect(from, to, board.latest),
     linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames),
     justDrawn: justDrawnOf(board, edits.actions),
     undoable: undoableOf(board, edits.actions.at(-1)),
