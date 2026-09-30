@@ -26,6 +26,15 @@ async function connectFromKeyboard(user: Awaited<ReturnType<typeof onTheBoard>>[
   await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${GUESS}”` });
 }
 
+const FIXED = "Ops asks the customer before picking another carrier.";
+
+async function correctGuess(user: Awaited<ReturnType<typeof onTheBoard>>["user"]) {
+  await user.dblClick(cardButton(GUESS));
+  const field = within(board()).getByRole("textbox", { name: "Correct this event" });
+  await user.clear(field);
+  await user.type(field, `${FIXED}{Enter}`);
+}
+
 describe("Linking two cards (#96)", () => {
   it("links two cards from the keyboard, draws the link and logs it", async () => {
     const { user } = await onTheBoard();
@@ -87,6 +96,30 @@ describe("Linking two cards (#96)", () => {
     await waitFor(() => expect(screen.getByRole("status", { name: "Board changes" })).toHaveTextContent("Already linked."));
     await user.click(within(linkLine()!.closest("p")!).getByRole("button", { name: "Undo" }));
     expect(linkEdge()).not.toBeInTheDocument();
+  });
+
+  describe("links and corrected cards (#124)", () => {
+    it("links to a guess you corrected, under your words", async () => {
+      const { user } = await onTheBoard();
+      await correctGuess(user);
+
+      await user.click(cardButton(FIRST));
+      await user.click(within(board()).getByRole("button", { name: "Connect to…" }));
+      await user.click(within(board()).getByRole("button", { name: `Link to “${FIXED}”` }));
+
+      expect(await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument();
+      expect(within(screen.getByRole("log")).getByText(`You connected “${FIRST}” → “${FIXED}”`)).toBeInTheDocument();
+    });
+
+    it("keeps a link to a guess when you then correct it, naming it by your words", async () => {
+      const { user } = await onTheBoard();
+      await connectFromKeyboard(user);
+      await user.keyboard("{Escape}");
+
+      await correctGuess(user);
+
+      expect(within(board()).getByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument();
+    });
   });
 
   describe("clearing 'Board changes' so a repeat is read again (#124)", () => {
