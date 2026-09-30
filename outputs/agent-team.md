@@ -38,7 +38,7 @@ Template: the latest `outputs/demos/*-deploy.md` (e.g. `117-121-118-deploy.md`).
 - Always pass `--context production` to `netlify env:list`/`env:get`; without it two vars are hidden and secrets read as blank, so they look falsely unset.
 - Check env as booleans only (model, effort, keys and password set). Never print values or change them.
 - Confirm the live index JS hash equals the build. Match response header names case-insensitively (`grep -i`).
-- Hosted checks: headers; chat GET 405 / POST 401; session 401 no-store; unlock GET 405; source paths 404; 0 `sk-or`/`OPENROUTER` in the HTML, JS, CSS and function zips; no `.map`.
+- Hosted checks: headers; chat GET 405 / POST 401; session 401 no-store; unlock GET 405; source paths 404; 0 `sk-or`/`OPENROUTER` in the HTML, JS and CSS, and 0 `sk-or` in the function zips (`OPENROUTER` there is only env var names, which is expected); no `.map`.
 - Fonts: every CSS font URL is same-origin, every woff2 returns 200, and there are 0 googleapis/gstatic references.
 - Shell gotchas on this machine: quote globs in zsh (`'--include=*.tsx'`), and `stat -f` resolves to GNU stat, so use `wc -c` for file sizes.
 - Before a paid run or deploy, check the key for free: GET https://openrouter.ai/api/v1/key with `node --env-file=.env`, printing only status, error and the limit fields (never the key). Loading `.env` this way is allowed; printing it is not. OpenRouter keys can expire ("API key expired", 401); prod's Netlify secret can't be read back by the CLI, so verify prod with one hosted call.
