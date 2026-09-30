@@ -32,7 +32,7 @@ One working tree; agents run sequentially so builder and sweeper never edit conc
 
 ## Deploy checklist
 
-Template: `outputs/demos/chores-30af2d6-deploy.md`.
+Template: the latest `outputs/demos/*-deploy.md` (e.g. `117-121-118-deploy.md`).
 - Build from a pinned git worktree outside the repo (`npm ci` + `bin/check.sh`), deploy with `netlify deploy --prod`, then remove the worktree.
 - Use the repo's `npx netlify` (27.x); the homebrew `netlify` on PATH is older and lacks flags such as `env:list --site`.
 - Always pass `--context production` to `netlify env:list`/`env:get`; without it two vars are hidden and secrets read as blank, so they look falsely unset.
@@ -41,7 +41,7 @@ Template: `outputs/demos/chores-30af2d6-deploy.md`.
 - Hosted checks: headers; chat GET 405 / POST 401; session 401 no-store; unlock GET 405; source paths 404; 0 `sk-or`/`OPENROUTER` in the HTML, JS, CSS and function zips; no `.map`.
 - Fonts: every CSS font URL is same-origin, every woff2 returns 200, and there are 0 googleapis/gstatic references.
 - Shell gotchas on this machine: quote globs in zsh (`'--include=*.tsx'`), and `stat -f` resolves to GNU stat, so use `wc -c` for file sizes.
-- Before a paid run or deploy, check the key for free: GET https://openrouter.ai/api/v1/key with `node --env-file=.env`, printing only status, error and the limit fields (never the key). OpenRouter keys can expire ("API key expired", 401); prod's Netlify secret can't be read back by the CLI, so verify prod with one hosted call.
+- Before a paid run or deploy, check the key for free: GET https://openrouter.ai/api/v1/key with `node --env-file=.env`, printing only status, error and the limit fields (never the key). Loading `.env` this way is allowed; printing it is not. OpenRouter keys can expire ("API key expired", 401); prod's Netlify secret can't be read back by the CLI, so verify prod with one hosted call.
 - After a deploy, `curl -s https://ddd-coach.netlify.app/api/health` must return `"status":"ok"`. The `health` GitHub Action checks it every 30 min and fails (emailing the owner) on anything else, including `key_expiring` a week before the key expires.
 - No unlock and no paid calls; the verifier owns the demo.
 
