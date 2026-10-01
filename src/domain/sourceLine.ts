@@ -8,16 +8,22 @@ const STOP_WORDS = new Set(["the", "and", "for", "with", "from", "that", "this",
 const MIN_SHARE = 0.5;
 const MIN_SHARED = 2;
 
-const tokensOf = (text: string): Set<string> =>
-  new Set((text.toLowerCase().match(/[a-z]{3,}|\d+/g) ?? []).filter((token) => !STOP_WORDS.has(token)));
+const stemOf = (token: string): string => (token.length > 5 ? token.replace(/(ances?|ings?|ed|es|s)$/, "") : token);
+
+const tokensOf = (text: string, stems: boolean): Set<string> => {
+  const tokens = (text.toLowerCase().match(/[a-z]{3,}|\d+/g) ?? []).filter((token) => !STOP_WORDS.has(token));
+  return new Set(stems ? tokens.map(stemOf) : tokens);
+};
+
+export type MatchOptions = { stems?: boolean };
 
 type Scored = LineMatch & { share: number };
 
-export function closestLine(event: string, prompts: readonly PastedPrompt[]): LineMatch | null {
-  const wanted = tokensOf(event);
+export function closestLine(event: string, prompts: readonly PastedPrompt[], { stems = false }: MatchOptions = {}): LineMatch | null {
+  const wanted = tokensOf(event, stems);
   let best: Scored | null = null;
   for (const line of prompts.flatMap(linesOf)) {
-    const shared = [...tokensOf(line.text)].filter((token) => wanted.has(token)).length;
+    const shared = [...tokensOf(line.text, stems)].filter((token) => wanted.has(token)).length;
     const share = shared / Math.max(wanted.size, 1);
     if (shared >= MIN_SHARED && share >= MIN_SHARE && share > (best?.share ?? 0)) best = { ...line.match, share };
   }

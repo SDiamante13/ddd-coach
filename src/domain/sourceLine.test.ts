@@ -81,3 +81,15 @@ describe("lineOfCard", () => {
     expect(lineOfCard(card("x1", "guess"), [sent("x1", LINE)])).toBeNull();
   });
 });
+
+describe("closestLine across word endings, for term rows (#138)", () => {
+  it("matches a line that says the same thing with other endings when asked to: accepted/acceptance, cancelling/cancelled", () => {
+    const line = "for carriers it's contractual. once they've accepted, cancelling costs us a TONU if the truck's rolling";
+
+    const meaning = "confirmed A contractual acceptance that can create a TONU risk if cancelled while the truck is rolling.";
+    const prompts = [{ exchangeId: "e1" as ExchangeId, text: line }];
+
+    expect(closestLine(meaning, prompts, { stems: true })).not.toBeNull();
+    expect(closestLine(meaning, prompts)).toBeNull();
+  });
+});

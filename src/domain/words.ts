@@ -63,7 +63,7 @@ const sourceLineIn =
   (upTo: readonly Exchange[], whoIsWho: WhoIsWho): LineOf =>
   (holder, text) => {
     const prompts = [...upTo].reverse().map(({ id, prompt }) => ({ exchangeId: id, text: ownLinesOf(prompt, holder, whoIsWho) }));
-    const match = closestLine(text, prompts);
+    const match = closestLine(text, prompts) ?? closestLine(text, prompts, { stems: true });
     return match && (upTo.find(({ id }) => id === match.exchangeId)?.prompt.slice(match.start, match.end) ?? null);
   };
 
@@ -71,7 +71,8 @@ const wordsOfText = (text: string): string[] => text.toLowerCase().match(/[a-z0-
 
 function speaksFor(speaker: string, holder: string, team: string | null, whoIsWho: WhoIsWho): boolean {
   const own = new Set(wordsOfText(speaker));
-  return wordsOfText(holder).every((token) => own.has(token)) || (team !== null && whoIsWho.get(speaker.toLowerCase()) === team);
+  const named = wordsOfText(holder);
+  return (named.length > 0 && named.every((token) => own.has(token))) || (team !== null && whoIsWho.get(speaker.toLowerCase()) === team);
 }
 
 function ownLinesOf(prompt: string, holder: string, whoIsWho: WhoIsWho): string {

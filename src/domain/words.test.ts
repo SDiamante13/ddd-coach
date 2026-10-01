@@ -128,5 +128,22 @@ describe("wordsOf", () => {
     it("gives no source when the holder could be more than one of the visitor's teams", () => {
       expect(rowLine("Ops (view B)", "the truck is checked in.")).toBeNull();
     });
+
+    it("finds a team's line that says the same thing with other word endings (#138, the Carrier desk row in the #133 demo)", () => {
+      const tonu = "for carriers it's contractual. once they've accepted, cancelling costs us a TONU if the truck's rolling";
+      const reply = ["Words that don't match", '"confirmed"', "- From thread: Carrier desk means a contractual acceptance that can create a TONU risk if cancelled while the truck is rolling."].join("\n");
+      const exchange: Exchange = { id: "e1" as ExchangeId, prompt: ["Rosa Delgado  8:15 AM", tonu].join("\n") as Prompt, status: "replied", reply, signature: "s" };
+
+      expect(wordsOf([exchange], [], new Map([["rosa delgado", "Carrier desk"]])).terms[0]!.rows[0]!.line).toBe(tonu);
+    });
+
+    it("gives a row whose team is unclear no line, rather than anyone's (#138)", () => {
+      const reply = ["Words that don't match", '"booking count"', "- From thread: means night dispatch subtracts rebooks by hand."].join("\n");
+      const exchange: Exchange = { id: "e1" as ExchangeId, prompt: "Mon 08:04  Ops night desk: night dispatch subtracts rebooks by hand from the booking count" as Prompt, status: "replied", reply, signature: "s" };
+
+      const row = wordsOf([exchange]).terms[0]!.rows[0]!;
+
+      expect([row.holder, row.line]).toEqual(["", null]);
+    });
   });
 });
