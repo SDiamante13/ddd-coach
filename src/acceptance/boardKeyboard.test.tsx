@@ -57,7 +57,7 @@ describe("The board from the keyboard (#20)", () => {
   it("says how to get around on first focus", async () => {
     await onTheBoard();
 
-    expect(within(board()).getByText("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves")).toBeInTheDocument();
+    expect(board().querySelector(".board-hint")).toHaveTextContent("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves");
   });
 
   it("comes back to the card when you leave the correction with Escape, and then off the board", async () => {
@@ -68,5 +68,11 @@ describe("The board from the keyboard (#20)", () => {
     expect(card(1)).toHaveFocus();
     await user.keyboard("{Escape}");
     expect(input()).toHaveFocus();
+  });
+
+  it("gives screen readers the keys on every card", async () => {
+    await onTheBoard();
+
+    expect(card(2)).toHaveAccessibleDescription("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves");
   });
 });

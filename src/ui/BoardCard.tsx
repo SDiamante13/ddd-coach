@@ -3,6 +3,7 @@ import { type KeyboardEvent, type RefObject, useEffect, useLayoutEffect, useRef,
 import { changeOf, type EventCard, labelOf, struckWordsOf } from "../domain/board.ts";
 import { CardNote } from "./CardNote.tsx";
 import { onCardKey } from "./cardKeys.ts";
+import { BOARD_KEYS_ID } from "./BoardHint.tsx";
 import { lanePosition } from "./boardLayout.ts";
 import type { Position as Place } from "../domain/cardMoves.ts";
 import type { BoardView } from "./EventBoard.tsx";
@@ -28,7 +29,7 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
   return (
     <div className="board-card nopan" data-card-id={card.id} data-source={card.correctedFrom === undefined ? card.provenance : "you"} data-change={change ?? undefined}>
       {editing && <CardEditor initial={title} onKeep={keep} onCancel={close} />}
-      <button ref={button} type="button" className="card" aria-label={`Event ${place.index} of ${place.total}, ${labelOf(card)}: ${title}`} aria-hidden={editing || undefined} tabIndex={editing ? -1 : undefined} aria-pressed={pressed} aria-describedby={pressed ? noteId : undefined} onClick={() => view.toggle(card.id)} onDoubleClick={open} onKeyDown={(event) => onCardKey(event, { nudge, edit: open })}>
+      <button ref={button} type="button" className="card" aria-label={`Event ${place.index} of ${place.total}, ${labelOf(card)}: ${title}`} aria-hidden={editing || undefined} tabIndex={editing ? -1 : undefined} aria-pressed={pressed} aria-describedby={pressed ? `${noteId} ${BOARD_KEYS_ID}` : BOARD_KEYS_ID} onClick={() => view.toggle(card.id)} onDoubleClick={open} onKeyDown={(event) => onCardKey(event, { nudge, edit: open })}>
         <CardFace card={card} view={view} title={title} restoreNames={restoreNames} />
         {change && <ChangeMark key={`${change}-${view.board.latest}`} change={change} />}
       </button>

@@ -20,6 +20,8 @@ type MessageFormProps = {
 
 const asTyped = (draft: string) => draft;
 
+export const MESSAGE_BOX_ID = "message-box";
+
 export function MessageForm(props: MessageFormProps) {
   const { busy, draft, onDraftChange, onSend, children, boxRef, notice, outgoing = asTyped, restsAtStart = false } = props;
   const id = useId();
@@ -42,10 +44,10 @@ export function MessageForm(props: MessageFormProps) {
   return (
     <form onSubmit={handleSubmit} onBlur={rest.endOnLeave} data-resting={rest.resting || undefined}>
       {notice}
-      <label htmlFor={`${id}-box`}>Message</label>
+      <label htmlFor={MESSAGE_BOX_ID}>Message</label>
       <div className="row">
         <MessageBox
-          id={`${id}-box`}
+          id={MESSAGE_BOX_ID}
           draft={draft}
           describedBy={keyHint ? `${id}-hint ${id}-limit` : `${id}-limit`}
           invalid={over}

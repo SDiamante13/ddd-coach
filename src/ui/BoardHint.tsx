@@ -1,6 +1,7 @@
 import { type FocusEvent, useState } from "react";
 
 export const BOARD_KEYS_HINT = "← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves";
+export const BOARD_KEYS_ID = "board-keys";
 
 type Hint = "unseen" | "showing" | "seen";
 
@@ -15,8 +16,15 @@ export function useBoardHint() {
   return { shown: hint === "showing", onFocus, onBlur };
 }
 
-export const BoardHint = () => (
-  <p className="board-hint">
-    {BOARD_KEYS_HINT}
-  </p>
+export const BoardHint = ({ shown }: { shown: boolean }) => (
+  <>
+    <p id={BOARD_KEYS_ID} className="visually-hidden">
+      {BOARD_KEYS_HINT}
+    </p>
+    {shown && (
+      <p className="board-hint" aria-hidden="true">
+        {BOARD_KEYS_HINT}
+      </p>
+    )}
+  </>
 );

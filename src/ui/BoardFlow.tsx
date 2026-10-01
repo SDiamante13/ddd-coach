@@ -140,7 +140,7 @@ function Lane(props: LaneProps) {
         <MiniMap position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} style={MINI_MAP_SIZE} />
       </ReactFlow>
       <EdgeChips view={props.view} lane={lane} />
-      {hint.shown && <BoardHint />}
+      <BoardHint shown={hint.shown} />
       <BoardControls following={props.view.followingCoach} onFollowChange={props.view.setFollowingCoach} />
     </div>
   );
