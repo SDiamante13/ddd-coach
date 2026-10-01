@@ -18,6 +18,7 @@ async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: FIRST_BOARD_REPLY, signature: "sig-1" });
   await within(board()).findByRole("list", { name: "Events on the board" });
+  await within(board()).findByRole("button", { name: /Customer submits a bkg/ });
   return conversation;
 }
 

@@ -125,7 +125,7 @@ describe("Linking two cards (#96)", () => {
       await user.click(await within(board()).findByRole("button", { name: "Connect to…" }));
       await user.click(await within(board()).findByRole("button", { name: `Link to “${FIXED}”` }));
 
-      expect(await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument();
+      await waitFor(() => expect(within(board()).getByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument());
       expect(await within(screen.getByRole("log")).findByText("You connected “Customer submits a bkg on the…” → “Ops asks the customer before picking…”")).toBeInTheDocument();
     });
 
