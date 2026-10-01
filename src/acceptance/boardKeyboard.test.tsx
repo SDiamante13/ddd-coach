@@ -54,6 +54,16 @@ describe("The board from the keyboard (#20)", () => {
     expect(within(board()).getByRole("button", { name: "Zoom out" })).toHaveFocus();
   });
 
+  it("has no Tab stop before the roving card, not even the board's list (#127)", async () => {
+    const { user } = await onTheBoard();
+    const list = within(board()).getByRole("list", { name: "Events on the board" });
+
+    await user.tab({ shift: true });
+
+    expect(list).not.toHaveFocus();
+    expect(list).toHaveAttribute("tabindex", "-1");
+  });
+
   it("is one Tab stop: only one card at a time can be tabbed to (#127)", async () => {
     const { user } = await onTheBoard();
     await user.keyboard("{ArrowRight}");

@@ -169,5 +169,5 @@ function asList(root: HTMLDivElement | null): void {
   list.setAttribute("role", "list");
   list.setAttribute("aria-label", "Events on the board");
   list.setAttribute("id", BOARD_LANE_ID);
-  list.setAttribute("tabindex", "0");
+  list.setAttribute("tabindex", "-1");
 }
