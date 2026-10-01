@@ -126,7 +126,7 @@ describe("Linking two cards (#96)", () => {
       await user.click(within(board()).getByRole("button", { name: `Link to “${FIXED}”` }));
 
       expect(await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument();
-      expect(within(screen.getByRole("log")).getByText("You connected “Customer submits a bkg on the…” → “Ops asks the customer before picking…”")).toBeInTheDocument();
+      expect(await within(screen.getByRole("log")).findByText("You connected “Customer submits a bkg on the…” → “Ops asks the customer before picking…”")).toBeInTheDocument();
     });
 
     it("keeps a link to a guess when you then correct it, naming it by your words", async () => {

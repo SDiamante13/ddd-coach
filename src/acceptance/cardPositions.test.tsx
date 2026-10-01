@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderApp } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
@@ -23,7 +23,7 @@ describe("Cards keep where you put them (#20)", () => {
     await renderApp();
 
     expect(await within(board()).findByRole("list", { name: "Events on the board" })).toBeInTheDocument();
-    expect(nodeOf(FIRST).style.transform).toBe("translate(40px,260px)");
+    await waitFor(() => expect(nodeOf(FIRST).style.transform).toBe("translate(40px,260px)"));
   });
 
   it("takes back your last link, not your last move, on Undo", async () => {
@@ -34,6 +34,6 @@ describe("Cards keep where you put them (#20)", () => {
     await user.click(within(screen.getByRole("log")).getByRole("button", { name: "Undo" }));
 
     expect(within(board()).queryByRole("img", { name: /^Link from/ })).not.toBeInTheDocument();
-    expect(nodeOf(FIRST).style.transform).toBe("translate(40px,260px)");
+    await waitFor(() => expect(nodeOf(FIRST).style.transform).toBe("translate(40px,260px)"));
   });
 });

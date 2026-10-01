@@ -71,7 +71,7 @@ describe("The Words lane (#109)", () => {
 
     await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
 
-    expect(term("late").style.transform).toBe("translate(0px,436px)");
+    await waitFor(() => expect(term("late").style.transform).toBe("translate(0px,436px)"));
   });
 
   it("goes down from the events to the Words lane with the arrow keys, as one Tab stop (#127)", async () => {
@@ -93,7 +93,7 @@ describe("The Words lane (#109)", () => {
 
     within(term("on time")).getByRole("group", { name: "Term “on time”" }).focus();
     await conversation.user.keyboard("{Shift>}{ArrowRight}{/Shift}");
-    expect(term("on time").style.transform).toBe("translate(16px,0px)");
+    await waitFor(() => expect(term("on time").style.transform).toBe("translate(16px,0px)"));
   });
 
   describe("reaching the Words lane at 100% (#109 hotfix)", () => {

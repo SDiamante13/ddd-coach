@@ -67,10 +67,12 @@ describe("Event board", () => {
 
     await user.click(within(cards()[1]!).getByRole("button"));
 
-    const [first, selected, third] = cards().map((card) => nodeOf(card));
-    expect(Number(selected!.style.zIndex)).toBeGreaterThan(Number(first!.style.zIndex));
-    expect(first!.style.zIndex).toBe(third!.style.zIndex);
-    expect(cards().map((card) => nodeOf(card).style.transform)).toEqual(placesBefore);
+    await waitFor(() => {
+      const [first, selected, third] = cards().map((card) => nodeOf(card));
+      expect(Number(selected!.style.zIndex)).toBeGreaterThan(Number(first!.style.zIndex));
+      expect(first!.style.zIndex).toBe(third!.style.zIndex);
+    });
+    await waitFor(() => expect(cards().map((card) => nodeOf(card).style.transform)).toEqual(placesBefore));
     expect(cards().map((card) => [nodeOf(card).style.width, nodeOf(card).style.height])).toEqual(Array(3).fill(["156px", "120px"]));
   });
 

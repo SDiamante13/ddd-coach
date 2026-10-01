@@ -141,7 +141,7 @@ describe("Keeping the session across a reload (#5)", () => {
 
     const { log, user } = await reload();
 
-    expect(within(log()).getByRole("alert")).toHaveTextContent("The page reloaded before the coach answered.");
+    expect(await within(log()).findByRole("alert")).toHaveTextContent("The page reloaded before the coach answered.");
     await user.click(within(log()).getByRole("button", { name: "Retry" }));
     expect(server.bodyOf(1)).toEqual({ message: "Here is our thread.", history: [] });
   });
@@ -218,7 +218,7 @@ describe("Keeping the session across a reload (#5)", () => {
 
       await renderApp();
 
-      expect(screen.getByText("Picked up where you left off · 29 Sep 2026, 14:05")).toBeInTheDocument();
+      expect(await screen.findByText("Picked up where you left off · 29 Sep 2026, 14:05")).toBeInTheDocument();
     });
 
     it("fades out after 5 seconds", async () => {
@@ -254,7 +254,7 @@ describe("Keeping the session across a reload (#5)", () => {
 
     await renderApp();
 
-    expect(screen.getByText(/Customer submits a bkg/)).toBeInTheDocument();
+    expect(await screen.findByText(/Customer submits a bkg/)).toBeInTheDocument();
     await waitFor(() => expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,16px) scale(1)" }));
   });
 

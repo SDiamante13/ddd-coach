@@ -40,7 +40,7 @@ describe("Finding your way along the board (#20)", () => {
     await user.click(within(board()).getByRole("button", { name: "Show the 2 later events" }));
 
     await waitFor(() => expect(within(board()).getByRole("button", { name: "Show the 3 earlier events" })).toHaveTextContent("◂ 3 earlier"));
-    expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-468px,16px) scale(1)" });
+    await waitFor(() => expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-468px,16px) scale(1)" }));
     expect(within(board()).queryByRole("button", { name: /later/ })).not.toBeInTheDocument();
     expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
   });

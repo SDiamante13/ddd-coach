@@ -1,4 +1,4 @@
-import { act, cleanup, screen, within } from "@testing-library/react";
+import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderApp, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
@@ -34,7 +34,7 @@ describe("The board from the keyboard (#20)", () => {
 
     await user.keyboard("{Shift>}{ArrowRight}{ArrowDown}{/Shift}");
 
-    expect(nodeOf(FIRST).style.transform).toBe("translate(16px,16px)");
+    await waitFor(() => expect(nodeOf(FIRST).style.transform).toBe("translate(16px,16px)"));
     expect(card(1)).toHaveFocus();
   });
 
