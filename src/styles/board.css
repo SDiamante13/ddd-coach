@@ -1008,3 +1008,8 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   left: calc(-1 * var(--space-3));
   opacity: 0;
 }
+
+.board-lane .react-flow__handle.row-handle.right {
+  right: calc(-1 * var(--space-3));
+  left: auto;
+}

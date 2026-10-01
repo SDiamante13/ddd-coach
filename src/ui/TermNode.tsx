@@ -51,7 +51,8 @@ export function TermNode({ data: { term, change, restoreNames, nudge, roving } }
 function TermRowItem({ row, shown }: { row: TermRow; shown: (text: string) => string }) {
   return (
     <li className="term-row" data-source={row.provenance}>
-      <Handle id={row.id} type="source" position={Side.Left} isConnectable={false} className="row-handle" />
+      <Handle id={`${row.id}|left`} type="source" position={Side.Left} isConnectable={false} className="row-handle" />
+      <Handle id={`${row.id}|right`} type="source" position={Side.Right} isConnectable={false} className="row-handle right" />
       <span className="term-holder">{shown(row.holder)}</span>
       <span className="term-source">{TAG[row.provenance]}</span>
       <p className="term-meaning">{shown(row.meaning)}</p>

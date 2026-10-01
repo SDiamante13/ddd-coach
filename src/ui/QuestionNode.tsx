@@ -71,10 +71,15 @@ const relates = (id: string, source: string, sourceHandle: string, target: strin
   domAttributes: { "aria-hidden": true },
 });
 
-export const relatesEdgesOf = ({ hotspot }: BoardView): Edge[] =>
-  hotspot === null
-    ? []
-    : [
-        ...hotspot.links.map((link) => relates(`relates-${link}`, link, "link-out", hotspot.id, "relates-in")),
-        ...hotspot.rows.map(({ term, row }) => relates(`relates-${row}`, term, row, hotspot.id, "relates-below")),
-      ];
+export function relatesEdgesOf({ hotspot }: BoardView, nodes: readonly Node[]): Edge[] {
+  if (hotspot === null) return [];
+  const centre = (id: string) => {
+    const node = nodes.find((each) => each.id === id);
+    return node ? node.position.x + (node.width ?? CARD_WIDTH) / 2 : 0;
+  };
+  const sideOf = (term: string) => (centre(term) < centre(hotspot.id) ? "right" : "left");
+  return [
+    ...hotspot.links.map((link) => relates(`relates-${link}`, link, "link-out", hotspot.id, "relates-in")),
+    ...hotspot.rows.map(({ term, row }) => relates(`relates-${row}`, term, `${row}|${sideOf(term)}`, hotspot.id, "relates-below")),
+  ];
+}

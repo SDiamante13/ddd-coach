@@ -108,7 +108,7 @@ function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
   const dragging = useDragging(props.view);
   const nodes = useMemo(() => nodesOf(props).map(dragging.at), [props, dragging.at]);
-  const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
+  const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view, nodes)], [props, nodes]);
   usePanToChanges(props.view, root);
   const lane = useLaneSize(root);
   useRevealItem(props.view, lane, nodes);
