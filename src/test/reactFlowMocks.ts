@@ -24,14 +24,17 @@ export function mockReactFlowLayout(): void {
     offsetWidth: { configurable: true, get: () => 156 },
   });
   (SVGElement.prototype as unknown as { getBBox: () => DOMRect }).getBBox = () => ({ x: 0, y: 0, width: 0, height: 0 }) as DOMRect;
-  giveEventsAView();
 }
 
-// user-event defines a null view on the mouse events it dispatches; a browser always sets one, and d3-drag reads it on draggable nodes.
-function giveEventsAView(): void {
+// user-event defines a null view on the mouse events it dispatches; a browser always sets one, and d3-drag reads it on draggable cards.
+// Installed per test file and restored after it, and limited to a mouse event's null view.
+export function giveMouseEventsAView(): () => void {
   const define = Object.defineProperty;
   Object.defineProperty = function <T>(target: T, key: PropertyKey, descriptor: PropertyDescriptor & ThisType<unknown>): T {
-    const nullView = key === "view" && target instanceof UIEvent && descriptor.get?.() === null;
+    const nullView = key === "view" && target instanceof MouseEvent && descriptor.get !== undefined && descriptor.get() === null;
     return define(target, key, nullView ? { get: () => window } : descriptor);
   } as typeof Object.defineProperty;
+  return () => {
+    Object.defineProperty = define;
+  };
 }

@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
-import { mockReactFlowLayout } from "./reactFlowMocks.ts";
+import { afterAll, afterEach, beforeAll } from "vitest";
+import { giveMouseEventsAView, mockReactFlowLayout } from "./reactFlowMocks.ts";
 
 afterEach(() => {
   cleanup();
@@ -11,3 +11,9 @@ afterEach(() => {
 if (typeof Element !== "undefined") Element.prototype.scrollIntoView ??= function scrollIntoView() {};
 
 if (typeof window !== "undefined") mockReactFlowLayout();
+
+let restoreDefineProperty = () => {};
+beforeAll(() => {
+  if (typeof window !== "undefined") restoreDefineProperty = giveMouseEventsAView();
+});
+afterAll(() => restoreDefineProperty());
