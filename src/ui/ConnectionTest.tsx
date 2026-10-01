@@ -25,7 +25,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   return (
     <>
       <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} session={composer.board} />
-      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, reveal: view.revealQuestion }} />
+      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}

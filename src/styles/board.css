@@ -847,3 +847,27 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   color: var(--color-surface);
   font-size: 12px;
 }
+
+/* #126: a question's quote that no card comes from is named on the hotspot and shown on request */
+.hotspot-unplaced {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.hotspot-unplaced button {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-card-ink);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hotspot-quote {
+  font-style: italic;
+}

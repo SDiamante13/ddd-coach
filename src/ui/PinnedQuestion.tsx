@@ -4,10 +4,11 @@ import { useFlashOnChange } from "./useFlashOnChange.ts";
 import { usePinnedReserve } from "./usePinnedReserve.ts";
 import { useQuestionLead } from "./useQuestionLead.ts";
 import { QuestionCard } from "./QuestionCard.tsx";
+import { unplacedLabel } from "./unplacedQuotes.ts";
 
 export const PINNED_QUESTION_ID = "current-question";
 
-export type QuestionOnBoard = { linked: number; reveal: () => void };
+export type QuestionOnBoard = { linked: number; unplaced: number; reveal: () => void };
 
 export function PinnedQuestion({ question, onBoard = null }: { question: LatestQuestion | null; onBoard?: QuestionOnBoard | null }) {
   const ref = useRef<HTMLElement>(null);
@@ -44,11 +45,12 @@ function QuestionStrip({ question, expanded, onToggle }: QuestionStripProps) {
   );
 }
 
-function OnTheBoardChip({ linked, reveal }: QuestionOnBoard) {
+function OnTheBoardChip({ linked, unplaced, reveal }: QuestionOnBoard) {
   const events = linked === 0 ? "" : ` linked to ${linked} event${linked === 1 ? "" : "s"}`;
+  const missing = unplaced === 0 ? "" : ` · ${unplacedLabel(unplaced)}`;
   return (
     <button type="button" className="board-chip on-the-board" onClick={reveal}>
-      {`On the board ↖${events}`}
+      {`On the board ↖${events}${missing}`}
     </button>
   );
 }

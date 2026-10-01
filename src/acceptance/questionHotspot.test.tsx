@@ -66,4 +66,33 @@ describe("The open question on the board (#97)", () => {
 
     expect(onBoard().at(-1)).toHaveAccessibleName("Open question: Does Customer D keep the credit?, relates to Event 1 and Event 2");
   });
+
+  describe("a quote no card comes from (#126)", () => {
+    const UNPLACED = "who owns the weekly late report now";
+    const reply = QUESTION_REPLY.replace('"issued Customer D a service credit for 7731"', `"${UNPLACED}"`);
+
+    async function askedWithAStrayQuote() {
+      const conversation = await startConversation();
+      conversation.server.reply(await conversation.send(QUESTION_PASTE), 200, { reply, signature: "sig-1" });
+      await within(board()).findByRole("list", { name: "Events on the board" });
+      return conversation;
+    }
+
+    it("says on the hotspot that a quote isn't on the board, and shows it when asked", async () => {
+      const { user } = await askedWithAStrayQuote();
+      const hotspot = onBoard().at(-1)!;
+      expect(hotspot).toHaveAccessibleName("Open question: Does a late pickup earn the credit?, relates to Event 1, 1 quote not on the board");
+
+      await user.click(within(hotspot).getByRole("button", { name: "1 quote not on the board" }));
+
+      expect(within(hotspot).getByText(`“${UNPLACED}”`)).toBeVisible();
+    });
+
+    it("says it on the pinned question's chip too", async () => {
+      await askedWithAStrayQuote();
+      const pinned = screen.getByRole("complementary", { name: "Current question" });
+
+      expect(within(pinned).getByRole("button", { name: "On the board ↖ linked to 1 event · 1 quote not on the board" })).toBeInTheDocument();
+    });
+  });
 });

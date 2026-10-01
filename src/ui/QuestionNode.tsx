@@ -1,7 +1,9 @@
 import { type Edge, Handle, type Node, type NodeProps, Position } from "@xyflow/react";
 import type { BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, lanePosition } from "./boardLayout.ts";
+import { useState } from "react";
 import { type Hotspot, hotspotNameOf } from "./hotspot.ts";
+import { unplacedLabel } from "./unplacedQuotes.ts";
 
 const DROP = CARD_HEIGHT + 96;
 
@@ -16,6 +18,7 @@ export function QuestionNode({ data: { hotspot, fresh } }: NodeProps<QuestionNod
         <span className="card-kind">QUESTION</span>
         <span className="card-source">OPEN</span>
         <span className="card-title">{hotspot.text}</span>
+        {hotspot.unplaced.length > 0 && <UnplacedQuotes quotes={hotspot.unplaced} />}
         {fresh && (
           <>
             <span className="card-ring" aria-hidden="true" />
@@ -24,6 +27,18 @@ export function QuestionNode({ data: { hotspot, fresh } }: NodeProps<QuestionNod
         )}
       </div>
     </>
+  );
+}
+
+function UnplacedQuotes({ quotes }: { quotes: readonly string[] }) {
+  const [shown, setShown] = useState(false);
+  return (
+    <span className="hotspot-unplaced nodrag">
+      <button type="button" aria-expanded={shown} onClick={() => setShown(!shown)}>
+        {unplacedLabel(quotes.length)}
+      </button>
+      {shown && quotes.map((quote) => <span key={quote} className="hotspot-quote">{`“${quote}”`}</span>)}
+    </span>
   );
 }
 
