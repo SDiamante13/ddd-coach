@@ -97,4 +97,13 @@ describe("The open question on the board (#97)", () => {
       expect(chip.closest(".question-card")).not.toBeNull();
     });
   });
+
+  it("reads the pinned question before its chip, and the chip before the quotes (#126)", async () => {
+    await asked();
+    const card = within(screen.getByRole("complementary", { name: "Current question" })).getByRole("region", { name: "Question" });
+
+    const order = [...card.children].map((child) => child.className);
+
+    expect(order).toEqual(["question-for", "question-text", "question-action", "question-sources"]);
+  });
 });
