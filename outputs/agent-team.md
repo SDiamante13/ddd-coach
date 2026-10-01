@@ -51,6 +51,7 @@ Template: the latest `outputs/demos/*-deploy.md` (e.g. `117-121-118-deploy.md`).
 
 ## Demo recording
 
+- **Default recorder (#116):** `node bin/demo-record.mjs --script <steps.mjs> --out <path without extension> [--viewport 1280x800] [--fixtures] [--chat-delay 1200]`. It drives system Chrome through `playwright-core` with a fresh temporary profile and records the viewport only, writes `<out>.mp4` (H.264, yuv420p, even size) and prints the page-error count (exit 1 if any). `--fixtures` starts its own `COACH_FIXTURES=1` Vite on :5195 (no paid calls) and stops it afterwards. A steps file default-exports `async ({ page, caption, overlay, shot, pause }) => …`: `caption(text)` sets the magenta bottom-left banner, `overlay(box, label)` draws a magenta dashed box (`overlay(null)` clears it), `shot(name)` saves `<out>-<name>.png`. Keep steps files in `outputs/demos/scripts/`. Example: `outputs/demos/scripts/111.mjs` re-records #111 with the command in its header.
 - `agent-browser record start <path>.webm` → scripted acceptance steps → `record stop`.
 - Captions: inject an on-page banner per step via agent-browser (local ffmpeg lacks `drawtext`/`subtitles` filters).
 - Convert: `ffmpeg -i in.webm -c:v libx264 -pix_fmt yuv420p out.mp4`; GIF via `-vf "fps=10,scale=800:-1"`; optional soft CC track by muxing `.srt` as `mov_text`.
