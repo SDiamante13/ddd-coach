@@ -10,7 +10,7 @@ const cards = () =>
   within(within(board()).getByRole("list", { name: "Events on the board" }))
     .getAllByRole("listitem")
     .filter((item) => !item.getAttribute("aria-label")?.startsWith("Open question"));
-const newChip = () => within(board()).queryByRole("button", { name: /^Show the / });
+const newChip = () => within(board()).queryByRole("button", { name: /^Show the .*(new|updated)/ });
 
 async function onTheBoard() {
   const conversation = await startConversation();

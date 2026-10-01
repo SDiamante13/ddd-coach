@@ -769,3 +769,68 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   background: var(--color-coach);
   color: var(--color-on-coach);
 }
+
+/* #20: the lane's edges fade softly, and counted chips say how many cards sit past each edge. */
+.board-lane::before,
+.board-lane::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+  width: var(--space-4);
+  pointer-events: none;
+  content: "";
+}
+
+.board-lane::before {
+  left: 0;
+  background: linear-gradient(to right, var(--color-paper), transparent);
+}
+
+.board-lane::after {
+  right: 0;
+  background: linear-gradient(to left, var(--color-paper), transparent);
+}
+
+.edge-chip {
+  position: absolute;
+  top: 152px;
+  z-index: 5;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.edge-chip.earlier {
+  left: var(--space-4);
+}
+
+.edge-chip.later {
+  right: var(--space-4);
+}
+
+.edge-chip:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.board-controls .zoom-level {
+  min-width: 3.5em;
+  align-self: center;
+  color: var(--color-ink-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.board-lane .react-flow__minimap {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}

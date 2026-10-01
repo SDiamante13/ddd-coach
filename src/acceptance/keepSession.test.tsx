@@ -178,7 +178,7 @@ describe("Keeping the session across a reload (#5)", () => {
 
       expect(await within(board()).findByRole("button", { name: "Undo" })).toBeInTheDocument();
       expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
-      expect(within(board()).queryByRole("button", { name: /^Show the / })).not.toBeInTheDocument();
+      expect(within(board()).queryByRole("button", { name: /^Show the .*(new|updated)/ })).not.toBeInTheDocument();
     });
 
     it("shows a restored correction's log line settled, and rings only a new one", async () => {

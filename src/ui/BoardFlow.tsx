@@ -1,4 +1,4 @@
-import { Handle, type Node, type NodeProps, Position, ReactFlow, ReactFlowProvider, type Edge, MarkerType } from "@xyflow/react";
+import { type CoordinateExtent, Handle, MiniMap, type Node, type NodeProps, Position, ReactFlow, ReactFlowProvider, type Edge, MarkerType } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { EventCard } from "../domain/board.ts";
@@ -8,8 +8,9 @@ import { BoardCard } from "./BoardCard.tsx";
 import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
-import { NewEventsChip } from "./NewEventsChip.tsx";
-import { FollowCoachToggle } from "./FollowCoachToggle.tsx";
+import { EdgeChips } from "./EdgeChips.tsx";
+import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
+import { BoardControls } from "./BoardControls.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
 import { useRevealQuestion } from "./useRevealQuestion.ts";
@@ -103,6 +104,7 @@ function Lane(props: LaneProps) {
   const nodes = useMemo(() => nodesOf(props), [props]);
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
   usePanToChanges(props.view, root);
+  const lane = useLaneSize(root);
   useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
@@ -126,15 +128,23 @@ function Lane(props: LaneProps) {
         zoomOnDoubleClick={false}
         minZoom={BOARD_ZOOM.min}
         maxZoom={BOARD_ZOOM.max}
-      />
-      <NewEventsChip events={props.view.newOffScreen} onReveal={props.view.revealNew} />
-      <FollowCoachToggle following={props.view.followingCoach} onChange={props.view.setFollowingCoach} />
+        translateExtent={rowLocked(lane)}
+      >
+        <MiniMap position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} style={MINI_MAP_SIZE} />
+      </ReactFlow>
+      <EdgeChips view={props.view} lane={lane} />
+      <BoardControls following={props.view.followingCoach} onFollowChange={props.view.setFollowingCoach} />
     </div>
   );
 }
 
 const keepPointerEvents = () => {};
+const MINI_MAP_SIZE = { width: 160, height: 96, marginBottom: 28 };
+const miniMapColor = (node: Node) => (node.type === "question" ? "var(--color-card-question)" : "var(--color-card-event)");
 const START_VIEWPORT = { x: LANE_INSET, y: 16, zoom: 1 };
+const rowLocked = ({ height }: LaneSize): CoordinateExtent =>
+  height === 0 ? UNLOCKED : [[-Infinity, -START_VIEWPORT.y], [Infinity, height - START_VIEWPORT.y]];
+const UNLOCKED: CoordinateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]];
 
 function asList(root: HTMLDivElement | null): void {
   root?.querySelector(".react-flow")?.removeAttribute("role");
