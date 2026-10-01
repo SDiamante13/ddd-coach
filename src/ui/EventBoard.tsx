@@ -43,89 +43,55 @@ export type BoardView = {
   revealQuestion: () => void;
   setFollowingCoach: (following: boolean) => void;
 };
-export type BoardSession = {
-  pickedUpAt: string | null;
-  viewport: Viewport | null;
-  keepViewport: (viewport: Viewport) => void;
-  saving: boolean;
-};
+export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void; saving: boolean };
 
-export const NOT_SAVING =
-  "This browser isn't saving your session, so a reload will lose the conversation and board.";
-type EventBoardProps = {
-  view: BoardView;
-  thinking: boolean;
-  restoreNames: RestoreNames;
-  session?: BoardSession;
-};
+export const NOT_SAVING = "This browser isn't saving your session, so a reload will lose the conversation and board.";
+type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session?: BoardSession };
 
-const NO_SESSION: BoardSession = {
-  pickedUpAt: null,
-  viewport: null,
-  keepViewport: () => {},
-  saving: true,
-};
+const NO_SESSION: BoardSession = { pickedUpAt: null, viewport: null, keepViewport: () => {}, saving: true };
 
-export function EventBoard({
-  view,
-  thinking,
-  restoreNames,
-  session = NO_SESSION,
-}: EventBoardProps) {
+export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION }: EventBoardProps) {
   const hasEvents = view.board.cards.length > 0 || thinking;
   const empty = !hasEvents && view.words.terms.length === 0;
   const [overview, setOverview] = useState(wideEnoughForOverview);
   return (
     <ReactFlowProvider>
-      <section className="event-board" aria-label="Event board">
-        {!session.saving && (
-          <p className="not-saving" role="status">
-            {NOT_SAVING}
-          </p>
-        )}
-        <PickedUpLine savedAt={session.pickedUpAt} />
-        {empty ? (
-          <p className="board-empty">
-            Events from your paste land here, left to right, in order.
-          </p>
-        ) : (
-          <>
-            <div className="board-header-row">
-              <p className="board-header">
-                {hasEvents && (
-                  <>
-                    <span className="board-label">Timeline · Events</span>{" "}
-                    <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
-                  </>
-                )}
-                {wordsSummaryOf(view.words) && (
-                  <span
-                    className={hasEvents ? "board-words" : "board-words alone"}
-                  >
-                    {wordsSummaryOf(view.words)}
-                  </span>
-                )}
-              </p>
-              <BoardControls
-                following={view.followingCoach}
-                onFollowChange={view.setFollowingCoach}
-                overview={overview}
-                onOverviewChange={setOverview}
-              />
-            </div>
-            <BoardFlow
-              view={view}
-              thinking={thinking}
-              restoreNames={restoreNames}
-              session={session}
-              overview={overview}
-            />
-          </>
-        )}
-      </section>
+      <BoardSection view={view} thinking={thinking} restoreNames={restoreNames} session={session} hasEvents={hasEvents} empty={empty} overview={overview} setOverview={setOverview} />
     </ReactFlowProvider>
   );
 }
 
-const wideEnoughForOverview = (): boolean =>
-  window.matchMedia?.("(min-width: 900px)").matches ?? true;
+type BoardSectionProps = Required<EventBoardProps> & { hasEvents: boolean; empty: boolean; overview: boolean; setOverview: (shown: boolean) => void };
+
+function BoardSection({ view, thinking, restoreNames, session, hasEvents, empty, overview, setOverview }: BoardSectionProps) {
+  return (
+    <section className="event-board" aria-label="Event board">
+      {!session.saving && (
+        <p className="not-saving" role="status">
+          {NOT_SAVING}
+        </p>
+      )}
+      <PickedUpLine savedAt={session.pickedUpAt} />
+      {empty ? (
+        <p className="board-empty">Events from your paste land here, left to right, in order.</p>
+      ) : (
+        <>
+          <div className="board-header-row">
+            <p className="board-header">
+              {hasEvents && (
+                <>
+                  <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
+                </>
+              )}
+              {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
+            </p>
+            <BoardControls following={view.followingCoach} onFollowChange={view.setFollowingCoach} overview={overview} onOverviewChange={setOverview} />
+          </div>
+          <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} overview={overview} />
+        </>
+      )}
+    </section>
+  );
+}
+
+const wideEnoughForOverview = (): boolean => window.matchMedia?.("(min-width: 900px)").matches ?? true;
