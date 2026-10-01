@@ -25,8 +25,7 @@ export function PinnedQuestion({ question, onBoard = null }: { question: LatestQ
   return (
     <aside ref={ref} id={PINNED_QUESTION_ID} className="pinned-question" aria-label="Current question" tabIndex={-1} data-expanded={expanded || undefined}>
       <QuestionStrip question={question} expanded={expanded} onToggle={toggle} />
-      <QuestionCard roles={question.roles} text={question.text} sources={question.sources} />
-      {onBoard && <OnTheBoardChip {...onBoard} />}
+      <QuestionCard roles={question.roles} text={question.text} sources={question.sources} action={onBoard && <OnTheBoardChip {...onBoard} />} />
     </aside>
   );
 }

@@ -88,11 +88,13 @@ describe("The open question on the board (#97)", () => {
       expect(within(hotspot).getByText(`“${UNPLACED}”`)).toBeVisible();
     });
 
-    it("says it on the pinned question's chip too", async () => {
+    it("says it on the pinned question's chip too, inside the card", async () => {
       await askedWithAStrayQuote();
       const pinned = screen.getByRole("complementary", { name: "Current question" });
 
-      expect(within(pinned).getByRole("button", { name: "On the board ↖ linked to 1 event · 1 quote not on the board" })).toBeInTheDocument();
+      const chip = within(pinned).getByRole("button", { name: "On the board ↖ linked to 1 event · 1 quote not on the board" });
+
+      expect(chip.closest(".question-card")).not.toBeNull();
     });
   });
 });

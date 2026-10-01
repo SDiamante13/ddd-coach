@@ -848,7 +848,7 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   font-size: 12px;
 }
 
-/* #126: a question's quote that no card comes from is named on the hotspot and shown on request */
+/* #126: a question's quote that no card comes from is named on the hotspot and shown on request; the chip sits inside the pinned card, under the question. */
 .hotspot-unplaced {
   grid-column: 1 / -1;
   display: flex;
@@ -870,4 +870,8 @@ ol[role="log"] > li > p.correction-line[data-settled] {
 
 .hotspot-quote {
   font-style: italic;
+}
+
+.question-action {
+  margin: var(--space-2) 0 var(--space-3);
 }
