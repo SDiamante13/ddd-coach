@@ -10,11 +10,12 @@ Everything the owner needs to run one real session: one message, one 30-minute c
 
 Synthetic interviews (Priya, Marcus) are hypotheses. This session confirms or kills them; don't steer it toward them.
 
-**State of the hosted app** (check again on the day; this is true at `65bdb7c`)
+**State of the hosted app** (check again on the day; this is true once #133 is live)
 
 - Live: paste a thread, word swaps with a "What's sent" preview, events on the board, the Words lane ("Words that don't match"), the question card with the expert's lines, "I checked" (Yes, it holds / No, it's wrong / Couldn't tell, with "Where?"), Settle by, "Copy for your RFC", "Copy for your repo", `/data`.
+- Live with #133: **Who's who**, for Slack- or notes-style pastes where speakers are people and rows are teams. When most rows have no source line, a one-time callout offers "Who's who · N people" or "Not now". The visitor puts each speaker on a team once ("Apply · find source lines" or "Skip"); rows then find their lines, and the strip collapses to "Who's who · N people [Edit]". It's kept in this browser until deleted (like "Your swaps"), never sent, and reused on later pastes.
 - Off in production: the kept glossary (`GLOSSARY_ENABLED = false`, #100), so no "Keep these words", drift rows or "settled · not re-asked". Board corrections (`CORRECTIONS_ENABLED = false`, #95).
-- Not built: "Who's who" (#133, Exploration 14). Real threads often get "Team unclear" rows and missing sources (#99, #133). Expect it, and note what they do about it.
+- Real threads can still get "Team unclear" rows and missing sources (#99). Expect it, and note what they do about it.
 
 ## 1. Outreach message
 
@@ -40,7 +41,7 @@ If they say yes, reply with: the link (`https://ddd-coach.netlify.app`), the dat
 > - Your browser sends your message, with your swaps applied, to our server, which passes it to OpenRouter, which sends it only to OpenAI's API. No fallback to another provider.
 > - OpenAI may keep messages and replies for up to 30 days in abuse-monitoring logs. OpenAI doesn't train on API data by default. OpenRouter doesn't store messages unless the account opts in, and ours doesn't.
 > - Our server saves nothing you type. Its logs hold only error names and status codes.
-> - Your browser keeps the conversation, the board and your swaps (with the real names) until you clear them. That's also why a return visit needs the same browser.
+> - Your browser keeps the conversation, the board, your swaps (with the real names) and Who's who (which team each person in your thread is on) until you clear them. Who's who is never sent either. That's also why a return visit needs the same browser.
 >
 > **Swap names before you paste.** Open "Your swaps" and add a swap for each real name: people, teams if they identify the company, customers, carriers, products, the company itself. Example: `[a colleague's name] → Ops lead`, `[a customer's name] → Customer A`. The coach sees the placeholders; your browser puts the real words back into the reply. Before you press Send, open **What's sent** and read it: that's exactly what leaves your browser.
 >
@@ -63,20 +64,20 @@ Rules for the owner: don't pitch, don't explain the UI unless they're stuck for 
 | Time | Step | What you say |
 |---|---|---|
 | 0–3 | **Setup** | "Thanks for doing this. I built it, so you won't hurt my feelings; the rough parts are what I need to see. Please think out loud as you go, even half-thoughts. Is it OK if I take notes? [Recording, only if they agreed in writing.]" Confirm which input they're using. |
-| 3–7 | **Warm-up** | "Tell me about the thread you picked. Who's in it, and what's the disagreement?" · "The last time a word meant different things to different people at work, what happened next?" · "When you need an answer from someone who knows the business, how does that usually go?" |
+| 3–7 | **Warm-up** | "Tell me about the thread you picked. Who's in it, and what's the disagreement?" · "The last time a thread like this didn't get settled, what happened next?" |
 | 7–11 | **Swaps and paste** | "Here's the link and the password. Set it up the way you would if I weren't here." If they skip swaps on real material: "Before you send, is there anything in there you'd want hidden?" (Once. Then let them decide.) |
 | 11–20 | **Read the reply** | Say nothing while they read. Then, only as needed: "What are you looking at now?" · "What do you make of that?" · "Anything there you'd disagree with?" · "What would you do next?" |
-| 20–24 | **The key moment** | "If this were a normal workday, what, if anything, would you do with what's on the screen?" Then wait. If they mention the question: "Who would you take it to? Would you change it first?" If they don't: don't bring it up. Note that. |
-| 24–28 | **Their own docs** | "Is there somewhere this would normally end up, like a design doc, an RFC or the repo?" If yes: "Go ahead and put it there, the way you normally would." Watch "Copy for your RFC" into their real Confluence (or doc), and "Copy for your repo". If something on the board is already settled for them: "Is any of this something you already know the answer to?" (that's where "I checked" may come up; don't point at it). |
-| 28–30 | **Close** | "What was the most useful part, if any? What would stop you using it?" · "Can I message you in a week to ask what happened next?" Thank them. Stop. |
+| 20–24 | **The key moment** | "If this were a normal workday, what, if anything, would you do with what's on the screen?" Then wait. If they mention the question: "What would you do with it? Would you change anything first?" If they don't: don't bring it up. Note that. |
+| 24–28 | **Their own docs** | "Where, if anywhere, would any of this normally end up?" Only if they name a place: "Go ahead and put it there, the way you normally would." Watch "Copy for your RFC" into their real Confluence (or doc), and "Copy for your repo". If something on the board is already settled for them: "Is any of this something you already know the answer to?" (that's where "I checked" may come up; don't point at it). |
+| 28–30 | **Close** | "When you need an answer from someone who knows the business, how does that usually go?" · "What was the most useful part, if any? What would stop you using it?" · "Can I message you in a week to ask what happened next?" Thank them. Stop. |
 
 **After the main task only, if there's time**, ask from this list (one or two, neutral wording). Skip any that depend on a feature that's off on the day.
 
-- "Would you paste your team's existing glossary or doc in here each time, or not?" (#6, #113 round-trip)
+- "Where does your team keep meanings it has agreed on today? How, if at all, would that fit with this?" (#6, #113 round-trip)
 - "When you talk to the expert, how do you usually capture what they say?" (#112: typing vs dictating)
 - Glossary probes (drift row as a finding, "settled · not re-asked" as trust) only if `GLOSSARY_ENABLED` is on in production that day. Otherwise skip them; don't show the Exploration 08 mockups during the session.
 
-**Don't say:** "Isn't the question useful?", "Would you take this to your expert?", "Did you notice the Words lane?", "Most people like…", or any explanation of what DDD says they should do.
+**Don't say:** "Isn't the question useful?", "Would you take this to your expert?", "Did you notice the Words lane?", "Did you see the question?", "Try Copy for your RFC", "Who's who" or "map the speakers" (let them find it or not), "Most people like…", naming any on-screen control before they do, or any explanation of what DDD says they should do.
 
 ## 4. Observation sheet
 
@@ -96,6 +97,7 @@ Copy this per session. Note times from the call start. Write what they do and sa
 | What they copied, and where they pasted it (RFC, Confluence, repo, Slack) | |
 | Did the pasted result need fixing in their doc? What? | |
 | "I checked": used unprompted? Which answer? | |
+| Who's who: did the callout show? Opened, "Not now", or ignored? Teams they picked; source lines found | |
 | Questions they asked you | |
 | Exact quotes worth keeping (no names) | |
 
