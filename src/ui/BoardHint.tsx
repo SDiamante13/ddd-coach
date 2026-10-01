@@ -1,4 +1,4 @@
-import { type FocusEvent, useEffect, useRef, useState } from "react";
+import { type FocusEvent, type KeyboardEvent, useEffect, useRef, useState } from "react";
 
 export const BOARD_KEYS_HINT = "← → along a row · ↑ ↓ between rows · Shift + arrows nudge · Enter corrects · Esc to the controls";
 export const BOARD_KEYS_ID = "board-keys";
@@ -13,12 +13,14 @@ export function useBoardHint() {
   const onFocus = (event: FocusEvent<HTMLElement>) => {
     if (hint !== "unseen" || !byKeyboard.current || !event.target.matches("[data-board-item]")) return;
     setHint("showing");
-    rememberSeen();
+  };
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (hint === "showing" && event.key.startsWith("Arrow")) rememberSeen();
   };
   const onBlur = (event: FocusEvent<HTMLElement>) => {
     if (hint === "showing" && !event.currentTarget.contains(event.relatedTarget)) setHint("seen");
   };
-  return { shown: hint === "showing", onFocus, onBlur };
+  return { shown: hint === "showing", onFocus, onBlur, onKeyDown };
 }
 
 function useKeyboardModality() {

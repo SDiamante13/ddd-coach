@@ -1,6 +1,6 @@
 import { type CoordinateExtent, Handle, MiniMap, type Node, type NodeProps, Position, ReactFlow, type Edge, MarkerType } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { type KeyboardEvent, useLayoutEffect, useMemo, useRef } from "react";
 import type { EventCard } from "../domain/board.ts";
 import type { EntityId } from "../domain/entityId.ts";
 import { titleOf } from "./linkLines.ts";
@@ -109,7 +109,7 @@ function Lane(props: LaneProps) {
   useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
-    <div ref={root} className="board-lane" onFocus={hint.onFocus} onBlur={hint.onBlur} onKeyDown={onBoardKey}>
+    <div ref={root} className="board-lane" onFocus={hint.onFocus} onBlur={hint.onBlur} onKeyDown={(event) => onBoardKeys(event, hint.onKeyDown)}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -143,6 +143,10 @@ function Lane(props: LaneProps) {
 }
 
 const keepPointerEvents = () => {};
+const onBoardKeys = (event: KeyboardEvent<HTMLDivElement>, hinted: (event: KeyboardEvent<HTMLDivElement>) => void) => {
+  hinted(event);
+  onBoardKey(event);
+};
 const MINI_MAP_SIZE = { width: 120, height: 56, margin: 8 };
 const MINI_MAP_COLORS: Record<string, string> = { question: "var(--color-card-question)", term: "var(--color-line-strong)" };
 const miniMapColor = (node: Node) => MINI_MAP_COLORS[node.type ?? ""] ?? "var(--color-card-event)";

@@ -105,10 +105,10 @@ describe("The board from the keyboard (#20)", () => {
       expect(hint()).toBeNull();
     });
 
-    it("counts as seen once shown, even if you leave by Escape to the controls", async () => {
+    it("counts as seen once you use an arrow key, even if you then leave by Escape (#127)", async () => {
       const { user } = await onTheBoard();
       await reachByKeyboard(user);
-      await user.keyboard("{Escape}");
+      await user.keyboard("{ArrowRight}{Escape}");
 
       cleanup();
       const again = await renderApp();
@@ -119,9 +119,24 @@ describe("The board from the keyboard (#20)", () => {
       expect(hint()).toBeNull();
     });
 
+    it("comes back after a reload if you never used an arrow key (#127)", async () => {
+      const { user, input } = await onTheBoard();
+      await reachByKeyboard(user);
+      act(() => input().focus());
+
+      cleanup();
+      const again = await renderApp();
+      await within(board()).findByRole("list", { name: "Events on the board" });
+      await again.user.keyboard("{Shift}");
+      act(() => card(2).focus());
+
+      expect(hint()).not.toBeNull();
+    });
+
     it("isn't shown again in this browser once seen", async () => {
       const { user, input } = await onTheBoard();
       await reachByKeyboard(user);
+      await user.keyboard("{ArrowLeft}");
       act(() => input().focus());
 
       cleanup();
