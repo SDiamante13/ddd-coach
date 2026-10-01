@@ -90,6 +90,7 @@ describe("The Words lane (#109)", () => {
 
     expect(await within(board()).findByRole("listitem", { name: /^Term “on time”/ })).toBeInTheDocument();
     expect(within(board()).getByText("Words · 1 term · 1 row")).toBeInTheDocument();
+    expect(board().querySelector(".board-header")?.textContent).not.toMatch(/Events|0 events/);
 
     within(term("on time")).getByRole("group", { name: "Term “on time”" }).focus();
     await conversation.user.keyboard("{Shift>}{ArrowRight}{/Shift}");

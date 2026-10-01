@@ -950,6 +950,10 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   content: " · ";
 }
 
+.board-words.alone::before {
+  content: none;
+}
+
 .term-card:focus-visible {
   box-shadow: var(--focus-ring);
   outline: none;

@@ -48,7 +48,8 @@ type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: Resto
 const NO_SESSION: BoardSession = { pickedUpAt: null, viewport: null, keepViewport: () => {}, saving: true };
 
 export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION }: EventBoardProps) {
-  const empty = view.board.cards.length === 0 && view.words.terms.length === 0 && !thinking;
+  const hasEvents = view.board.cards.length > 0 || thinking;
+  const empty = !hasEvents && view.words.terms.length === 0;
   return (
     <section className="event-board" aria-label="Event board">
       {!session.saving && (
@@ -62,8 +63,12 @@ export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION 
       ) : (
         <>
           <p className="board-header">
-            <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
-            {wordsSummaryOf(view.words) && <span className="board-words">{wordsSummaryOf(view.words)}</span>}
+            {hasEvents && (
+              <>
+                <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
+              </>
+            )}
+            {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
           </p>
           <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} />
         </>
