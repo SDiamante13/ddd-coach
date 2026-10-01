@@ -147,4 +147,34 @@ describe("Checking a term row yourself (#90a)", () => {
 
     expect(await navigator.clipboard.readText()).toContain("| Billing | Any load past the booked appointment. (was: A load on the weekly late report.) | From thread | Settled · marked wrong by you, 1 Oct 2026 |");
   });
+
+  it("still marks a new link Just drawn after you clear a check kept from before a reload (#124)", async () => {
+    const reply = [WORDS_REPLY.replace("after the pickup window.", "after the pickup window.\n2. From thread: Billing adds load 7731 to the weekly late report.")].join("\n");
+    const app = await startConversation();
+    app.server.reply(await app.send(WORDS_PASTE), 200, { reply, signature: "sig" });
+    await within(board()).findByRole("listitem", { name: /^Term “late”/ });
+    await checkRow(app.user, "Billing", "Yes, it holds");
+    cleanup();
+    const { user } = await renderApp();
+    await within(board()).findByRole("listitem", { name: /^Term “late”/ });
+
+    await checkRow(user, "Billing", "Clear check");
+    await user.click(within(board()).getByRole("button", { name: /^Event 1 of 2/ }));
+    await user.click(within(board()).getByRole("button", { name: "Connect to…" }));
+    await user.click(within(board()).getByRole("button", { name: /^Link to “Billing adds load 7731/ }));
+
+    expect(await within(board()).findByText("Just drawn")).toBeInTheDocument();
+  });
+
+  it("keeps a cleared check open after a reload", async () => {
+    const { user } = await onTheWords();
+    await checkRow(user, "Billing", "Yes, it holds");
+    await checkRow(user, "Billing", "Clear check");
+
+    cleanup();
+    await renderApp();
+
+    await within(board()).findByRole("listitem", { name: /^Term “late”/ });
+    expect(row("Billing")).toHaveTextContent("OPEN");
+  });
 });

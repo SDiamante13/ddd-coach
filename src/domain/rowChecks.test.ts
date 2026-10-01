@@ -3,7 +3,7 @@ import { boardOf, type VisitorAction } from "./boardFromReplies.ts";
 import { compactMoves, lastEdit } from "./cardMoves.ts";
 import { entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId, Prompt } from "./exchange.ts";
-import { checksOf, withoutCheck } from "./rowChecks.ts";
+import { checksOf } from "./rowChecks.ts";
 
 const e1 = "e1" as ExchangeId;
 const billing = entityId("meaning", "late|Billing");
@@ -24,10 +24,13 @@ describe("row checks", () => {
     expect(lastEdit([link, check(billing, "holds")])).toBe(link);
   });
 
-  it("clears a row's check, leaving other rows' checks and every other edit", () => {
-    const fix: VisitorAction = { kind: "correct", id: billing, text: "Any load past the booked appointment.", after: e1 };
+  it("reads a row cleared after its check as open, keeping only the clear when saved and leaving it out of Undo", () => {
+    const clear: VisitorAction = { kind: "clearCheck", row: billing, after: e1 };
+    const actions = [check(billing, "wrong"), link, check(code, "holds"), clear];
 
-    expect(withoutCheck([check(billing, "unknown"), link, fix, check(code, "holds"), check(billing, "wrong")], billing)).toEqual([link, fix, check(code, "holds")]);
+    expect([...checksOf(actions).keys()]).toEqual([code]);
+    expect(compactMoves(actions)).toEqual([link, check(code, "holds"), clear]);
+    expect(lastEdit(actions)).toBe(link);
   });
 
   it("leaves the board's events untouched by checks", () => {

@@ -3,10 +3,12 @@ import type { EntityId } from "./entityId.ts";
 
 export type RowCheck = { verdict: Verdict; where?: string; at: string };
 
-const isCheck = (action: VisitorAction): action is Check => action.kind === "check";
-
 export function checksOf(actions: readonly VisitorAction[]): Map<EntityId, RowCheck> {
-  return new Map(actions.filter(isCheck).map(({ row, verdict, where, at }) => [row, { verdict, at, ...(where !== undefined && { where }) }]));
+  return actions.reduce((checks, action) => {
+    if (action.kind === "clearCheck") checks.delete(action.row);
+    if (action.kind === "check") checks.set(action.row, rowCheckOf(action));
+    return checks;
+  }, new Map<EntityId, RowCheck>());
 }
 
-export const withoutCheck = (actions: readonly VisitorAction[], row: EntityId): VisitorAction[] => actions.filter((action) => !(isCheck(action) && action.row === row));
+const rowCheckOf = ({ verdict, where, at }: Check): RowCheck => ({ verdict, at, ...(where !== undefined && { where }) });

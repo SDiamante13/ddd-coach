@@ -5,7 +5,10 @@ export type Position = { x: number; y: number };
 
 const isMove = (action: VisitorAction): action is Move => action.kind === "move";
 
-const latestKeyOf = (action: VisitorAction): string | null => (action.kind === "move" ? `move|${action.id}` : action.kind === "check" ? `check|${action.row}` : null);
+function latestKeyOf(action: VisitorAction): string | null {
+  if (action.kind === "move") return `move|${action.id}`;
+  return action.kind === "check" || action.kind === "clearCheck" ? `check|${action.row}` : null;
+}
 
 export function positionsOf(actions: readonly VisitorAction[]): Map<EntityId, Position> {
   return new Map(actions.filter(isMove).map(({ id, x, y }) => [id, { x, y }]));

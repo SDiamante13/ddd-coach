@@ -11,7 +11,8 @@ export type Connection = { kind: "connect"; from: EntityId; to: EntityId; after:
 export type Move = { kind: "move"; id: EntityId; x: number; y: number; after: ExchangeId };
 export type Verdict = "holds" | "wrong" | "unknown";
 export type Check = { kind: "check"; row: EntityId; verdict: Verdict; where?: string; at: string; after: ExchangeId };
-export type VisitorAction = Correction | Connection | Move | Check;
+export type ClearCheck = { kind: "clearCheck"; row: EntityId; after: ExchangeId };
+export type VisitorAction = Correction | Connection | Move | Check | ClearCheck;
 
 export function boardOf(exchanges: readonly Exchange[], edits: readonly VisitorAction[] = []): Board {
   return exchanges.flatMap((exchange) => actionsOf(exchange, edits)).reduce(applyAction, emptyBoard);

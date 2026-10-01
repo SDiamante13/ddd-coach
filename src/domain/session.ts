@@ -93,6 +93,8 @@ function isVisitorAction(value: unknown): value is VisitorAction {
       return texts("from", "to", "after");
     case "check":
       return texts("row", "after") && VERDICTS.includes(field(value, "verdict")) && DAY.test(stringField(value, "at") ?? "") && ["undefined", "string"].includes(typeof field(value, "where"));
+    case "clearCheck":
+      return texts("row", "after");
     case "move":
       return texts("id", "after") && [field(value, "x"), field(value, "y")].every((n) => typeof n === "number" && Number.isFinite(n));
     default:

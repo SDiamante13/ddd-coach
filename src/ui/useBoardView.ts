@@ -80,7 +80,10 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
       const after = board.latest ?? words.latest;
       if (after !== null) edits.check(row, verdict, where, after);
     }),
-    clearCheck: touching(edits.clearCheck),
+    clearCheck: touching((row: EntityId) => {
+      const after = board.latest ?? words.latest;
+      if (after !== null) edits.clearCheck(row, after);
+    }),
     move: (id: EntityId, position: Position) => {
       follow.pauseFollow();
       const after = board.latest ?? words.latest;
