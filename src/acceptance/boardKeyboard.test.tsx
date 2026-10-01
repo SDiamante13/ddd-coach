@@ -84,7 +84,7 @@ describe("The board from the keyboard (#20)", () => {
 
       await reachByKeyboard(user);
 
-      expect(hint()).toHaveTextContent("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves");
+      expect(hint()).toHaveTextContent("← → along a row · ↑ ↓ between rows · Shift + arrows nudge · Enter corrects · Esc to the controls");
     });
 
     it("keeps quiet for a mouse click, so the click doesn't use it up", async () => {
@@ -123,6 +123,6 @@ describe("The board from the keyboard (#20)", () => {
   it("gives screen readers the keys on every card", async () => {
     await onTheBoard();
 
-    expect(card(2)).toHaveAccessibleDescription("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves");
+    expect(card(2)).toHaveAccessibleDescription("← → along a row · ↑ ↓ between rows · Shift + arrows nudge · Enter corrects · Esc to the controls");
   });
 });

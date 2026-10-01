@@ -1,6 +1,6 @@
 import { type FocusEvent, useEffect, useRef, useState } from "react";
 
-export const BOARD_KEYS_HINT = "← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves";
+export const BOARD_KEYS_HINT = "← → along a row · ↑ ↓ between rows · Shift + arrows nudge · Enter corrects · Esc to the controls";
 export const BOARD_KEYS_ID = "board-keys";
 
 const SEEN_KEY = "ddd-coach.board-hint-seen";
