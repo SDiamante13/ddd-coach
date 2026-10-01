@@ -21,7 +21,7 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
     setEditing(false);
   };
   return (
-    <div className="board-card nopan nodrag" data-card-id={card.id} data-source={card.correctedFrom === undefined ? card.provenance : "you"} data-change={change ?? undefined}>
+    <div className="board-card nopan" data-card-id={card.id} data-source={card.correctedFrom === undefined ? card.provenance : "you"} data-change={change ?? undefined}>
       {editing && <CardEditor initial={title} onKeep={keep} onCancel={() => setEditing(false)} />}
       <button type="button" className="card" aria-label={`Event ${place.index} of ${place.total}, ${labelOf(card)}: ${title}`} aria-hidden={editing || undefined} tabIndex={editing ? -1 : undefined} aria-pressed={pressed} aria-describedby={pressed ? noteId : undefined} onClick={() => view.toggle(card.id)} onDoubleClick={() => setEditing(true)}>
         <CardFace card={card} view={view} title={title} restoreNames={restoreNames} />
@@ -87,7 +87,7 @@ function useOverflow(ref: RefObject<HTMLElement | null>, text: string, unclamped
 
 function UndoPill({ onUndo }: { onUndo: () => void }) {
   return (
-    <p className="card-undo">
+    <p className="card-undo nodrag">
       Corrected your sticky{" "}
       <button type="button" onClick={onUndo}>
         Undo
@@ -117,7 +117,7 @@ function CardEditor({ initial, onKeep, onCancel }: CardEditorProps) {
     else onKeep(text);
   };
   return (
-    <div className="card card-editing">
+    <div className="card card-editing nodrag">
       <input className="card-input" aria-label="Correct this event" defaultValue={initial} autoFocus onKeyDown={onKeyDown} onBlur={onCancel} />
       <span className="card-hint">Enter keeps · Esc cancels</span>
     </div>

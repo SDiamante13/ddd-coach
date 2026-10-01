@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { lastEdit } from "../domain/cardMoves.ts";
 import { type Board, canLink } from "../domain/board.ts";
 import type { EntityId } from "../domain/entityId.ts";
 import type { ExchangeId } from "../domain/exchange.ts";
@@ -27,7 +28,7 @@ export function useAnnouncedEdits(board: Board, edits: ReturnType<typeof useVisi
     setAnnouncement(linkLineText({ from: titleOf(board, from, restoreNames), to: titleOf(board, to, restoreNames) }));
   };
   const undo = () => {
-    setAnnouncement(edits.actions.at(-1)?.kind === "connect" ? LINK_UNDONE : CORRECTION_UNDONE);
+    setAnnouncement(lastEdit(edits.actions)?.kind === "connect" ? LINK_UNDONE : CORRECTION_UNDONE);
     edits.undo();
   };
   return { correct, connect, undo, announcement };

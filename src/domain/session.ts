@@ -72,6 +72,8 @@ function isVisitorAction(value: unknown): value is VisitorAction {
       return texts("id", "text", "after");
     case "connect":
       return texts("from", "to", "after");
+    case "move":
+      return texts("id", "after") && [field(value, "x"), field(value, "y")].every((n) => typeof n === "number" && Number.isFinite(n));
     default:
       return false;
   }

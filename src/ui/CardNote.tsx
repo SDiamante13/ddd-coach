@@ -9,7 +9,7 @@ export function CardNote({ id, provenance, line, onCorrect, others, onLink }: Ca
   const noteRef = useRef<HTMLDivElement>(null);
   const align = useAlignInsideBoard(noteRef);
   return (
-    <div ref={noteRef} id={id} role="note" className="card-note" data-align={align}>
+    <div ref={noteRef} id={id} role="note" className="card-note nodrag" data-align={align}>
       {provenance === "guess" ? (
         <p>The coach's guess: no line in your paste says this.</p>
       ) : line === null ? (

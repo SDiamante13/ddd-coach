@@ -4,6 +4,7 @@ import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
 import { PickedUpLine } from "./PickedUpLine.tsx";
 import type { Hotspot } from "./hotspot.ts";
+import type { Position } from "../domain/cardMoves.ts";
 import type { OffScreenOffer } from "./useOffScreenOffer.ts";
 import type { Viewport } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
@@ -21,6 +22,8 @@ export type BoardView = {
   undoable: EntityId | null;
   highlightedLine: string | null;
   followingCoach: boolean;
+  positions: ReadonlyMap<EntityId, Position>;
+  move: (id: EntityId, position: Position) => void;
   newOffScreen: OffScreenOffer | null;
   offerNew: (offer: OffScreenOffer | null) => void;
   newReveals: number;

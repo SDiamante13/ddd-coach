@@ -9,6 +9,7 @@ import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { EdgeChips } from "./EdgeChips.tsx";
+import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
 import { BoardControls } from "./BoardControls.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
@@ -46,14 +47,14 @@ function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | 
   const events: EventNodeType[] = cards.map((card, index) => ({
     id: card.id,
     type: "event",
-    position: lanePosition(index),
+    position: view.positions.get(card.id) ?? lanePosition(index),
     ...SLOT,
     zIndex: view.selected === card.id ? LIFTED : 0,
     ariaRole: "listitem",
     data: { card, view, restoreNames, index: index + 1, total: cards.length },
   }));
   const ghosts: GhostNodeType[] = thinking
-    ? GHOST_SLOTS.map((slot) => ({ id: `ghost-${slot}`, type: "ghost", className: "board-ghost", position: lanePosition(cards.length + slot - 1), ...SLOT, data: {}, domAttributes: { "aria-hidden": true } }))
+    ? GHOST_SLOTS.map((slot) => ({ id: `ghost-${slot}`, type: "ghost", className: "board-ghost", position: lanePosition(cards.length + slot - 1), ...SLOT, draggable: false, data: {}, domAttributes: { "aria-hidden": true } }))
     : [];
   return [...events, ...questionNodesOf(view), ...ghosts];
 }
@@ -101,7 +102,8 @@ export function BoardFlow(props: LaneProps) {
 
 function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
-  const nodes = useMemo(() => nodesOf(props), [props]);
+  const dragging = useDragging(props.view);
+  const nodes = useMemo(() => nodesOf(props).map(dragging.at), [props, dragging.at]);
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
   usePanToChanges(props.view, root);
   const lane = useLaneSize(root);
@@ -116,7 +118,10 @@ function Lane(props: LaneProps) {
         defaultViewport={props.session.viewport ?? START_VIEWPORT}
         onMoveStart={(event) => event && props.view.setFollowingCoach(false)}
         onMoveEnd={(_event, viewport) => props.session.keepViewport(viewport)}
-        nodesDraggable={false}
+        nodeDragThreshold={4}
+        onNodesChange={dragging.onNodesChange}
+        onNodeDragStart={() => props.view.setFollowingCoach(false)}
+        onNodeDragStop={dragging.onNodeDragStop}
         onConnect={({ source, target }) => props.view.connect(source as EntityId, target as EntityId)}
         isValidConnection={({ source, target }) => source !== target}
         nodesFocusable={false}

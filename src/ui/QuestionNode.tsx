@@ -31,7 +31,7 @@ export function questionNodesOf(view: BoardView): QuestionNodeType[] {
   const { hotspot, board } = view;
   if (hotspot === null) return [];
   const fresh = hotspot.askedIn === board.latest && !view.atRest;
-  return [{ id: hotspot.id, type: "question", position: placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh } }];
+  return [{ id: hotspot.id, type: "question", position: view.positions.get(hotspot.id) ?? placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh } }];
 }
 
 function placeOf({ links }: Hotspot, { board }: BoardView) {

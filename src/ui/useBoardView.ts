@@ -10,6 +10,7 @@ import type { RestoreNames } from "./ReplyView.tsx";
 import type { CorrectionLine } from "./CorrectionLines.tsx";
 import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
 import { hotspotOf } from "./hotspot.ts";
+import { lastEdit, type Position, positionsOf } from "../domain/cardMoves.ts";
 import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
@@ -48,7 +49,12 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames, restorePoint.actions),
     justDrawn: edits.actions.length > restorePoint.actions ? justDrawnOf(board, edits.actions) : null,
     atRest: restorePoint.turn !== null && board.latest === restorePoint.turn,
-    undoable: undoableOf(board, edits.actions.at(-1)),
+    undoable: undoableOf(board, lastEdit(edits.actions)),
+    positions: positionsOf(edits.actions),
+    move: (id: EntityId, position: Position) => {
+      follow.setFollowingCoach(false);
+      if (board.latest !== null) edits.move(id, position, board.latest);
+    },
     correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames, keptCorrection(edits.actions, restorePoint)),
     highlight,
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),

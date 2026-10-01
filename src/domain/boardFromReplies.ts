@@ -8,7 +8,8 @@ const PROVENANCE_OF: Record<Source, Provenance> = { "From thread": "thread", Gue
 
 export type Correction = { kind: "correct"; id: EntityId; text: string; after: ExchangeId };
 export type Connection = { kind: "connect"; from: EntityId; to: EntityId; after: ExchangeId };
-export type VisitorAction = Correction | Connection;
+export type Move = { kind: "move"; id: EntityId; x: number; y: number; after: ExchangeId };
+export type VisitorAction = Correction | Connection | Move;
 
 export function boardOf(exchanges: readonly Exchange[], edits: readonly VisitorAction[] = []): Board {
   return exchanges.flatMap((exchange) => actionsOf(exchange, edits)).reduce(applyAction, emptyBoard);
@@ -39,9 +40,9 @@ function countsOf(board: Board, by: ExchangeId, events: readonly AddEvent[]): Re
 }
 
 const editsAfter = (by: ExchangeId, edits: readonly VisitorAction[]): BoardAction[] =>
-  edits.filter(({ after }) => after === by).map(boardActionOf);
+  edits.filter((edit): edit is Correction | Connection => edit.after === by && edit.kind !== "move").map(boardActionOf);
 
-const boardActionOf = (edit: VisitorAction): BoardAction =>
+const boardActionOf = (edit: Correction | Connection): BoardAction =>
   edit.kind === "correct" ? { type: "correctCard", id: edit.id, text: edit.text } : { type: "connectCards", from: edit.from, to: edit.to };
 
 export function eventActionsOf(reply: string, by: ExchangeId): AddEvent[] {
