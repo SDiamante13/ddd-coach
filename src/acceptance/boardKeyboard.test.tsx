@@ -1,6 +1,6 @@
-import { screen, within } from "@testing-library/react";
+import { act, cleanup, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { renderApp, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 import { entityId } from "../domain/entityId.ts";
 
@@ -54,10 +54,42 @@ describe("The board from the keyboard (#20)", () => {
     expect(input()).toHaveFocus();
   });
 
-  it("says how to get around on first focus", async () => {
-    await onTheBoard();
+  describe("the keys hint (#127)", () => {
+    const hint = () => board().querySelector(".board-hint");
+    const reachByKeyboard = async (user: Awaited<ReturnType<typeof onTheBoard>>["user"]) => {
+      await user.keyboard("{Shift}");
+      act(() => card(2).focus());
+    };
 
-    expect(board().querySelector(".board-hint")).toHaveTextContent("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves");
+    it("says how to get around when you first reach the board from the keyboard", async () => {
+      const { user } = await onTheBoard();
+
+      await reachByKeyboard(user);
+
+      expect(hint()).toHaveTextContent("← → move between cards · Shift + arrows nudge · Enter corrects · Esc leaves");
+    });
+
+    it("keeps quiet for a mouse click, so the click doesn't use it up", async () => {
+      const { user } = await onTheBoard();
+
+      await user.click(card(2));
+
+      expect(hint()).toBeNull();
+    });
+
+    it("isn't shown again in this browser once seen", async () => {
+      const { user, input } = await onTheBoard();
+      await reachByKeyboard(user);
+      act(() => input().focus());
+
+      cleanup();
+      const again = await renderApp();
+      await within(board()).findByRole("list", { name: "Events on the board" });
+      await again.user.keyboard("{Shift}");
+      act(() => card(2).focus());
+
+      expect(hint()).toBeNull();
+    });
   });
 
   it("comes back to the card when you leave the correction with Escape, and then off the board", async () => {
