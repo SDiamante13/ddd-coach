@@ -48,7 +48,7 @@ function UnplacedQuotes({ quotes, tabIndex }: { quotes: readonly string[]; tabIn
 export function questionNodesOf(view: BoardView): QuestionNodeType[] {
   const { hotspot, board } = view;
   if (hotspot === null) return [];
-  const fresh = hotspot.askedIn === board.latest && !view.atRest;
+  const fresh = hotspot.askedIn === board.latest && !view.atRest && !view.quietRings;
   return [{ id: hotspot.id, type: "question", position: view.positions.get(hotspot.id) ?? placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh, roving: rovingOf(view, hotspot.id) } }];
 }
 

@@ -1028,3 +1028,12 @@ ol[role="log"] > li > p.correction-line[data-settled] {
 .board-lane .relates-edge {
   pointer-events: none;
 }
+
+/* #127: when a reply adds more than 5 things, one quiet count replaces a ring on every card. */
+.many-new {
+  margin-left: var(--space-2);
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-coach);
+  color: var(--color-on-coach);
+}

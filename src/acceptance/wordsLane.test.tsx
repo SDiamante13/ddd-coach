@@ -121,6 +121,16 @@ describe("The Words lane (#109)", () => {
     expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
   });
 
+  it("shows one 'N new on the board' line instead of a ring on every card when a reply adds more than 5 things (#127)", async () => {
+    const conversation = await startConversation();
+    const many = ["Events, in order", ...[1, 2, 3, 4, 5].map((n) => `${n}. From thread: Ops step ${n} happens on load 7731.`), "", WORDS_REPLY.slice(WORDS_REPLY.indexOf("Words that don't match"))].join("\n");
+    conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply: many, signature: "sig" });
+    await within(board()).findByRole("list", { name: "Events on the board" });
+
+    expect(within(board()).getByText("6 new on the board")).toBeInTheDocument();
+    expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
+  });
+
   describe("reaching the Words lane at 100% (#109 hotfix)", () => {
     beforeEach(() => {
       vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query, addEventListener: () => {}, removeEventListener: () => {} }));

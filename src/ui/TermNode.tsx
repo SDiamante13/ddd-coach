@@ -79,7 +79,7 @@ function termNodeOf(term: TermCard, position: Position, view: BoardView, restore
     height: HEADER_HEIGHT + term.rows.reduce((sum, row) => sum + rowHeightOf(row), 0),
     ariaRole: "listitem",
     ariaLabel: termNameOf(term, restoreNames),
-    data: { term, change: view.atRest ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id) },
+    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id) },
   };
 }
 

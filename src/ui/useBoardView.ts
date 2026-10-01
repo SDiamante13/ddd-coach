@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { type Board, struckWordsOf } from "../domain/board.ts";
+import { type Board, changeOf, struckWordsOf } from "../domain/board.ts";
 import { boardOf, replyCountsOf, type VisitorAction } from "../domain/boardFromReplies.ts";
 import type { ReplyCounts } from "../domain/replyChip.ts";
 import type { EntityId } from "../domain/entityId.ts";
@@ -9,8 +9,8 @@ import { lineOfCard, type LineMatch } from "../domain/sourceLine.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 import type { CorrectionLine } from "./CorrectionLines.tsx";
 import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
-import { hotspotOf } from "./hotspot.ts";
-import { wordsOf } from "../domain/words.ts";
+import { type Hotspot, hotspotOf } from "./hotspot.ts";
+import { type WordsLane, wordsOf } from "../domain/words.ts";
 import { lastEdit, type Position, positionsOf } from "../domain/cardMoves.ts";
 import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
@@ -26,6 +26,9 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const words = useMemo(() => wordsOf(exchanges), [exchanges]);
+  const hotspot = hotspotOf(exchanges, board, restoreNames);
+  const atRest = restorePoint.turn !== null && board.latest === restorePoint.turn;
+  const freshCount = freshItemsOf(board, words, hotspot);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
   const { selected, toggle } = useBoardSelection();
   const [questionReveals, setQuestionReveals] = useState(0);
@@ -51,7 +54,9 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     setFollowingCoach: follow.setFollowingCoach,
     linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames, restorePoint.actions),
     justDrawn: edits.actions.length > restorePoint.actions ? justDrawnOf(board, edits.actions) : null,
-    atRest: restorePoint.turn !== null && board.latest === restorePoint.turn,
+    atRest,
+    freshCount,
+    quietRings: !atRest && freshCount > RINGS_UP_TO,
     undoable: undoableOf(board, lastEdit(edits.actions)),
     positions: positionsOf(edits.actions),
     move: (id: EntityId, position: Position) => {
@@ -63,7 +68,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     highlight,
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
-    hotspot: hotspotOf(exchanges, board, restoreNames),
+    hotspot,
     words,
     rovingId: focused ?? board.cards[0]?.id ?? words.terms[0]?.id ?? null,
     focusedId: focused,
@@ -98,3 +103,11 @@ function lineTextOf({ exchangeId, start, end }: LineMatch, exchanges: readonly E
 }
 
 const restoredLine = (line: string | null, restoreNames: RestoreNames): string | null => line && restoreNames(line).text;
+
+const RINGS_UP_TO = 5;
+
+function freshItemsOf(board: Board, words: WordsLane, hotspot: Hotspot | null): number {
+  const cards = board.cards.filter((card) => changeOf(board, card) === "added").length;
+  const terms = words.terms.filter((term) => term.placedBy === words.latest).length;
+  return cards + terms + (hotspot !== null && hotspot.askedIn === board.latest ? 1 : 0);
+}

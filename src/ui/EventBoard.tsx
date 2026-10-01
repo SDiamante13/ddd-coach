@@ -34,6 +34,8 @@ export type BoardView = {
   newReveals: number;
   revealNew: () => void;
   atRest: boolean;
+  freshCount: number;
+  quietRings: boolean;
   hotspot: Hotspot | null;
   words: WordsLane;
   rovingId: EntityId | null;
@@ -84,6 +86,7 @@ function BoardSection({ view, thinking, restoreNames, session, hasEvents, empty,
                 </>
               )}
               {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
+              {view.quietRings && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
             </p>
             <BoardControls following={view.followingCoach} onFollowChange={view.setFollowingCoach} overview={overview} onOverviewChange={setOverview} />
           </div>

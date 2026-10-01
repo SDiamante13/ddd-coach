@@ -16,7 +16,7 @@ export type CardPlace = { index: number; total: number };
 
 export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & { place: CardPlace }) {
   const { button, editing, open, close } = useCardEditing();
-  const change = view.atRest ? null : changeOf(view.board, card);
+  const change = view.atRest || view.quietRings ? null : changeOf(view.board, card);
   const pressed = view.selected === card.id;
   const at = view.positions.get(card.id) ?? lanePosition(place.index - 1);
   const nudge = (by: Place) => view.move(card.id, { x: at.x + by.x, y: at.y + by.y });
