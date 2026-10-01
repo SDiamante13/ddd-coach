@@ -46,7 +46,7 @@ describe("Who's who (#133)", () => {
   it("says in the notice that who's who stays in this browser until you delete it", async () => {
     await startConversation();
 
-    expect(screen.getByRole("complementary", { name: "Where your text goes" })).toHaveTextContent("your word swaps and who's who, with real names, stay until you delete them.");
+    expect(screen.getByRole("complementary", { name: "Where your text goes" })).toHaveTextContent("your word swaps (with real names) and your who's who (the names as pasted, with your swaps applied) stay until you delete them.");
   });
 
   describe("the strip in the margin", () => {

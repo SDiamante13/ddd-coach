@@ -87,8 +87,8 @@ function InYourBrowser() {
       </p>
       <p>
         This browser keeps your conversation and board, with your corrections and links, until you start a new
-        conversation. “New conversation” clears the conversation and board; your word swaps and who's who, with real
-        names, stay until you delete them. Nothing is stored on our server.
+        conversation. “New conversation” clears the conversation and board; your word swaps (with real names) and your
+        who's who (the names as pasted, with your swaps applied) stay until you delete them. Nothing is stored on our server.
       </p>
     </Section>
   );
