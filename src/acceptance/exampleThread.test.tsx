@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
 import { startConversation } from "../test/appDriver.tsx";
@@ -18,6 +18,16 @@ describe("Try an example thread", () => {
     expect(input()).toHaveValue(EXAMPLE_THREAD);
     expect(input()).toHaveFocus();
     expect(server.pendingCount()).toBe(0);
+  });
+
+  it("keeps focus in the message box while pressed, so Safari's resting composer doesn't fold it away mid-click (#67)", async () => {
+    const { input } = await startConversation();
+    input().focus();
+
+    const pressed = fireEvent.mouseDown(tryExample());
+
+    expect(pressed).toBe(false);
+    expect(input()).toHaveFocus();
   });
 
   it("puts the caret at the top of the example, so its first line is what shows", async () => {
