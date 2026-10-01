@@ -177,4 +177,84 @@ describe("Checking a term row yourself (#90a)", () => {
     await within(board()).findByRole("listitem", { name: /^Term “late”/ });
     expect(row("Billing")).toHaveTextContent("OPEN");
   });
+
+  describe("in the copies, as things stand now (#132)", () => {
+    async function checkedAndCorrected() {
+      const app = await onTheWords();
+      await checkRow(app.user, "Billing", "Yes, it holds", "Contract §4");
+      await checkRow(app.user, "Ops (day desk)", "No, it's wrong");
+      const field = within(row("Ops (day desk)")).getByRole("textbox", { name: "Correct this meaning" });
+      await app.user.clear(field);
+      await pasteInto(app.user, field, "A truck past its pickup appointment.");
+      await app.user.keyboard("{Enter}");
+      return app;
+    }
+
+    it("writes the checks and corrections into the RFC's rich text, dating only what you checked", async () => {
+      vi.stubGlobal(
+        "ClipboardItem",
+        class {
+          constructor(private readonly data: Record<string, Blob>) {}
+          get types() {
+            return Object.keys(this.data);
+          }
+          async getType(type: string) {
+            return this.data[type];
+          }
+        },
+      );
+      const { user, log } = await checkedAndCorrected();
+
+      await user.click(within(log()).getByRole("button", { name: "Copy for your RFC" }));
+
+      const [item] = await navigator.clipboard.read();
+      const html = await (await item!.getType("text/html")).text();
+      expect(html).toContain("<td>From thread · checked by you, 1 Oct 2026, Contract §4</td>");
+      expect(html).toContain("<td>A truck past its pickup appointment. (was: A truck not at pickup by the end of the pickup window.)</td>");
+      expect(html.match(/by you, 1 Oct 2026/g)).toHaveLength(2);
+    });
+
+    it("writes the current checks and corrections into the repo glossary, and nothing for an untouched row", async () => {
+      const { user, log } = await checkedAndCorrected();
+
+      await user.click(within(log()).getByRole("button", { name: "Copy for your repo" }));
+
+      const glossary = await navigator.clipboard.readText();
+      expect(glossary).toContain("| Billing | A load on the weekly late report. | From thread | Settled · checked by you, 1 Oct 2026, Contract §4 |");
+      expect(glossary).toContain("| Ops (day desk) | A truck past its pickup appointment. (was: A truck not at pickup by the end of the pickup window.) | From thread | Settled · marked wrong by you, 1 Oct 2026 |");
+      expect(glossary).toContain("| Code | Guess: actual_pickup_at is after pickup_window_end. | Guess | **Unsettled**, a guess |");
+    });
+  });
+
+  describe("from the keyboard (#132)", () => {
+    const menuButton = (holder: string) => within(row(holder)).getByRole("button", { name: "I checked" });
+    const press = async (user: UserEvent, button: HTMLElement) => {
+      button.focus();
+      await user.keyboard("{Enter}");
+    };
+
+    it("opens the menu, chooses an answer and clears it", async () => {
+      const { user } = await onTheWords();
+
+      await press(user, menuButton("Billing"));
+      expect(menuButton("Billing")).toHaveAttribute("aria-expanded", "true");
+      await press(user, within(row("Billing")).getByRole("button", { name: "Yes, it holds" }));
+      expect(row("Billing")).toHaveTextContent("CHECKED BY YOU · 1 Oct 2026");
+
+      await press(user, menuButton("Billing"));
+      await press(user, within(row("Billing")).getByRole("button", { name: "Clear check" }));
+      expect(row("Billing")).toHaveTextContent("OPEN");
+    });
+
+    it("closes the menu on Esc and puts focus back on I checked", async () => {
+      const { user } = await onTheWords();
+      await press(user, menuButton("Billing"));
+      within(row("Billing")).getByRole("button", { name: "Yes, it holds" }).focus();
+
+      await user.keyboard("{Escape}");
+
+      expect(menuButton("Billing")).toHaveAttribute("aria-expanded", "false");
+      expect(menuButton("Billing")).toHaveFocus();
+    });
+  });
 });

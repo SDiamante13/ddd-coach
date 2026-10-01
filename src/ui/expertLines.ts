@@ -26,4 +26,7 @@ export function expertLinesOf(hotspot: Hotspot | null, roles: string | undefined
 
 const asClause = (meaning: string): string => meaning.replace(/[.\s]+$/, "");
 
-export const updatedInThreePlaces = (who: string): string => `Updated in 3 places: the row, the question card and the lines for ${who}.`;
+const updatedInThreePlaces = (who: string): string => `Updated in 3 places: the row, the question card and the lines for ${who}.`;
+
+export const updatedLineOf = (verdict: RowCheck["verdict"], who: string): string =>
+  ANSWERED.includes(verdict) ? updatedInThreePlaces(who) : `Updated: the row and the lines for ${who}.`;

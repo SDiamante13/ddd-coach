@@ -13,7 +13,7 @@ import { type Hotspot, hotspotOf } from "./hotspot.ts";
 import { type WordsLane, wordsOf } from "../domain/words.ts";
 import { lastEdit, type Position, positionsOf } from "../domain/cardMoves.ts";
 import { checksOf } from "../domain/rowChecks.ts";
-import { type ExpertLines, expertLinesOf, updatedInThreePlaces } from "./expertLines.ts";
+import { type ExpertLines, expertLinesOf, updatedLineOf } from "./expertLines.ts";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
@@ -76,7 +76,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     expert,
     justChecked: justCheckedOf(edits.actions.at(-1), expert),
     checkLinesOf: (id: ExchangeId): string[] =>
-      expert === null ? [] : edits.actions.flatMap((action) => (action.kind === "check" && action.after === id && expert.rows.has(action.row) ? [updatedInThreePlaces(expert.who)] : [])),
+      expert === null ? [] : edits.actions.flatMap((action) => (action.kind === "check" && action.after === id && expert.rows.has(action.row) ? [updatedLineOf(action.verdict, expert.who)] : [])),
     check: touching((row: EntityId, verdict: Verdict, where: string) => {
       const after = board.latest ?? words.latest;
       if (after !== null) edits.check(row, verdict, where, after);

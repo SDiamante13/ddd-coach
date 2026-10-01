@@ -2,6 +2,8 @@ import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { startConversation } from "../test/appDriver.tsx";
+import { EXAMPLE_THREAD } from "../shared/exampleThread.ts";
+import { BOARD_DEMO_REPLIES } from "../test/boardDemoReplies.ts";
 import { WORDS_PASTE, WORDS_QUESTION_REPLY } from "../test/wordReplies.ts";
 
 beforeEach(() => {
@@ -58,9 +60,12 @@ describe("One fact, one place (#90b)", () => {
   });
 
   it("asks for evidence when you couldn't tell", async () => {
-    const { user } = await asked();
+    const { user, log } = await asked();
 
     await checkRow(user, "Code", "Couldn't tell");
+
+    expect(within(log()).getByText("Updated: the row and the lines for the billing lead.")).toBeInTheDocument();
+    expect(within(log()).queryByText(/Updated in 3 places/)).not.toBeInTheDocument();
 
     expect(within(lines()).getAllByRole("listitem").at(-1)).toHaveTextContent("Code on “late”: can you point me to where it's written down now?");
     expect(hotspot()).toHaveTextContent("0 OF 3 ANSWERED");
@@ -84,5 +89,17 @@ describe("One fact, one place (#90b)", () => {
     expect(row("Billing")).toHaveTextContent("OPEN");
     expect(within(lines()).getAllByRole("listitem")).toHaveLength(3);
     expect(hotspot()).toHaveTextContent("0 OF 3 ANSWERED");
+  });
+
+  it("shows the first 3 lines and opens the rest from 'N more'", async () => {
+    const conversation = await startConversation();
+    conversation.server.reply(await conversation.send(EXAMPLE_THREAD), 200, { reply: BOARD_DEMO_REPLIES[0], signature: "sig" });
+    const list = await screen.findByRole("list", { name: /^Lines for / });
+    expect(within(list).getAllByRole("listitem")).toHaveLength(3);
+
+    await conversation.user.click(within(pinned()).getByRole("button", { name: "5 more" }));
+
+    expect(within(list).getAllByRole("listitem")).toHaveLength(8);
+    expect(within(pinned()).queryByRole("button", { name: /more$/ })).not.toBeInTheDocument();
   });
 });

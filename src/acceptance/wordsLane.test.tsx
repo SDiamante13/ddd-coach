@@ -1,9 +1,12 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { addSwap, boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { WORDS_ONLY_REPLY, WORDS_PASTE, WORDS_REPLY } from "../test/wordReplies.ts";
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 const board = () => screen.getByRole("region", { name: "Event board" });
 const term = (word: string) => within(board()).getByRole("listitem", { name: new RegExp(`^Term “${word}”`) });
@@ -129,6 +132,20 @@ describe("The Words lane (#109)", () => {
 
     expect(within(board()).getByText("6 new on the board")).toBeInTheDocument();
     expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
+  });
+
+  it("fades the 'N new on the board' line after about 5 seconds, leaving the reply's chip as the record (#132)", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const conversation = await startConversation();
+    const many = ["Events, in order", ...[1, 2, 3, 4, 5].map((n) => `${n}. From thread: Ops step ${n} happens on load 7731.`), "", WORDS_REPLY.slice(WORDS_REPLY.indexOf("Words that don't match"))].join("\n");
+    conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply: many, signature: "sig" });
+    await boardShowsReply();
+    expect(within(board()).getByText("6 new on the board")).toBeInTheDocument();
+
+    await act(() => vi.advanceTimersByTimeAsync(5000));
+
+    await waitFor(() => expect(within(board()).queryByText("6 new on the board")).not.toBeInTheDocument());
+    expect(within(conversation.log()).getByRole("button", { name: /new on the board/ })).toBeInTheDocument();
   });
 
   describe("reaching the Words lane at 100% (#109 hotfix)", () => {

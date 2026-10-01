@@ -17,6 +17,7 @@ import type { OffScreenOffer } from "./useOffScreenOffer.ts";
 import type { SettleBy, Viewport } from "../domain/session.ts";
 import { SettleByLine } from "./SettleByLine.tsx";
 import type { RestoreNames } from "./ReplyView.tsx";
+import { useShownFor } from "./useShownFor.ts";
 
 export { BOARD_LANE_ID } from "./BoardFlow.tsx";
 
@@ -109,7 +110,10 @@ function BoardSection({ view, thinking, restoreNames, session, hasEvents, empty,
 
 type BoardHeaderProps = Pick<BoardSectionProps, "view" | "session" | "restoreNames" | "hasEvents" | "overview" | "setOverview">;
 
+const NEW_COUNT_FOR_MS = 5000;
+
 function BoardHeader({ view, session, restoreNames, hasEvents, overview, setOverview }: BoardHeaderProps) {
+  const newCountShown = useShownFor(view.board.latest ?? view.words.latest, NEW_COUNT_FOR_MS);
   return (
     <>
       <div className="board-header-row">
@@ -120,7 +124,7 @@ function BoardHeader({ view, session, restoreNames, hasEvents, overview, setOver
             </>
           )}
           {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
-          {view.quietRings && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
+          {view.quietRings && newCountShown && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
         </p>
         <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} onFit={view.fitBoard} overview={overview} onOverviewChange={setOverview} />
       </div>

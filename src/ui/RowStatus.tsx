@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useState } from "react";
+import { type KeyboardEvent, useRef, useState } from "react";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import { shortDay } from "../domain/dates.ts";
 import type { RowCheck } from "../domain/rowChecks.ts";
@@ -61,39 +61,45 @@ type CheckMenuProps = { onCheck: (verdict: Verdict, where: string) => void; onCl
 
 function CheckMenu({ onCheck, onClear }: CheckMenuProps) {
   const [open, setOpen] = useState(false);
-  const [where, setWhere] = useState("");
-  const choose = (verdict: Verdict) => {
-    onCheck(verdict, where.trim());
+  const trigger = useRef<HTMLButtonElement>(null);
+  const close = (refocus: boolean) => {
     setOpen(false);
-    setWhere("");
+    if (refocus) trigger.current?.focus();
   };
   return (
     <>
-      <button type="button" className="row-check" aria-expanded={open} aria-label="I checked" onClick={() => setOpen(!open)}>
+      <button ref={trigger} type="button" className="row-check" aria-expanded={open} aria-label="I checked" onClick={() => setOpen(!open)}>
         I checked ▾
       </button>
-      {open && (
-        <div className="row-check-menu">
-          <input aria-label="Where? (optional)" placeholder="Where? e.g. app/models/booking.rb:212" value={where} onChange={(event) => setWhere(event.target.value)} />
-          {CHOICES.map(([verdict, label]) => (
-            <button key={verdict} type="button" onClick={() => choose(verdict)}>
-              {label}
-            </button>
-          ))}
-          {onClear && (
-            <button
-              type="button"
-              className="row-clear"
-              onClick={() => {
-                setOpen(false);
-                onClear();
-              }}
-            >
-              Clear check
-            </button>
-          )}
-        </div>
-      )}
+      {open && <CheckMenuPanel onCheck={onCheck} onClear={onClear} onClose={close} />}
     </>
+  );
+}
+
+function CheckMenuPanel({ onCheck, onClear, onClose }: CheckMenuProps & { onClose: (refocus: boolean) => void }) {
+  const [where, setWhere] = useState("");
+  const closeOnEscape = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Escape") return;
+    event.stopPropagation();
+    onClose(true);
+  };
+  const then = (act: () => void) => () => {
+    onClose(false);
+    act();
+  };
+  return (
+    <div className="row-check-menu" onKeyDown={closeOnEscape}>
+      <input aria-label="Where? (optional)" placeholder="Where? e.g. app/models/booking.rb:212" value={where} onChange={(event) => setWhere(event.target.value)} />
+      {CHOICES.map(([verdict, label]) => (
+        <button key={verdict} type="button" onClick={then(() => onCheck(verdict, where.trim()))}>
+          {label}
+        </button>
+      ))}
+      {onClear && (
+        <button type="button" className="row-clear" onClick={then(onClear)}>
+          Clear check
+        </button>
+      )}
+    </div>
   );
 }

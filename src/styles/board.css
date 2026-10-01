@@ -1229,3 +1229,15 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   margin: var(--space-1) 0 0;
   color: var(--color-ink-muted);
 }
+
+.expert-lines-more {
+  min-height: 28px;
+  margin-top: var(--space-1);
+  padding: 2px 10px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: 12px;
+  cursor: pointer;
+}
