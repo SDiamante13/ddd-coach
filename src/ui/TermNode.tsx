@@ -62,7 +62,7 @@ function TermRowItem({ row, shown }: { row: TermRow; shown: (text: string) => st
 export function termNodesOf(view: BoardView, restoreNames: RestoreNames): TermNodeType[] {
   const { words } = view;
   return words.terms.map((term, index) => {
-    const position = view.positions.get(term.id) ?? { x: index * TERM_STEP, y: WORDS_Y };
+    const position = view.positions.get(term.id) ?? { x: index * TERM_STEP, y: view.board.cards.length === 0 ? 0 : WORDS_Y };
     const nudge = (by: Position) => view.move(term.id, { x: position.x + by.x, y: position.y + by.y });
     return termNodeOf(term, position, view, restoreNames, nudge);
   });

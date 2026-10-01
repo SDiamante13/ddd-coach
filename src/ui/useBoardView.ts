@@ -56,7 +56,8 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     positions: positionsOf(edits.actions),
     move: (id: EntityId, position: Position) => {
       follow.setFollowingCoach(false);
-      if (board.latest !== null) edits.move(id, position, board.latest);
+      const after = board.latest ?? words.latest;
+      if (after !== null) edits.move(id, position, after);
     },
     correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames, keptCorrection(edits.actions, restorePoint)),
     highlight,

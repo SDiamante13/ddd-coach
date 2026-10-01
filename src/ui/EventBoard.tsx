@@ -47,7 +47,7 @@ type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: Resto
 const NO_SESSION: BoardSession = { pickedUpAt: null, viewport: null, keepViewport: () => {}, saving: true };
 
 export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION }: EventBoardProps) {
-  const empty = view.board.cards.length === 0 && !thinking;
+  const empty = view.board.cards.length === 0 && view.words.terms.length === 0 && !thinking;
   return (
     <section className="event-board" aria-label="Event board">
       {!session.saving && (

@@ -83,4 +83,16 @@ describe("The Words lane (#109)", () => {
     expect(within(term("late")).getByRole("group", { name: "Term “late”" })).toHaveFocus();
     expect(board().querySelectorAll('[data-board-item][tabindex="0"]')).toHaveLength(1);
   });
+
+  it("shows the board with its Words lane when a reply has words but no events (#127)", async () => {
+    const conversation = await startConversation();
+    conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply: WORDS_ONLY_REPLY, signature: "sig" });
+
+    expect(await within(board()).findByRole("listitem", { name: /^Term “on time”/ })).toBeInTheDocument();
+    expect(within(board()).getByText("Words · 1 term · 1 row")).toBeInTheDocument();
+
+    within(term("on time")).getByRole("group", { name: "Term “on time”" }).focus();
+    await conversation.user.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    expect(term("on time").style.transform).toBe("translate(16px,0px)");
+  });
 });
