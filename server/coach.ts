@@ -1,7 +1,7 @@
 import type { VerifiedConversation } from "./turnSignature.ts";
 
 export interface Coach {
-  reply(conversation: VerifiedConversation): Promise<string>;
+  reply(conversation: VerifiedConversation, signal?: AbortSignal): Promise<string>;
 }
 
 export class CoachOutOfCredit extends Error {

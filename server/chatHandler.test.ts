@@ -80,7 +80,7 @@ describe("chat handler", () => {
 
     await handler({ createCoach: () => coach })(post(JSON.stringify({ message: "Next", history: [], corrections })));
 
-    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [], corrections });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [], corrections }, expect.any(AbortSignal));
   });
 
   it.skipIf(CORRECTIONS_ENABLED)("hands the coach no corrections while they're off, even ones a client sends (#95)", async () => {
@@ -88,7 +88,7 @@ describe("chat handler", () => {
 
     await handler({ createCoach: () => coach })(post(JSON.stringify({ message: "Next", history: [], corrections: [{ was: "a", now: "b" }] })));
 
-    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [] });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [] }, expect.any(AbortSignal));
   });
 
   it.skipIf(GLOSSARY_ENABLED)("hands the coach no glossary while the glossary is off, even one a client sends", async () => {
@@ -97,7 +97,7 @@ describe("chat handler", () => {
 
     await handler({ createCoach: () => coach })(post(JSON.stringify({ message: "Next", history: [], glossary: [row] })));
 
-    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [] });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [] }, expect.any(AbortSignal));
   });
 
   it.skipIf(!GLOSSARY_ENABLED)("hands the coach the kept glossary sent with the message (#100)", async () => {
@@ -106,7 +106,7 @@ describe("chat handler", () => {
 
     await handler({ createCoach: () => coach })(post(JSON.stringify({ message: "Next", history: [], glossary: [row] })));
 
-    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [row] });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history: [], prompt: "Next", glossary: [row] }, expect.any(AbortSignal));
   });
 
   it("refuses a kept glossary too big to send with its own 413 (#100)", async () => {
@@ -161,7 +161,7 @@ describe("chat handler", () => {
     const response = await handle(postMessage("B", history));
 
     expect(response.status).toBe(200);
-    expect(coach.reply).toHaveBeenLastCalledWith({ history, prompt: "B", glossary: [] });
+    expect(coach.reply).toHaveBeenLastCalledWith({ history, prompt: "B", glossary: [] }, expect.any(AbortSignal));
   });
 
   const genuineA = signedTurn("A", "Echo: A");
@@ -329,6 +329,21 @@ describe("chat handler", () => {
 
     expect(response.status).toBe(504);
     expect(await response.json()).toEqual({ error: "The coach took too long. Try a shorter question or Retry.", reason: "timed_out" });
+  });
+
+  it("aborts the coach's in-flight call when it gives up at the deadline (#15)", async () => {
+    let given: AbortSignal | undefined;
+    const silentCoach = (): Coach => ({
+      reply: (_conversation, signal) => {
+        given = signal;
+        return new Promise<string>(() => {});
+      },
+    });
+    const handle = handler({ createCoach: silentCoach, deadlineMs: 10 });
+
+    await handle(postMessage("Hello coach"));
+
+    expect(given?.aborted).toBe(true);
   });
 
   it("logs a missed deadline as a Timeout", async () => {

@@ -31,8 +31,8 @@ export function createOpenRouterCoach(
   chat: ChatClient = new OpenRouter({ apiKey: config.apiKey }).chat,
 ): Coach {
   return {
-    reply: async (conversation: Conversation) =>
-      replyText(await chat.send(chatRequest(config, instructions, conversation), WITHOUT_RETRIES).catch(asCoachError)),
+    reply: async (conversation: Conversation, signal?: AbortSignal) =>
+      replyText(await chat.send(chatRequest(config, instructions, conversation), { ...WITHOUT_RETRIES, ...(signal && { signal }) }).catch(asCoachError)),
   };
 }
 

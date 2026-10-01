@@ -104,6 +104,15 @@ describe("OpenRouter coach", () => {
     ]);
   });
 
+  it("hands the provider call the signal that aborts it at the deadline (#15)", async () => {
+    const { chat, requests } = fakeChat("Hi there");
+    const abort = new AbortController();
+
+    await coachOn(chat).reply(verifiedConversationOf("C"), abort.signal);
+
+    expect(requests[0]![1]?.signal).toBe(abort.signal);
+  });
+
   it("sends the instructions as a system message, then the history as alternating turns before the prompt, capped and without SDK retries", async () => {
     const { chat, requests } = fakeChat("Hi there");
     const conversation = verifiedConversationOf("C", [

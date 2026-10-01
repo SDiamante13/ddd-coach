@@ -95,7 +95,7 @@ async function replyFrom(
   { deadlineMs, log, signer, vetReply = asIs }: ReplyDeps,
 ): Promise<Response> {
   try {
-    const reply = await withDeadline(coach.reply(conversation), deadlineMs);
+    const reply = await withDeadline((signal) => coach.reply(conversation, signal), deadlineMs);
     if (reply === TIMED_OUT) log(MISSED_DEADLINE);
     return replied(reply === TIMED_OUT ? reply : vetReply(reply), conversation.prompt, signer);
   } catch (error) {
