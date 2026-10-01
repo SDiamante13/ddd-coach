@@ -3,6 +3,8 @@ import { type EntityId, entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId } from "./exchange.ts";
 import { type Meaning, parseReply, type Source, type WordRow } from "./replyBlocks.ts";
 import { closestLine } from "./sourceLine.ts";
+import { spokenLinesOf } from "./pasteSpeakers.ts";
+import { teamOfHolder, type WhoIsWho } from "./whosWho.ts";
 import type { Correction, VisitorAction } from "./boardFromReplies.ts";
 
 export type TermRow = {
@@ -20,11 +22,11 @@ export type WordsLane = { terms: TermCard[]; latest: ExchangeId | null };
 
 const PROVENANCE_OF: Record<Source, Provenance> = { "From thread": "thread", Guess: "guess" };
 
-export function wordsOf(exchanges: readonly Exchange[], edits: readonly VisitorAction[] = []): WordsLane {
+export function wordsOf(exchanges: readonly Exchange[], edits: readonly VisitorAction[] = [], whoIsWho: WhoIsWho = new Map()): WordsLane {
   return exchanges.reduce<WordsLane>((lane, exchange, index) => {
     if (exchange.status !== "replied") return lane;
     const rows = parseReply(exchange.reply).flatMap((block) => (block.kind === "words" ? block.rows : []));
-    const lineOf = sourceLineIn(exchanges.slice(0, index + 1));
+    const lineOf = sourceLineIn(exchanges.slice(0, index + 1), whoIsWho);
     const terms = rows.reduce((kept, row) => withWord(kept, row, exchange.id, lineOf), lane.terms);
     return { terms: correctionsAfter(exchange.id, edits).reduce(withCorrection, terms), latest: exchange.id };
   }, { terms: [], latest: null });
@@ -58,22 +60,23 @@ function withMeaning(rows: TermRow[], word: string, { source, holder, meaning }:
 }
 
 const sourceLineIn =
-  (upTo: readonly Exchange[]): LineOf =>
+  (upTo: readonly Exchange[], whoIsWho: WhoIsWho): LineOf =>
   (holder, text) => {
-    const prompts = [...upTo].reverse().map(({ id, prompt }) => ({ exchangeId: id, text: ownLinesOf(prompt, holder) }));
+    const prompts = [...upTo].reverse().map(({ id, prompt }) => ({ exchangeId: id, text: ownLinesOf(prompt, holder, whoIsWho) }));
     const match = closestLine(text, prompts);
     return match && (upTo.find(({ id }) => id === match.exchangeId)?.prompt.slice(match.start, match.end) ?? null);
   };
 
 const wordsOfText = (text: string): string[] => text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
 
-function ownLinesOf(prompt: string, holder: string): string {
-  const team = wordsOfText(holder);
-  return prompt
-    .split("\n")
-    .map((line) => {
-      const speaker = new Set(wordsOfText(line.split(": ")[0] ?? ""));
-      return team.every((token) => speaker.has(token)) ? line : " ".repeat(line.length);
-    })
-    .join("\n");
+function speaksFor(speaker: string, holder: string, team: string | null, whoIsWho: WhoIsWho): boolean {
+  const own = new Set(wordsOfText(speaker));
+  return wordsOfText(holder).every((token) => own.has(token)) || (team !== null && whoIsWho.get(speaker.toLowerCase()) === team);
+}
+
+function ownLinesOf(prompt: string, holder: string, whoIsWho: WhoIsWho): string {
+  const team = teamOfHolder(holder, [...new Set(whoIsWho.values())]);
+  const masked = prompt.replace(/[^\n]/g, " ").split("");
+  for (const { start, end } of spokenLinesOf(prompt).filter(({ speaker }) => speaksFor(speaker, holder, team, whoIsWho))) masked.splice(start, end - start, ...prompt.slice(start, end).split(""));
+  return masked.join("");
 }
