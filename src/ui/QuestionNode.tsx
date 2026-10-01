@@ -20,7 +20,7 @@ export function QuestionNode({ data: { hotspot, fresh, roving } }: NodeProps<Que
         <span className="card-kind">QUESTION</span>
         <span className="card-source">OPEN</span>
         <span className="card-title">{hotspot.text}</span>
-        {hotspot.unplaced.length > 0 && <UnplacedQuotes quotes={hotspot.unplaced} />}
+        {hotspot.unplaced.length > 0 && <UnplacedQuotes quotes={hotspot.unplaced} tabIndex={roving.tabIndex} />}
         {fresh && (
           <>
             <span className="card-ring" aria-hidden="true" />
@@ -32,11 +32,11 @@ export function QuestionNode({ data: { hotspot, fresh, roving } }: NodeProps<Que
   );
 }
 
-function UnplacedQuotes({ quotes }: { quotes: readonly string[] }) {
+function UnplacedQuotes({ quotes, tabIndex }: { quotes: readonly string[]; tabIndex: 0 | -1 }) {
   const [shown, setShown] = useState(false);
   return (
     <span className="hotspot-unplaced nodrag">
-      <button type="button" aria-expanded={shown} onClick={() => setShown(!shown)}>
+      <button type="button" aria-expanded={shown} tabIndex={tabIndex} onClick={() => setShown(!shown)}>
         {unplacedLabel(quotes.length)}
       </button>
       {shown && quotes.map((quote) => <span key={quote} className="hotspot-quote">{`“${quote}”`}</span>)}

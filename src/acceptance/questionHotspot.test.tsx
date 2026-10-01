@@ -88,6 +88,12 @@ describe("The open question on the board (#97)", () => {
       expect(within(hotspot).getByText(`“${UNPLACED}”`)).toBeVisible();
     });
 
+    it("keeps the quote button out of the Tab order until the question is the board's focus (#127)", async () => {
+      await askedWithAStrayQuote();
+
+      expect(within(onBoard().at(-1)!).getByRole("button", { name: "1 quote not on the board" })).toHaveAttribute("tabindex", "-1");
+    });
+
     it("says it on the pinned question's chip too, inside the card", async () => {
       await askedWithAStrayQuote();
       const pinned = screen.getByRole("complementary", { name: "Current question" });
