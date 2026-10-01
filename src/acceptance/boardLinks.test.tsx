@@ -86,12 +86,12 @@ describe("Linking two cards (#96)", () => {
     const conversation = await onTheBoard();
     await connectFromKeyboard(conversation.user);
     const arrowhead = () => linkEdge()!.querySelector("path")!.getAttribute("marker-end");
-    expect(arrowhead()).toContain("--color-coach");
+    await waitFor(() => expect(arrowhead()).toContain("--color-coach"));
 
     conversation.server.reply(await conversation.send("And the next part."), 200, { reply: THIRD_BOARD_REPLY, signature: "sig-2" });
     await within(conversation.log()).findAllByRole("button", { name: /on the board/ });
 
-    expect(arrowhead()).toContain("--color-ink");
+    await waitFor(() => expect(arrowhead()).toContain("--color-ink"));
   });
 
   it("announces a new link and its undo in the one 'Board changes' region", async () => {
@@ -122,8 +122,8 @@ describe("Linking two cards (#96)", () => {
       await correctGuess(user);
 
       await user.click(cardButton(FIRST));
-      await user.click(within(board()).getByRole("button", { name: "Connect to…" }));
-      await user.click(within(board()).getByRole("button", { name: `Link to “${FIXED}”` }));
+      await user.click(await within(board()).findByRole("button", { name: "Connect to…" }));
+      await user.click(await within(board()).findByRole("button", { name: `Link to “${FIXED}”` }));
 
       expect(await within(board()).findByRole("img", { name: `Link from “${FIRST}” to “${FIXED}”` })).toBeInTheDocument();
       expect(await within(screen.getByRole("log")).findByText("You connected “Customer submits a bkg on the…” → “Ops asks the customer before picking…”")).toBeInTheDocument();
@@ -152,7 +152,7 @@ describe("Linking two cards (#96)", () => {
       const ys = [...path.getAttribute("d")!.matchAll(/(-?[\d.]+)[ ,](-?[\d.]+)/g)].map(([, , y]) => Number(y));
       return Math.max(...ys);
     };
-    expect(depth(SECOND) - depth(GUESS)).toBe(12);
+    await waitFor(() => expect(depth(SECOND) - depth(GUESS)).toBe(12));
   });
 
   describe("clearing 'Board changes' so a repeat is read again (#124)", () => {
