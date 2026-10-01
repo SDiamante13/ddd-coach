@@ -85,4 +85,23 @@ describe("Checking a term row yourself (#90a)", () => {
     expect(localStorage.getItem("ddd-coach.session.v1")).toContain("Customer A contract §4");
     expect(localStorage.getItem("ddd-coach.session.v1")).not.toContain("Acme Foods");
   });
+
+  it("hands a no to a correction of the row's meaning, striking the coach's words through (#90c)", async () => {
+    const { user } = await onTheWords();
+
+    await checkRow(user, "Billing", "No, it's wrong");
+    const field = within(row("Billing")).getByRole("textbox", { name: "Correct this meaning" });
+    expect(field).toHaveFocus();
+    await user.clear(field);
+    await pasteInto(user, field, "Any load past the booked appointment.");
+    await user.keyboard("{Enter}");
+
+    expect(row("Billing")).toHaveTextContent("YOU SAID");
+    expect(row("Billing").querySelector(".term-meaning")).toHaveTextContent("Any load past the booked appointment.");
+    expect(row("Billing").querySelector("s")).toHaveTextContent("A load on the weekly late report.");
+
+    cleanup();
+    await renderApp();
+    expect(await within(board()).findByText("Any load past the booked appointment.")).toBeInTheDocument();
+  });
 });

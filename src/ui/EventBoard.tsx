@@ -33,6 +33,7 @@ export type BoardView = {
   positions: ReadonlyMap<EntityId, Position>;
   checks: ReadonlyMap<EntityId, RowCheck>;
   expert: ExpertLines | null;
+  correctRow: (row: EntityId, text: string) => void;
   justChecked: EntityId | null;
   check: (row: EntityId, verdict: Verdict, where: string) => void;
   move: (id: EntityId, position: Position) => void;

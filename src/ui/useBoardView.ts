@@ -28,7 +28,7 @@ type FollowCoach = { followingCoach: boolean; setFollowingCoach: (following: boo
 export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, follow: FollowCoach, restorePoint = FRESH) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
-  const words = useMemo(() => wordsOf(exchanges), [exchanges]);
+  const words = useMemo(() => wordsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const hotspot = hotspotOf(exchanges, board, restoreNames);
   const atRest = restorePoint.turn !== null && board.latest === restorePoint.turn;
   const freshCount = freshItemsOf(board, words, hotspot);
@@ -66,6 +66,10 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     undoable: undoableOf(board, lastEdit(edits.actions)),
     positions: positionsOf(edits.actions),
     checks,
+    correctRow: touching((row: EntityId, text: string) => {
+      const after = words.latest;
+      if (after !== null) edits.correct(row, text, after);
+    }),
     expert,
     justChecked: justCheckedOf(edits.actions.at(-1), expert),
     checkLinesOf: (id: ExchangeId): string[] =>

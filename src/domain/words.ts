@@ -3,21 +3,38 @@ import { type EntityId, entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId } from "./exchange.ts";
 import { type Meaning, parseReply, type Source, type WordRow } from "./replyBlocks.ts";
 import { closestLine } from "./sourceLine.ts";
+import type { Correction, VisitorAction } from "./boardFromReplies.ts";
 
-export type TermRow = { id: EntityId; holder: string; meaning: string; provenance: Provenance; line: string | null; placedBy: ExchangeId; changedBy: ExchangeId };
+export type TermRow = {
+  id: EntityId;
+  holder: string;
+  meaning: string;
+  provenance: Provenance;
+  line: string | null;
+  placedBy: ExchangeId;
+  changedBy: ExchangeId;
+  correctedFrom?: string;
+};
 export type TermCard = { id: EntityId; word: string; rows: TermRow[]; placedBy: ExchangeId };
 export type WordsLane = { terms: TermCard[]; latest: ExchangeId | null };
 
 const PROVENANCE_OF: Record<Source, Provenance> = { "From thread": "thread", Guess: "guess" };
 
-export function wordsOf(exchanges: readonly Exchange[]): WordsLane {
+export function wordsOf(exchanges: readonly Exchange[], edits: readonly VisitorAction[] = []): WordsLane {
   return exchanges.reduce<WordsLane>((lane, exchange, index) => {
     if (exchange.status !== "replied") return lane;
     const rows = parseReply(exchange.reply).flatMap((block) => (block.kind === "words" ? block.rows : []));
     const lineOf = sourceLineIn(exchanges.slice(0, index + 1));
-    return { terms: rows.reduce((terms, row) => withWord(terms, row, exchange.id, lineOf), lane.terms), latest: exchange.id };
+    const terms = rows.reduce((kept, row) => withWord(kept, row, exchange.id, lineOf), lane.terms);
+    return { terms: correctionsAfter(exchange.id, edits).reduce(withCorrection, terms), latest: exchange.id };
   }, { terms: [], latest: null });
 }
+
+const correctionsAfter = (by: ExchangeId, edits: readonly VisitorAction[]): Correction[] =>
+  edits.filter((edit): edit is Correction => edit.kind === "correct" && edit.after === by);
+
+const withCorrection = (terms: TermCard[], { id, text }: Correction): TermCard[] =>
+  terms.map((term) => ({ ...term, rows: term.rows.map((row) => (row.id === id ? { ...row, meaning: text, correctedFrom: row.correctedFrom ?? row.meaning } : row)) }));
 
 type LineOf = (holder: string, text: string) => string | null;
 

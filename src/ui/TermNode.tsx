@@ -22,7 +22,12 @@ const NO_LINE = { thread: "No line in your paste matches closely.", guess: "The 
 const CHANGE_TAG = { added: "JUST ADDED", updated: "UPDATED" } as const;
 
 type TermChange = keyof typeof CHANGE_TAG | null;
-type RowChecks = { checks: ReadonlyMap<string, RowCheck>; onCheck: (row: TermRow["id"], verdict: Verdict, where: string) => void; justChecked: string | null };
+type RowChecks = {
+  checks: ReadonlyMap<string, RowCheck>;
+  onCheck: (row: TermRow["id"], verdict: Verdict, where: string) => void;
+  onCorrect: (row: TermRow["id"], text: string) => void;
+  justChecked: string | null;
+};
 type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames; nudge: (by: Position) => void; roving: Roving; rowChecks: RowChecks };
 export type TermNodeType = Node<TermData, "term">;
 
@@ -58,10 +63,21 @@ function TermRowItem({ row, shown, rowChecks }: { row: TermRow; shown: (text: st
       <Handle id={`${row.id}|left`} type="source" position={Side.Left} isConnectable={false} className="row-handle" />
       <Handle id={`${row.id}|right`} type="source" position={Side.Right} isConnectable={false} className="row-handle right" />
       <span className="term-holder">{shown(row.holder)}</span>
-      <span className="term-source">{TAG[row.provenance]}</span>
+      <span className="term-source">{row.correctedFrom === undefined ? TAG[row.provenance] : "YOU SAID"}</span>
       <p className="term-meaning">{shown(row.meaning)}</p>
+      {row.correctedFrom !== undefined && (
+        <p className="term-was">
+          was: <s>{shown(row.correctedFrom)}</s>
+        </p>
+      )}
       <p className="term-line">{row.line === null ? NO_LINE[row.provenance] : shown(row.line)}</p>
-      <RowStatus check={rowChecks.checks.get(row.id)} shown={shown} onCheck={(verdict, where) => rowChecks.onCheck(row.id, verdict, where)} />
+      <RowStatus
+        check={rowChecks.checks.get(row.id)}
+        meaning={shown(row.meaning)}
+        shown={shown}
+        onCheck={(verdict, where) => rowChecks.onCheck(row.id, verdict, where)}
+        onCorrect={(text) => rowChecks.onCorrect(row.id, text)}
+      />
     </li>
   );
 }
@@ -84,7 +100,7 @@ function termNodeOf(term: TermCard, position: Position, view: BoardView, restore
     height: HEADER_HEIGHT + term.rows.reduce((sum, row) => sum + rowHeightOf(row), 0),
     ariaRole: "listitem",
     ariaLabel: termNameOf(term, restoreNames),
-    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id), rowChecks: { checks: view.checks, onCheck: view.check, justChecked: view.justChecked } },
+    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id), rowChecks: { checks: view.checks, onCheck: view.check, onCorrect: view.correctRow, justChecked: view.justChecked } },
   };
 }
 

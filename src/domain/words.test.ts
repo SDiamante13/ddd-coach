@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId, Prompt } from "./exchange.ts";
 import { wordsOf } from "./words.ts";
+import type { VisitorAction } from "./boardFromReplies.ts";
 
 const PASTE = ["Mon Ops (day desk): late means the truck missed the pickup window", "Tue Billing: late is anything on the weekly late report"].join("\n");
 
@@ -63,5 +64,13 @@ describe("wordsOf", () => {
 
     expect(onTime!.rows[0]!.line).toBeNull();
     expect(onTime!.rows[1]!.line).toBe("Mon 10:02  Ops night desk: on time means delivered before the appointment, even after a late pickup");
+  });
+
+  it("takes the visitor's correction of a row's meaning, keeping the coach's words to strike through (#90c)", () => {
+    const fix: VisitorAction = { kind: "correct", id: entityId("meaning", "late|Billing"), text: "Any load past the booked appointment.", after: "e1" as ExchangeId };
+
+    const billing = wordsOf([replied("e1", FIRST)], [fix]).terms[0]!.rows[1]!;
+
+    expect([billing.meaning, billing.correctedFrom]).toEqual(["Any load past the booked appointment.", "A load on the weekly late report."]);
   });
 });

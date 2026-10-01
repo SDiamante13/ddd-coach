@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type KeyboardEvent, useState } from "react";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import { shortDate } from "../domain/dates.ts";
 import type { RowCheck } from "../domain/rowChecks.ts";
@@ -10,15 +10,41 @@ const CHOICES: readonly [Verdict, string][] = [
   ["unknown", "Couldn't tell"],
 ];
 
-type RowStatusProps = { check: RowCheck | undefined; shown: (text: string) => string; onCheck: (verdict: Verdict, where: string) => void };
+type RowStatusProps = {
+  check: RowCheck | undefined;
+  meaning: string;
+  shown: (text: string) => string;
+  onCheck: (verdict: Verdict, where: string) => void;
+  onCorrect: (text: string) => void;
+};
 
-export function RowStatus({ check, shown, onCheck }: RowStatusProps) {
+export function RowStatus({ check, meaning, shown, onCheck, onCorrect }: RowStatusProps) {
+  const [correcting, setCorrecting] = useState(false);
+  const checked = (verdict: Verdict, where: string) => {
+    onCheck(verdict, where);
+    setCorrecting(verdict === "wrong");
+  };
+  const keep = (text: string) => {
+    setCorrecting(false);
+    if (text !== "" && text !== meaning) onCorrect(text);
+  };
   return (
     <div className="row-status nodrag nopan">
       {check ? <CheckedBadge check={check} shown={shown} /> : <span className="row-open">OPEN</span>}
-      <CheckMenu onCheck={onCheck} />
+      <CheckMenu onCheck={checked} />
+      {correcting && <MeaningEditor initial={meaning} onKeep={keep} onCancel={() => setCorrecting(false)} />}
     </div>
   );
+}
+
+function MeaningEditor({ initial, onKeep, onCancel }: { initial: string; onKeep: (text: string) => void; onCancel: () => void }) {
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape") onCancel();
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    onKeep(event.currentTarget.value.trim());
+  };
+  return <input className="row-correct" aria-label="Correct this meaning" defaultValue={initial} autoFocus onKeyDown={onKeyDown} />;
 }
 
 function CheckedBadge({ check, shown }: { check: RowCheck; shown: (text: string) => string }) {
