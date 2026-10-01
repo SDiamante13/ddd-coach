@@ -134,8 +134,7 @@ function BoardCounts({ view, hasEvents }: Pick<BoardHeaderProps, "view" | "hasEv
           <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
         </>
       )}
-      {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
-      {view.sourcedRows !== null && <span className="board-sourced">{`${view.sourcedRows} with a source line`}</span>}
+      {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words, view.sourcedRows)}</span>}
       {view.quietRings && newCountShown && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
     </p>
   );

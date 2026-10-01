@@ -76,7 +76,7 @@ describe("Who's who (#133)", () => {
       expect(within(callout).getByText("1 more source line found · 1 still none")).toBeInTheDocument();
       expect(within(callout).getByText(/^Who's who · 2 people/)).toBeInTheDocument();
       expect(JSON.parse(localStorage.getItem(KEY)!)).toEqual([{ speaker: "Rosa Delgado", team: "Carriers" }]);
-      expect(board().querySelector(".board-header")).toHaveTextContent("1 with a source line");
+      expect(board().querySelector(".board-header")).toHaveTextContent("Words · 1 term · 2 rows · 1 with a source line");
     });
 
     it("keeps a typed team and the names behind your swaps", async () => {

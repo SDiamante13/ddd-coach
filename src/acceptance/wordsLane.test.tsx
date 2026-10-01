@@ -148,6 +148,16 @@ describe("The Words lane (#109)", () => {
     expect(within(conversation.log()).getByRole("button", { name: /new on the board/ })).toBeInTheDocument();
   });
 
+  it("counts terms in the margin chip the way the board merges them, so 'Confirmed' and 'confirmed' are one term (#138)", async () => {
+    const conversation = await startConversation();
+    const reply = ["Words that don't match", '"Confirmed"', "- From thread: Carrier desk means the carrier accepted the tender.", '"confirmed"', "- From thread: Ops means the customer agreed the window."].join("\n");
+    conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply, signature: "sig" });
+
+    expect(await within(conversation.log()).findByRole("button", { name: "← 1 term on the board · 2 rows" })).toBeInTheDocument();
+    expect(within(board()).getAllByRole("group", { name: /^Term / })).toHaveLength(1);
+    expect(board().querySelector(".board-header")).toHaveTextContent("Words · 1 term · 2 rows");
+  });
+
   describe("reaching the Words lane at 100% (#109 hotfix)", () => {
     beforeEach(() => {
       vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query, addEventListener: () => {}, removeEventListener: () => {} }));

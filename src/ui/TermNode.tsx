@@ -116,8 +116,9 @@ function changeOf(term: TermCard, { latest }: WordsLane): TermChange {
   return term.rows.some((row) => row.changedBy === latest) ? "updated" : null;
 }
 
-export function wordsSummaryOf({ terms }: WordsLane): string | null {
+export function wordsSummaryOf({ terms }: WordsLane, sourced: number | null = null): string | null {
   if (terms.length === 0) return null;
   const rows = terms.reduce((sum, term) => sum + term.rows.length, 0);
-  return `Words · ${terms.length} ${terms.length === 1 ? "term" : "terms"} · ${rows} ${rows === 1 ? "row" : "rows"}`;
+  const counts = `Words · ${terms.length} ${terms.length === 1 ? "term" : "terms"} · ${rows} ${rows === 1 ? "row" : "rows"}`;
+  return sourced === null ? counts : `${counts} · ${sourced} with a source line`;
 }
