@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { shortDate } from "../domain/dates.ts";
+import { shortDay } from "../domain/dates.ts";
 import type { SettleBy } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
@@ -37,6 +37,5 @@ function SettleByForm({ onKeep, onCancel }: { onKeep: (settleBy: SettleBy) => vo
 }
 
 export function settleByText({ forum, on }: SettleBy, restoreNames: RestoreNames): string {
-  const [year, month, day] = on.split("-").map(Number);
-  return `${restoreNames(forum).text}, ${shortDate(new Date(year!, month! - 1, day!))}`;
+  return `${restoreNames(forum).text}, ${shortDay(on)}`;
 }

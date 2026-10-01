@@ -1,5 +1,5 @@
 import type { Verdict } from "./boardFromReplies.ts";
-import { shortDate } from "./dates.ts";
+import { shortDay } from "./dates.ts";
 import type { EntityId } from "./entityId.ts";
 import type { RowCheck } from "./rowChecks.ts";
 import type { RowFact, RowFacts } from "./rfcExport.ts";
@@ -20,6 +20,5 @@ function factOf({ meaning, correctedFrom }: TermRow, check: RowCheck | undefined
 }
 
 function statusOf({ verdict, at, where }: RowCheck, shown: Shown): string {
-  const [year, month, day] = at.split("-").map(Number);
-  return [VERDICT_TEXT[verdict], shortDate(new Date(year!, month! - 1, day!)), ...(where ? [shown(where)] : [])].join(", ");
+  return [VERDICT_TEXT[verdict], shortDay(at), ...(where ? [shown(where)] : [])].join(", ");
 }

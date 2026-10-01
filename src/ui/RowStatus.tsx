@@ -1,6 +1,6 @@
 import { type KeyboardEvent, useState } from "react";
 import type { Verdict } from "../domain/boardFromReplies.ts";
-import { shortDate } from "../domain/dates.ts";
+import { shortDay } from "../domain/dates.ts";
 import type { RowCheck } from "../domain/rowChecks.ts";
 
 const BADGE: Record<Verdict, string> = { holds: "CHECKED BY YOU", unknown: "COULDN'T TELL", wrong: "MARKED WRONG BY YOU" };
@@ -49,10 +49,9 @@ function MeaningEditor({ initial, onKeep, onCancel }: { initial: string; onKeep:
 }
 
 function CheckedBadge({ check, shown }: { check: RowCheck; shown: (text: string) => string }) {
-  const [year, month, day] = check.at.split("-").map(Number);
   return (
     <>
-      <span className="row-checked" data-verdict={check.verdict}>{`${BADGE[check.verdict]} · ${shortDate(new Date(year!, month! - 1, day!))}`}</span>
+      <span className="row-checked" data-verdict={check.verdict}>{`${BADGE[check.verdict]} · ${shortDay(check.at)}`}</span>
       {check.where && <span className="row-where">{`Where: ${shown(check.where)}`}</span>}
     </>
   );

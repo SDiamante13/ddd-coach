@@ -1,4 +1,4 @@
-import { shortDate } from "./dates.ts";
+import { shortDate, shortDay } from "./dates.ts";
 import { entityId, type EntityId } from "./entityId.ts";
 import { applySwaps, type SwapList } from "./swaps.ts";
 import type { ReplyBlock, Source, WordRow } from "./replyBlocks.ts";
@@ -73,8 +73,7 @@ export function byWord(glossary: Glossary): WordGroup[] {
 }
 
 export function keptLabel({ keptOn, from }: KeptGlossaryRow): string {
-  const [year, month, day] = keptOn.split("-").map(Number);
-  return `${shortDate(new Date(year!, month! - 1, day))} from ${from}`;
+  return `${shortDay(keptOn)} from ${from}`;
 }
 
 export const removeRow = (glossary: Glossary, id: EntityId): Glossary => glossary.filter((row) => row.id !== id);
