@@ -50,4 +50,18 @@ describe("wordsOf", () => {
     expect(late!.rows[0]!.line).toBe("Mon Ops (day desk): late means the truck missed the pickup window");
     expect(late!.rows[2]!.line).toBeNull();
   });
+
+  it("takes a row's source line only from its own team, never another desk's (#109 hotfix)", () => {
+    const paste = [
+      "Mon 09:40  Ops day desk: a truck not at pickup by the window end is late",
+      "Mon 10:02  Ops night desk: on time means delivered before the appointment, even after a late pickup",
+    ].join("\n");
+    const reply = ["Words that don't match", '"on time"', "- From thread: Ops (day desk) means a load can recover from a late pickup by delivering before the appointment.", "- From thread: Ops (night desk) means delivered before the appointment even after a late pickup."].join("\n");
+    const exchanges: Exchange[] = [{ id: "e1" as ExchangeId, prompt: paste as Prompt, status: "replied", reply, signature: "s" }];
+
+    const [onTime] = wordsOf(exchanges).terms;
+
+    expect(onTime!.rows[0]!.line).toBeNull();
+    expect(onTime!.rows[1]!.line).toBe("Mon 10:02  Ops night desk: on time means delivered before the appointment, even after a late pickup");
+  });
 });
