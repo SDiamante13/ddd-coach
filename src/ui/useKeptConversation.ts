@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { sentCorrectionsOf } from "../domain/board.ts";
-import { boardOf } from "../domain/boardFromReplies.ts";
+import { sendableCorrections } from "../domain/board.ts";
+import { boardOf, type VisitorAction } from "../domain/boardFromReplies.ts";
+import type { EntityId } from "../domain/entityId.ts";
 import type { ExchangeId, Prompt } from "../domain/exchange.ts";
 import { wordsOf } from "../domain/words.ts";
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
@@ -28,7 +29,7 @@ export function useKeptConversation({ outgoing, ...callbacks }: KeptConversation
   const edits = useVisitorActions(outgoing, kept.visitorActions);
   const chat = useExchanges({
     ...callbacks,
-    corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(chat.exchanges, edits.actions), wordsOf(chat.exchanges, edits.actions).terms) : []),
+    corrections: () => (CORRECTIONS_ENABLED ? sendableCorrections(boardOf(chat.exchanges, edits.actions), wordsOf(chat.exchanges, edits.actions).terms, correctedInOrder(edits.actions)) : []),
     initial: kept.exchanges,
   });
   const { viewport, followingCoach, settleBy } = place;
@@ -49,3 +50,5 @@ const restorePointOf = (kept: Session): RestorePoint => ({
   actions: kept.visitorActions.length,
   savedAt: kept.exchanges.length > 0 ? kept.savedAt : null,
 });
+
+const correctedInOrder = (actions: readonly VisitorAction[]): EntityId[] => actions.flatMap((action) => (action.kind === "correct" ? [action.id] : []));

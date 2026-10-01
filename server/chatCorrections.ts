@@ -1,9 +1,7 @@
 import type { SentCorrection } from "../src/domain/board.ts";
+import { MAX_CORRECTION_CHARS, MAX_CORRECTIONS } from "../src/shared/chatContract.ts";
 import { CORRECTIONS_ENABLED } from "../src/shared/features.ts";
 import { field, stringField } from "../src/shared/json.ts";
-
-export const MAX_CORRECTIONS = 20;
-const MAX_CORRECTION_CHARS = 300;
 
 const isLong = (item: unknown): boolean =>
   (["was", "now"] as const).some((key) => (stringField(item, key)?.length ?? 0) > MAX_CORRECTION_CHARS);

@@ -1,6 +1,7 @@
 import { type EntityId, entityId } from "./entityId.ts";
 import type { ExchangeId } from "./exchange.ts";
 import type { TermCard } from "./words.ts";
+import { MAX_CORRECTION_CHARS, MAX_CORRECTIONS } from "../shared/chatContract.ts";
 
 export type Provenance = "thread" | "guess";
 export type EventCard = {
@@ -105,12 +106,24 @@ export function struckWordsOf(board: Board, card: EventCard): string | null {
 
 export type SentCorrection = { was: string; now: string };
 
-export const sentCorrectionsOf = ({ cards }: Board, terms: readonly TermCard[] = []): SentCorrection[] => [
-  ...cards.flatMap(({ correctedFrom, text }) => (correctedFrom === undefined ? [] : [{ was: correctedFrom, now: text }])),
+type KeptCorrection = SentCorrection & { id: EntityId };
+
+const keptCorrectionsOf = ({ cards }: Board, terms: readonly TermCard[]): KeptCorrection[] => [
+  ...cards.flatMap(({ id, correctedFrom, text }) => (correctedFrom === undefined ? [] : [{ id, was: correctedFrom, now: text }])),
   ...terms.flatMap(termCorrections),
 ];
 
-const termCorrections = ({ word, rows }: TermCard): SentCorrection[] =>
-  rows.flatMap(({ holder, meaning, correctedFrom }) =>
-    correctedFrom === undefined ? [] : [{ was: `${word} (${holder}): ${correctedFrom}`, now: `${word} (${holder}): ${meaning}` }],
+const termCorrections = ({ word, rows }: TermCard): KeptCorrection[] =>
+  rows.flatMap(({ id, holder, meaning, correctedFrom }) =>
+    correctedFrom === undefined ? [] : [{ id, was: `${word} (${holder}): ${correctedFrom}`, now: `${word} (${holder}): ${meaning}` }],
   );
+
+export const sentCorrectionsOf = (board: Board, terms: readonly TermCard[] = []): SentCorrection[] => keptCorrectionsOf(board, terms).map(({ was, now }) => ({ was, now }));
+
+const fitted = (text: string): string => (text.length <= MAX_CORRECTION_CHARS ? text : `${text.slice(0, MAX_CORRECTION_CHARS - 1)}…`);
+
+export function sendableCorrections(board: Board, terms: readonly TermCard[], correctedInOrder: readonly EntityId[]): SentCorrection[] {
+  const recency = (id: EntityId) => correctedInOrder.lastIndexOf(id);
+  const latest = keptCorrectionsOf(board, terms).sort((a, b) => recency(a.id) - recency(b.id)).slice(-MAX_CORRECTIONS);
+  return latest.map(({ was, now }) => ({ was: fitted(was), now: fitted(now) }));
+}

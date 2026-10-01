@@ -28,6 +28,8 @@ export function isChatFailureReason(value: unknown): value is ChatFailureReason 
 }
 
 export const MAX_MESSAGE_CHARS = 24_000;
+export const MAX_CORRECTIONS = 20;
+export const MAX_CORRECTION_CHARS = 300;
 
 export const COACH_UNAVAILABLE = "The coach is unavailable. Try again.";
 export const coachUnavailableFor = (seconds: number) => `The coach is unavailable. Try again in ${seconds} s.`;
