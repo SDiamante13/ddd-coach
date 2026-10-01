@@ -4,8 +4,9 @@ import type { WordsLane } from "../domain/words.ts";
 import type { Hotspot } from "./hotspot.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
-export type ExpertLine = { row: EntityId; text: string };
+export type ExpertLine = { term: EntityId; text: string };
 export type ExpertLines = { who: string; rows: ReadonlySet<EntityId>; lines: ExpertLine[]; answered: number; total: number };
+type ShownRow = { id: EntityId; holder: string };
 
 const ANSWERED: readonly (RowCheck["verdict"] | undefined)[] = ["holds", "wrong"];
 
@@ -13,18 +14,22 @@ export function expertLinesOf(hotspot: Hotspot | null, roles: string | undefined
   if (hotspot === null || roles === undefined) return null;
   const tied = new Set(hotspot.rows.map(({ term }) => term));
   const shown = (text: string) => restoreNames(text).text;
-  const rows = words.terms.filter(({ id }) => tied.has(id)).flatMap((term) => term.rows.map((row) => ({ ...row, word: shown(term.word), holder: shown(row.holder), meaning: shown(row.meaning) })));
+  const terms = words.terms.filter(({ id }) => tied.has(id)).map((term) => ({ id: term.id, word: shown(term.word), rows: term.rows.map((row) => ({ id: row.id, holder: shown(row.holder) })) }));
+  const rows = terms.flatMap((term) => term.rows);
   if (rows.length === 0) return null;
-  const lines = rows.flatMap((row) => {
-    const verdict = checks.get(row.id)?.verdict;
-    if (verdict === "unknown") return [{ row: row.id, text: `${row.holder} on “${row.word}”: can you point me to where it's written down now?` }];
-    return ANSWERED.includes(verdict) ? [] : [{ row: row.id, text: `Does ${row.holder}'s “${row.word}” still mean: ${asClause(row.meaning)}?` }];
-  });
-  const answered = rows.filter((row) => ANSWERED.includes(checks.get(row.id)?.verdict)).length;
+  const verdictOf = (row: ShownRow) => checks.get(row.id)?.verdict;
+  const lines = terms.flatMap(({ id, word, rows: termRows }) => termLine(id, word, termRows, verdictOf));
+  const answered = rows.filter((row) => ANSWERED.includes(verdictOf(row))).length;
   return { who: roles.split(", at ")[0]!, rows: new Set(rows.map(({ id }) => id)), lines, answered, total: rows.length };
 }
 
-const asClause = (meaning: string): string => meaning.replace(/[.\s]+$/, "");
+function termLine(term: EntityId, word: string, rows: ShownRow[], verdictOf: (row: ShownRow) => RowCheck["verdict"] | undefined): ExpertLine[] {
+  const desks = (wanted: (verdict: RowCheck["verdict"] | undefined) => boolean) => rows.filter((row) => wanted(verdictOf(row))).map(({ holder }) => holder).join(", ");
+  const open = desks((verdict) => verdict === undefined);
+  const unsure = desks((verdict) => verdict === "unknown");
+  const asks = [...(open ? [`still current for ${open}?`] : []), ...(unsure ? [`${open ? "Where" : "where"} is it written down for ${unsure}?`] : [])];
+  return asks.length === 0 ? [] : [{ term, text: `“${word}”: ${asks.join(" ")}` }];
+}
 
 const updatedInThreePlaces = (who: string): string => `Updated in 3 places: the row, the question card and the lines for ${who}.`;
 

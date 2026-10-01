@@ -113,23 +113,29 @@ type BoardHeaderProps = Pick<BoardSectionProps, "view" | "session" | "restoreNam
 const NEW_COUNT_FOR_MS = 5000;
 
 function BoardHeader({ view, session, restoreNames, hasEvents, overview, setOverview }: BoardHeaderProps) {
+  return (
+    <div className="board-header-row">
+      <div className="board-counts">
+        <BoardCounts view={view} hasEvents={hasEvents} />
+        {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
+      </div>
+      <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} onFit={view.fitBoard} overview={overview} onOverviewChange={setOverview} />
+    </div>
+  );
+}
+
+function BoardCounts({ view, hasEvents }: Pick<BoardHeaderProps, "view" | "hasEvents">) {
   const newCountShown = useShownFor(view.board.latest ?? view.words.latest, NEW_COUNT_FOR_MS);
   return (
-    <>
-      <div className="board-header-row">
-        <p className="board-header">
-          {hasEvents && (
-            <>
-              <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
-            </>
-          )}
-          {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
-          {view.quietRings && newCountShown && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
-        </p>
-        <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} onFit={view.fitBoard} overview={overview} onOverviewChange={setOverview} />
-      </div>
-      {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
-    </>
+    <p className="board-header">
+      {hasEvents && (
+        <>
+          <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
+        </>
+      )}
+      {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
+      {view.quietRings && newCountShown && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
+    </p>
   );
 }
 

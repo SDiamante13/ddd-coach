@@ -1,25 +1,30 @@
-import { useState } from "react";
 import type { ExpertLines } from "./expertLines.ts";
 
-const SHOWN = 3;
+const countOf = (lines: number, who: string): string => `${lines} ${lines === 1 ? "line" : "lines"} for ${who} ▸`;
 
-export function ExpertLinesList({ expert, rung, before }: { expert: ExpertLines; rung: boolean; before: string | null }) {
-  const [all, setAll] = useState(false);
+type ExpertLinesListProps = { expert: ExpertLines; rung: boolean; before: string | null; open: boolean; onOpen: (open: boolean) => void };
+
+export function ExpertLinesList({ expert, rung, before, open, onOpen }: ExpertLinesListProps) {
   const name = `Lines for ${expert.who}`;
-  const hidden = all ? 0 : Math.max(expert.lines.length - SHOWN, 0);
   return (
     <div className="expert-lines" data-rung={rung || undefined}>
-      <p className="expert-lines-head">
-        <span>{`${name} · only what's open`}</span> <span className="from-table">from your table</span>
-      </p>
-      <ol aria-label={name}>
-        {expert.lines.slice(0, expert.lines.length - hidden).map(({ row, text }) => (
-          <li key={row}>{text}</li>
-        ))}
-      </ol>
-      {hidden > 0 && (
-        <button type="button" className="expert-lines-more" onClick={() => setAll(true)}>
-          {`${hidden} more`}
+      {open ? (
+        <>
+          <p className="expert-lines-head">
+            <span>{`${name} · only what's open`}</span> <span className="from-table">from your table</span>{" "}
+            <button type="button" className="expert-lines-hide" aria-expanded={true} aria-label="Hide the lines" onClick={() => onOpen(false)}>
+              ▾
+            </button>
+          </p>
+          <ol aria-label={name}>
+            {expert.lines.map(({ term, text }) => (
+              <li key={term}>{text}</li>
+            ))}
+          </ol>
+        </>
+      ) : (
+        <button type="button" className="expert-lines-toggle" aria-expanded={false} onClick={() => onOpen(true)}>
+          {countOf(expert.lines.length, expert.who)}
         </button>
       )}
       {before && <p className="expert-lines-before">{before}</p>}

@@ -71,4 +71,13 @@ describe("A settle-by date, only if you have one (#90d)", () => {
 
     expect((await navigator.clipboard.readText()).split("\n")[1]).toBe("Settle by: Finance review, 27 Oct 2026 (typed by you)");
   });
+
+  it("sits on the board's counts line, not a line of its own (#132)", async () => {
+    const { user } = await asked();
+    expect(within(board()).getByRole("button", { name: "+ Add a settle-by date (only if you have one)" }).closest(".board-counts")).not.toBeNull();
+
+    await settleBy(user, "Finance review", "2026-10-27");
+
+    expect(within(board()).getByText("Settle by: Finance review, 27 Oct 2026 · typed by you").closest(".board-counts")).not.toBeNull();
+  });
 });

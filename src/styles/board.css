@@ -1046,6 +1046,20 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   gap: var(--space-2);
 }
 
+/* #132: Settle by sits on the right of the counts, giving the canvas its line back. */
+.board-counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.board-counts .board-header,
+.board-counts .settle-by,
+.board-counts .settle-by-add {
+  margin: 0;
+}
+
 .board-lane .board-overview {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
@@ -1117,6 +1131,23 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   background: var(--color-surface);
   font-size: 11px;
   cursor: pointer;
+}
+
+/* #132: 'I checked' only on the card being worked on; the status chip stays on every row. Opacity keeps it in the Tab order. */
+.term-card .row-check {
+  opacity: 0;
+}
+
+.term-card:hover .row-check,
+.term-card:focus-within .row-check,
+.term-card .row-check[aria-expanded="true"] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .term-card .row-check {
+    opacity: 1;
+  }
 }
 
 .row-check-menu {
@@ -1230,7 +1261,8 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   color: var(--color-ink-muted);
 }
 
-.expert-lines-more {
+.expert-lines-toggle,
+.expert-lines-hide {
   min-height: 28px;
   margin-top: var(--space-1);
   padding: 2px 10px;

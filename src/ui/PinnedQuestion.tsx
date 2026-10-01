@@ -17,6 +17,7 @@ type PinnedQuestionProps = { question: LatestQuestion | null; onBoard?: Question
 export function PinnedQuestion({ question, onBoard = null, expert = null, rung = false, before = null }: PinnedQuestionProps) {
   const ref = useRef<HTMLElement>(null);
   const [opened, setOpened] = useState(false);
+  const [linesOpen, setLinesOpen] = useState(false);
   const flash = useFlashOnChange(question?.exchangeId ?? null);
   const expanded = opened || flash.flashing;
   const toggle = () => {
@@ -29,7 +30,7 @@ export function PinnedQuestion({ question, onBoard = null, expert = null, rung =
   return (
     <aside ref={ref} id={PINNED_QUESTION_ID} className="pinned-question" aria-label="Current question" tabIndex={-1} data-expanded={expanded || undefined}>
       <QuestionStrip question={question} expanded={expanded} onToggle={toggle} />
-      <QuestionCard roles={question.roles} text={question.text} sources={question.sources} action={onBoard && <OnTheBoardChip {...onBoard} />} lines={expert && <ExpertLinesList key={String(rung)} expert={expert} rung={rung} before={before} />} />
+      <QuestionCard roles={question.roles} text={question.text} sources={question.sources} action={onBoard && <OnTheBoardChip {...onBoard} />} lines={expert && <ExpertLinesList key={String(rung)} expert={expert} rung={rung} before={before} open={linesOpen} onOpen={setLinesOpen} />} />
     </aside>
   );
 }
