@@ -35,4 +35,17 @@ describe("useExchanges", () => {
     expect(server.fetchMock).toHaveBeenCalledTimes(1);
     expect(result.current.exchanges).toHaveLength(1);
   });
+
+  it("starts one request when two sends land in the same tick, before React re-renders (#38)", () => {
+    const server = stubFetch();
+    const { result } = renderHook(() => useExchanges());
+
+    act(() => {
+      result.current.send("First message" as Prompt);
+      result.current.send("Second message" as Prompt);
+    });
+
+    expect(server.fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.current.exchanges).toHaveLength(1);
+  });
 });

@@ -1,5 +1,5 @@
 import type { SentCorrection } from "../domain/board.ts";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { askCoach } from "../api/askCoach.ts";
 import { historyBefore, turnsOf, type Conversation } from "../domain/conversation.ts";
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
@@ -26,6 +26,12 @@ type ExchangeCallbacks = {
 
 export function useExchanges({ onRefused, onAccessLost, glossary = () => [], corrections = () => [], initial = [] }: ExchangeCallbacks = {}) {
   const [exchanges, setExchanges] = useState<readonly Exchange[]>(initial);
+  const latest = useRef(exchanges);
+  latest.current = exchanges;
+  const update = (change: (current: readonly Exchange[]) => readonly Exchange[]) => {
+    latest.current = change(latest.current);
+    setExchanges(change);
+  };
 
   async function ask(id: ExchangeId, conversation: Conversation) {
     const result = await askCoach(conversation);
@@ -35,15 +41,15 @@ export function useExchanges({ onRefused, onAccessLost, glossary = () => [], cor
   }
 
   function send(prompt: Prompt) {
-    if (!canSend(exchanges)) return;
+    if (!canSend(latest.current)) return;
     const id = crypto.randomUUID() as ExchangeId;
-    setExchanges((current) => [...current, submit(id, prompt)]);
+    update((current) => [...current, submit(id, prompt)]);
     void ask(id, { history: turnsOf(exchanges), prompt, glossary: glossary(), corrections: corrections() });
   }
 
   function retryFailed(failed: FailedExchange) {
-    if (!canRetry(exchanges, failed.id)) return;
-    setExchanges((current) => current.map((e) => (e.id === failed.id ? retry(e) : e)));
+    if (!canRetry(latest.current, failed.id)) return;
+    update((current) => current.map((e) => (e.id === failed.id ? retry(e) : e)));
     void ask(failed.id, { history: historyBefore(exchanges, failed.id), prompt: failed.prompt, glossary: glossary(), corrections: corrections() });
   }
 
