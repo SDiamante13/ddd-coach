@@ -245,7 +245,7 @@ describe("Keeping the session across a reload (#5)", () => {
 
     await renderApp();
 
-    expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-300px,16px) scale(1.25)" });
+    await waitFor(() => expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-300px,16px) scale(1.25)" }));
   });
 
   it("starts the board at its beginning when the stored pan and zoom are out of range", async () => {
@@ -255,7 +255,7 @@ describe("Keeping the session across a reload (#5)", () => {
     await renderApp();
 
     expect(screen.getByText(/Customer submits a bkg/)).toBeInTheDocument();
-    expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,16px) scale(1)" });
+    await waitFor(() => expect(document.querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,16px) scale(1)" }));
   });
 
   it("says so when this browser can't save the session, and keeps working (#124)", async () => {
