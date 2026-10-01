@@ -89,6 +89,8 @@ describe("A settle-by date, only if you have one (#90d)", () => {
     await settleBy(user, "Finance review", "2026-10-27");
 
     await user.click(within(board()).getByRole("button", { name: "Change the settle-by" }));
+    expect(within(board()).getByRole("textbox", { name: "Where it gets settled" })).toHaveValue("Finance review");
+    expect(within(board()).getByLabelText("By when")).toHaveValue("2026-10-27");
     await user.clear(within(board()).getByRole("textbox", { name: "Where it gets settled" }));
     await pasteInto(user, within(board()).getByRole("textbox", { name: "Where it gets settled" }), "Ops review");
     await user.click(within(board()).getByRole("button", { name: "Keep settle-by" }));
