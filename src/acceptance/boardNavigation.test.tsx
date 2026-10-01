@@ -40,6 +40,7 @@ describe("Finding your way along the board (#20)", () => {
     await user.click(within(board()).getByRole("button", { name: "Show the 2 later events" }));
 
     await waitFor(() => expect(within(board()).getByRole("button", { name: "Show the 3 earlier events" })).toHaveTextContent("◂ 3 earlier"));
+    expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-468px,16px) scale(1)" });
     expect(within(board()).queryByRole("button", { name: /later/ })).not.toBeInTheDocument();
     expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
   });
@@ -63,12 +64,12 @@ describe("Finding your way along the board (#20)", () => {
     expect(within(board()).getByRole("img", { name: "Board overview" })).toBeInTheDocument();
   });
 
-  it("brings a card you select fully into view, moving the board no further than needed (#126)", async () => {
+  it("brings a card you select fully into view, clear of the edge chips, moving the board no further than needed (#126, #127)", async () => {
     const { user } = await onTheBoard();
 
     await user.click(within(board()).getByRole("button", { name: /^Event 5 of 5/ }));
 
-    await waitFor(() => expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-348px,16px) scale(1)" }));
+    await waitFor(() => expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-460px,16px) scale(1)" }));
   });
 
   it("leaves the board where it is when the card you select is already in view (#126)", async () => {

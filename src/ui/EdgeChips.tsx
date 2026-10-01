@@ -1,6 +1,6 @@
 import { useReactFlow, useViewport } from "@xyflow/react";
 import type { BoardView } from "./EventBoard.tsx";
-import { CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
+import { CARD_WIDTH, EDGE_CHIP_SAFE, lanePosition } from "./boardLayout.ts";
 import { prefersReducedMotion } from "./motion.ts";
 import { NewEventsChip } from "./NewEventsChip.tsx";
 import type { LaneSize } from "./useLaneSize.ts";
@@ -17,8 +17,8 @@ export function EdgeChips({ view, lane: { width } }: { view: BoardView; lane: La
     view.setFollowingCoach(false);
     void flow.setViewport({ x: viewportX, y: flow.getViewport().y, zoom }, { duration: prefersReducedMotion() ? 0 : 300 });
   };
-  const showEarlier = () => glideTo(width - LANE_INSET - (lanePosition(earlier.at(-1)!).x + CARD_WIDTH) * zoom);
-  const showLater = () => glideTo(LANE_INSET - lanePosition(later[0]!).x * zoom);
+  const showEarlier = () => glideTo(width - EDGE_CHIP_SAFE - (lanePosition(earlier.at(-1)!).x + CARD_WIDTH) * zoom);
+  const showLater = () => glideTo(EDGE_CHIP_SAFE - lanePosition(later[0]!).x * zoom);
   return (
     <>
       {earlier.length > 0 && (
