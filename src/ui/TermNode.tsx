@@ -22,7 +22,7 @@ const NO_LINE = { thread: "No line in your paste matches closely.", guess: "The 
 const CHANGE_TAG = { added: "JUST ADDED", updated: "UPDATED" } as const;
 
 type TermChange = keyof typeof CHANGE_TAG | null;
-type RowChecks = { checks: ReadonlyMap<string, RowCheck>; onCheck: (row: TermRow["id"], verdict: Verdict, where: string) => void };
+type RowChecks = { checks: ReadonlyMap<string, RowCheck>; onCheck: (row: TermRow["id"], verdict: Verdict, where: string) => void; justChecked: string | null };
 type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames; nudge: (by: Position) => void; roving: Roving; rowChecks: RowChecks };
 export type TermNodeType = Node<TermData, "term">;
 
@@ -54,7 +54,7 @@ export function TermNode({ data: { term, change, restoreNames, nudge, roving, ro
 
 function TermRowItem({ row, shown, rowChecks }: { row: TermRow; shown: (text: string) => string; rowChecks: RowChecks }) {
   return (
-    <li className="term-row" data-source={row.provenance}>
+    <li className="term-row" data-source={row.provenance} data-rung={rowChecks.justChecked === row.id || undefined}>
       <Handle id={`${row.id}|left`} type="source" position={Side.Left} isConnectable={false} className="row-handle" />
       <Handle id={`${row.id}|right`} type="source" position={Side.Right} isConnectable={false} className="row-handle right" />
       <span className="term-holder">{shown(row.holder)}</span>
@@ -84,7 +84,7 @@ function termNodeOf(term: TermCard, position: Position, view: BoardView, restore
     height: HEADER_HEIGHT + term.rows.reduce((sum, row) => sum + rowHeightOf(row), 0),
     ariaRole: "listitem",
     ariaLabel: termNameOf(term, restoreNames),
-    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id), rowChecks: { checks: view.checks, onCheck: view.check } },
+    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id), rowChecks: { checks: view.checks, onCheck: view.check, justChecked: view.justChecked } },
   };
 }
 

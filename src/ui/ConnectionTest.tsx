@@ -25,7 +25,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   return (
     <>
       <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} session={composer.board} />
-      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, rows: view.hotspot.rows.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} />
+      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, rows: view.hotspot.rows.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} expert={view.expert} rung={view.justChecked !== null} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}
@@ -40,6 +40,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         countsOf={view.countsOf}
         offScreenOf={view.offScreenOf}
         correctionsOf={view.correctionsOf}
+        checkLinesOf={view.checkLinesOf}
         linksOf={view.linksOf}
         onUndo={view.undo}
       />

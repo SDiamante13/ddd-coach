@@ -1116,3 +1116,45 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   text-align: left;
   cursor: pointer;
 }
+
+/* #90b: one fact, one place: the row, the question card and the expert's lines ring together for 3 s after a check. */
+[data-rung] {
+  outline: 2px dashed var(--color-coach);
+  outline-offset: 3px;
+  animation: rung-settle 300ms 3s forwards;
+}
+
+@keyframes rung-settle {
+  to {
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rung] {
+    animation: rung-settle 0s 3s forwards;
+  }
+}
+
+.expert-lines {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.expert-lines-head {
+  margin: 0 0 var(--space-1);
+  color: var(--color-coach);
+  font: 500 11px / 1.4 var(--font-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.expert-lines .from-table {
+  color: var(--color-ink-muted);
+  text-transform: none;
+}
+
+.expert-lines ol {
+  margin: 0;
+  padding-left: var(--space-5);
+}

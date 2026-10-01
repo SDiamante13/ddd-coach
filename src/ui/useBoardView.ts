@@ -13,6 +13,7 @@ import { type Hotspot, hotspotOf } from "./hotspot.ts";
 import { type WordsLane, wordsOf } from "../domain/words.ts";
 import { lastEdit, type Position, positionsOf } from "../domain/cardMoves.ts";
 import { checksOf } from "../domain/rowChecks.ts";
+import { type ExpertLines, expertLinesOf, updatedInThreePlaces } from "./expertLines.ts";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
@@ -31,6 +32,9 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const hotspot = hotspotOf(exchanges, board, restoreNames);
   const atRest = restorePoint.turn !== null && board.latest === restorePoint.turn;
   const freshCount = freshItemsOf(board, words, hotspot);
+  const checks = checksOf(edits.actions);
+  const question = latestQuestionOf(exchanges, (text) => restoreNames(text).text);
+  const expert = expertLinesOf(hotspot, question?.roles, words, checks, restoreNames);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
   const { selected, toggle } = useBoardSelection();
   const [questionReveals, setQuestionReveals] = useState(0);
@@ -61,7 +65,11 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     quietRings: !atRest && freshCount > RINGS_UP_TO,
     undoable: undoableOf(board, lastEdit(edits.actions)),
     positions: positionsOf(edits.actions),
-    checks: checksOf(edits.actions),
+    checks,
+    expert,
+    justChecked: justCheckedOf(edits.actions.at(-1), expert),
+    checkLinesOf: (id: ExchangeId): string[] =>
+      expert === null ? [] : edits.actions.flatMap((action) => (action.kind === "check" && action.after === id && expert.rows.has(action.row) ? [updatedInThreePlaces(expert.who)] : [])),
     check: touching((row: EntityId, verdict: Verdict, where: string) => {
       const after = board.latest ?? words.latest;
       if (after !== null) edits.check(row, verdict, where, after);
@@ -74,7 +82,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     correctionsOf: (id: ExchangeId): CorrectionLine[] => correctionLinesOf(board, id, restoreNames, keptCorrection(edits.actions, restorePoint)),
     highlight,
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
-    question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
+    question,
     hotspot,
     words,
     rovingId: focused ?? board.cards[0]?.id ?? words.terms[0]?.id ?? null,
@@ -117,4 +125,8 @@ function freshItemsOf(board: Board, words: WordsLane, hotspot: Hotspot | null): 
   const cards = board.cards.filter((card) => changeOf(board, card) === "added").length;
   const terms = words.terms.filter((term) => term.placedBy === words.latest).length;
   return cards + terms + (hotspot !== null && hotspot.askedIn === board.latest ? 1 : 0);
+}
+
+function justCheckedOf(last: VisitorAction | undefined, expert: ExpertLines | null): EntityId | null {
+  return last?.kind === "check" && expert?.rows.has(last.row) ? last.row : null;
 }

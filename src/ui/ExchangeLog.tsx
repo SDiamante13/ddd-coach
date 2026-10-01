@@ -24,17 +24,23 @@ type ExchangeLogProps = {
   countsOf: (id: ExchangeId) => ReplyCounts;
   offScreenOf: (id: ExchangeId) => (() => void) | undefined;
   correctionsOf: (id: ExchangeId) => readonly CorrectionLine[];
+  checkLinesOf: (id: ExchangeId) => readonly string[];
   linksOf: (id: ExchangeId) => readonly LinkLine[];
   onUndo: () => void;
 };
 
-export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, offScreenOf, correctionsOf, linksOf, onUndo, ...outcome }: ExchangeLogProps) {
+export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, offScreenOf, correctionsOf, checkLinesOf, linksOf, onUndo, ...outcome }: ExchangeLogProps) {
   return (
     <ol role="log" ref={logRef}>
       {exchanges.map((exchange) => (
         <ExchangeEntry key={exchange.id} exchange={exchange} highlight={highlight?.exchangeId === exchange.id ? highlight : null}>
           <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} counts={countsOf(exchange.id)} revealOffScreen={offScreenOf(exchange.id)} />
           <CorrectionLines lines={correctionsOf(exchange.id)} />
+          {checkLinesOf(exchange.id).map((line, index) => (
+            <p key={index} className="correction-line">
+              {line}
+            </p>
+          ))}
           <LinkLines lines={linksOf(exchange.id)} onUndo={onUndo} />
         </ExchangeEntry>
       ))}

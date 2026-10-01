@@ -13,3 +13,11 @@ export const WORDS_REPLY = [
 ].join("\n");
 
 export const WORDS_ONLY_REPLY = ["Words that don't match", '"on time"', "- Guess: Account team means meeting the booked delivery appointment."].join("\n");
+
+// Hand-written in the v11 shape, not a real coach reply: the split word plus a question that quotes Billing's line.
+export const WORDS_QUESTION_REPLY = [
+  WORDS_REPLY,
+  "",
+  "Question for the billing lead, at Friday's review: Which late counts for the credit?",
+  'From thread: "late is anything on the weekly late report"',
+].join("\n");

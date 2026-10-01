@@ -11,6 +11,7 @@ import type { WordsLane } from "../domain/words.ts";
 import { wordsSummaryOf } from "./TermNode.tsx";
 import type { Position } from "../domain/cardMoves.ts";
 import type { RowCheck } from "../domain/rowChecks.ts";
+import type { ExpertLines } from "./expertLines.ts";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import type { OffScreenOffer } from "./useOffScreenOffer.ts";
 import type { Viewport } from "../domain/session.ts";
@@ -31,6 +32,8 @@ export type BoardView = {
   followingCoach: boolean;
   positions: ReadonlyMap<EntityId, Position>;
   checks: ReadonlyMap<EntityId, RowCheck>;
+  expert: ExpertLines | null;
+  justChecked: EntityId | null;
   check: (row: EntityId, verdict: Verdict, where: string) => void;
   move: (id: EntityId, position: Position) => void;
   newOffScreen: OffScreenOffer | null;

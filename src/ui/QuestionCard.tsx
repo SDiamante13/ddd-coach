@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
-type QuestionCardProps = { roles: string; text: string; sources: string[]; action?: ReactNode };
+type QuestionCardProps = { roles: string; text: string; sources: string[]; action?: ReactNode; lines?: ReactNode };
 
-export function QuestionCard({ roles, text, sources, action }: QuestionCardProps) {
+export function QuestionCard({ roles, text, sources, action, lines }: QuestionCardProps) {
   return (
     <section className="question-card" aria-label="Question">
       <p className="question-for">Question for {roles}</p>
@@ -15,6 +15,7 @@ export function QuestionCard({ roles, text, sources, action }: QuestionCardProps
           ))}
         </ul>
       )}
+      {lines}
     </section>
   );
 }

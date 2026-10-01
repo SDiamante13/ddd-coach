@@ -8,18 +8,18 @@ import { unplacedLabel } from "./unplacedQuotes.ts";
 
 const DROP = CARD_HEIGHT + 96;
 
-type QuestionData = { hotspot: Hotspot; fresh: boolean; roving: Roving };
+type QuestionData = { hotspot: Hotspot; fresh: boolean; roving: Roving; answered: string | null; rung: boolean };
 export type Roving = { tabIndex: 0 | -1; onFocus: () => void };
 export type QuestionNodeType = Node<QuestionData, "question">;
 
-export function QuestionNode({ data: { hotspot, fresh, roving } }: NodeProps<QuestionNodeType>) {
+export function QuestionNode({ data: { hotspot, fresh, roving, answered, rung } }: NodeProps<QuestionNodeType>) {
   return (
     <>
       <Handle id="relates-in" type="target" position={Position.Top} isConnectable={false} />
       <Handle id="relates-below" type="target" position={Position.Bottom} isConnectable={false} />
-      <div className="card hotspot-card" tabIndex={roving.tabIndex} onFocus={roving.onFocus} data-board-item data-lane="question">
+      <div className="card hotspot-card" tabIndex={roving.tabIndex} onFocus={roving.onFocus} data-board-item data-lane="question" data-rung={rung || undefined}>
         <span className="card-kind">QUESTION</span>
-        <span className="card-source">OPEN</span>
+        <span className="card-source">{answered ?? "OPEN"}</span>
         <span className="card-title">{hotspot.text}</span>
         {hotspot.unplaced.length > 0 && <UnplacedQuotes quotes={hotspot.unplaced} tabIndex={roving.tabIndex} />}
         {fresh && (
@@ -49,7 +49,7 @@ export function questionNodesOf(view: BoardView): QuestionNodeType[] {
   const { hotspot, board } = view;
   if (hotspot === null) return [];
   const fresh = hotspot.askedIn === board.latest && !view.atRest && !view.quietRings;
-  return [{ id: hotspot.id, type: "question", position: view.positions.get(hotspot.id) ?? placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh, roving: rovingOf(view, hotspot.id) } }];
+  return [{ id: hotspot.id, type: "question", position: view.positions.get(hotspot.id) ?? placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh, roving: rovingOf(view, hotspot.id), answered: view.expert && `${view.expert.answered} OF ${view.expert.total} ANSWERED`, rung: view.justChecked !== null } }];
 }
 
 function placeOf({ links }: Hotspot, { board }: BoardView) {
