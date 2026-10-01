@@ -23,6 +23,9 @@ export function BoardControls({ following, onFollowChange }: BoardControlsProps)
         Fit
       </button>
       <button type="button" className="follow-coach" aria-pressed={following} onClick={() => onFollowChange(!following)}>
+        <span className="switch-track" aria-hidden="true">
+          <span className="switch-knob" />
+        </span>
         Follow coach
       </button>
     </div>

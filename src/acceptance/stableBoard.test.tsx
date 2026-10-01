@@ -47,12 +47,14 @@ describe("A board that holds still once you've touched it (#124, #20)", () => {
     expect(newChip()).not.toBeInTheDocument();
   });
 
-  it("stops following the coach for good once you touch the board", async () => {
+  it("stops following the coach for good once you touch the board, and the switch shows it (#127)", async () => {
     const conversation = await onTheBoard();
+    expect(follow().querySelector(".switch-knob")).not.toBeNull();
 
     await conversation.user.click(within(board()).getByRole("button", { name: /Customer submits a bkg/ }));
 
     expect(follow()).toHaveAttribute("aria-pressed", "false");
+    expect(follow()).toHaveAccessibleName("Follow coach");
   });
 
   it("follows again when you turn Follow coach back on", async () => {
