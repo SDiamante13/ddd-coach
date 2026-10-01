@@ -1349,3 +1349,9 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   min-width: 10rem;
   font-size: 12px;
 }
+
+.whos-who-suggested {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--color-coach);
+}

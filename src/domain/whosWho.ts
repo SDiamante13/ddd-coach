@@ -20,3 +20,22 @@ function closest(teams: string[], qualifier: string[]): string[] {
   const most = Math.max(...teams.map(shared));
   return most === 0 ? [] : teams.filter((team) => shared(team) === most);
 }
+
+export type Suggestion = { team: string; quote: string };
+
+const SELF = /\b(we|we're|our|us|i'm|here)\b/i;
+const QUOTE_CHARS = 60;
+
+const ownWordsOf = (team: string): string[] => {
+  const qualifier = stemsOf([...team.matchAll(QUALIFIER)].map((match) => match[1]).join(" "));
+  return qualifier.length > 0 ? qualifier : stemsOf(team);
+};
+
+export function suggestedTeam(lines: readonly string[], teams: readonly string[]): Suggestion | null {
+  for (const line of lines.filter((text) => SELF.test(text))) {
+    const said = stemsOf(line);
+    const named = teams.filter((team) => ownWordsOf(team).every((word) => said.includes(word)));
+    if (named.length === 1) return { team: named[0]!, quote: line.trim().slice(0, QUOTE_CHARS) };
+  }
+  return null;
+}

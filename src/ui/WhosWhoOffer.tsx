@@ -1,25 +1,33 @@
 import { useState } from "react";
 import type { Speaker } from "../domain/pasteSpeakers.ts";
 import type { SourceGap } from "../domain/sourceGap.ts";
-import type { WhoIsWhoEntry } from "../domain/whosWho.ts";
+import { whoIsWhoOf, type WhoIsWhoEntry } from "../domain/whosWho.ts";
 import { WhosWhoStrip } from "./WhosWhoStrip.tsx";
 
 export type WhosWhoOfferProps = {
   gap: SourceGap;
   speakers: Speaker[];
+  paste: string;
   entries: readonly WhoIsWhoEntry[];
   onKeep: (entries: WhoIsWhoEntry[]) => void;
   shown: (text: string) => string;
   outgoing: (text: string) => string;
 };
 
-type Phase = "callout" | "strip" | "applied" | "dismissed";
+type Phase = "callout" | "ask" | "strip" | "applied" | "dismissed";
 
 const people = (count: number) => `${count} ${count === 1 ? "person" : "people"}`;
 const mostlyUnsourced = ({ rows, none }: SourceGap) => rows > 0 && none * 2 > rows;
 
+const newSpeakers = (speakers: Speaker[], entries: readonly WhoIsWhoEntry[]): Speaker[] => {
+  const known = whoIsWhoOf(entries);
+  return speakers.filter(({ speaker }) => !known.has(speaker.toLowerCase()));
+};
+
 export function WhosWhoOffer(props: WhosWhoOfferProps) {
-  const [phase, setPhase] = useState<Phase>("callout");
+  const [fresh] = useState(() => newSpeakers(props.speakers, props.entries));
+  const asking = fresh.length > 0 && fresh.length < props.speakers.length;
+  const [phase, setPhase] = useState<Phase>(asking ? "ask" : "callout");
   const [noneBefore, setNoneBefore] = useState(0);
   const { gap, speakers } = props;
   if (phase === "dismissed" || speakers.length === 0 || (phase === "callout" && !mostlyUnsourced(gap))) return null;
@@ -31,10 +39,17 @@ export function WhosWhoOffer(props: WhosWhoOfferProps) {
   return (
     <div className="whos-who" role="group" aria-label="Who's who">
       {phase === "callout" && <Callout gap={gap} speakers={speakers.length} onOpen={() => setPhase("strip")} onDismiss={() => setPhase("dismissed")} />}
+      {phase === "ask" && <WhosWhoStrip {...props} speakers={fresh} head={askOf(fresh, props.shown)} onApply={apply} onSkip={() => setPhase("dismissed")} />}
       {phase === "strip" && <WhosWhoStrip {...props} onApply={apply} onSkip={() => setPhase("dismissed")} />}
       {phase === "applied" && <Applied found={noneBefore - gap.none} none={gap.none} speakers={speakers.length} onEdit={() => setPhase("strip")} />}
     </div>
   );
+}
+
+function askOf(fresh: Speaker[], shown: (text: string) => string): string {
+  if (fresh.length > 1) return `${fresh.length} new speakers. Which teams?`;
+  const [{ speaker, lines }] = fresh as [Speaker];
+  return `One new speaker: ${shown(speaker)} (${lines} ${lines === 1 ? "line" : "lines"}). Which team?`;
 }
 
 function Callout({ gap, speakers, onOpen, onDismiss }: { gap: SourceGap; speakers: number; onOpen: () => void; onDismiss: () => void }) {

@@ -64,11 +64,11 @@ describe("Who's who (#133)", () => {
       const callout = await within(log()).findByRole("group", { name: "Who's who" });
       await user.click(within(callout).getByRole("button", { name: "Who's who · 2 people" }));
       const rosa = within(callout).getByRole("group", { name: "Rosa Delgado" });
-      expect(within(rosa).getAllByRole("button").map((chip) => chip.textContent)).toEqual(["Carriers", "Account team", "Code", "Not sure"]);
+      expect(within(rosa).getAllByRole("button").map((chip) => chip.textContent)).toEqual(["Carriers?", "Account team", "Code", "Not sure"]);
       expect(within(rosa).getAllByRole("button").filter((chip) => chip.getAttribute("aria-pressed") === "true")).toHaveLength(0);
       expect(within(callout).getByText("Code: for people describing what the code does")).toBeInTheDocument();
 
-      await user.click(within(rosa).getByRole("button", { name: "Carriers" }));
+      await user.click(within(rosa).getByRole("button", { name: "Carriers?" }));
       await user.click(within(within(callout).getByRole("group", { name: "Luis Ortega" })).getByRole("button", { name: "Not sure" }));
       await user.click(within(callout).getByRole("button", { name: "Apply · find source lines" }));
 
@@ -101,6 +101,38 @@ describe("Who's who (#133)", () => {
       await user.click(within(callout).getByRole("button", { name: "Not now" }));
 
       expect(within(log()).queryByRole("group", { name: "Who's who" })).not.toBeInTheDocument();
+    });
+
+    it("suggests the team a person names as their own, to confirm, never chosen for them", async () => {
+      const { user, log } = await onTheWords();
+      const callout = await within(log()).findByRole("group", { name: "Who's who" });
+      await user.click(within(callout).getByRole("button", { name: "Who's who · 2 people" }));
+      const rosa = within(callout).getByRole("group", { name: "Rosa Delgado" });
+
+      const suggestion = within(rosa).getByRole("button", { name: "Carriers?" });
+      expect(suggestion).toHaveAttribute("aria-pressed", "false");
+      expect(rosa).toHaveTextContent("Suggested from “for us Confirmed means the carrier accepted the tender”; tap to confirm");
+      expect(within(within(callout).getByRole("group", { name: "Luis Ortega" })).queryByRole("button", { name: /\?$/ })).not.toBeInTheDocument();
+
+      await user.click(suggestion);
+
+      expect(within(rosa).getByRole("button", { name: "Carriers" })).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("asks only about a new speaker in a later paste, reusing who you've already placed", async () => {
+      localStorage.setItem(KEY, JSON.stringify([{ speaker: "Rosa Delgado", team: "Carriers" }]));
+      const { user, log } = await onTheWords();
+      const ask = await within(log()).findByRole("group", { name: "Who's who" });
+
+      expect(ask).toHaveTextContent("One new speaker: Luis Ortega (1 line). Which team?");
+      expect(within(ask).queryByRole("group", { name: "Rosa Delgado" })).not.toBeInTheDocument();
+      await user.click(within(within(ask).getByRole("group", { name: "Luis Ortega" })).getByRole("button", { name: "Account team" }));
+      await user.click(within(ask).getByRole("button", { name: "Apply · find source lines" }));
+
+      expect(JSON.parse(localStorage.getItem(KEY)!)).toEqual([
+        { speaker: "Rosa Delgado", team: "Carriers" },
+        { speaker: "Luis Ortega", team: "Account team" },
+      ]);
     });
   });
 });

@@ -56,7 +56,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         linksOf={view.linksOf}
         whosWhoOf={(exchange) =>
           exchange.status === "replied" && (
-            <WhosWhoOffer gap={sourceGapOf(view.words, exchange.id)} speakers={speakersOf(exchange.prompt)} entries={whosWho.entries} onKeep={whosWho.keep} shown={(text) => composer.box.restoreNames(text).text} outgoing={composer.box.outgoing} />
+            <WhosWhoOffer gap={sourceGapOf(view.words, exchange.id)} speakers={speakersOf(exchange.prompt)} paste={exchange.prompt} entries={whosWho.entries} onKeep={whosWho.keep} shown={(text) => composer.box.restoreNames(text).text} outgoing={composer.box.outgoing} />
           )
         }
         onUndo={view.undo}
