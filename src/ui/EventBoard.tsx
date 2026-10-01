@@ -14,7 +14,8 @@ import type { RowCheck } from "../domain/rowChecks.ts";
 import type { ExpertLines } from "./expertLines.ts";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import type { OffScreenOffer } from "./useOffScreenOffer.ts";
-import type { Viewport } from "../domain/session.ts";
+import type { SettleBy, Viewport } from "../domain/session.ts";
+import { SettleByLine } from "./SettleByLine.tsx";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 export { BOARD_LANE_ID } from "./BoardFlow.tsx";
@@ -53,7 +54,14 @@ export type BoardView = {
   revealQuestion: () => void;
   setFollowingCoach: (following: boolean) => void;
 };
-export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void; saving: boolean };
+export type BoardSession = {
+  pickedUpAt: string | null;
+  viewport: Viewport | null;
+  keepViewport: (viewport: Viewport) => void;
+  saving: boolean;
+  settleBy?: SettleBy | null;
+  keepSettleBy?: (settleBy: SettleBy) => void;
+};
 
 export const NOT_SAVING = "This browser isn't saving your session, so a reload will lose the conversation and board.";
 type EventBoardProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session?: BoardSession };
@@ -98,6 +106,7 @@ function BoardSection({ view, thinking, restoreNames, session, hasEvents, empty,
             </p>
             <BoardControls following={view.followingCoach} onFollowChange={view.setFollowingCoach} overview={overview} onOverviewChange={setOverview} />
           </div>
+          {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
           <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} overview={overview} />
         </>
       )}

@@ -30,10 +30,10 @@ export function useKeptConversation({ outgoing, ...callbacks }: KeptConversation
     corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(chat.exchanges, edits.actions)) : []),
     initial: kept.exchanges,
   });
-  const { viewport, followingCoach } = place;
+  const { viewport, followingCoach, settleBy } = place;
   useEffect(
-    () => setSaving(keepSession({ exchanges: chat.exchanges, visitorActions: edits.actions, viewport, followingCoach })),
-    [chat.exchanges, edits.actions, viewport, followingCoach],
+    () => setSaving(keepSession({ exchanges: chat.exchanges, visitorActions: edits.actions, viewport, followingCoach, settleBy })),
+    [chat.exchanges, edits.actions, viewport, followingCoach, settleBy],
   );
   const clear = () => {
     chat.clear();

@@ -8,6 +8,7 @@ import { ExchangeLog } from "./ExchangeLog.tsx";
 import { MessageForm } from "./MessageForm.tsx";
 import { NewReplyButton } from "./NewReplyButton.tsx";
 import { PinnedQuestion } from "./PinnedQuestion.tsx";
+import { settleByText } from "./SettleByLine.tsx";
 import { SentPreview } from "./SentPreview.tsx";
 import { GlossaryPanel } from "./GlossaryPanel.tsx";
 import { SwapPanel } from "./SwapPanel.tsx";
@@ -25,7 +26,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   return (
     <>
       <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} session={composer.board} />
-      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, rows: view.hotspot.rows.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} expert={view.expert} rung={view.justChecked !== null} />
+      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, rows: view.hotspot.rows.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} expert={view.expert} rung={view.justChecked !== null} before={composer.board.settleBy ? `Before ${settleByText(composer.board.settleBy, composer.box.restoreNames)}.` : null} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}

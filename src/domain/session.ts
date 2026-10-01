@@ -12,11 +12,14 @@ export type Session = {
   savedAt: string | null;
   viewport: Viewport | null;
   followingCoach: boolean;
+  settleBy: SettleBy | null;
 };
+
+export type SettleBy = { forum: string; on: string };
 
 export const FOLLOW_COACH_AT_START = true;
 
-export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null, viewport: null, followingCoach: FOLLOW_COACH_AT_START };
+export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null, viewport: null, followingCoach: FOLLOW_COACH_AT_START, settleBy: null };
 
 export const BOARD_ZOOM = { min: 0.5, max: 1.5 } as const;
 
@@ -27,7 +30,13 @@ export function sessionOf(stored: unknown): Session {
   const visitorActions = field(stored, "visitorActions");
   const valid =
     field(stored, "version") === SESSION_VERSION && everyIs(exchanges, isExchange) && everyIs(visitorActions, isVisitorAction);
-  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")), followingCoach: followingOf(stored) } : EMPTY_SESSION;
+  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")), followingCoach: followingOf(stored), settleBy: settleByOf(field(stored, "settleBy")) } : EMPTY_SESSION;
+}
+
+function settleByOf(stored: unknown): SettleBy | null {
+  const forum = stringField(stored, "forum")?.trim();
+  const on = stringField(stored, "on");
+  return forum && on !== undefined && /^\d{4}-\d{2}-\d{2}$/.test(on) ? { forum, on } : null;
 }
 
 function followingOf(stored: unknown): boolean {

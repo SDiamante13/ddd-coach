@@ -13,6 +13,7 @@ import { useComposerReserve } from "./useComposerReserve.ts";
 import { useGlossary } from "./useGlossary.ts";
 import { outgoingGlossary } from "../domain/glossary.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
+import type { SettleBy } from "../domain/session.ts";
 import { useKeptConversation } from "./useKeptConversation.ts";
 import { useLogFollow } from "./useLogFollow.ts";
 import { useSwaps } from "./useSwaps.ts";
@@ -43,7 +44,7 @@ export function useComposer(unlock: Unlock) {
   };
   const conversation = () => conversationText(exchanges, (text) => box.restoreNames(text).text);
   const pastedThread = pastedThreadOf(exchanges, box.restoreNames);
-  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, edits, restorePoint, board: { pickedUpAt: restorePoint.savedAt, viewport: place.viewport, keepViewport: place.keepViewport, saving }, place, pastedThread, busy: isBusy(exchanges) };
+  return { box, access, exchanges, retry, confirmation, follow, submit, conversation, glossary, edits, restorePoint, board: { pickedUpAt: restorePoint.savedAt, viewport: place.viewport, keepViewport: place.keepViewport, saving, settleBy: place.settleBy, keepSettleBy: ({ forum, on }: SettleBy) => place.keepSettleBy({ forum: box.outgoing(forum), on }) }, place, pastedThread, busy: isBusy(exchanges) };
 }
 
 function pastedThreadOf(exchanges: readonly Exchange[], restoreNames: (text: string) => SwappedText): string | undefined {
