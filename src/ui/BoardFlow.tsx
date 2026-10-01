@@ -7,7 +7,7 @@ import { titleOf } from "./linkLines.ts";
 import { BoardCard } from "./BoardCard.tsx";
 import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
-import { CARD_HEIGHT, CARD_WIDTH, CONTROLS_CLEARANCE, LANE_INSET, lanePosition, ROW_TOP } from "./boardLayout.ts";
+import { CARD_HEIGHT, CARD_WIDTH, CONTROLS_BAND, LANE_INSET, lanePosition, ROW_TOP } from "./boardLayout.ts";
 import { EdgeChips } from "./EdgeChips.tsx";
 import { onBoardKey } from "./boardFocus.ts";
 import { BoardHint, useBoardHint } from "./BoardHint.tsx";
@@ -140,9 +140,8 @@ function Lane(props: LaneProps) {
         minZoom={BOARD_ZOOM.min}
         maxZoom={BOARD_ZOOM.max}
         translateExtent={contentLocked(lane, nodes)}
-      >
-        <MiniMap position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} style={MINI_MAP_SIZE} />
-      </ReactFlow>
+      />
+      <MiniMap className="board-overview" position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} bgColor="var(--color-surface)" maskColor="rgb(0 0 0 / 0.08)" style={MINI_MAP_SIZE} />
       <EdgeChips view={props.view} lane={lane} />
       <BoardHint shown={hint.shown} />
       <BoardControls following={props.view.followingCoach} onFollowChange={props.view.setFollowingCoach} />
@@ -151,14 +150,14 @@ function Lane(props: LaneProps) {
 }
 
 const keepPointerEvents = () => {};
-const MINI_MAP_SIZE = { width: 160, height: 96, marginBottom: 28 };
+const MINI_MAP_SIZE = { width: 120, height: 56, margin: 8 };
 const MINI_MAP_COLORS: Record<string, string> = { question: "var(--color-card-question)", term: "var(--color-line-strong)" };
 const miniMapColor = (node: Node) => MINI_MAP_COLORS[node.type ?? ""] ?? "var(--color-card-event)";
 const START_VIEWPORT = { x: LANE_INSET, y: 16, zoom: 1 };
 const contentLocked = ({ height }: LaneSize, nodes: readonly Node[]): CoordinateExtent => {
   if (height === 0) return UNLOCKED;
   const bottom = Math.max(...nodes.map(({ position, height: tall }) => position.y + (tall ?? CARD_HEIGHT)));
-  return [[-Infinity, -ROW_TOP], [Infinity, Math.max(height - ROW_TOP, bottom + CONTROLS_CLEARANCE)]];
+  return [[-Infinity, -ROW_TOP], [Infinity, Math.max(height - CONTROLS_BAND - ROW_TOP, bottom + ROW_TOP)]];
 };
 const UNLOCKED: CoordinateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]];
 
