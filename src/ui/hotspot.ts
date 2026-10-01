@@ -3,15 +3,16 @@ import { type EntityId, entityId } from "../domain/entityId.ts";
 import type { Exchange, ExchangeId } from "../domain/exchange.ts";
 import { latestQuestionOf } from "../domain/latestQuestion.ts";
 import { type RowTie, questionTiesOf } from "../domain/questionLinks.ts";
+import type { WhoIsWho } from "../domain/whosWho.ts";
 import { unplacedLabel } from "./unplacedQuotes.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 export type Hotspot = { id: EntityId; text: string; links: readonly EntityId[]; rows: readonly RowTie[]; unplaced: readonly string[]; askedIn: ExchangeId };
 
-export function hotspotOf(exchanges: readonly Exchange[], board: Board, restoreNames: RestoreNames): Hotspot | null {
+export function hotspotOf(exchanges: readonly Exchange[], board: Board, restoreNames: RestoreNames, whoIsWho?: WhoIsWho): Hotspot | null {
   const asked = latestQuestionOf(exchanges);
   if (asked === null || board.cards.length === 0) return null;
-  const { links, rows, unplaced } = questionTiesOf(asked, board, exchanges);
+  const { links, rows, unplaced } = questionTiesOf(asked, board, exchanges, whoIsWho);
   const restored = (text: string) => restoreNames(text).text;
   const shownRows = rows.map((row) => ({ ...row, word: restored(row.word), holder: restored(row.holder) }));
   return { id: entityId("question", asked.text), text: restored(asked.text), links, rows: shownRows, unplaced: unplaced.map(restored), askedIn: asked.exchangeId };

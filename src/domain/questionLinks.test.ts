@@ -49,3 +49,22 @@ describe("questionLinksOf", () => {
     expect(ties.unplaced).toEqual([]);
   });
 });
+
+describe("questionTiesOf with who's who (#133)", () => {
+  const paste = ["Luis Ortega  8:12 AM", "customer D asked why 7731 says Confirmed", "", "Rosa Delgado  8:15 AM", "for us Confirmed means the carrier accepted the tender"].join("\n");
+  const reply = [
+    "Words that don't match",
+    '"confirmed"',
+    "- From thread: Carriers means the carrier accepted the tender.",
+    "",
+    "Question for the carrier lead: Which Confirmed should the portal show?",
+    'From thread: "for us Confirmed means the carrier accepted the tender"',
+  ].join("\n");
+  const exchanges: Exchange[] = [{ id: "e1" as ExchangeId, prompt: paste as Prompt, status: "replied", reply, signature: "sig" }];
+  const tiesWith = (whoIsWho?: ReadonlyMap<string, string>) => questionTiesOf(latestQuestionOf(exchanges)!, boardOf(exchanges), exchanges, whoIsWho).rows.map(({ holder }) => holder);
+
+  it("ties the question to the row whose line it quotes once the speaker's team is known", () => {
+    expect(tiesWith()).toEqual([]);
+    expect(tiesWith(new Map([["rosa delgado", "Carrier desk"]]))).toEqual(["Carriers"]);
+  });
+});

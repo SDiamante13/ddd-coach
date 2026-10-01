@@ -31,7 +31,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const words = useMemo(() => wordsOf(exchanges, edits.actions, whoIsWho), [exchanges, edits.actions, whoIsWho]);
-  const hotspot = hotspotOf(exchanges, board, restoreNames);
+  const hotspot = hotspotOf(exchanges, board, restoreNames, whoIsWho);
   const atRest = restorePoint.turn !== null && board.latest === restorePoint.turn;
   const freshCount = freshItemsOf(board, words, hotspot);
   const checks = checksOf(edits.actions);

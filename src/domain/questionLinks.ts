@@ -4,18 +4,19 @@ import type { Exchange } from "./exchange.ts";
 import type { LatestQuestion } from "./latestQuestion.ts";
 import { closestLine, type LineMatch, lineOfCard } from "./sourceLine.ts";
 import { wordsOf } from "./words.ts";
+import type { WhoIsWho } from "./whosWho.ts";
 
 const MAX_LINKS = 2;
 
 export type RowTie = { term: EntityId; row: EntityId; word: string; holder: string };
 export type QuestionTies = { links: EntityId[]; rows: RowTie[]; unplaced: string[] };
 
-export function questionTiesOf(question: LatestQuestion, board: Board, exchanges: readonly Exchange[]): QuestionTies {
+export function questionTiesOf(question: LatestQuestion, board: Board, exchanges: readonly Exchange[], whoIsWho: WhoIsWho = new Map()): QuestionTies {
   const asked = exchanges.findIndex((exchange) => exchange.id === question.exchangeId);
   const upTo = exchanges.slice(0, asked + 1);
   const prompts = [...upTo].reverse().map(({ id, prompt }) => ({ exchangeId: id, text: prompt }));
   const cardLines = board.cards.map((card) => ({ id: card.id, line: lineOfCard(card, exchanges) }));
-  const termRows = wordsOf(upTo).terms.flatMap((term) => term.rows.map((row) => ({ term: term.id, row: row.id, word: term.word, holder: row.holder, line: row.line })));
+  const termRows = wordsOf(upTo, [], whoIsWho).terms.flatMap((term) => term.rows.map((row) => ({ term: term.id, row: row.id, word: term.word, holder: row.holder, line: row.line })));
   const tied = question.sources.map((source) => {
     const line = closestLine(source, prompts);
     const text = line && textOf(line, upTo);
