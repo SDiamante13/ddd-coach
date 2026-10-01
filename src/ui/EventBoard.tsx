@@ -87,33 +87,43 @@ type BoardSectionProps = Required<EventBoardProps> & { hasEvents: boolean; empty
 function BoardSection({ view, thinking, restoreNames, session, hasEvents, empty, overview, setOverview }: BoardSectionProps) {
   return (
     <section className="event-board" aria-label="Event board">
-      {!session.saving && (
-        <p className="not-saving" role="status">
-          {NOT_SAVING}
-        </p>
-      )}
-      <PickedUpLine savedAt={session.pickedUpAt} />
+      <div className="board-band">
+        {!session.saving && (
+          <p className="not-saving" role="status">
+            {NOT_SAVING}
+          </p>
+        )}
+        <PickedUpLine savedAt={session.pickedUpAt} />
+        {!empty && <BoardHeader view={view} session={session} restoreNames={restoreNames} hasEvents={hasEvents} overview={overview} setOverview={setOverview} />}
+      </div>
       {empty ? (
         <p className="board-empty">Events from your paste land here, left to right, in order.</p>
       ) : (
-        <>
-          <div className="board-header-row">
-            <p className="board-header">
-              {hasEvents && (
-                <>
-                  <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
-                </>
-              )}
-              {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
-              {view.quietRings && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
-            </p>
-            <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} overview={overview} onOverviewChange={setOverview} />
-          </div>
-          {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
-          <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} overview={overview} />
-        </>
+        <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} overview={overview} />
       )}
     </section>
+  );
+}
+
+type BoardHeaderProps = Pick<BoardSectionProps, "view" | "session" | "restoreNames" | "hasEvents" | "overview" | "setOverview">;
+
+function BoardHeader({ view, session, restoreNames, hasEvents, overview, setOverview }: BoardHeaderProps) {
+  return (
+    <>
+      <div className="board-header-row">
+        <p className="board-header">
+          {hasEvents && (
+            <>
+              <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
+            </>
+          )}
+          {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
+          {view.quietRings && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
+        </p>
+        <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} overview={overview} onOverviewChange={setOverview} />
+      </div>
+      {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
+    </>
   );
 }
 
