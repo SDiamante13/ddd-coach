@@ -377,12 +377,12 @@ ol[role="log"] mark {
 }
 
 @media (min-width: 1024px) {
-  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm, .example)):has(textarea:placeholder-shown) {
     gap: 0;
     padding: var(--space-2);
   }
 
-  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) > label {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm, .example)):has(textarea:placeholder-shown) > label {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -391,11 +391,11 @@ ol[role="log"] mark {
     white-space: nowrap;
   }
 
-  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) :is(button[type="submit"], .formfoot) {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm, .example)):has(textarea:placeholder-shown) :is(button[type="submit"], .formfoot) {
     display: none;
   }
 
-  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm)):has(textarea:placeholder-shown) textarea {
+  body:has(.event-board) form:not(.gate):is(:not(:focus-within), [data-resting]):not(:has(details[open], .new-reply, .confirm, .example)):has(textarea:placeholder-shown) textarea {
     height: 44px;
     min-height: 44px;
     max-height: 44px;

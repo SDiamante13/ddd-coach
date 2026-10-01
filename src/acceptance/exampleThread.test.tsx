@@ -30,6 +30,16 @@ describe("Try an example thread", () => {
     expect(input()).toHaveFocus();
   });
 
+  it("offers the example while the conversation is empty, even with nothing focused (#137; bin/safari-check.mjs checks the folded layout in WebKit)", async () => {
+    const { input } = await startConversation();
+
+    input().blur();
+
+    expect(document.activeElement).toBe(document.body);
+    expect(tryExample()).toBeVisible();
+    expect(input().closest("form")).not.toHaveAttribute("data-resting");
+  });
+
   it("puts the caret at the top of the example, so its first line is what shows", async () => {
     const { user, input } = await startConversation();
 
