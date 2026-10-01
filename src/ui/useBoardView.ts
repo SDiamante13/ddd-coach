@@ -10,6 +10,7 @@ import type { RestoreNames } from "./ReplyView.tsx";
 import type { CorrectionLine } from "./CorrectionLines.tsx";
 import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
 import { hotspotOf } from "./hotspot.ts";
+import { wordsOf } from "../domain/words.ts";
 import { lastEdit, type Position, positionsOf } from "../domain/cardMoves.ts";
 import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
@@ -24,6 +25,7 @@ type FollowCoach = { followingCoach: boolean; setFollowingCoach: (following: boo
 export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, follow: FollowCoach, restorePoint = FRESH) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
+  const words = useMemo(() => wordsOf(exchanges), [exchanges]);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
   const { selected, toggle } = useBoardSelection();
   const [questionReveals, setQuestionReveals] = useState(0);
@@ -60,6 +62,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     highlightedLine: highlight && restoredLine(lineTextOf(highlight, exchanges), restoreNames),
     question: latestQuestionOf(exchanges, (text) => restoreNames(text).text),
     hotspot: hotspotOf(exchanges, board, restoreNames),
+    words,
     questionReveals,
     revealQuestion: () => setQuestionReveals((count) => count + 1),
   };

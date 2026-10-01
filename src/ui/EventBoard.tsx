@@ -4,6 +4,8 @@ import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
 import { PickedUpLine } from "./PickedUpLine.tsx";
 import type { Hotspot } from "./hotspot.ts";
+import type { WordsLane } from "../domain/words.ts";
+import { wordsSummaryOf } from "./TermNode.tsx";
 import type { Position } from "../domain/cardMoves.ts";
 import type { OffScreenOffer } from "./useOffScreenOffer.ts";
 import type { Viewport } from "../domain/session.ts";
@@ -30,6 +32,7 @@ export type BoardView = {
   revealNew: () => void;
   atRest: boolean;
   hotspot: Hotspot | null;
+  words: WordsLane;
   questionReveals: number;
   revealQuestion: () => void;
   setFollowingCoach: (following: boolean) => void;
@@ -57,6 +60,7 @@ export function EventBoard({ view, thinking, restoreNames, session = NO_SESSION 
         <>
           <p className="board-header">
             <span className="board-label">Timeline · Events</span> <span>{`${boardSummary(view.board)}${view.hotspot ? " · 1 open question" : ""}`}</span>
+            {wordsSummaryOf(view.words) && <span className="board-words">{wordsSummaryOf(view.words)}</span>}
           </p>
           <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} />
         </>

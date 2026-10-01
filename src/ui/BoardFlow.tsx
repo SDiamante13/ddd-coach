@@ -14,6 +14,7 @@ import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
 import { useRevealSelected } from "./useRevealSelected.ts";
 import { BoardControls } from "./BoardControls.tsx";
+import { TermNode, type TermNodeType, termNodesOf } from "./TermNode.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
 import { useRevealQuestion } from "./useRevealQuestion.ts";
@@ -40,11 +41,11 @@ function EventNode({ data: { card, view, restoreNames, index, total } }: NodePro
 
 const GhostNode = () => <div className="ghost-card" />;
 
-const NODE_TYPES = { event: EventNode, ghost: GhostNode, question: QuestionNode };
+const NODE_TYPES = { event: EventNode, ghost: GhostNode, question: QuestionNode, term: TermNode };
 
 type LaneProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session: BoardSession };
 
-function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | GhostNodeType | QuestionNodeType)[] {
+function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | GhostNodeType | QuestionNodeType | TermNodeType)[] {
   const { cards } = view.board;
   const events: EventNodeType[] = cards.map((card, index) => ({
     id: card.id,
@@ -58,7 +59,7 @@ function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | 
   const ghosts: GhostNodeType[] = thinking
     ? GHOST_SLOTS.map((slot) => ({ id: `ghost-${slot}`, type: "ghost", className: "board-ghost", position: lanePosition(cards.length + slot - 1), ...SLOT, draggable: false, data: {}, domAttributes: { "aria-hidden": true } }))
     : [];
-  return [...events, ...questionNodesOf(view), ...ghosts];
+  return [...events, ...questionNodesOf(view), ...termNodesOf(view, restoreNames), ...ghosts];
 }
 
 const thenEdgesOf = (cards: readonly EventCard[]): Edge[] =>
@@ -150,7 +151,8 @@ function Lane(props: LaneProps) {
 
 const keepPointerEvents = () => {};
 const MINI_MAP_SIZE = { width: 160, height: 96, marginBottom: 28 };
-const miniMapColor = (node: Node) => (node.type === "question" ? "var(--color-card-question)" : "var(--color-card-event)");
+const MINI_MAP_COLORS: Record<string, string> = { question: "var(--color-card-question)", term: "var(--color-line-strong)" };
+const miniMapColor = (node: Node) => MINI_MAP_COLORS[node.type ?? ""] ?? "var(--color-card-event)";
 const START_VIEWPORT = { x: LANE_INSET, y: 16, zoom: 1 };
 const rowLocked = ({ height }: LaneSize): CoordinateExtent =>
   height === 0 ? UNLOCKED : [[-Infinity, -START_VIEWPORT.y], [Infinity, height - START_VIEWPORT.y]];
