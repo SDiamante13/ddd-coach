@@ -52,6 +52,7 @@ function withMeaning(rows: TermRow[], word: string, { source, holder, meaning }:
   const line = provenance === "guess" ? null : lineOf(holder, `${word} ${meaning}`);
   const kept = rows.find((row) => row.id === id);
   if (kept === undefined) return [...rows, { id, holder, meaning, provenance, line, placedBy: by, changedBy: by }];
+  if (kept.correctedFrom !== undefined) return rows;
   if (kept.meaning === meaning && kept.provenance === provenance) return rows;
   return rows.map((row) => (row.id === id ? { ...row, meaning, provenance, line, changedBy: by } : row));
 }

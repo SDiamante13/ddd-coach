@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { sentCorrectionsOf } from "../domain/board.ts";
 import { boardOf } from "../domain/boardFromReplies.ts";
 import type { ExchangeId, Prompt } from "../domain/exchange.ts";
+import { wordsOf } from "../domain/words.ts";
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
 import { CORRECTIONS_ENABLED } from "../shared/features.ts";
 import type { Session } from "../domain/session.ts";
@@ -27,7 +28,7 @@ export function useKeptConversation({ outgoing, ...callbacks }: KeptConversation
   const edits = useVisitorActions(outgoing, kept.visitorActions);
   const chat = useExchanges({
     ...callbacks,
-    corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(chat.exchanges, edits.actions)) : []),
+    corrections: () => (CORRECTIONS_ENABLED ? sentCorrectionsOf(boardOf(chat.exchanges, edits.actions), wordsOf(chat.exchanges, edits.actions).terms) : []),
     initial: kept.exchanges,
   });
   const { viewport, followingCoach, settleBy } = place;

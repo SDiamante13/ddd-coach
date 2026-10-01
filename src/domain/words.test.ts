@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId, Prompt } from "./exchange.ts";
 import { wordsOf } from "./words.ts";
+import { emptyBoard, sentCorrectionsOf } from "./board.ts";
 import type { VisitorAction } from "./boardFromReplies.ts";
 
 const PASTE = ["Mon Ops (day desk): late means the truck missed the pickup window", "Tue Billing: late is anything on the weekly late report"].join("\n");
@@ -72,5 +73,23 @@ describe("wordsOf", () => {
     const billing = wordsOf([replied("e1", FIRST)], [fix]).terms[0]!.rows[1]!;
 
     expect([billing.meaning, billing.correctedFrom]).toEqual(["Any load past the booked appointment.", "A load on the weekly late report."]);
+  });
+
+  it("keeps the visitor's wording when a later reply restates a corrected row (#95's rule)", () => {
+    const fix: VisitorAction = { kind: "correct", id: entityId("meaning", "late|Billing"), text: "Any load past the booked appointment.", after: "e1" as ExchangeId };
+
+    const billing = wordsOf([replied("e1", FIRST), replied("e2", SECOND)], [fix]).terms[0]!.rows[1]!;
+
+    expect([billing.meaning, billing.correctedFrom]).toEqual(["Any load past the booked appointment.", "A load on the weekly late report."]);
+  });
+
+  it("sends each corrected term row with its word and team, and nothing for rows the visitor left alone", () => {
+    const fix: VisitorAction = { kind: "correct", id: entityId("meaning", "late|Billing"), text: "Any load past the booked appointment.", after: "e1" as ExchangeId };
+
+    const lane = wordsOf([replied("e1", FIRST)], [fix]);
+
+    expect(sentCorrectionsOf(emptyBoard, lane.terms)).toEqual([
+      { was: "late (Billing): A load on the weekly late report.", now: "late (Billing): Any load past the booked appointment." },
+    ]);
   });
 });

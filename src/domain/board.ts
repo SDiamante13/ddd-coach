@@ -1,5 +1,6 @@
 import { type EntityId, entityId } from "./entityId.ts";
 import type { ExchangeId } from "./exchange.ts";
+import type { TermCard } from "./words.ts";
 
 export type Provenance = "thread" | "guess";
 export type EventCard = {
@@ -104,5 +105,12 @@ export function struckWordsOf(board: Board, card: EventCard): string | null {
 
 export type SentCorrection = { was: string; now: string };
 
-export const sentCorrectionsOf = ({ cards }: Board): SentCorrection[] =>
-  cards.flatMap(({ correctedFrom, text }) => (correctedFrom === undefined ? [] : [{ was: correctedFrom, now: text }]));
+export const sentCorrectionsOf = ({ cards }: Board, terms: readonly TermCard[] = []): SentCorrection[] => [
+  ...cards.flatMap(({ correctedFrom, text }) => (correctedFrom === undefined ? [] : [{ was: correctedFrom, now: text }])),
+  ...terms.flatMap(termCorrections),
+];
+
+const termCorrections = ({ word, rows }: TermCard): SentCorrection[] =>
+  rows.flatMap(({ holder, meaning, correctedFrom }) =>
+    correctedFrom === undefined ? [] : [{ was: `${word} (${holder}): ${correctedFrom}`, now: `${word} (${holder}): ${meaning}` }],
+  );
