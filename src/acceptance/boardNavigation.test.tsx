@@ -79,4 +79,22 @@ describe("Finding your way along the board (#20)", () => {
 
     expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,16px) scale(1)" });
   });
+
+  it("on a lane too narrow for both safe zones, keeps the left one and doesn't bounce (#127)", async () => {
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
+      return this.classList.contains("board-lane") ? 390 : 0;
+    });
+    const { user } = await onTheBoard();
+    const viewport = () => board().querySelector(".react-flow__viewport");
+
+    await user.click(within(board()).getByRole("button", { name: /^Event 5 of 5/ }));
+    await waitFor(() => expect(viewport()).toHaveStyle({ transform: "translate(-664px,16px) scale(1)" }));
+    await user.keyboard("{ArrowLeft}");
+    await waitFor(() => expect(viewport()).toHaveStyle({ transform: "translate(-468px,16px) scale(1)" }));
+    await user.keyboard("{ArrowRight}");
+    await waitFor(() => expect(viewport()).toHaveStyle({ transform: "translate(-664px,16px) scale(1)" }));
+
+    await user.click(within(board()).getByRole("button", { name: /^Event 5 of 5/ }));
+    expect(viewport()).toHaveStyle({ transform: "translate(-664px,16px) scale(1)" });
+  });
 });
