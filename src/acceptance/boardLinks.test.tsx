@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { pasteInto, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => {
@@ -36,7 +36,9 @@ async function correctGuess(user: Awaited<ReturnType<typeof onTheBoard>>["user"]
   await user.dblClick(cardButton(GUESS));
   const field = within(board()).getByRole("textbox", { name: "Correct this event" });
   await user.clear(field);
-  await user.type(field, `${FIXED}{Enter}`);
+  await pasteInto(user, field, FIXED);
+  await user.keyboard("{Enter}");
+  await within(board()).findByRole("button", { name: `Event 3 of 3, YOU SAID: ${FIXED}` });
 }
 
 describe("Linking two cards (#96)", () => {
