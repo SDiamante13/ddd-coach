@@ -2,19 +2,21 @@ import { type Edge, Handle, type Node, type NodeProps, Position } from "@xyflow/
 import type { BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, lanePosition } from "./boardLayout.ts";
 import { useState } from "react";
+import type { EntityId } from "../domain/entityId.ts";
 import { type Hotspot, hotspotNameOf } from "./hotspot.ts";
 import { unplacedLabel } from "./unplacedQuotes.ts";
 
 const DROP = CARD_HEIGHT + 96;
 
-type QuestionData = { hotspot: Hotspot; fresh: boolean };
+type QuestionData = { hotspot: Hotspot; fresh: boolean; roving: Roving };
+export type Roving = { tabIndex: 0 | -1; onFocus: () => void };
 export type QuestionNodeType = Node<QuestionData, "question">;
 
-export function QuestionNode({ data: { hotspot, fresh } }: NodeProps<QuestionNodeType>) {
+export function QuestionNode({ data: { hotspot, fresh, roving } }: NodeProps<QuestionNodeType>) {
   return (
     <>
       <Handle id="relates-in" type="target" position={Position.Top} isConnectable={false} />
-      <div className="card hotspot-card" tabIndex={-1}>
+      <div className="card hotspot-card" tabIndex={roving.tabIndex} onFocus={roving.onFocus} data-board-item data-lane="question">
         <span className="card-kind">QUESTION</span>
         <span className="card-source">OPEN</span>
         <span className="card-title">{hotspot.text}</span>
@@ -46,7 +48,7 @@ export function questionNodesOf(view: BoardView): QuestionNodeType[] {
   const { hotspot, board } = view;
   if (hotspot === null) return [];
   const fresh = hotspot.askedIn === board.latest && !view.atRest;
-  return [{ id: hotspot.id, type: "question", position: view.positions.get(hotspot.id) ?? placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh } }];
+  return [{ id: hotspot.id, type: "question", position: view.positions.get(hotspot.id) ?? placeOf(hotspot, view), width: CARD_WIDTH, height: CARD_HEIGHT, ariaRole: "listitem", ariaLabel: hotspotNameOf(hotspot, board), data: { hotspot, fresh, roving: rovingOf(view, hotspot.id) } }];
 }
 
 function placeOf({ links }: Hotspot, { board }: BoardView) {
@@ -55,6 +57,8 @@ function placeOf({ links }: Hotspot, { board }: BoardView) {
   const x = around.reduce((sum, index) => sum + lanePosition(index).x, 0) / around.length;
   return { x, y: DROP };
 }
+
+export const rovingOf = (view: BoardView, id: EntityId): Roving => ({ tabIndex: view.rovingId === id ? 0 : -1, onFocus: () => view.setRovingId(id) });
 
 export const relatesEdgesOf = ({ hotspot, board }: BoardView): Edge[] =>
   hotspot === null

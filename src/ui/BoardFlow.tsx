@@ -9,6 +9,7 @@ import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { EdgeChips } from "./EdgeChips.tsx";
+import { onBoardKey } from "./boardFocus.ts";
 import { BoardHint, useBoardHint } from "./BoardHint.tsx";
 import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
@@ -115,7 +116,7 @@ function Lane(props: LaneProps) {
   useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
-    <div ref={root} className="board-lane" onFocus={hint.onFocus} onBlur={hint.onBlur}>
+    <div ref={root} className="board-lane" onFocus={hint.onFocus} onBlur={hint.onBlur} onKeyDown={onBoardKey}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

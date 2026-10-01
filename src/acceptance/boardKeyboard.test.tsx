@@ -46,12 +46,30 @@ describe("The board from the keyboard (#20)", () => {
     expect(within(board()).getByRole("textbox", { name: "Correct this event" })).toHaveFocus();
   });
 
-  it("leaves the board for the message box on Escape", async () => {
-    const { user, input } = await onTheBoard();
+  it("leaves the board for its next control on Escape (#127)", async () => {
+    const { user } = await onTheBoard();
 
     await user.keyboard("{Escape}");
 
-    expect(input()).toHaveFocus();
+    expect(within(board()).getByRole("button", { name: "Zoom out" })).toHaveFocus();
+  });
+
+  it("is one Tab stop: only one card at a time can be tabbed to (#127)", async () => {
+    const { user } = await onTheBoard();
+    await user.keyboard("{ArrowRight}");
+
+    expect(board().querySelectorAll('[data-board-item][tabindex="0"]')).toHaveLength(1);
+    expect(card(2)).toHaveAttribute("tabindex", "0");
+    expect(card(1)).toHaveAttribute("tabindex", "-1");
+  });
+
+  it("goes down from an event to the open question and back up (#127)", async () => {
+    const { user } = await onTheBoard();
+
+    await user.keyboard("{ArrowDown}");
+    expect(within(board()).getByRole("listitem", { name: /^Open question/ }).querySelector(".hotspot-card")).toHaveFocus();
+    await user.keyboard("{ArrowUp}");
+    expect(document.activeElement?.getAttribute("aria-label")).toMatch(/^Event \d of 3/);
   });
 
   describe("the keys hint (#127)", () => {
@@ -93,13 +111,13 @@ describe("The board from the keyboard (#20)", () => {
   });
 
   it("comes back to the card when you leave the correction with Escape, and then off the board", async () => {
-    const { user, input } = await onTheBoard();
+    const { user } = await onTheBoard();
     await user.keyboard("{Enter}");
 
     await user.keyboard("{Escape}");
     expect(card(1)).toHaveFocus();
     await user.keyboard("{Escape}");
-    expect(input()).toHaveFocus();
+    expect(within(board()).getByRole("button", { name: "Zoom out" })).toHaveFocus();
   });
 
   it("gives screen readers the keys on every card", async () => {

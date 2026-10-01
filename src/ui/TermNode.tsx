@@ -2,6 +2,7 @@ import type { Node, NodeProps } from "@xyflow/react";
 import type { KeyboardEvent } from "react";
 import type { Position } from "../domain/cardMoves.ts";
 import { nudgeOf } from "./cardKeys.ts";
+import { type Roving, rovingOf } from "./QuestionNode.tsx";
 import type { TermCard, TermRow, WordsLane } from "../domain/words.ts";
 import type { BoardView } from "./EventBoard.tsx";
 import type { RestoreNames } from "./ReplyView.tsx";
@@ -18,10 +19,10 @@ const NO_LINE = { thread: "No line in your paste matches closely.", guess: "The 
 const CHANGE_TAG = { added: "JUST ADDED", updated: "UPDATED" } as const;
 
 type TermChange = keyof typeof CHANGE_TAG | null;
-type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames; nudge: (by: Position) => void };
+type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames; nudge: (by: Position) => void; roving: Roving };
 export type TermNodeType = Node<TermData, "term">;
 
-export function TermNode({ data: { term, change, restoreNames, nudge } }: NodeProps<TermNodeType>) {
+export function TermNode({ data: { term, change, restoreNames, nudge, roving } }: NodeProps<TermNodeType>) {
   const shown = (text: string) => restoreNames(text).text;
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     const by = nudgeOf(event);
@@ -30,7 +31,7 @@ export function TermNode({ data: { term, change, restoreNames, nudge } }: NodePr
     nudge(by);
   };
   return (
-    <div className="term-card" role="group" aria-label={`Term “${shown(term.word)}”`} tabIndex={0} onKeyDown={onKeyDown}>
+    <div className="term-card" role="group" aria-label={`Term “${shown(term.word)}”`} tabIndex={roving.tabIndex} onFocus={roving.onFocus} onKeyDown={onKeyDown} data-board-item data-lane="words">
       <span className="term-word">{`“${shown(term.word)}”`}</span>
       <ul className="term-rows" aria-label="Meanings">
         {term.rows.map((row) => (
@@ -76,7 +77,7 @@ function termNodeOf(term: TermCard, position: Position, view: BoardView, restore
     height: HEADER_HEIGHT + term.rows.reduce((sum, row) => sum + rowHeightOf(row), 0),
     ariaRole: "listitem",
     ariaLabel: termNameOf(term, restoreNames),
-    data: { term, change: view.atRest ? null : changeOf(term, view.words), restoreNames, nudge },
+    data: { term, change: view.atRest ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id) },
   };
 }
 

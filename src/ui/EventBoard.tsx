@@ -33,6 +33,8 @@ export type BoardView = {
   atRest: boolean;
   hotspot: Hotspot | null;
   words: WordsLane;
+  rovingId: EntityId | null;
+  setRovingId: (id: EntityId) => void;
   questionReveals: number;
   revealQuestion: () => void;
   setFollowingCoach: (following: boolean) => void;

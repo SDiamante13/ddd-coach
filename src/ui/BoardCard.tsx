@@ -29,7 +29,7 @@ export function BoardCard({ card, view, restoreNames, place }: BoardCardProps & 
   return (
     <div className="board-card nopan" data-card-id={card.id} data-source={card.correctedFrom === undefined ? card.provenance : "you"} data-change={change ?? undefined}>
       {editing && <CardEditor initial={title} onKeep={keep} onCancel={close} />}
-      <button ref={button} type="button" className="card" aria-label={`Event ${place.index} of ${place.total}, ${labelOf(card)}: ${title}`} aria-hidden={editing || undefined} tabIndex={editing ? -1 : undefined} aria-pressed={pressed} aria-describedby={pressed ? `${noteId} ${BOARD_KEYS_ID}` : BOARD_KEYS_ID} onClick={() => view.toggle(card.id)} onDoubleClick={open} onKeyDown={(event) => onCardKey(event, { nudge, edit: open })}>
+      <button ref={button} type="button" className="card" aria-label={`Event ${place.index} of ${place.total}, ${labelOf(card)}: ${title}`} aria-hidden={editing || undefined} tabIndex={!editing && view.rovingId === card.id ? 0 : -1} data-board-item data-lane="events" onFocus={() => view.setRovingId(card.id)} aria-pressed={pressed} aria-describedby={pressed ? `${noteId} ${BOARD_KEYS_ID}` : BOARD_KEYS_ID} onClick={() => view.toggle(card.id)} onDoubleClick={open} onKeyDown={(event) => onCardKey(event, { nudge, edit: open })}>
         <CardFace card={card} view={view} title={title} restoreNames={restoreNames} />
         {change && <ChangeMark key={`${change}-${view.board.latest}`} change={change} />}
       </button>

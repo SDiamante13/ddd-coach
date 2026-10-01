@@ -73,4 +73,14 @@ describe("The Words lane (#109)", () => {
 
     expect(term("late").style.transform).toBe("translate(0px,436px)");
   });
+
+  it("goes down from the events to the Words lane with the arrow keys, as one Tab stop (#127)", async () => {
+    const { user } = await replied();
+    within(board()).getByRole("button", { name: /^Event 1 of 1/ }).focus();
+
+    await user.keyboard("{ArrowDown}");
+
+    expect(within(term("late")).getByRole("group", { name: "Term “late”" })).toHaveFocus();
+    expect(board().querySelectorAll('[data-board-item][tabindex="0"]')).toHaveLength(1);
+  });
 });
