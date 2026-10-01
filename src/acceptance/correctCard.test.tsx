@@ -138,7 +138,7 @@ describe("Correcting a card (#95)", () => {
   it("can be corrected from the keyboard, through the card's note", async () => {
     const { user } = await onTheBoard();
     within(cardItem(GUESS)).getByRole("button").focus();
-    await user.keyboard("{Enter}");
+    await user.keyboard(" ");
 
     await user.click(within(board()).getByRole("button", { name: "Correct this card" }));
 

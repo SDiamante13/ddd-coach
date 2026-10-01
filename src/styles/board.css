@@ -834,3 +834,16 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   border-radius: var(--radius-sm);
   background: var(--color-surface);
 }
+
+.board-hint {
+  position: absolute;
+  bottom: calc(var(--space-4) + 44px);
+  left: var(--space-4);
+  z-index: 5;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font-size: 12px;
+}

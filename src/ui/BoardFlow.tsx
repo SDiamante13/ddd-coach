@@ -9,6 +9,7 @@ import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { EdgeChips } from "./EdgeChips.tsx";
+import { BoardHint, useBoardHint } from "./BoardHint.tsx";
 import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
 import { BoardControls } from "./BoardControls.tsx";
@@ -107,10 +108,11 @@ function Lane(props: LaneProps) {
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
   usePanToChanges(props.view, root);
   const lane = useLaneSize(root);
+  const hint = useBoardHint();
   useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
-    <div ref={root} className="board-lane">
+    <div ref={root} className="board-lane" onFocus={hint.onFocus} onBlur={hint.onBlur}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -138,6 +140,7 @@ function Lane(props: LaneProps) {
         <MiniMap position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} style={MINI_MAP_SIZE} />
       </ReactFlow>
       <EdgeChips view={props.view} lane={lane} />
+      {hint.shown && <BoardHint />}
       <BoardControls following={props.view.followingCoach} onFollowChange={props.view.setFollowingCoach} />
     </div>
   );
