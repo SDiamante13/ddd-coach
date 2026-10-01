@@ -21,9 +21,11 @@ export function SettleByLine({ settleBy, onKeep, restoreNames }: SettleByLinePro
 }
 
 function SettledBy({ settleBy, restoreNames, onEdit }: { settleBy: SettleBy; restoreNames: RestoreNames; onEdit: () => void }) {
+  const full = `Settle by: ${settleByText(settleBy, restoreNames)} · typed by you`;
   return (
     <p className="settle-by">
-      <span className="settle-by-text" title={`Settle by: ${settleByText(settleBy, restoreNames)} · typed by you`}>
+      <span className="visually-hidden">{full}</span>
+      <span className="settle-by-text" title={full} aria-hidden="true">
         {`Settle by ${dayAndMonth(settleBy.on)} · ${restoreNames(settleBy.forum).text}`}
       </span>
       <button type="button" className="settle-by-edit" aria-label="Change the settle-by" onClick={onEdit}>

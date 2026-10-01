@@ -38,6 +38,8 @@ describe("A settle-by date, only if you have one (#90d)", () => {
 
     const line = within(board()).getByText("Settle by 27 Oct · Finance review");
     expect(line).toHaveAttribute("title", "Settle by: Finance review, 27 Oct 2026 · typed by you");
+    expect(line).toHaveAttribute("aria-hidden", "true");
+    expect(within(board()).getByText("Settle by: Finance review, 27 Oct 2026 · typed by you")).toHaveClass("visually-hidden");
     expect(within(pinned()).getByText("Before Finance review, 27 Oct 2026.")).toBeInTheDocument();
   });
 
