@@ -49,3 +49,11 @@ export function spokenLinesOf(paste: string): SpokenLine[] {
     return speaker === null ? [] : [{ speaker, start, end }];
   });
 }
+
+export type Speaker = { speaker: string; lines: number };
+
+export function speakersOf(paste: string): Speaker[] {
+  const counts = new Map<string, number>();
+  for (const { speaker } of spokenLinesOf(paste)) counts.set(speaker, (counts.get(speaker) ?? 0) + 1);
+  return [...counts].map(([speaker, lines]) => ({ speaker, lines }));
+}

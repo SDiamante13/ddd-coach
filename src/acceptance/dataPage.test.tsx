@@ -85,10 +85,19 @@ describe("Data page", () => {
 
     expect(section("What stays in your browser")).toHaveTextContent(
       "This browser keeps your conversation and board, with your corrections and links, until you start a new conversation. " +
-        "“New conversation” clears the conversation and board; your word swaps, with real names, stay until you delete them. " +
+        "“New conversation” clears the conversation and board; your word swaps and who's who, with real names, stay until you delete them. " +
         "Nothing is stored on our server.",
     );
     expect(screen.queryByText(/glossary/i)).not.toBeInTheDocument();
+  });
+
+  it("says who's who stays in the browser, swapped and never sent (#133)", () => {
+    openDataPage();
+
+    expect(section("What stays in your browser")).toHaveTextContent(
+      "Who's who, the team you put each person in your thread on, is saved in this browser too, with the same swaps applied, and is never sent. " +
+        "It only helps the board find each row's line in your paste.",
+    );
   });
 
   it("links the OpenAI and OpenRouter policies it cites", () => {

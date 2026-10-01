@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { spokenLinesOf } from "./pasteSpeakers.ts";
+import { speakersOf, spokenLinesOf } from "./pasteSpeakers.ts";
 
 const said = (paste: string) => spokenLinesOf(paste).map(({ speaker, start, end }) => [speaker, paste.slice(start, end)]);
 
@@ -38,6 +38,15 @@ describe("spokenLinesOf", () => {
       ["Dana", "- RB = same bkg unless lane/date chg (Dana, from 2019 sheet row 12)"],
       ["Dana", "  - i.e. lane or date change = AMENDED"],
       ["Maya", "- Maya: nights RB everything."],
+    ]);
+  });
+
+  it("counts each speaker's lines, in the order they first speak", () => {
+    const paste = ["Luis Ortega  8:12 AM", "one", "two", "", "Rosa Delgado  8:15 AM", "three", "", "Luis Ortega  8:20 AM", "four"].join("\n");
+
+    expect(speakersOf(paste)).toEqual([
+      { speaker: "Luis Ortega", lines: 3 },
+      { speaker: "Rosa Delgado", lines: 1 },
     ]);
   });
 });

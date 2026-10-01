@@ -54,6 +54,7 @@ export type BoardView = {
   setRovingId: (id: EntityId) => void;
   questionReveals: number;
   revealQuestion: () => void;
+  sourcedRows: number | null;
   fitRequests: number;
   fitBoard: () => void;
   setFollowingCoach: (following: boolean) => void;
@@ -134,6 +135,7 @@ function BoardCounts({ view, hasEvents }: Pick<BoardHeaderProps, "view" | "hasEv
         </>
       )}
       {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
+      {view.sourcedRows !== null && <span className="board-sourced">{`${view.sourcedRows} with a source line`}</span>}
       {view.quietRings && newCountShown && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
     </p>
   );

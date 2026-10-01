@@ -1,4 +1,4 @@
-import type { Ref } from "react";
+import type { ReactNode, Ref } from "react";
 import type { Exchange, ExchangeId, FailedExchange } from "../domain/exchange.ts";
 import type { ReplyCounts } from "../domain/replyChip.ts";
 import type { LineMatch } from "../domain/sourceLine.ts";
@@ -28,15 +28,17 @@ type ExchangeLogProps = {
   correctionsOf: (id: ExchangeId) => readonly CorrectionLine[];
   checkLinesOf: (id: ExchangeId) => readonly string[];
   linksOf: (id: ExchangeId) => readonly LinkLine[];
+  whosWhoOf: (exchange: Exchange) => ReactNode;
   onUndo: () => void;
 };
 
-export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, offScreenOf, correctionsOf, checkLinesOf, linksOf, onUndo, ...outcome }: ExchangeLogProps) {
+export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, offScreenOf, correctionsOf, checkLinesOf, linksOf, whosWhoOf, onUndo, ...outcome }: ExchangeLogProps) {
   return (
     <ol role="log" ref={logRef}>
       {exchanges.map((exchange) => (
         <ExchangeEntry key={exchange.id} exchange={exchange} highlight={highlight?.exchangeId === exchange.id ? highlight : null}>
           <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} counts={countsOf(exchange.id)} revealOffScreen={offScreenOf(exchange.id)} />
+          {whosWhoOf(exchange)}
           <CorrectionLines lines={correctionsOf(exchange.id)} />
           {checkLinesOf(exchange.id).map((line, index) => (
             <p key={index} className="correction-line">

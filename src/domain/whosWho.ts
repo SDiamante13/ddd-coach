@@ -1,4 +1,7 @@
 export type WhoIsWho = ReadonlyMap<string, string>;
+export type WhoIsWhoEntry = { speaker: string; team: string };
+
+export const whoIsWhoOf = (entries: readonly WhoIsWhoEntry[]): WhoIsWho => new Map(entries.map(({ speaker, team }) => [speaker.toLowerCase(), team]));
 
 const stemsOf = (text: string): string[] => (text.toLowerCase().match(/[a-z0-9]+/g) ?? []).map((word) => (word.length > 3 ? word.replace(/s$/, "") : word));
 

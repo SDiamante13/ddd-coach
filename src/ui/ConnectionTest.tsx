@@ -16,13 +16,19 @@ import type { Unlock } from "./useAccess.ts";
 import { useBoardView } from "./useBoardView.ts";
 import { rowFactsOf } from "../domain/rowFacts.ts";
 import { type Composer, useComposer } from "./useComposer.ts";
+import { useWhosWho, type WhosWho } from "./useWhosWho.ts";
+import { WhosWhoPanel } from "./WhosWhoPanel.tsx";
+import { WhosWhoOffer } from "./WhosWhoOffer.tsx";
+import { speakersOf } from "../domain/pasteSpeakers.ts";
+import { sourceGapOf } from "../domain/sourceGap.ts";
 
 type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 
 export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
-  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits, composer.place, composer.restorePoint);
+  const whosWho = useWhosWho();
+  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits, composer.place, composer.restorePoint, whosWho.whoIsWho);
   const { settleBy } = composer.board;
   const settleByLine = settleBy ? settleByText(settleBy, composer.box.restoreNames) : undefined;
   const rowFacts = rowFactsOf(view.words, view.checks, (text) => composer.box.restoreNames(text).text, settleByLine);
@@ -48,6 +54,11 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         correctionsOf={view.correctionsOf}
         checkLinesOf={view.checkLinesOf}
         linksOf={view.linksOf}
+        whosWhoOf={(exchange) =>
+          exchange.status === "replied" && (
+            <WhosWhoOffer gap={sourceGapOf(view.words, exchange.id)} speakers={speakersOf(exchange.prompt)} entries={whosWho.entries} onKeep={whosWho.keep} shown={(text) => composer.box.restoreNames(text).text} outgoing={composer.box.outgoing} />
+          )
+        }
         onUndo={view.undo}
       />
       <BoardAnnouncer message={view.announcement} />
@@ -57,12 +68,12 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
           {UNLOCKED_FOR}
         </p>
       )}
-      <ComposerForm composer={composer} />
+      <ComposerForm composer={composer} whosWho={whosWho} />
     </>
   );
 }
 
-function ComposerForm({ composer }: { composer: Composer }) {
+function ComposerForm({ composer, whosWho }: { composer: Composer; whosWho: WhosWho }) {
   const { box, busy, follow } = composer;
   return (
     <MessageForm
@@ -86,6 +97,7 @@ function ComposerForm({ composer }: { composer: Composer }) {
       />
       {GLOSSARY_ENABLED && <GlossaryPanel {...composer.glossary} shown={(text) => box.restoreNames(text).text} />}
       <SwapPanel {...box.swaps} {...box.swapsPanel} thread={box.draft} />
+      <WhosWhoPanel whosWho={whosWho} restoreNames={box.restoreNames} />
       {!box.blank && <SentPreview swaps={box.swaps.swaps} draft={box.draft} glossary={composer.glossary.rows} />}
     </MessageForm>
   );

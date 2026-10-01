@@ -82,9 +82,13 @@ function InYourBrowser() {
         before sending, and puts the real word back in the reply.
       </p>
       <p>
+        Who's who, the team you put each person in your thread on, is saved in this browser too, with the same
+        swaps applied, and is never sent. It only helps the board find each row's line in your paste.
+      </p>
+      <p>
         This browser keeps your conversation and board, with your corrections and links, until you start a new
-        conversation. “New conversation” clears the conversation and board; your word swaps, with real names, stay
-        until you delete them. Nothing is stored on our server.
+        conversation. “New conversation” clears the conversation and board; your word swaps and who's who, with real
+        names, stay until you delete them. Nothing is stored on our server.
       </p>
     </Section>
   );

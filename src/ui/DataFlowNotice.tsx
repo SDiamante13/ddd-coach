@@ -5,7 +5,7 @@ export const DATA_FLOW_NOTICE =
   `Your messages go to OpenRouter, which routes them to ${coachProvider.name} to write replies. ` +
   `${coachProvider.name} doesn't train on them but may keep them for up to 30 days for abuse monitoring. ` +
   "This browser keeps your conversation and board until you start a new conversation; " +
-  "your word swaps, with real names, stay until you delete them. " +
+  "your word swaps and who's who, with real names, stay until you delete them. " +
   "Nothing is stored on our server. Don't paste customer names, rates, lanes or contract terms. " +
   "Add swaps below to replace names before sending.";
 

@@ -21,13 +21,16 @@ import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useVisitorActions } from "./useVisitorActions.ts";
 import type { RestorePoint } from "./useKeptConversation.ts";
 import { type FollowCoach, useFollowCoach } from "./useFollowCoach.ts";
+import type { WhoIsWho } from "../domain/whosWho.ts";
 
 const FRESH: RestorePoint = { turn: null, actions: 0, savedAt: null };
 
-export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, place: FollowCoach, restorePoint = FRESH) {
+const NO_ONE: WhoIsWho = new Map();
+
+export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, place: FollowCoach, restorePoint = FRESH, whoIsWho = NO_ONE) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
-  const words = useMemo(() => wordsOf(exchanges, edits.actions), [exchanges, edits.actions]);
+  const words = useMemo(() => wordsOf(exchanges, edits.actions, whoIsWho), [exchanges, edits.actions, whoIsWho]);
   const hotspot = hotspotOf(exchanges, board, restoreNames);
   const atRest = restorePoint.turn !== null && board.latest === restorePoint.turn;
   const freshCount = freshItemsOf(board, words, hotspot);
@@ -69,6 +72,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     undoable: undoableOf(board, lastEdit(edits.actions)),
     positions: positionsOf(edits.actions),
     checks,
+    sourcedRows: whoIsWho.size === 0 ? null : words.terms.flatMap(({ rows }) => rows).filter((row) => row.line !== null).length,
     correctRow: touching((row: EntityId, text: string) => {
       const after = words.latest;
       if (after !== null) edits.correct(row, text, after);
