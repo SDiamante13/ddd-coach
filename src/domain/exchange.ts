@@ -40,6 +40,8 @@ export function isBusy(exchanges: readonly Exchange[]): boolean {
   return exchanges.some((exchange) => exchange.status === "pending");
 }
 
+export const canSend = (exchanges: readonly Exchange[]): boolean => !isBusy(exchanges);
+
 export function canRetry(exchanges: readonly Exchange[], id: ExchangeId): boolean {
   const target = exchanges.find((exchange) => exchange.id === id);
   return target?.status === "failed" && target.remedy === "retry" && !isBusy(exchanges);

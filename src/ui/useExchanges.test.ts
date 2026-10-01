@@ -24,4 +24,15 @@ describe("useExchanges", () => {
 
     expect(server.fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it("starts no second request while a message is still pending, even if the button were pressed (#38)", () => {
+    const server = stubFetch();
+    const { result } = renderHook(() => useExchanges());
+    act(() => result.current.send("First message" as Prompt));
+
+    act(() => result.current.send("Second message" as Prompt));
+
+    expect(server.fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.current.exchanges).toHaveLength(1);
+  });
 });

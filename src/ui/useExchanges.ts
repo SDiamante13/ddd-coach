@@ -5,6 +5,7 @@ import { historyBefore, turnsOf, type Conversation } from "../domain/conversatio
 import type { KeptGlossaryRow } from "../domain/glossary.ts";
 import {
   canRetry,
+  canSend,
   isRefused,
   retry,
   settle,
@@ -34,6 +35,7 @@ export function useExchanges({ onRefused, onAccessLost, glossary = () => [], cor
   }
 
   function send(prompt: Prompt) {
+    if (!canSend(exchanges)) return;
     const id = crypto.randomUUID() as ExchangeId;
     setExchanges((current) => [...current, submit(id, prompt)]);
     void ask(id, { history: turnsOf(exchanges), prompt, glossary: glossary(), corrections: corrections() });
