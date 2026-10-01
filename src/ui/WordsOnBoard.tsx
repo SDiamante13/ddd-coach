@@ -5,7 +5,8 @@ const plural = (count: number, one: string, many: string) => `${count} ${count =
 
 export function WordsOnBoard({ rows }: { rows: WordRow[] }) {
   const meanings = rows.reduce((sum, row) => sum + row.meanings.length, 0);
-  const focusFirstTerm = () => document.querySelector<HTMLElement>(`[role="group"][aria-label="Term “${rows[0]?.word}”"]`)?.focus();
+  const name = `Term “${rows[0]?.word}”`;
+  const focusFirstTerm = () => [...document.querySelectorAll<HTMLElement>('[data-lane="words"]')].find((card) => card.getAttribute("aria-label") === name)?.focus();
   return (
     <>
       <button type="button" className="board-chip" onClick={focusFirstTerm}>

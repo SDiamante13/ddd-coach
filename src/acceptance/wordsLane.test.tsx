@@ -108,6 +108,18 @@ describe("The Words lane (#109)", () => {
     expect(within(term("late")).getByRole("group", { name: "Term “late”" })).toHaveFocus();
   });
 
+  it("takes you to a term whose word has a quote and a backslash, and stops following the coach (#127)", async () => {
+    const word = '7" pallet\\';
+    const conversation = await startConversation();
+    conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply: ["Words that don't match", `"${word}"`, "- Guess: Ops means a pallet seven inches high."].join("\n"), signature: "sig" });
+    const chip = await within(conversation.log()).findByRole("button", { name: "← 1 term on the board · 1 row" });
+
+    await conversation.user.click(chip);
+
+    expect(within(board()).getByRole("group", { name: `Term “${word}”` })).toHaveFocus();
+    expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
+  });
+
   describe("reaching the Words lane at 100% (#109 hotfix)", () => {
     beforeEach(() => {
       vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query, addEventListener: () => {}, removeEventListener: () => {} }));
