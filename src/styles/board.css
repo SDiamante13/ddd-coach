@@ -949,3 +949,8 @@ ol[role="log"] > li > p.correction-line[data-settled] {
 .board-words::before {
   content: " · ";
 }
+
+.term-card:focus-visible {
+  box-shadow: var(--focus-ring);
+  outline: none;
+}

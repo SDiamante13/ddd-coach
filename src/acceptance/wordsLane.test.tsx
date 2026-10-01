@@ -63,4 +63,14 @@ describe("The Words lane (#109)", () => {
     expect(finance).toHaveTextContent("No line in your paste matches closely.");
     expect(within(term("late")).getAllByRole("listitem")[3]).toHaveTextContent("The coach's guess: no line in your paste says this.");
   });
+
+  it("nudges a term card from the keyboard and keeps it there", async () => {
+    const { user } = await replied();
+    const card = within(term("late")).getByRole("group", { name: /^Term “late”/ });
+    card.focus();
+
+    await user.keyboard("{Shift>}{ArrowDown}{/Shift}");
+
+    expect(term("late").style.transform).toBe("translate(0px,436px)");
+  });
 });

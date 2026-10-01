@@ -1,4 +1,7 @@
 import type { Node, NodeProps } from "@xyflow/react";
+import type { KeyboardEvent } from "react";
+import type { Position } from "../domain/cardMoves.ts";
+import { nudgeOf } from "./cardKeys.ts";
 import type { TermCard, TermRow, WordsLane } from "../domain/words.ts";
 import type { BoardView } from "./EventBoard.tsx";
 import type { RestoreNames } from "./ReplyView.tsx";
@@ -15,13 +18,19 @@ const NO_LINE = { thread: "No line in your paste matches closely.", guess: "The 
 const CHANGE_TAG = { added: "JUST ADDED", updated: "UPDATED" } as const;
 
 type TermChange = keyof typeof CHANGE_TAG | null;
-type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames };
+type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames; nudge: (by: Position) => void };
 export type TermNodeType = Node<TermData, "term">;
 
-export function TermNode({ data: { term, change, restoreNames } }: NodeProps<TermNodeType>) {
+export function TermNode({ data: { term, change, restoreNames, nudge } }: NodeProps<TermNodeType>) {
   const shown = (text: string) => restoreNames(text).text;
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    const by = nudgeOf(event);
+    if (by === undefined) return;
+    event.preventDefault();
+    nudge(by);
+  };
   return (
-    <div className="term-card">
+    <div className="term-card" role="group" aria-label={`Term “${shown(term.word)}”`} tabIndex={0} onKeyDown={onKeyDown}>
       <span className="term-word">{`“${shown(term.word)}”`}</span>
       <ul className="term-rows" aria-label="Meanings">
         {term.rows.map((row) => (
@@ -51,16 +60,24 @@ function TermRowItem({ row, shown }: { row: TermRow; shown: (text: string) => st
 
 export function termNodesOf(view: BoardView, restoreNames: RestoreNames): TermNodeType[] {
   const { words } = view;
-  return words.terms.map((term, index) => ({
+  return words.terms.map((term, index) => {
+    const position = view.positions.get(term.id) ?? { x: index * TERM_STEP, y: WORDS_Y };
+    const nudge = (by: Position) => view.move(term.id, { x: position.x + by.x, y: position.y + by.y });
+    return termNodeOf(term, position, view, restoreNames, nudge);
+  });
+}
+
+function termNodeOf(term: TermCard, position: Position, view: BoardView, restoreNames: RestoreNames, nudge: (by: Position) => void): TermNodeType {
+  return {
     id: term.id,
     type: "term",
-    position: view.positions.get(term.id) ?? { x: index * TERM_STEP, y: WORDS_Y },
+    position,
     width: TERM_WIDTH,
     height: HEADER_HEIGHT + term.rows.reduce((sum, row) => sum + rowHeightOf(row), 0),
     ariaRole: "listitem",
     ariaLabel: termNameOf(term, restoreNames),
-    data: { term, change: view.atRest ? null : changeOf(term, words), restoreNames },
-  }));
+    data: { term, change: view.atRest ? null : changeOf(term, view.words), restoreNames, nudge },
+  };
 }
 
 const rowHeightOf = ({ meaning }: TermRow): number => ROW_BASE + Math.ceil(meaning.length / CHARS_PER_LINE) * LINE_HEIGHT;

@@ -8,6 +8,10 @@ const STEPS: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1 };
 
 export type CardKeyActions = { nudge: (by: Position) => void; edit: () => void };
 
+export function nudgeOf(event: KeyboardEvent): Position | undefined {
+  return event.shiftKey ? NUDGES[event.key] : undefined;
+}
+
 export function onCardKey(event: KeyboardEvent<HTMLButtonElement>, { nudge, edit }: CardKeyActions): void {
   const by = NUDGES[event.key];
   if (event.shiftKey && by) return handled(event, () => nudge(by));
