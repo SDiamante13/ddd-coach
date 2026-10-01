@@ -24,6 +24,6 @@ export function expertLinesOf(hotspot: Hotspot | null, roles: string | undefined
   return { who: roles.split(", at ")[0]!, rows: new Set(rows.map(({ id }) => id)), lines, answered, total: rows.length };
 }
 
-const asClause = (meaning: string): string => `${meaning.charAt(0).toLowerCase()}${meaning.slice(1)}`.replace(/[.\s]+$/, "");
+const asClause = (meaning: string): string => meaning.replace(/[.\s]+$/, "");
 
 export const updatedInThreePlaces = (who: string): string => `Updated in 3 places: the row, the question card and the lines for ${who}.`;

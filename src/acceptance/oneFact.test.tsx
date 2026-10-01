@@ -39,8 +39,8 @@ describe("One fact, one place (#90b)", () => {
     expect(within(pinned()).getByText("Lines for the billing lead · only what's open")).toBeInTheDocument();
     expect(within(pinned()).getByText("from your table")).toBeInTheDocument();
     expect(within(lines()).getAllByRole("listitem").map((line) => line.textContent)).toEqual([
-      "Does Ops (day desk)'s “late” still mean: a truck not at pickup by the end of the pickup window?",
-      "Does Billing's “late” still mean: a load on the weekly late report?",
+      "Does Ops (day desk)'s “late” still mean: A truck not at pickup by the end of the pickup window?",
+      "Does Billing's “late” still mean: A load on the weekly late report?",
       "Does Code's “late” still mean: actual_pickup_at is after pickup_window_end?",
     ]);
     expect(hotspot()).toHaveTextContent("0 OF 3 ANSWERED");
