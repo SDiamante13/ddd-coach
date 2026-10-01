@@ -109,7 +109,7 @@ describe("The Words lane (#109)", () => {
     expect(within(term("late")).getByRole("group", { name: "Term “late”" })).toHaveFocus();
   });
 
-  it("takes you to a term whose word has a quote and a backslash, and stops following the coach (#127)", async () => {
+  it("takes you to a term whose word has a quote and a backslash, still following the coach when the term is already in view (#127)", async () => {
     const word = '7" pallet\\';
     const conversation = await startConversation();
     conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply: ["Words that don't match", `"${word}"`, "- Guess: Ops means a pallet seven inches high."].join("\n"), signature: "sig" });
@@ -118,7 +118,7 @@ describe("The Words lane (#109)", () => {
     await conversation.user.click(chip);
 
     expect(within(board()).getByRole("group", { name: `Term “${word}”` })).toHaveFocus();
-    expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("shows one 'N new on the board' line instead of a ring on every card when a reply adds more than 5 things (#127)", async () => {

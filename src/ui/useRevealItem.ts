@@ -7,7 +7,7 @@ import type { LaneSize } from "./useLaneSize.ts";
 
 type Span = { start: number; end: number };
 
-export function useRevealItem({ focusedId, selected }: Pick<BoardView, "focusedId" | "selected">, lane: LaneSize, nodes: readonly Node[]): void {
+export function useRevealItem({ focusedId, selected, pauseFollow }: Pick<BoardView, "focusedId" | "selected" | "pauseFollow">, lane: LaneSize, nodes: readonly Node[]): void {
   const flow = useReactFlow();
   useEffect(() => {
     const node = nodes.find(({ id }) => id === (focusedId ?? selected));
@@ -17,7 +17,9 @@ export function useRevealItem({ focusedId, selected }: Pick<BoardView, "focusedI
     const down = spanOf(node.position.y, node.height ?? CARD_HEIGHT, y, zoom);
     const dx = alongShift(across, lane.width);
     const dy = downShift(down, lane.height);
-    if (dx !== 0 || dy !== 0) void flow.setViewport({ x: x + dx, y: y + dy, zoom }, { duration: prefersReducedMotion() ? 0 : 200 });
+    if (dx === 0 && dy === 0) return;
+    pauseFollow();
+    void flow.setViewport({ x: x + dx, y: y + dy, zoom }, { duration: prefersReducedMotion() ? 0 : 200 });
   }, [focusedId, selected]);
 }
 

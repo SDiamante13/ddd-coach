@@ -14,7 +14,7 @@ export function EdgeChips({ view, lane: { width } }: { view: BoardView; lane: La
   const earlier = lefts.flatMap((left, index) => (left < 0 ? [index] : []));
   const later = lefts.flatMap((left, index) => (left + CARD_WIDTH * zoom > width ? [index] : []));
   const glideTo = (viewportX: number) => {
-    view.setFollowingCoach(false);
+    view.pauseFollow();
     void flow.setViewport({ x: viewportX, y: flow.getViewport().y, zoom }, { duration: prefersReducedMotion() ? 0 : 300 });
   };
   const showEarlier = () => glideTo(width - EDGE_CHIP_SAFE - (lanePosition(earlier.at(-1)!).x + CARD_WIDTH) * zoom);

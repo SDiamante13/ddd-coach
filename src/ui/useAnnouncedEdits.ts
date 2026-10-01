@@ -31,7 +31,7 @@ export function useAnnouncedEdits(board: Board, edits: ReturnType<typeof useVisi
     setAnnouncement(lastEdit(edits.actions)?.kind === "connect" ? LINK_UNDONE : CORRECTION_UNDONE);
     edits.undo();
   };
-  return { correct, connect, undo, announcement };
+  return { correct, connect, undo, announcement, announce: setAnnouncement };
 }
 
 function useTurnAnnouncement(turn: ExchangeId | null): [string, (text: string) => void] {

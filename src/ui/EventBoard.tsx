@@ -54,6 +54,8 @@ export type BoardView = {
   questionReveals: number;
   revealQuestion: () => void;
   setFollowingCoach: (following: boolean) => void;
+  followPaused: boolean;
+  pauseFollow: () => void;
 };
 export type BoardSession = {
   pickedUpAt: string | null;
@@ -105,7 +107,7 @@ function BoardSection({ view, thinking, restoreNames, session, hasEvents, empty,
               {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
               {view.quietRings && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
             </p>
-            <BoardControls following={view.followingCoach} onFollowChange={view.setFollowingCoach} overview={overview} onOverviewChange={setOverview} />
+            <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} overview={overview} onOverviewChange={setOverview} />
           </div>
           {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
           <BoardFlow view={view} thinking={thinking} restoreNames={restoreNames} session={session} overview={overview} />

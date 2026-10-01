@@ -1,13 +1,20 @@
 import { useReactFlow, useViewport } from "@xyflow/react";
 import { prefersReducedMotion } from "./motion.ts";
+import { FOLLOW_PAUSED } from "./useFollowCoach.ts";
 
-type BoardControlsProps = { following: boolean; onFollowChange: (following: boolean) => void; overview: boolean; onOverviewChange: (shown: boolean) => void };
+type BoardControlsProps = {
+  following: boolean;
+  paused: boolean;
+  onFollowChange: (following: boolean) => void;
+  onPause: () => void;
+  overview: boolean; onOverviewChange: (shown: boolean) => void;
+};
 
-export function BoardControls({ following, onFollowChange, overview, onOverviewChange }: BoardControlsProps) {
+export function BoardControls({ following, paused, onFollowChange, onPause, overview, onOverviewChange }: BoardControlsProps) {
   const flow = useReactFlow();
   const { zoom } = useViewport();
   const touching = (move: (options: { duration: number }) => unknown) => () => {
-    onFollowChange(false);
+    onPause();
     void move({ duration: prefersReducedMotion() ? 0 : 200 });
   };
   return (
@@ -29,7 +36,7 @@ export function BoardControls({ following, onFollowChange, overview, onOverviewC
         <span className="switch-track" aria-hidden="true">
           <span className="switch-knob" />
         </span>
-        Follow coach
+        {paused ? FOLLOW_PAUSED : "Follow coach"}
       </button>
     </div>
   );

@@ -20,12 +20,11 @@ import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useVisitorActions } from "./useVisitorActions.ts";
 import type { RestorePoint } from "./useKeptConversation.ts";
+import { type FollowCoach, useFollowCoach } from "./useFollowCoach.ts";
 
 const FRESH: RestorePoint = { turn: null, actions: 0, savedAt: null };
 
-type FollowCoach = { followingCoach: boolean; setFollowingCoach: (following: boolean) => void };
-
-export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, follow: FollowCoach, restorePoint = FRESH) {
+export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, place: FollowCoach, restorePoint = FRESH) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const words = useMemo(() => wordsOf(exchanges, edits.actions), [exchanges, edits.actions]);
@@ -36,12 +35,13 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const question = latestQuestionOf(exchanges, (text) => restoreNames(text).text);
   const expert = expertLinesOf(hotspot, question?.roles, words, checks, restoreNames);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
+  const follow = useFollowCoach(place, announced.announce);
   const { selected, toggle } = useBoardSelection();
   const [questionReveals, setQuestionReveals] = useState(0);
   const [focused, setRovingId] = useState<EntityId | null>(null);
   const offScreen = useOffScreenOffer(board.latest);
   const touching = <A extends unknown[]>(act: (...args: A) => void) => (...args: A) => {
-    follow.setFollowingCoach(false);
+    follow.pauseFollow();
     act(...args);
   };
   const selectedCard = board.cards.find((card) => card.id === selected);
@@ -58,6 +58,8 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     offScreenOf: (id: ExchangeId) => (offScreen.newOffScreen?.at === id ? offScreen.revealNew : undefined),
     followingCoach: follow.followingCoach,
     setFollowingCoach: follow.setFollowingCoach,
+    followPaused: follow.followPaused,
+    pauseFollow: follow.pauseFollow,
     linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames, restorePoint.actions),
     justDrawn: edits.actions.length > restorePoint.actions ? justDrawnOf(board, edits.actions) : null,
     atRest,
@@ -80,7 +82,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     }),
     clearCheck: touching(edits.clearCheck),
     move: (id: EntityId, position: Position) => {
-      follow.setFollowingCoach(false);
+      follow.pauseFollow();
       const after = board.latest ?? words.latest;
       if (after !== null) edits.move(id, position, after);
     },
@@ -92,7 +94,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     words,
     rovingId: focused ?? board.cards[0]?.id ?? words.terms[0]?.id ?? null,
     focusedId: focused,
-    setRovingId: touching(setRovingId),
+    setRovingId,
     questionReveals,
     revealQuestion: () => setQuestionReveals((count) => count + 1),
   };

@@ -26,7 +26,7 @@ async function nextReply(conversation: Awaited<ReturnType<typeof onTheBoard>>) {
   await waitFor(() => expect(cards()).toHaveLength(7));
 }
 
-const follow = () => within(board()).getByRole("button", { name: "Follow coach" });
+const follow = () => within(board()).getByRole("button", { name: /^Follow (coach|paused)/ });
 
 describe("A board that holds still once you've touched it (#124, #20)", () => {
   it("offers the new events in a chip instead of panning, once you've selected a card", async () => {
@@ -54,7 +54,7 @@ describe("A board that holds still once you've touched it (#124, #20)", () => {
     await conversation.user.click(within(board()).getByRole("button", { name: /Customer submits a bkg/ }));
 
     expect(follow()).toHaveAttribute("aria-pressed", "false");
-    expect(follow()).toHaveAccessibleName("Follow coach");
+    expect(follow()).toHaveAccessibleName("Follow paused while you work");
   });
 
   it("follows again when you turn Follow coach back on", async () => {

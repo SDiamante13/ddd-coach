@@ -42,7 +42,7 @@ describe("Finding your way along the board (#20)", () => {
     await waitFor(() => expect(within(board()).getByRole("button", { name: "Show the 3 earlier events" })).toHaveTextContent("◂ 3 earlier"));
     await waitFor(() => expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(-468px,16px) scale(1)" }));
     expect(within(board()).queryByRole("button", { name: /later/ })).not.toBeInTheDocument();
-    expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(board()).getByRole("button", { name: /^Follow (coach|paused)/ })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("zooms from the controls, shows the zoom level, and stops following the coach", async () => {
@@ -53,7 +53,7 @@ describe("Finding your way along the board (#20)", () => {
     await user.click(within(board()).getByRole("button", { name: "Zoom in" }));
 
     await waitFor(() => expect(zoomLevel()).toHaveTextContent("120%"));
-    expect(within(board()).getByRole("button", { name: "Follow coach" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(board()).getByRole("button", { name: /^Follow (coach|paused)/ })).toHaveAttribute("aria-pressed", "false");
     expect(within(board()).getByRole("button", { name: "Zoom out" })).toBeEnabled();
     expect(within(board()).getByRole("button", { name: "Fit the board" })).toBeEnabled();
   });

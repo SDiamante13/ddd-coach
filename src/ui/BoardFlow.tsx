@@ -115,11 +115,11 @@ function Lane(props: LaneProps) {
         edges={edges}
         nodeTypes={NODE_TYPES}
         defaultViewport={props.session.viewport ?? START_VIEWPORT}
-        onMoveStart={(event) => event && props.view.setFollowingCoach(false)}
+        onMoveStart={(event) => event && props.view.pauseFollow()}
         onMoveEnd={(_event, viewport) => props.session.keepViewport(viewport)}
         nodeDragThreshold={4}
         onNodesChange={dragging.onNodesChange}
-        onNodeDragStart={() => props.view.setFollowingCoach(false)}
+        onNodeDragStart={props.view.pauseFollow}
         onNodeDragStop={dragging.onNodeDragStop}
         onConnect={({ source, target }) => props.view.connect(source as EntityId, target as EntityId)}
         isValidConnection={({ source, target }) => source !== target}
