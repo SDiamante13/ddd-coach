@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { parseReply } from "./replyBlocks.ts";
-import { copiedMessage, rfcDocument, toMarkdown } from "./rfcExport.ts";
+import { copiedMessage, rfcDocument, type RowFacts, toMarkdown } from "./rfcExport.ts";
 
 const AS_OF = new Date(2026, 8, 25, 14, 30);
 
@@ -122,5 +122,22 @@ describe("copiedMessage", () => {
     [2, "Copied for your RFC. 2 rows are still guesses."],
   ])("counts %i guess rows", (guesses, message) => {
     expect(copiedMessage(guesses)).toBe(message);
+  });
+});
+
+describe("toMarkdown with the visitor's checks (#90e)", () => {
+  const facts: RowFacts = {
+    settleBy: "Friday's service review, 2 Oct 2026",
+    rowOf: (word, holder) =>
+      holder === "Ops (day desk)" ? { status: "checked by you, 1 Oct 2026, Contract §4" } : holder === "Code" ? { status: "marked wrong by you, 1 Oct 2026", meaning: "Code counts only the new row." } : undefined,
+  };
+
+  it("adds the settle-by line, each row's check, and the visitor's wording with the coach's kept as was", () => {
+    const markdown = toMarkdown(rfcDocument(parseReply(WORDS), facts), AS_OF);
+
+    expect(markdown).toContain("Settle by: Friday's service review, 2 Oct 2026 (typed by you)");
+    expect(markdown).toContain("From thread · checked by you, 1 Oct 2026, Contract §4");
+    expect(markdown).toContain("Code counts only the new row. (was: Guess: Counts both rows of a rebook.)");
+    expect(markdown).toContain("Guess · marked wrong by you, 1 Oct 2026");
   });
 });

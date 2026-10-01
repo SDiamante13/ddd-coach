@@ -12,16 +12,17 @@ import { KeepButton } from "./KeepButton.tsx";
 import { RepoCopyButton } from "./RepoCopyButton.tsx";
 import { RfcCopyButton } from "./RfcCopyButton.tsx";
 import type { KeepReply } from "./useGlossary.ts";
+import type { RowFacts } from "../domain/rfcExport.ts";
 
 export type RestoreNames = (text: string) => SwappedText;
 
 export const RESTORED_NOTE = "Names restored in this browser from your swaps.";
 
 type OffScreen = { revealOffScreen?: (() => void) | undefined };
-type ReplyViewProps = { reply: string; restoreNames: RestoreNames; onKeep: KeepReply; questionPinned: boolean; counts: ReplyCounts } & OffScreen;
+type ReplyViewProps = { reply: string; restoreNames: RestoreNames; onKeep: KeepReply; rowFacts: RowFacts; questionPinned: boolean; counts: ReplyCounts } & OffScreen;
 type PartProps = { block: ReplyBlock; questionPinned: boolean; counts: ReplyCounts } & OffScreen;
 
-export function ReplyView({ reply, restoreNames, onKeep, questionPinned, counts, revealOffScreen }: ReplyViewProps) {
+export function ReplyView({ reply, restoreNames, onKeep, rowFacts, questionPinned, counts, revealOffScreen }: ReplyViewProps) {
   const restored = restoreNames(reply);
   const blocks = displayOrder(parseReply(restored.text));
   return (
@@ -30,8 +31,8 @@ export function ReplyView({ reply, restoreNames, onKeep, questionPinned, counts,
         <ReplyPart key={index} block={block} questionPinned={questionPinned} counts={counts} revealOffScreen={revealOffScreen} />
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
-      {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
-      {blocks.some((block) => block.kind === "words") && <RepoCopyButton blocks={blocks} />}
+      {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} facts={rowFacts} />}
+      {blocks.some((block) => block.kind === "words") && <RepoCopyButton blocks={blocks} facts={rowFacts} />}
       {GLOSSARY_ENABLED && blocks.some((block) => block.kind === "words") && <KeepButton reply={reply} onKeep={onKeep} />}
     </div>
   );

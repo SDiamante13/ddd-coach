@@ -1,33 +1,35 @@
 import { entityId } from "./entityId.ts";
 import { identifiersIn } from "./identifier.ts";
 import type { Source, WordRow } from "./replyBlocks.ts";
-import type { RfcDocument, RfcQuestion } from "./rfcExport.ts";
+import type { RfcDocument, RfcQuestion, RowFact, RowFacts } from "./rfcExport.ts";
 
 export type RowStatus = { kind: "settled" } | { kind: "guess" } | { kind: "unsettled"; question: number };
-export type ContextRow = { context: string; meaning: string; source: Source; status: RowStatus };
+export type ContextRow = { context: string; meaning: string; source: Source; status: RowStatus; fact?: RowFact | undefined };
 export type RepoTerm = { word: string; avoid: string[]; identifiers: string[]; rows: ContextRow[] };
-export type RepoGlossary = { origin: string; terms: RepoTerm[]; questions: RfcQuestion[] };
+export type RepoGlossary = { origin: string; terms: RepoTerm[]; questions: RfcQuestion[]; facts?: RowFacts | undefined };
 
 const REPLY_ORIGIN = "from one coach reply to a pasted thread";
 const UNNAMED_CONTEXT = "Team unclear";
 
 export const replyGlossary = (document: RfcDocument): RepoGlossary => ({
   origin: REPLY_ORIGIN,
-  terms: document.words.map((word) => termOf(word, document.questions)),
+  terms: document.words.map((word) => termOf(word, document.questions, document.facts?.rowOf)),
   questions: document.questions,
+  facts: document.facts,
 });
 
 export const isOpen = ({ status }: ContextRow): boolean => status.kind !== "settled";
 
 export const unsettledTerms = ({ terms }: RepoGlossary): number => terms.filter(({ rows }) => rows.some(isOpen)).length;
 
-const termOf = (term: WordRow, questions: RfcQuestion[]): RepoTerm => ({
+const termOf = (term: WordRow, questions: RfcQuestion[], rowOf: RowFacts["rowOf"] = () => undefined): RepoTerm => ({
   word: term.word,
   avoid: sameMeaningWords(term),
   identifiers: codeIdentifiers(term),
   rows: term.meanings.map(({ holder, meaning, source }) => ({
     ...{ context: holder || UNNAMED_CONTEXT, meaning, source },
     status: statusOf(term.word, source, questions),
+    fact: rowOf(term.word, holder),
   })),
 });
 

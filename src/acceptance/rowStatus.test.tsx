@@ -125,4 +125,26 @@ describe("Checking a term row yourself (#90a)", () => {
     expect(row("Billing")).toHaveTextContent("YOU SAID");
     expect(row("Billing").querySelector(".term-meaning")).toHaveTextContent("Past the appointment.");
   });
+
+  it("copies your check into the RFC's source column (#90e)", async () => {
+    const { user, log } = await onTheWords();
+    await checkRow(user, "Billing", "Yes, it holds", "Contract §4");
+
+    await user.click(within(log()).getByRole("button", { name: "Copy for your RFC" }));
+
+    expect(await navigator.clipboard.readText()).toContain("| Billing | A load on the weekly late report. | From thread · checked by you, 1 Oct 2026, Contract §4 |");
+  });
+
+  it("copies your correction and check into the repo glossary (#90e)", async () => {
+    const { user, log } = await onTheWords();
+    await checkRow(user, "Billing", "No, it's wrong");
+    const field = within(row("Billing")).getByRole("textbox", { name: "Correct this meaning" });
+    await user.clear(field);
+    await pasteInto(user, field, "Any load past the booked appointment.");
+    await user.keyboard("{Enter}");
+
+    await user.click(within(log()).getByRole("button", { name: "Copy for your repo" }));
+
+    expect(await navigator.clipboard.readText()).toContain("| Billing | Any load past the booked appointment. (was: A load on the weekly late report.) | From thread | Settled · marked wrong by you, 1 Oct 2026 |");
+  });
 });

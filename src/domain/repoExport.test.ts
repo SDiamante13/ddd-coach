@@ -5,7 +5,7 @@ import { parseReply } from "./replyBlocks.ts";
 import { claudeSection } from "./claudeSection.ts";
 import { glossaryMarkdown, repoCopiedMessage, repoMarkdown } from "./repoExport.ts";
 import { replyGlossary } from "./repoGlossary.ts";
-import { rfcDocument } from "./rfcExport.ts";
+import { rfcDocument, type RowFacts } from "./rfcExport.ts";
 
 const AS_OF = new Date(2026, 8, 25, 14, 30);
 
@@ -315,5 +315,21 @@ describe("glossaryMarkdown", () => {
         "",
       ].join("\n"),
     )).toBe(true);
+  });
+});
+
+describe("glossaryMarkdown with the visitor's checks (#90e)", () => {
+  const facts: RowFacts = {
+    settleBy: "Friday's service review, 2 Oct 2026",
+    rowOf: (_word, holder) =>
+      holder === "Ops (day desk)" ? { status: "checked by you, 1 Oct 2026, Contract §4" } : holder === "Code" ? { status: "marked wrong by you, 1 Oct 2026", meaning: "Code counts only the new row." } : undefined,
+  };
+
+  it("adds the settle-by line, each row's check, and the visitor's wording with the coach's kept as was", () => {
+    const markdown = glossaryMarkdown(replyGlossary(rfcDocument(parseReply(WORDS), facts)), AS_OF);
+
+    expect(markdown).toContain("Settle by: Friday's service review, 2 Oct 2026 (typed by you)");
+    expect(markdown).toContain("| Ops (day desk) | A date change with the same carrier is AMENDED. | From thread | Settled · checked by you, 1 Oct 2026, Contract §4 |");
+    expect(markdown).toContain("| Code | Code counts only the new row. (was: Guess: Counts both rows of a rebook.) | Guess | **Unsettled**, a guess · marked wrong by you, 1 Oct 2026 |");
   });
 });

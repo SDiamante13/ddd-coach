@@ -1,7 +1,7 @@
 import { claudeSection } from "./claudeSection.ts";
 import { codeSpan, markdownTable, markdownText } from "./markdown.ts";
 import type { RepoGlossary, RepoTerm, RowStatus } from "./repoGlossary.ts";
-import { asOfLine, questionLine, type RfcQuestion, sourceLine } from "./rfcExport.ts";
+import { asOfLine, meaningCell, questionLine, type RfcQuestion, settleByLines, sourceLine, withStatus } from "./rfcExport.ts";
 
 const GLOSSARY_LABEL = "<!-- GLOSSARY.md: save this part as GLOSSARY.md at the root of your repo. -->";
 const SECTION_LABEL = "<!-- CLAUDE.md or AGENTS.md: paste this section in. It points at GLOSSARY.md, so there is one copy to keep current. -->";
@@ -26,11 +26,16 @@ const AGENT_RULES = [
 
 export function glossaryMarkdown(glossary: RepoGlossary, asOf: Date): string {
   const header = `${asOfLine(asOf)}. Exported from DDD Coach, ${glossary.origin}. When a question below is settled, change its rows here, or export again.`;
-  return ["# Glossary", "", header, "", AGENT_RULES, "", ...glossary.terms.flatMap(termSection), ...openQuestions(glossary.questions)].join("\n");
+  return ["# Glossary", "", header, "", ...settleByLines(glossary.facts).flatMap((line) => [line, ""]), AGENT_RULES, "", ...glossary.terms.flatMap(termSection), ...openQuestions(glossary.questions)].join("\n");
 }
 
 function termSection({ word, avoid, rows }: RepoTerm): string[] {
-  const cells = rows.map(({ context, meaning, source, status }) => [context, source === "Guess" ? `Guess: ${meaning}` : meaning, source, statusCell(status)]);
+  const cells = rows.map(({ context, meaning, source, status, fact }) => [
+    context,
+    meaningCell(source === "Guess" ? `Guess: ${meaning}` : meaning, fact),
+    source,
+    withStatus(statusCell(status), fact?.status),
+  ]);
   return [
     `## ${markdownText(word)}`,
     "",

@@ -62,4 +62,13 @@ describe("A settle-by date, only if you have one (#90d)", () => {
 
     expect(screen.queryByText(/Settle by:/)).toBeNull();
   });
+
+  it("puts what you typed at the top of the RFC copy (#90e)", async () => {
+    const { user, log } = await asked();
+    await settleBy(user, "Finance review", "2026-10-27");
+
+    await user.click(within(log()).getByRole("button", { name: "Copy for your RFC" }));
+
+    expect((await navigator.clipboard.readText()).split("\n")[1]).toBe("Settle by: Finance review, 27 Oct 2026 (typed by you)");
+  });
 });

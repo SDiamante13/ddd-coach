@@ -14,6 +14,7 @@ import { GlossaryPanel } from "./GlossaryPanel.tsx";
 import { SwapPanel } from "./SwapPanel.tsx";
 import type { Unlock } from "./useAccess.ts";
 import { useBoardView } from "./useBoardView.ts";
+import { rowFactsOf } from "../domain/rowFacts.ts";
 import { type Composer, useComposer } from "./useComposer.ts";
 
 type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
@@ -22,11 +23,14 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
   const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits, composer.place, composer.restorePoint);
+  const { settleBy } = composer.board;
+  const settleByLine = settleBy ? settleByText(settleBy, composer.box.restoreNames) : undefined;
+  const rowFacts = rowFactsOf(view.words, view.checks, (text) => composer.box.restoreNames(text).text, settleByLine);
 
   return (
     <>
       <EventBoard view={view} thinking={composer.busy} restoreNames={composer.box.restoreNames} session={composer.board} />
-      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, rows: view.hotspot.rows.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} expert={view.expert} rung={view.justChecked !== null} before={composer.board.settleBy ? `Before ${settleByText(composer.board.settleBy, composer.box.restoreNames)}.` : null} />
+      <PinnedQuestion question={view.question} onBoard={view.hotspot && { linked: view.hotspot.links.length, rows: view.hotspot.rows.length, unplaced: view.hotspot.unplaced.length, reveal: view.revealQuestion }} expert={view.expert} rung={view.justChecked !== null} before={settleByLine ? `Before ${settleByLine}.` : null} />
       <ExchangeLog
         exchanges={composer.exchanges}
         busy={composer.busy}
@@ -36,6 +40,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         logRef={composer.follow.logRef}
         restoreNames={composer.box.restoreNames}
         onKeep={composer.glossary.keepReply}
+        rowFacts={rowFacts}
         pinnedQuestionOf={view.question?.exchangeId ?? null}
         highlight={view.highlight}
         countsOf={view.countsOf}

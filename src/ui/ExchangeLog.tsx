@@ -7,6 +7,7 @@ import { LinkLines } from "./LinkLines.tsx";
 import type { LinkLine } from "./linkLines.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 import type { KeepReply } from "./useGlossary.ts";
+import type { RowFacts } from "../domain/rfcExport.ts";
 import { ExchangeEntry } from "./ExchangeEntry.tsx";
 import { ExchangeOutcome } from "./ExchangeOutcome.tsx";
 
@@ -19,6 +20,7 @@ type ExchangeLogProps = {
   logRef: Ref<HTMLOListElement>;
   restoreNames: RestoreNames;
   onKeep: KeepReply;
+  rowFacts: RowFacts;
   pinnedQuestionOf: ExchangeId | null;
   highlight: LineMatch | null;
   countsOf: (id: ExchangeId) => ReplyCounts;

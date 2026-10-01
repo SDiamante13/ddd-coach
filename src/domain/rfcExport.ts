@@ -3,10 +3,13 @@ import { markdownTable, markdownText } from "./markdown.ts";
 import type { Claim, ReplyBlock, WordRow } from "./replyBlocks.ts";
 
 export type RfcQuestion = { roles: string; text: string; sources: string[] };
-export type RfcDocument = { words: WordRow[]; questions: RfcQuestion[]; events: Claim[]; cut: boolean };
+export type RowFact = { status?: string; meaning?: string };
+export type RowFacts = { settleBy?: string; rowOf?: (word: string, holder: string) => RowFact | undefined };
+export type RfcDocument = { words: WordRow[]; questions: RfcQuestion[]; events: Claim[]; cut: boolean; facts?: RowFacts };
 
-export function rfcDocument(blocks: ReplyBlock[]): RfcDocument {
+export function rfcDocument(blocks: ReplyBlock[], facts?: RowFacts): RfcDocument {
   return {
+    ...(facts && { facts }),
     words: blocks.flatMap((block) => (block.kind === "words" ? block.rows : [])),
     questions: blocks.flatMap((block) => (block.kind === "question" ? [{ roles: block.roles, text: block.text, sources: block.sources }] : [])),
     events: blocks.flatMap((block) => (block.kind === "events" ? block.items : [])),
@@ -16,18 +19,33 @@ export function rfcDocument(blocks: ReplyBlock[]): RfcDocument {
 
 export const asOfLine = (asOf: Date): string => `As of ${shortDate(asOf)}`;
 
-export type TableRow = { term: string; team: string; meaning: string; source: string };
+export type TableRow = { term: string; team: string; meaning: string; source: string; status?: string };
 
-export function tableRows(words: WordRow[]): TableRow[] {
+export function tableRows(words: WordRow[], rowOf: RowFacts["rowOf"] = () => undefined): TableRow[] {
   return words.flatMap(({ word, meanings }) =>
-    meanings.map(({ holder, meaning, source }, index) => ({
-      term: index === 0 ? word : "",
-      team: holder,
-      meaning: source === "Guess" ? `Guess: ${meaning}` : meaning,
-      source,
-    })),
+    meanings.map(({ holder, meaning, source }, index) => {
+      const coach = source === "Guess" ? `Guess: ${meaning}` : meaning;
+      const fact = rowOf(word, holder);
+      return {
+        term: index === 0 ? word : "",
+        team: holder,
+        meaning: meaningCell(coach, fact),
+        source,
+        ...(fact?.status !== undefined && { status: fact.status }),
+      };
+    }),
   );
 }
+
+export const meaningCell = (coach: string, fact: RowFact | undefined): string => (fact?.meaning === undefined ? coach : `${fact.meaning} (was: ${coach})`);
+
+export const withStatus = (cell: string, status: string | undefined): string => (status === undefined ? cell : `${cell} · ${status}`);
+
+const sourceCell = ({ source, status }: TableRow): string => withStatus(source, status);
+
+export const settleByLines = (facts: RowFacts | undefined): string[] => (facts?.settleBy ? [`Settle by: ${facts.settleBy} (typed by you)`] : []);
+
+const headLines = (document: RfcDocument, asOf: Date): string[] => [asOfLine(asOf), ...settleByLines(document.facts)];
 
 export const guessRows = (document: RfcDocument): number => tableRows(document.words).filter((row) => row.source === "Guess").length;
 
@@ -37,8 +55,8 @@ export function copiedMessage(guesses: number): string {
 }
 
 export function toMarkdown(document: RfcDocument, asOf: Date): string {
-  const sections = [wordsTable(document.words), markdownQuestions(document.questions), markdownEvents(document.events)];
-  return [asOfLine(asOf), "", ...sections.flat(), ...(document.cut ? [CUT_LINE] : [])].join("\n");
+  const sections = [wordsTable(document), markdownQuestions(document.questions), markdownEvents(document.events)];
+  return [...headLines(document, asOf), "", ...sections.flat(), ...(document.cut ? [CUT_LINE] : [])].join("\n");
 }
 
 export const CUT_LINE = "The coach's reply was cut short here; ask it to continue for the rest.";
@@ -62,15 +80,15 @@ function markdownQuestions(questions: RfcQuestion[]): string[] {
   return ["## Open questions", "", ...items, ""];
 }
 
-function wordsTable(words: WordRow[]): string[] {
+function wordsTable({ words, facts }: RfcDocument): string[] {
   if (words.length === 0) return [];
-  const rows = tableRows(words).map(({ term, team, meaning, source }) => [term, team, meaning, source]);
+  const rows = tableRows(words, facts?.rowOf).map((row) => [row.term, row.team, row.meaning, sourceCell(row)]);
   return ["## Words that don't match", "", ...markdownTable(["Term", "Team", "Meaning", "Source"], rows), ""];
 }
 
 export function toHtml(document: RfcDocument, asOf: Date): string {
-  const sections = [htmlTable(document.words), htmlQuestions(document.questions), htmlEvents(document.events)];
-  return [tag("p", asOfLine(asOf)), ...sections, document.cut ? tag("p", CUT_LINE) : ""].join("");
+  const sections = [htmlTable(document), htmlQuestions(document.questions), htmlEvents(document.events)];
+  return [...headLines(document, asOf).map((line) => tag("p", line)), ...sections, document.cut ? tag("p", CUT_LINE) : ""].join("");
 }
 
 const escapeHtml = (text: string): string =>
@@ -78,10 +96,10 @@ const escapeHtml = (text: string): string =>
 
 const tag = (name: string, text: string): string => `<${name}>${escapeHtml(text)}</${name}>`;
 
-function htmlTable(words: WordRow[]): string {
+function htmlTable({ words, facts }: RfcDocument): string {
   if (words.length === 0) return "";
   const head = `<thead><tr>${["Term", "Team", "Meaning", "Source"].map((cell) => tag("th", cell)).join("")}</tr></thead>`;
-  const rows = tableRows(words).map(({ term, team, meaning, source }) => `<tr>${[term, team, meaning, source].map((cell) => tag("td", cell)).join("")}</tr>`);
+  const rows = tableRows(words, facts?.rowOf).map((row) => `<tr>${[row.term, row.team, row.meaning, sourceCell(row)].map((cell) => tag("td", cell)).join("")}</tr>`);
   return `${tag("h2", "Words that don't match")}<table>${head}<tbody>${rows.join("")}</tbody></table>`;
 }
 

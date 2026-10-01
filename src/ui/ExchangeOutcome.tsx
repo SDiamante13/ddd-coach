@@ -4,6 +4,7 @@ import { isRefused, type Exchange, type FailedExchange } from "../domain/exchang
 import { CopyConversationButton } from "./CopyConversationButton.tsx";
 import { ReplyView, type RestoreNames } from "./ReplyView.tsx";
 import type { KeepReply } from "./useGlossary.ts";
+import type { RowFacts } from "../domain/rfcExport.ts";
 
 const MS_PER_SECOND = 1_000;
 
@@ -15,17 +16,18 @@ type ExchangeOutcomeProps = {
   onStartNew: () => void;
   restoreNames: RestoreNames;
   onKeep: KeepReply;
+  rowFacts: RowFacts;
   questionPinned: boolean;
   counts: ReplyCounts;
   revealOffScreen?: (() => void) | undefined;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, questionPinned, counts, revealOffScreen }: ExchangeOutcomeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, rowFacts, questionPinned, counts, revealOffScreen }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
     case "replied":
-      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} questionPinned={questionPinned} counts={counts} revealOffScreen={revealOffScreen} />;
+      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} rowFacts={rowFacts} questionPinned={questionPinned} counts={counts} revealOffScreen={revealOffScreen} />;
     case "failed":
       return (
         <>
