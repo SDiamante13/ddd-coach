@@ -42,6 +42,7 @@ Template: the latest `outputs/demos/*-deploy.md` (e.g. `117-121-118-deploy.md`).
 - Fonts: every CSS font URL is same-origin, every woff2 returns 200, and there are 0 googleapis/gstatic references.
 - Shell gotchas on this machine: quote globs in zsh (`'--include=*.tsx'`), and `stat -f` resolves to GNU stat, so use `wc -c` for file sizes.
 - Before a paid run or deploy, check the key for free: GET https://openrouter.ai/api/v1/key with `node --env-file=.env`, printing only status, error and the limit fields (never the key). Loading `.env` this way is allowed; printing it is not. OpenRouter keys can expire ("API key expired", 401); prod's Netlify secret can't be read back by the CLI, so verify prod with one hosted call.
+- Deploy only a SHA whose `ci.yml` run is green. Find it with `gh run list --workflow ci.yml --json headSha,status,conclusion` and match `headSha`; `--commit` lists nothing while the run is still in progress.
 - After a deploy, `curl -s https://ddd-coach.netlify.app/api/health` must return `"status":"ok"`. The `health` GitHub Action checks it every 30 min and fails (emailing the owner) on anything else, including `key_expiring` a week before the key expires.
 - No unlock and no paid calls; the verifier owns the demo.
 
