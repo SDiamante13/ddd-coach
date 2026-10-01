@@ -4,7 +4,7 @@ import { entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId, Prompt } from "./exchange.ts";
 import { latestQuestionOf } from "./latestQuestion.ts";
 import { questionLinksOf, questionTiesOf } from "./questionLinks.ts";
-import { QUESTION_PASTE, QUESTION_REPLY } from "../test/questionReplies.ts";
+import { QUESTION_PASTE, QUESTION_REPLY, ROW_QUOTE_PASTE, ROW_QUOTE_REPLY } from "../test/questionReplies.ts";
 
 const replied = (reply: string): Exchange => ({ id: "e1" as ExchangeId, prompt: QUESTION_PASTE as Prompt, status: "replied", reply, signature: "sig" });
 
@@ -37,5 +37,15 @@ describe("questionLinksOf", () => {
 
     expect(ties.unplaced).toEqual(["who owns the weekly late report now"]);
     expect(ties.links).toEqual([entityId("event", "The truck picks up 7731 fifty minutes after the pickup window.")]);
+  });
+
+  it("ties a quote to the term row it comes from, so only quotes on neither cards nor rows are missing (#109 hotfix)", () => {
+    const exchanges: Exchange[] = [{ id: "e1" as ExchangeId, prompt: ROW_QUOTE_PASTE as Prompt, status: "replied", reply: ROW_QUOTE_REPLY, signature: "s" }];
+
+    const ties = questionTiesOf(latestQuestionOf(exchanges)!, boardOf(exchanges), exchanges);
+
+    expect(ties.links).toEqual([entityId("event", "The truck picks up 7731 fifty minutes after the pickup window.")]);
+    expect(ties.rows).toEqual([{ term: entityId("term", "late"), row: entityId("meaning", "late|Account team"), word: "late", holder: "Account team" }]);
+    expect(ties.unplaced).toEqual([]);
   });
 });

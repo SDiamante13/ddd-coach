@@ -8,7 +8,7 @@ import { unplacedLabel } from "./unplacedQuotes.ts";
 
 export const PINNED_QUESTION_ID = "current-question";
 
-export type QuestionOnBoard = { linked: number; unplaced: number; reveal: () => void };
+export type QuestionOnBoard = { linked: number; rows: number; unplaced: number; reveal: () => void };
 
 export function PinnedQuestion({ question, onBoard = null }: { question: LatestQuestion | null; onBoard?: QuestionOnBoard | null }) {
   const ref = useRef<HTMLElement>(null);
@@ -44,8 +44,9 @@ function QuestionStrip({ question, expanded, onToggle }: QuestionStripProps) {
   );
 }
 
-function OnTheBoardChip({ linked, unplaced, reveal }: QuestionOnBoard) {
-  const events = linked === 0 ? "" : ` linked to ${linked} event${linked === 1 ? "" : "s"}`;
+function OnTheBoardChip({ linked, rows, unplaced, reveal }: QuestionOnBoard) {
+  const tied = [linked > 0 ? `${linked} event${linked === 1 ? "" : "s"}` : "", rows > 0 ? `${rows} term row${rows === 1 ? "" : "s"}` : ""].filter((part) => part !== "");
+  const events = tied.length === 0 ? "" : ` linked to ${tied.join(" · ")}`;
   const missing = unplaced === 0 ? "" : ` · ${unplacedLabel(unplaced)}`;
   return (
     <button type="button" className="board-chip on-the-board" onClick={reveal}>

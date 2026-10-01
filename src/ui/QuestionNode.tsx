@@ -16,6 +16,7 @@ export function QuestionNode({ data: { hotspot, fresh, roving } }: NodeProps<Que
   return (
     <>
       <Handle id="relates-in" type="target" position={Position.Top} isConnectable={false} />
+      <Handle id="relates-below" type="target" position={Position.Bottom} isConnectable={false} />
       <div className="card hotspot-card" tabIndex={roving.tabIndex} onFocus={roving.onFocus} data-board-item data-lane="question">
         <span className="card-kind">QUESTION</span>
         <span className="card-source">OPEN</span>
@@ -60,15 +61,20 @@ function placeOf({ links }: Hotspot, { board }: BoardView) {
 
 export const rovingOf = (view: BoardView, id: EntityId): Roving => ({ tabIndex: view.rovingId === id ? 0 : -1, onFocus: () => view.setRovingId(id) });
 
-export const relatesEdgesOf = ({ hotspot, board }: BoardView): Edge[] =>
+const relates = (id: string, source: string, sourceHandle: string, target: string, targetHandle: string): Edge => ({
+  id,
+  source,
+  sourceHandle,
+  target,
+  targetHandle,
+  className: "relates-edge",
+  domAttributes: { "aria-hidden": true },
+});
+
+export const relatesEdgesOf = ({ hotspot }: BoardView): Edge[] =>
   hotspot === null
     ? []
-    : hotspot.links.map((link) => ({
-        id: `relates-${link}`,
-        source: link,
-        sourceHandle: "link-out",
-        target: hotspot.id,
-        targetHandle: "relates-in",
-        className: "relates-edge",
-        domAttributes: { "aria-hidden": true },
-      }));
+    : [
+        ...hotspot.links.map((link) => relates(`relates-${link}`, link, "link-out", hotspot.id, "relates-in")),
+        ...hotspot.rows.map(({ term, row }) => relates(`relates-${row}`, term, row, hotspot.id, "relates-below")),
+      ];

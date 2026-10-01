@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { addSwap, startConversation } from "../test/appDriver.tsx";
-import { QUESTION_PASTE, QUESTION_REPLY } from "../test/questionReplies.ts";
+import { QUESTION_PASTE, QUESTION_REPLY, ROW_QUOTE_PASTE, ROW_QUOTE_REPLY } from "../test/questionReplies.ts";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -111,5 +111,29 @@ describe("The open question on the board (#97)", () => {
     const order = [...card.children].map((child) => child.className);
 
     expect(order).toEqual(["question-for", "question-text", "question-action", "question-sources"]);
+  });
+
+  describe("a quote that is a term row on the board (#109 hotfix)", () => {
+    async function askedAboutARow() {
+      const conversation = await startConversation();
+      conversation.server.reply(await conversation.send(ROW_QUOTE_PASTE), 200, { reply: ROW_QUOTE_REPLY, signature: "sig-1" });
+      await within(board()).findByRole("list", { name: "Events on the board" });
+      return conversation;
+    }
+
+    it("relates the question to the row, with a dotted line to it, and calls nothing missing", async () => {
+      await askedAboutARow();
+      const hotspot = within(board()).getByRole("listitem", { name: /^Open question/ });
+
+      expect(hotspot).toHaveAccessibleName("Open question: Which late counts for the credit?, relates to Event 1 and the “late” row for Account team");
+      expect(board().querySelectorAll(".relates-edge")).toHaveLength(2);
+    });
+
+    it("counts the row on the pinned question's chip", async () => {
+      await askedAboutARow();
+      const pinned = screen.getByRole("complementary", { name: "Current question" });
+
+      expect(within(pinned).getByRole("button", { name: "On the board ↖ linked to 1 event · 1 term row" })).toBeInTheDocument();
+    });
   });
 });

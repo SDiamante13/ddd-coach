@@ -997,3 +997,14 @@ ol[role="log"] > li > p.correction-line[data-settled] {
     transition: none;
   }
 }
+
+/* #109 hotfix: a term row the open question quotes carries the dotted line's end on its left edge. */
+.term-row {
+  position: relative;
+}
+
+.board-lane .react-flow__handle.row-handle {
+  top: 50%;
+  left: calc(-1 * var(--space-3));
+  opacity: 0;
+}

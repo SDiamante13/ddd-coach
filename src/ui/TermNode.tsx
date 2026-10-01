@@ -1,4 +1,4 @@
-import type { Node, NodeProps } from "@xyflow/react";
+import { Handle, type Node, type NodeProps, Position as Side } from "@xyflow/react";
 import type { KeyboardEvent } from "react";
 import type { Position } from "../domain/cardMoves.ts";
 import { nudgeOf } from "./cardKeys.ts";
@@ -51,6 +51,7 @@ export function TermNode({ data: { term, change, restoreNames, nudge, roving } }
 function TermRowItem({ row, shown }: { row: TermRow; shown: (text: string) => string }) {
   return (
     <li className="term-row" data-source={row.provenance}>
+      <Handle id={row.id} type="source" position={Side.Left} isConnectable={false} className="row-handle" />
       <span className="term-holder">{shown(row.holder)}</span>
       <span className="term-source">{TAG[row.provenance]}</span>
       <p className="term-meaning">{shown(row.meaning)}</p>
