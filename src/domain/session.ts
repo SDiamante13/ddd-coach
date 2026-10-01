@@ -6,9 +6,17 @@ export const SESSION_VERSION = 1;
 
 export type Viewport = { x: number; y: number; zoom: number };
 
-export type Session = { exchanges: readonly Exchange[]; visitorActions: readonly VisitorAction[]; savedAt: string | null; viewport: Viewport | null };
+export type Session = {
+  exchanges: readonly Exchange[];
+  visitorActions: readonly VisitorAction[];
+  savedAt: string | null;
+  viewport: Viewport | null;
+  followingCoach: boolean;
+};
 
-export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null, viewport: null };
+export const FOLLOW_COACH_AT_START = true;
+
+export const EMPTY_SESSION: Session = { exchanges: [], visitorActions: [], savedAt: null, viewport: null, followingCoach: FOLLOW_COACH_AT_START };
 
 export const BOARD_ZOOM = { min: 0.5, max: 1.5 } as const;
 
@@ -19,7 +27,7 @@ export function sessionOf(stored: unknown): Session {
   const visitorActions = field(stored, "visitorActions");
   const valid =
     field(stored, "version") === SESSION_VERSION && everyIs(exchanges, isExchange) && everyIs(visitorActions, isVisitorAction);
-  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")) } : EMPTY_SESSION;
+  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")), followingCoach: field(stored, "followingCoach") !== false } : EMPTY_SESSION;
 }
 
 function viewportOf(stored: unknown): Viewport | null {

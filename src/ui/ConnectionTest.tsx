@@ -20,7 +20,7 @@ type ConnectionTestProps = { unlock: Unlock; justUnlocked: boolean };
 export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
   const composer = useComposer(unlock);
   const { access } = composer;
-  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits, composer.restorePoint);
+  const view = useBoardView(composer.exchanges, composer.box.restoreNames, composer.edits, composer.place, composer.restorePoint);
 
   return (
     <>
@@ -38,6 +38,7 @@ export function ConnectionTest({ unlock, justUnlocked }: ConnectionTestProps) {
         pinnedQuestionOf={view.question?.exchangeId ?? null}
         highlight={view.highlight}
         countsOf={view.countsOf}
+        offScreenOf={view.offScreenOf}
         correctionsOf={view.correctionsOf}
         linksOf={view.linksOf}
         onUndo={view.undo}

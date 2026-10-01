@@ -17,14 +17,15 @@ type ExchangeOutcomeProps = {
   onKeep: KeepReply;
   questionPinned: boolean;
   counts: ReplyCounts;
+  revealOffScreen?: (() => void) | undefined;
 };
 
-export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, questionPinned, counts }: ExchangeOutcomeProps) {
+export function ExchangeOutcome({ exchange, busy, onRetry, conversation, onStartNew, restoreNames, onKeep, questionPinned, counts, revealOffScreen }: ExchangeOutcomeProps) {
   switch (exchange.status) {
     case "pending":
       return <p>Coach is thinking…</p>;
     case "replied":
-      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} questionPinned={questionPinned} counts={counts} />;
+      return <ReplyView reply={exchange.reply} restoreNames={restoreNames} onKeep={onKeep} questionPinned={questionPinned} counts={counts} revealOffScreen={revealOffScreen} />;
     case "failed":
       return (
         <>

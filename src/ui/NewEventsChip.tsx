@@ -1,9 +1,9 @@
-import type { ChangeCounts, NewEvents } from "./usePanToChanges.ts";
+import type { ChangeCounts, OffScreenOffer } from "./useOffScreenOffer.ts";
 
-export function NewEventsChip({ events }: { events: NewEvents }) {
+export function NewEventsChip({ events, onReveal }: { events: OffScreenOffer | null; onReveal: () => void }) {
   if (events === null) return null;
   return (
-    <button type="button" className="new-events-chip" aria-label={chipNameOf(events)} onClick={events.reveal}>
+    <button type="button" className="new-events-chip" aria-label={chipNameOf(events)} onClick={onReveal}>
       {chipTextOf(events)}
     </button>
   );

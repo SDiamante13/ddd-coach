@@ -4,6 +4,7 @@ import type { EntityId } from "../domain/entityId.ts";
 import { BoardFlow } from "./BoardFlow.tsx";
 import { PickedUpLine } from "./PickedUpLine.tsx";
 import type { Hotspot } from "./hotspot.ts";
+import type { OffScreenOffer } from "./useOffScreenOffer.ts";
 import type { Viewport } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
@@ -19,12 +20,16 @@ export type BoardView = {
   undo: () => void;
   undoable: EntityId | null;
   highlightedLine: string | null;
-  panHeld: boolean;
+  followingCoach: boolean;
+  newOffScreen: OffScreenOffer | null;
+  offerNew: (offer: OffScreenOffer | null) => void;
+  newReveals: number;
+  revealNew: () => void;
   atRest: boolean;
   hotspot: Hotspot | null;
   questionReveals: number;
   revealQuestion: () => void;
-  releasePan: () => void;
+  setFollowingCoach: (following: boolean) => void;
 };
 export type BoardSession = { pickedUpAt: string | null; viewport: Viewport | null; keepViewport: (viewport: Viewport) => void; saving: boolean };
 

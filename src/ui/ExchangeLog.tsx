@@ -22,17 +22,18 @@ type ExchangeLogProps = {
   pinnedQuestionOf: ExchangeId | null;
   highlight: LineMatch | null;
   countsOf: (id: ExchangeId) => ReplyCounts;
+  offScreenOf: (id: ExchangeId) => (() => void) | undefined;
   correctionsOf: (id: ExchangeId) => readonly CorrectionLine[];
   linksOf: (id: ExchangeId) => readonly LinkLine[];
   onUndo: () => void;
 };
 
-export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, correctionsOf, linksOf, onUndo, ...outcome }: ExchangeLogProps) {
+export function ExchangeLog({ exchanges, logRef, pinnedQuestionOf, highlight, countsOf, offScreenOf, correctionsOf, linksOf, onUndo, ...outcome }: ExchangeLogProps) {
   return (
     <ol role="log" ref={logRef}>
       {exchanges.map((exchange) => (
         <ExchangeEntry key={exchange.id} exchange={exchange} highlight={highlight?.exchangeId === exchange.id ? highlight : null}>
-          <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} counts={countsOf(exchange.id)} />
+          <ExchangeOutcome exchange={exchange} {...outcome} questionPinned={exchange.id === pinnedQuestionOf} counts={countsOf(exchange.id)} revealOffScreen={offScreenOf(exchange.id)} />
           <CorrectionLines lines={correctionsOf(exchange.id)} />
           <LinkLines lines={linksOf(exchange.id)} onUndo={onUndo} />
         </ExchangeEntry>

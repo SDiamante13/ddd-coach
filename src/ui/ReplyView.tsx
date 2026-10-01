@@ -17,16 +17,17 @@ export type RestoreNames = (text: string) => SwappedText;
 
 export const RESTORED_NOTE = "Names restored in this browser from your swaps.";
 
-type ReplyViewProps = { reply: string; restoreNames: RestoreNames; onKeep: KeepReply; questionPinned: boolean; counts: ReplyCounts };
-type PartProps = { block: ReplyBlock; questionPinned: boolean; counts: ReplyCounts };
+type OffScreen = { revealOffScreen?: (() => void) | undefined };
+type ReplyViewProps = { reply: string; restoreNames: RestoreNames; onKeep: KeepReply; questionPinned: boolean; counts: ReplyCounts } & OffScreen;
+type PartProps = { block: ReplyBlock; questionPinned: boolean; counts: ReplyCounts } & OffScreen;
 
-export function ReplyView({ reply, restoreNames, onKeep, questionPinned, counts }: ReplyViewProps) {
+export function ReplyView({ reply, restoreNames, onKeep, questionPinned, counts, revealOffScreen }: ReplyViewProps) {
   const restored = restoreNames(reply);
   const blocks = displayOrder(parseReply(restored.text));
   return (
     <div className="reply">
       {blocks.map((block, index) => (
-        <ReplyPart key={index} block={block} questionPinned={questionPinned} counts={counts} />
+        <ReplyPart key={index} block={block} questionPinned={questionPinned} counts={counts} revealOffScreen={revealOffScreen} />
       ))}
       {restored.spans.length > 0 && <p className="restored-note">{RESTORED_NOTE}</p>}
       {blocks.some(isAnalysis) && <RfcCopyButton blocks={blocks} />}
@@ -45,10 +46,10 @@ function displayOrder(blocks: ReplyBlock[]): ReplyBlock[] {
   return [...blocks.filter((block) => !LAST_KINDS.includes(block.kind)), ...LAST_KINDS.flatMap(lastOf)];
 }
 
-function ReplyPart({ block, questionPinned, counts }: PartProps) {
+function ReplyPart({ block, questionPinned, counts, revealOffScreen }: PartProps) {
   switch (block.kind) {
     case "events":
-      return <EventsOnBoard counts={counts} />;
+      return <EventsOnBoard counts={counts} revealOffScreen={revealOffScreen} />;
     case "words":
       return <WordTable rows={block.rows} />;
     case "question":

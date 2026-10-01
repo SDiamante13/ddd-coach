@@ -10,6 +10,7 @@ import type { RestoreNames } from "./ReplyView.tsx";
 import type { CorrectionLine } from "./CorrectionLines.tsx";
 import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
 import { hotspotOf } from "./hotspot.ts";
+import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
 import type { useVisitorActions } from "./useVisitorActions.ts";
@@ -17,15 +18,17 @@ import type { RestorePoint } from "./useKeptConversation.ts";
 
 const FRESH: RestorePoint = { turn: null, actions: 0, savedAt: null };
 
-export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, restorePoint = FRESH) {
+type FollowCoach = { followingCoach: boolean; setFollowingCoach: (following: boolean) => void };
+
+export function useBoardView(exchanges: readonly Exchange[], restoreNames: RestoreNames, edits: ReturnType<typeof useVisitorActions>, follow: FollowCoach, restorePoint = FRESH) {
   const board = useMemo(() => boardOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const counts = useMemo(() => replyCountsOf(exchanges, edits.actions), [exchanges, edits.actions]);
   const announced = useAnnouncedEdits(board, edits, restoreNames);
   const { selected, toggle } = useBoardSelection();
-  const [panHeld, setPanHeld] = useState(false);
   const [questionReveals, setQuestionReveals] = useState(0);
+  const offScreen = useOffScreenOffer(board.latest);
   const touching = <A extends unknown[]>(act: (...args: A) => void) => (...args: A) => {
-    setPanHeld(true);
+    follow.setFollowingCoach(false);
     act(...args);
   };
   const selectedCard = board.cards.find((card) => card.id === selected);
@@ -38,8 +41,10 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     toggle: touching(toggle),
     correct: touching(announced.correct),
     connect: touching(announced.connect),
-    panHeld,
-    releasePan: () => setPanHeld(false),
+    ...offScreen,
+    offScreenOf: (id: ExchangeId) => (offScreen.newOffScreen?.at === id ? offScreen.revealNew : undefined),
+    followingCoach: follow.followingCoach,
+    setFollowingCoach: follow.setFollowingCoach,
     linksOf: (id: ExchangeId): LinkLine[] => linkLinesOf(board, edits.actions, id, restoreNames, restorePoint.actions),
     justDrawn: edits.actions.length > restorePoint.actions ? justDrawnOf(board, edits.actions) : null,
     atRest: restorePoint.turn !== null && board.latest === restorePoint.turn,

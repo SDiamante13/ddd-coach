@@ -2,14 +2,14 @@ export type ReplyCounts = { added: number; updated: number; already: number; kep
 
 const KEPT = " · your wording kept";
 
-export function chipLabel(counts: ReplyCounts): string {
-  return `${countsLabel(counts)}${(counts.kept ?? 0) > 0 ? KEPT : ""}`;
+export function chipLabel(counts: ReplyCounts, offScreen = false): string {
+  return `${countsLabel(counts, offScreen)}${(counts.kept ?? 0) > 0 ? KEPT : ""}`;
 }
 
-function countsLabel({ added, updated, already }: ReplyCounts): string {
+function countsLabel({ added, updated, already }: ReplyCounts, offScreen: boolean): string {
   if (added === 0 && updated === 0) return `← ${already} already on the board`;
   const [first, ...rest] = [added > 0 && `${added} new`, updated > 0 && `${updated} updated`, already > 0 && `${already} already there`].filter(
     (part): part is string => part !== false,
   );
-  return [`← ${first} on the board`, ...rest].join(" · ");
+  return [offScreen ? `${first} on the board ▸ off-screen` : `← ${first} on the board`, ...rest].join(" · ");
 }

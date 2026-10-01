@@ -9,6 +9,7 @@ import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
 import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition } from "./boardLayout.ts";
 import { NewEventsChip } from "./NewEventsChip.tsx";
+import { FollowCoachToggle } from "./FollowCoachToggle.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
 import { useRevealQuestion } from "./useRevealQuestion.ts";
@@ -101,7 +102,7 @@ function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
   const nodes = useMemo(() => nodesOf(props), [props]);
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
-  const newEvents = usePanToChanges(props.view);
+  usePanToChanges(props.view, root);
   useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
@@ -111,6 +112,7 @@ function Lane(props: LaneProps) {
         edges={edges}
         nodeTypes={NODE_TYPES}
         defaultViewport={props.session.viewport ?? START_VIEWPORT}
+        onMoveStart={(event) => event && props.view.setFollowingCoach(false)}
         onMoveEnd={(_event, viewport) => props.session.keepViewport(viewport)}
         nodesDraggable={false}
         onConnect={({ source, target }) => props.view.connect(source as EntityId, target as EntityId)}
@@ -125,7 +127,8 @@ function Lane(props: LaneProps) {
         minZoom={BOARD_ZOOM.min}
         maxZoom={BOARD_ZOOM.max}
       />
-      <NewEventsChip events={newEvents} />
+      <NewEventsChip events={props.view.newOffScreen} onReveal={props.view.revealNew} />
+      <FollowCoachToggle following={props.view.followingCoach} onChange={props.view.setFollowingCoach} />
     </div>
   );
 }
