@@ -137,6 +137,15 @@ describe("The open question on the board (#97)", () => {
       expect(Math.min(...layers)).toBeGreaterThan(10);
     });
 
+    it("lets clicks through its dotted lines to the cards beneath (#127)", async () => {
+      await askedAboutARow();
+
+      const edges = [...board().querySelectorAll<SVGGElement>(".relates-edge")];
+
+      expect(edges.map((edge) => edge.querySelector<SVGPathElement>(".react-flow__edge-path")?.style.pointerEvents)).toEqual(["none", "none"]);
+      expect(edges.some((edge) => edge.querySelector(".react-flow__edge-interaction") !== null)).toBe(false);
+    });
+
     it("counts the row on the pinned question's chip", async () => {
       await askedAboutARow();
       const pinned = screen.getByRole("complementary", { name: "Current question" });

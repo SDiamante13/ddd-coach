@@ -69,6 +69,8 @@ const relates = (id: string, source: string, sourceHandle: string, target: strin
   targetHandle,
   className: "relates-edge",
   zIndex: RELATES_ABOVE_CARDS,
+  interactionWidth: 0,
+  style: { pointerEvents: "none" },
   domAttributes: { "aria-hidden": true },
 });
 

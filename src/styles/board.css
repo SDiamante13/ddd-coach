@@ -1024,3 +1024,7 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   border-radius: var(--radius-sm);
   background: var(--color-surface);
 }
+
+.board-lane .relates-edge {
+  pointer-events: none;
+}
