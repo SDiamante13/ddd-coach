@@ -1,4 +1,4 @@
-import { type CoordinateExtent, Handle, MiniMap, type Node, type NodeProps, Position, ReactFlow, ReactFlowProvider, type Edge, MarkerType } from "@xyflow/react";
+import { type CoordinateExtent, Handle, MiniMap, type Node, type NodeProps, Position, ReactFlow, type Edge, MarkerType } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import type { EventCard } from "../domain/board.ts";
@@ -7,14 +7,13 @@ import { titleOf } from "./linkLines.ts";
 import { BoardCard } from "./BoardCard.tsx";
 import { BOARD_ZOOM } from "../domain/session.ts";
 import type { BoardSession, BoardView } from "./EventBoard.tsx";
-import { CARD_HEIGHT, CARD_WIDTH, CONTROLS_BAND, LANE_INSET, lanePosition, ROW_TOP } from "./boardLayout.ts";
+import { CARD_HEIGHT, CARD_WIDTH, LANE_INSET, lanePosition, ROW_TOP } from "./boardLayout.ts";
 import { EdgeChips } from "./EdgeChips.tsx";
 import { onBoardKey } from "./boardFocus.ts";
 import { BoardHint, useBoardHint } from "./BoardHint.tsx";
 import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
 import { useRevealItem } from "./useRevealItem.ts";
-import { BoardControls } from "./BoardControls.tsx";
 import { TermNode, type TermNodeType, termNodesOf } from "./TermNode.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
@@ -44,7 +43,7 @@ const GhostNode = () => <div className="ghost-card" />;
 
 const NODE_TYPES = { event: EventNode, ghost: GhostNode, question: QuestionNode, term: TermNode };
 
-type LaneProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session: BoardSession };
+type LaneProps = { view: BoardView; thinking: boolean; restoreNames: RestoreNames; session: BoardSession; overview: boolean };
 
 function nodesOf({ view, thinking, restoreNames }: LaneProps): (EventNodeType | GhostNodeType | QuestionNodeType | TermNodeType)[] {
   const { cards } = view.board;
@@ -96,13 +95,7 @@ const linkEdgesOf = ({ view, restoreNames }: LaneProps): Edge[] =>
 
 const isJustDrawn = ({ justDrawn }: BoardView, from: EntityId, to: EntityId): boolean => justDrawn?.from === from && justDrawn.to === to;
 
-export function BoardFlow(props: LaneProps) {
-  return (
-    <ReactFlowProvider>
-      <Lane {...props} />
-    </ReactFlowProvider>
-  );
-}
+export const BoardFlow = (props: LaneProps) => <Lane {...props} />;
 
 function Lane(props: LaneProps) {
   const root = useRef<HTMLDivElement>(null);
@@ -140,11 +133,11 @@ function Lane(props: LaneProps) {
         minZoom={BOARD_ZOOM.min}
         maxZoom={BOARD_ZOOM.max}
         translateExtent={contentLocked(lane, nodes)}
-      />
-      <MiniMap className="board-overview" position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} bgColor="var(--color-surface)" maskColor="rgb(0 0 0 / 0.08)" style={MINI_MAP_SIZE} />
+      >
+        {props.overview && <MiniMap className="board-overview" position="bottom-right" ariaLabel="Board overview" pannable nodeColor={miniMapColor} style={MINI_MAP_SIZE} />}
+      </ReactFlow>
       <EdgeChips view={props.view} lane={lane} />
       <BoardHint shown={hint.shown} />
-      <BoardControls following={props.view.followingCoach} onFollowChange={props.view.setFollowingCoach} />
     </div>
   );
 }
@@ -157,7 +150,7 @@ const START_VIEWPORT = { x: LANE_INSET, y: 16, zoom: 1 };
 const contentLocked = ({ height }: LaneSize, nodes: readonly Node[]): CoordinateExtent => {
   if (height === 0) return UNLOCKED;
   const bottom = Math.max(...nodes.map(({ position, height: tall }) => position.y + (tall ?? CARD_HEIGHT)));
-  return [[-Infinity, -ROW_TOP], [Infinity, Math.max(height - CONTROLS_BAND - ROW_TOP, bottom + ROW_TOP)]];
+  return [[-Infinity, -ROW_TOP], [Infinity, Math.max(height - ROW_TOP, bottom + ROW_TOP)]];
 };
 const UNLOCKED: CoordinateExtent = [[-Infinity, -Infinity], [Infinity, Infinity]];
 

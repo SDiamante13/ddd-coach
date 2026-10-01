@@ -1,9 +1,9 @@
 import { useReactFlow, useViewport } from "@xyflow/react";
 import { prefersReducedMotion } from "./motion.ts";
 
-type BoardControlsProps = { following: boolean; onFollowChange: (following: boolean) => void };
+type BoardControlsProps = { following: boolean; onFollowChange: (following: boolean) => void; overview: boolean; onOverviewChange: (shown: boolean) => void };
 
-export function BoardControls({ following, onFollowChange }: BoardControlsProps) {
+export function BoardControls({ following, onFollowChange, overview, onOverviewChange }: BoardControlsProps) {
   const flow = useReactFlow();
   const { zoom } = useViewport();
   const touching = (move: (options: { duration: number }) => unknown) => () => {
@@ -21,6 +21,9 @@ export function BoardControls({ following, onFollowChange }: BoardControlsProps)
       </button>
       <button type="button" aria-label="Fit the board" onClick={touching(flow.fitView)}>
         Fit
+      </button>
+      <button type="button" className="overview-toggle" aria-pressed={overview} onClick={() => onOverviewChange(!overview)}>
+        Overview
       </button>
       <button type="button" className="follow-coach" aria-pressed={following} onClick={() => onFollowChange(!following)}>
         <span className="switch-track" aria-hidden="true">

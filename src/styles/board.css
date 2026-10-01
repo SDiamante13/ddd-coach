@@ -746,10 +746,6 @@ ol[role="log"] > li > p.correction-line[data-settled] {
 
 /* #20: board controls sit bottom-left; Follow coach shows its state as a pressed toggle. */
 .board-controls {
-  position: absolute;
-  bottom: 20px;
-  left: var(--space-4);
-  z-index: 5;
   display: flex;
   gap: var(--space-2);
 }
@@ -834,7 +830,7 @@ ol[role="log"] > li > p.correction-line[data-settled] {
 
 .board-hint {
   position: absolute;
-  bottom: calc(72px + var(--space-2));
+  bottom: var(--space-4);
   left: var(--space-4);
   z-index: 5;
   margin: 0;
@@ -1014,12 +1010,16 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   left: auto;
 }
 
-/* #127: the controls and the overview get their own 72 px band under the canvas, so they never cover a card. React Flow sets the canvas's inline height to 100%. */
-.board-lane > .react-flow {
-  height: calc(100% - 72px) !important;
+/* #127: the controls live in the board's header row, so they never cover a card; the overview is toggled. */
+.board-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
-.board-lane > .board-overview {
+.board-lane .board-overview {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
   background: var(--color-surface);

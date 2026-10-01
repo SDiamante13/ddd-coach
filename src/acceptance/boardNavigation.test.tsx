@@ -58,13 +58,21 @@ describe("Finding your way along the board (#20)", () => {
     expect(within(board()).getByRole("button", { name: "Fit the board" })).toBeEnabled();
   });
 
-  it("shows a small overview of the whole board, in the controls' band outside the canvas so neither covers a card (#127)", async () => {
+  it("keeps the controls in the board's header row, off the cards (#127)", async () => {
     await onTheBoard();
 
-    expect(within(board()).getByRole("img", { name: "Board overview" })).toBeInTheDocument();
-    const canvas = board().querySelector(".react-flow")!;
-    expect(canvas.contains(within(board()).getByRole("img", { name: "Board overview" }))).toBe(false);
-    expect(canvas.contains(within(board()).getByRole("button", { name: "Zoom in" }))).toBe(false);
+    expect(within(board()).getByRole("button", { name: "Zoom in" }).closest(".board-header-row")).not.toBeNull();
+  });
+
+  it("hides the overview on a narrow screen until asked, and shows it on request (#127)", async () => {
+    const { user } = await onTheBoard();
+    const overview = () => within(board()).queryByRole("img", { name: "Board overview" });
+    expect(within(board()).getByRole("button", { name: "Overview" })).toHaveAttribute("aria-pressed", "false");
+    expect(overview()).toBeNull();
+
+    await user.click(within(board()).getByRole("button", { name: "Overview" }));
+
+    expect(overview()).toBeInTheDocument();
   });
 
   it("brings a card you select fully into view, clear of the edge chips, moving the board no further than needed (#126, #127)", async () => {

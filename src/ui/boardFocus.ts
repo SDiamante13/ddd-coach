@@ -7,7 +7,7 @@ const ALONG: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1 };
 export function onBoardKey(event: KeyboardEvent<HTMLElement>): void {
   const item = (event.target as HTMLElement).closest<HTMLElement>("[data-board-item]");
   if (item === null || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey) return;
-  const next = event.key === "Escape" ? event.currentTarget.querySelector<HTMLElement>(".board-controls button") : neighbourOf(item, event.key, event.currentTarget);
+  const next = event.key === "Escape" ? event.currentTarget.closest(".event-board")?.querySelector<HTMLElement>(".board-controls button") ?? null : neighbourOf(item, event.key, event.currentTarget);
   if (next === null || next === undefined) return;
   event.preventDefault();
   next.focus();
