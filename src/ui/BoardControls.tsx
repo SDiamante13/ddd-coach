@@ -7,10 +7,12 @@ type BoardControlsProps = {
   paused: boolean;
   onFollowChange: (following: boolean) => void;
   onPause: () => void;
-  overview: boolean; onOverviewChange: (shown: boolean) => void;
+  onFit: () => void;
+  overview: boolean;
+  onOverviewChange: (shown: boolean) => void;
 };
 
-export function BoardControls({ following, paused, onFollowChange, onPause, overview, onOverviewChange }: BoardControlsProps) {
+export function BoardControls({ following, paused, onFollowChange, onPause, onFit, overview, onOverviewChange }: BoardControlsProps) {
   const flow = useReactFlow();
   const { zoom } = useViewport();
   const touching = (move: (options: { duration: number }) => unknown) => () => {
@@ -26,7 +28,14 @@ export function BoardControls({ following, paused, onFollowChange, onPause, over
       <button type="button" aria-label="Zoom in" onClick={touching(flow.zoomIn)}>
         +
       </button>
-      <button type="button" aria-label="Fit the board" onClick={touching(flow.fitView)}>
+      <button
+        type="button"
+        aria-label="Fit the board"
+        onClick={() => {
+          onPause();
+          onFit();
+        }}
+      >
         Fit
       </button>
       <button type="button" className="overview-toggle" aria-pressed={overview} onClick={() => onOverviewChange(!overview)}>

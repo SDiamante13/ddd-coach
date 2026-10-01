@@ -833,6 +833,13 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   right: var(--space-4);
 }
 
+.edge-chip.below {
+  top: auto;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .edge-chip:focus-visible {
   box-shadow: var(--focus-ring);
   outline: none;

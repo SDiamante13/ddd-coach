@@ -2,12 +2,13 @@ import { useReactFlow, useViewport } from "@xyflow/react";
 import type { BoardView } from "./EventBoard.tsx";
 import { CARD_WIDTH, EDGE_CHIP_SAFE, lanePosition } from "./boardLayout.ts";
 import { prefersReducedMotion } from "./motion.ts";
+import { MoreBelowChip } from "./MoreBelowChip.tsx";
 import { NewEventsChip } from "./NewEventsChip.tsx";
 import type { LaneSize } from "./useLaneSize.ts";
 
 const plural = (count: number) => (count === 1 ? "event" : "events");
 
-export function EdgeChips({ view, lane: { width } }: { view: BoardView; lane: LaneSize }) {
+export function EdgeChips({ view, lane: { width, height } }: { view: BoardView; lane: LaneSize }) {
   const { x, zoom } = useViewport();
   const flow = useReactFlow();
   const lefts = view.board.cards.map((_card, index) => lanePosition(index).x * zoom + x);
@@ -35,6 +36,7 @@ export function EdgeChips({ view, lane: { width } }: { view: BoardView; lane: La
           </button>
         )
       )}
+      <MoreBelowChip height={height} onPan={view.pauseFollow} />
     </>
   );
 }

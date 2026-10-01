@@ -13,6 +13,7 @@ import { onBoardKey } from "./boardFocus.ts";
 import { BoardHint, useBoardHint } from "./BoardHint.tsx";
 import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
+import { useFitBoard } from "./useFitBoard.ts";
 import { useRevealItem } from "./useRevealItem.ts";
 import { TermNode, type TermNodeType, termNodesOf } from "./TermNode.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
@@ -107,6 +108,7 @@ function Lane(props: LaneProps) {
   useRevealItem(props.view, lane, nodes);
   const hint = useBoardHint();
   useRevealQuestion(props.view, root);
+  useFitBoard(props.view, lane);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
   return (
     <div ref={root} className="board-lane" onFocus={hint.onFocus} onBlur={hint.onBlur} onKeyDown={(event) => onBoardKeys(event, hint.onKeyDown)}>

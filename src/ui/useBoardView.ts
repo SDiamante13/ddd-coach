@@ -38,6 +38,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
   const follow = useFollowCoach(place, announced.announce);
   const { selected, toggle } = useBoardSelection();
   const [questionReveals, setQuestionReveals] = useState(0);
+  const [fitRequests, setFitRequests] = useState(0);
   const [focused, setRovingId] = useState<EntityId | null>(null);
   const offScreen = useOffScreenOffer(board.latest);
   const touching = <A extends unknown[]>(act: (...args: A) => void) => (...args: A) => {
@@ -100,6 +101,8 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     setRovingId,
     questionReveals,
     revealQuestion: () => setQuestionReveals((count) => count + 1),
+    fitRequests,
+    fitBoard: () => setFitRequests((count) => count + 1),
   };
 }
 

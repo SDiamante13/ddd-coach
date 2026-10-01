@@ -53,6 +53,8 @@ export type BoardView = {
   setRovingId: (id: EntityId) => void;
   questionReveals: number;
   revealQuestion: () => void;
+  fitRequests: number;
+  fitBoard: () => void;
   setFollowingCoach: (following: boolean) => void;
   followPaused: boolean;
   pauseFollow: () => void;
@@ -120,7 +122,7 @@ function BoardHeader({ view, session, restoreNames, hasEvents, overview, setOver
           {wordsSummaryOf(view.words) && <span className={hasEvents ? "board-words" : "board-words alone"}>{wordsSummaryOf(view.words)}</span>}
           {view.quietRings && <span className="many-new">{`${view.freshCount} new on the board`}</span>}
         </p>
-        <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} overview={overview} onOverviewChange={setOverview} />
+        <BoardControls following={view.followingCoach} paused={view.followPaused} onFollowChange={view.setFollowingCoach} onPause={view.pauseFollow} onFit={view.fitBoard} overview={overview} onOverviewChange={setOverview} />
       </div>
       {view.words.terms.length > 0 && session.keepSettleBy && <SettleByLine settleBy={session.settleBy ?? null} onKeep={session.keepSettleBy} restoreNames={restoreNames} />}
     </>
