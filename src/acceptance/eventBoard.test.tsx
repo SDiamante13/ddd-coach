@@ -90,7 +90,7 @@ describe("Event board", () => {
 
     await replyNext(conversation, SECOND_BOARD_REPLY, 7);
 
-    const chips = within(conversation.log()).getAllByRole("button", { name: /on the board/ }).map((chip) => chip.textContent);
+    const chips = within(conversation.log()).getAllByRole("button", { name: /^← \d+ (new|updated|already)/ }).map((chip) => chip.textContent);
     expect(chips).toEqual(["← 5 new on the board", "← 2 new on the board · 1 already there"]);
   });
 
@@ -99,7 +99,7 @@ describe("Event board", () => {
 
     await replyNext(conversation, THIRD_BOARD_REPLY, 3);
 
-    const chips = within(conversation.log()).getAllByRole("button", { name: /on the board/ }).map((chip) => chip.textContent);
+    const chips = within(conversation.log()).getAllByRole("button", { name: /^← \d+ (new|updated|already)/ }).map((chip) => chip.textContent);
     expect(chips).toEqual(["← 3 new on the board", "← 1 updated on the board"]);
   });
 

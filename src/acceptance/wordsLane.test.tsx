@@ -96,6 +96,18 @@ describe("The Words lane (#109)", () => {
     await waitFor(() => expect(term("on time").style.transform).toBe("translate(16px,0px)"));
   });
 
+  it("collapses the reply's word table to a chip that takes you to the term cards, keeping the table one click away (#127)", async () => {
+    const { user, log } = await replied();
+
+    const chip = within(log()).getByRole("button", { name: "← 1 term on the board · 3 rows" });
+    expect(within(log()).getByText("Show as table").closest("details")).not.toHaveAttribute("open");
+    expect(within(log()).getByRole("button", { name: "Copy for your RFC" })).toBeInTheDocument();
+
+    await user.click(chip);
+
+    expect(within(term("late")).getByRole("group", { name: "Term “late”" })).toHaveFocus();
+  });
+
   describe("reaching the Words lane at 100% (#109 hotfix)", () => {
     beforeEach(() => {
       vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query, addEventListener: () => {}, removeEventListener: () => {} }));

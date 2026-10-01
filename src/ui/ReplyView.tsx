@@ -5,13 +5,13 @@ import { CUT_SHORT_NOTE } from "../shared/chatContract.ts";
 import { GLOSSARY_ENABLED } from "../shared/features.ts";
 import { UNSOURCED } from "../shared/replyLayout.ts";
 import { EventsOnBoard } from "./EventsOnBoard.tsx";
+import { WordsOnBoard } from "./WordsOnBoard.tsx";
 import { PinnedAboveChip } from "./PinnedQuestion.tsx";
 import { QuestionCard } from "./QuestionCard.tsx";
 import { KeepButton } from "./KeepButton.tsx";
 import { RepoCopyButton } from "./RepoCopyButton.tsx";
 import { RfcCopyButton } from "./RfcCopyButton.tsx";
 import type { KeepReply } from "./useGlossary.ts";
-import { WordTable } from "./WordTable.tsx";
 
 export type RestoreNames = (text: string) => SwappedText;
 
@@ -51,7 +51,7 @@ function ReplyPart({ block, questionPinned, counts, revealOffScreen }: PartProps
     case "events":
       return <EventsOnBoard counts={counts} revealOffScreen={revealOffScreen} />;
     case "words":
-      return <WordTable rows={block.rows} />;
+      return <WordsOnBoard rows={block.rows} />;
     case "question":
       return questionPinned ? <PinnedAboveChip /> : <QuestionCard roles={block.roles} text={block.text} sources={block.sources} />;
     case "cut":
