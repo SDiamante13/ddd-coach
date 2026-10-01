@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp } from "../test/appDriver.tsx";
+import { boardShowsReply, renderApp } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 import { entityId } from "../domain/entityId.ts";
 
@@ -22,7 +22,7 @@ describe("Cards keep where you put them (#20)", () => {
 
     await renderApp();
 
-    expect(await within(board()).findByRole("list", { name: "Events on the board" })).toBeInTheDocument();
+    expect(await boardShowsReply()).toBeInTheDocument();
     await waitFor(() => expect(nodeOf(FIRST).style.transform).toBe("translate(40px,260px)"));
   });
 

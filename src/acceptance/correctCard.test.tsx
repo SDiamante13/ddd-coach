@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CORRECTIONS_ENABLED } from "../shared/features.ts";
-import { addSwap, startConversation } from "../test/appDriver.tsx";
+import { addSwap, boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -16,7 +16,7 @@ const cardItem = (words: string) => within(board()).getAllByRole("listitem").fin
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 
@@ -152,7 +152,7 @@ describe("Correcting a card (#95)", () => {
     await conversation.user.click(screen.getByRole("button", { name: "Clear" }));
 
     conversation.server.reply(await conversation.send("Here is our #booking-split thread again."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-3" });
-    await within(board()).findByRole("list", { name: "Events on the board" });
+    await boardShowsReply();
     expect(within(board()).queryByText("YOU SAID")).not.toBeInTheDocument();
     expect(loggedLine()).not.toBeInTheDocument();
 

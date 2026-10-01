@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { addSwap, startConversation } from "../test/appDriver.tsx";
+import { addSwap, boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { V11_EXAMPLE_REPLY } from "../test/v10Replies.ts";
 import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
@@ -26,7 +26,7 @@ const changeTags = () => cards().map((card) => card.querySelector(".card-tag")?.
 async function replied(reply: string) {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 
@@ -154,7 +154,7 @@ describe("Event board", () => {
     const conversation = await startConversation();
     await addSwap(conversation.user, "Acme", "Customer B");
     conversation.server.reply(await conversation.send("Acme cancelled 7731."), 200, { reply, signature: "sig-1" });
-    await within(board()).findByRole("list", { name: "Events on the board" });
+    await boardShowsReply();
 
     expect(cards()[0]).toHaveTextContent("Acme cancels load 7731.");
     await conversation.send("Next.");
@@ -204,7 +204,7 @@ describe("Event board", () => {
       const conversation = await startConversation();
       await conversation.user.click(screen.getByRole("button", { name: "Try an example thread" }));
       conversation.server.reply(await conversation.send(""), 200, { reply: V11_EXAMPLE_REPLY, signature: "sig-1" });
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
       return conversation;
     }
 
@@ -239,7 +239,7 @@ describe("Event board", () => {
       await addSwap(conversation.user, "Acme Foods", "Customer B");
       const reply = "Events, in order\n1. From thread: Customer B billing issues a service credit for 7731.";
       conversation.server.reply(await conversation.send("Thu 09:30  Acme Foods billing: issued a service credit for 7731"), 200, { reply, signature: "s" });
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
 
       await conversation.user.click(cardButton("Acme Foods billing issues"));
 

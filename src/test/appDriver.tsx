@@ -1,6 +1,6 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
-import { vi } from "vitest";
+import { expect, vi } from "vitest";
 import { App } from "../App.tsx";
 import { stubFetch } from "./fetchStub.ts";
 
@@ -81,4 +81,17 @@ export async function addSwap(user: UserEvent, from: string, to: string) {
   await pasteInto(user, screen.getByRole("textbox", { name: "Replace" }), from);
   await pasteInto(user, screen.getByRole("textbox", { name: "With" }), to);
   await user.click(screen.getByRole("button", { name: "Add swap" }));
+}
+
+// The board lists its events while the coach is still thinking (ghost cards only), and React Flow hides each node until it has measured it.
+// Wait for the reply itself: no ghosts, and every node measured and shown.
+export async function boardShowsReply(): Promise<HTMLElement> {
+  const board = await screen.findByRole("region", { name: "Event board" });
+  await waitFor(() => {
+    const nodes = [...board.querySelectorAll<HTMLElement>(".react-flow__node")];
+    expect(board.querySelector(".board-ghost")).toBeNull();
+    expect(nodes.length).toBeGreaterThan(0);
+    expect(nodes.filter((node) => node.style.visibility === "hidden")).toEqual([]);
+  });
+  return within(board).getByRole("list", { name: "Events on the board" });
 }

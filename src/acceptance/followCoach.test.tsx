@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { FIRST_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => {
@@ -18,7 +18,7 @@ const firstCard = () => within(board()).getByRole("button", { name: /Customer su
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: FIRST_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 

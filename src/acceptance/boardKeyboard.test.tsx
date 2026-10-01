@@ -1,6 +1,6 @@
 import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp, startConversation } from "../test/appDriver.tsx";
+import { boardShowsReply, renderApp, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 import { entityId } from "../domain/entityId.ts";
 
@@ -14,7 +14,7 @@ const nodeOf = (text: string) => board().querySelector(`[data-id="${entityId("ev
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   card(1).focus();
   return conversation;
 }
@@ -112,7 +112,7 @@ describe("The board from the keyboard (#20)", () => {
 
       cleanup();
       const again = await renderApp();
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
       await again.user.keyboard("{Shift}");
       act(() => card(2).focus());
 
@@ -126,7 +126,7 @@ describe("The board from the keyboard (#20)", () => {
 
       cleanup();
       const again = await renderApp();
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
       await again.user.keyboard("{Shift}");
       act(() => card(2).focus());
 
@@ -141,7 +141,7 @@ describe("The board from the keyboard (#20)", () => {
 
       cleanup();
       const again = await renderApp();
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
       await again.user.keyboard("{Shift}");
       act(() => card(2).focus());
 

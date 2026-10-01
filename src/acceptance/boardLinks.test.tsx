@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { pasteInto, startConversation } from "../test/appDriver.tsx";
+import { boardShowsReply, pasteInto, startConversation } from "../test/appDriver.tsx";
 import { SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => {
@@ -19,7 +19,7 @@ const linkLine = () => within(screen.getByRole("log")).queryByText(LOGGED);
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 

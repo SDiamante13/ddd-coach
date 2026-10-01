@@ -2,7 +2,7 @@ import { act, cleanup, screen, waitFor, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COACH_UNVERIFIED } from "../shared/chatContract.ts";
-import { addSwap, composerOf, pasteInto, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
+import { addSwap, boardShowsReply, composerOf, pasteInto, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
 import { stubFetch } from "../test/fetchStub.ts";
 import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
@@ -21,7 +21,7 @@ const cardItem = (words: string) => within(board()).getAllByRole("listitem").fin
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: SECOND_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 

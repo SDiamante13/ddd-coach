@@ -1,6 +1,6 @@
 import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { renderApp, startConversation } from "../test/appDriver.tsx";
+import { boardShowsReply, renderApp, startConversation } from "../test/appDriver.tsx";
 import { FIRST_BOARD_REPLY, SECOND_BOARD_REPLY, THIRD_BOARD_REPLY } from "../test/boardReplies.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -17,8 +17,7 @@ const newChip = () => within(board()).queryByRole("button", { name: /^Show the .
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: FIRST_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
-  await within(board()).findByRole("button", { name: /Customer submits a bkg/ });
+  await boardShowsReply();
   return conversation;
 }
 
@@ -118,7 +117,7 @@ describe("A board that holds still once you've touched it (#124, #20)", () => {
     await conversation.user.click(screen.getByRole("button", { name: "Clear" }));
 
     conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: FIRST_BOARD_REPLY, signature: "sig-9" });
-    await within(board()).findByRole("list", { name: "Events on the board" });
+    await boardShowsReply();
 
     expect(follow()).toHaveAttribute("aria-pressed", "true");
   });

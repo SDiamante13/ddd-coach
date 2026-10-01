@@ -1,6 +1,6 @@
 import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { addSwap, startConversation } from "../test/appDriver.tsx";
+import { addSwap, boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { QUESTION_PASTE, QUESTION_REPLY, ROW_QUOTE_PASTE, ROW_QUOTE_REPLY } from "../test/questionReplies.ts";
 import { SECOND_BOARD_REPLY } from "../test/boardReplies.ts";
 
@@ -12,7 +12,7 @@ const onBoard = () => within(within(board()).getByRole("list", { name: "Events o
 async function asked() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send(QUESTION_PASTE), 200, { reply: QUESTION_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 
@@ -41,7 +41,7 @@ describe("The open question on the board (#97)", () => {
   it("puts no question on the board when the reply asks none", async () => {
     const conversation = await startConversation();
     conversation.server.reply(await conversation.send("Here is our thread."), 200, { reply: SECOND_BOARD_REPLY.split("\n\n")[0], signature: "sig-1" });
-    await within(board()).findByRole("list", { name: "Events on the board" });
+    await boardShowsReply();
 
     expect(onBoard().map((item) => item.getAttribute("aria-label") ?? "")).not.toContainEqual(expect.stringMatching(/^Open question/));
   });
@@ -62,7 +62,7 @@ describe("The open question on the board (#97)", () => {
       .replace("Does a late pickup earn the credit?", "Does Globex keep the credit?")
       .replace('"issued Globex a service credit for 7731"', '"Globex credit"');
     conversation.server.reply(await conversation.send(QUESTION_PASTE), 200, { reply, signature: "sig-1" });
-    await within(board()).findByRole("list", { name: "Events on the board" });
+    await boardShowsReply();
 
     expect(onBoard().at(-1)).toHaveAccessibleName("Open question: Does Customer D keep the credit?, relates to Event 1 and Event 2");
   });
@@ -74,7 +74,7 @@ describe("The open question on the board (#97)", () => {
     async function askedWithAStrayQuote() {
       const conversation = await startConversation();
       conversation.server.reply(await conversation.send(QUESTION_PASTE), 200, { reply, signature: "sig-1" });
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
       return conversation;
     }
 
@@ -117,7 +117,7 @@ describe("The open question on the board (#97)", () => {
     async function askedAboutARow() {
       const conversation = await startConversation();
       conversation.server.reply(await conversation.send(ROW_QUOTE_PASTE), 200, { reply: ROW_QUOTE_REPLY, signature: "sig-1" });
-      await within(board()).findByRole("list", { name: "Events on the board" });
+      await boardShowsReply();
       return conversation;
     }
 

@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { startConversation } from "../test/appDriver.tsx";
+import { boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { FIRST_BOARD_REPLY } from "../test/boardReplies.ts";
 
 const LANE_WIDTH = 600;
@@ -22,7 +22,7 @@ const board = () => screen.getByRole("region", { name: "Event board" });
 async function onTheBoard() {
   const conversation = await startConversation();
   conversation.server.reply(await conversation.send("Here is our #booking-split thread."), 200, { reply: FIRST_BOARD_REPLY, signature: "sig-1" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return conversation;
 }
 

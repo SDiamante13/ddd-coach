@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { addSwap, startConversation } from "../test/appDriver.tsx";
+import { addSwap, boardShowsReply, startConversation } from "../test/appDriver.tsx";
 import { WORDS_ONLY_REPLY, WORDS_PASTE, WORDS_REPLY } from "../test/wordReplies.ts";
 
 afterEach(() => vi.unstubAllGlobals());
@@ -11,7 +11,7 @@ const term = (word: string) => within(board()).getByRole("listitem", { name: new
 async function replied(reply = WORDS_REPLY, conversation?: Awaited<ReturnType<typeof startConversation>>) {
   const app = conversation ?? (await startConversation());
   app.server.reply(await app.send(WORDS_PASTE), 200, { reply, signature: "sig" });
-  await within(board()).findByRole("list", { name: "Events on the board" });
+  await boardShowsReply();
   return app;
 }
 
@@ -125,7 +125,7 @@ describe("The Words lane (#109)", () => {
     const conversation = await startConversation();
     const many = ["Events, in order", ...[1, 2, 3, 4, 5].map((n) => `${n}. From thread: Ops step ${n} happens on load 7731.`), "", WORDS_REPLY.slice(WORDS_REPLY.indexOf("Words that don't match"))].join("\n");
     conversation.server.reply(await conversation.send(WORDS_PASTE), 200, { reply: many, signature: "sig" });
-    await within(board()).findByRole("list", { name: "Events on the board" });
+    await boardShowsReply();
 
     expect(within(board()).getByText("6 new on the board")).toBeInTheDocument();
     expect(within(board()).queryAllByText("JUST ADDED")).toHaveLength(0);
