@@ -1,7 +1,9 @@
 import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { pasteInto, startConversation } from "../test/appDriver.tsx";
+import { entityId } from "../domain/entityId.ts";
+import { pasteInto, renderApp, sendText, startConversation } from "../test/appDriver.tsx";
+import { stubFetch } from "../test/fetchStub.ts";
 import { WORDS_PASTE } from "../test/wordReplies.ts";
 
 vi.mock("../shared/features.ts", () => ({ GLOSSARY_ENABLED: false, CORRECTIONS_ENABLED: true }));
@@ -44,12 +46,16 @@ describe("Corrections the server will take (#90, #95)", () => {
   });
 
   it("sends only the 20 most recent corrections, so the server never refuses the message for too many", async () => {
-    const app = await onTheWords(21);
-    for (let index = 21; index >= 1; index--) await correctRow(app.user, `word${index}`, `Fixed ${index}.`);
+    const replied = { id: "e1", prompt: WORDS_PASTE, status: "replied", reply: wordsReply(21), signature: "sig" };
+    const newestLast = Array.from({ length: 21 }, (_, index) => 21 - index).map((n) => ({ kind: "correct", id: entityId("meaning", `word${n}|Ops`), text: `Fixed ${n}.`, after: "e1" }));
+    localStorage.setItem("ddd-coach.session.v1", JSON.stringify({ version: 1, exchanges: [replied], visitorActions: newestLast }));
+    const server = stubFetch();
+    const { user, input } = await renderApp();
+    await within(board()).findByRole("listitem", { name: /^Term “word1”/ });
 
-    await app.send("And the next part.");
+    await sendText(user, input(), "And the next part.");
 
-    const sent = sentCorrections(app);
+    const sent = (server.bodyOf(0) as { corrections: Sent[] }).corrections;
     expect(sent).toHaveLength(20);
     expect(sent.map(({ now }) => now)).not.toContain("word21 (Ops): Fixed 21.");
   });
