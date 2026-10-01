@@ -41,6 +41,7 @@ Template: the latest `outputs/demos/*-deploy.md` (e.g. `117-121-118-deploy.md`).
 - Check env as booleans only (model, effort, keys and password set). Never print values or change them.
 - Confirm the live index JS hash equals the build. Match response header names case-insensitively (`grep -i`).
 - When checking new copy in the bundle, search for a stable fragment: plurals, templates and two-part labels ("QUESTION · OPEN") are split across strings.
+- Run `bin/hosted-check.sh https://ddd-coach.netlify.app` (#135) after every deploy. It prints PASS/FAIL per check and exits 1 on any failure: the three security headers, `/api/health` ok, chat GET 405 and session-less POST 401, no `sk-or`/`OPENROUTER`, source maps or googleapis/gstatic in the HTML, JS and CSS, and every woff2 same-origin with a 200. The bullets below remain the full list; check the function zips by hand.
 - Hosted checks: headers; chat GET 405 / POST 401; session 401 no-store; unlock GET 405; source paths 404; 0 `sk-or`/`OPENROUTER` in the HTML, JS and CSS, and 0 `sk-or` in the function zips (`OPENROUTER` there is only env var names, which is expected); no `.map`.
 - Fonts: every CSS font URL is same-origin, every woff2 returns 200, and there are 0 googleapis/gstatic references.
 - Shell gotchas on this machine: quote globs in zsh (`'--include=*.tsx'`), and `stat -f` resolves to GNU stat, so use `wc -c` for file sizes.
