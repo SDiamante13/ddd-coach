@@ -11,12 +11,12 @@ export function useBoardHint() {
   const [hint, setHint] = useState<Hint>(() => (seenBefore() ? "seen" : "unseen"));
   const byKeyboard = useKeyboardModality();
   const onFocus = (event: FocusEvent<HTMLElement>) => {
-    if (hint === "unseen" && byKeyboard.current && event.target.matches("button.card")) setHint("showing");
+    if (hint !== "unseen" || !byKeyboard.current || !event.target.matches("[data-board-item]")) return;
+    setHint("showing");
+    rememberSeen();
   };
   const onBlur = (event: FocusEvent<HTMLElement>) => {
-    if (hint !== "showing" || event.currentTarget.contains(event.relatedTarget)) return;
-    setHint("seen");
-    rememberSeen();
+    if (hint === "showing" && !event.currentTarget.contains(event.relatedTarget)) setHint("seen");
   };
   return { shown: hint === "showing", onFocus, onBlur };
 }
