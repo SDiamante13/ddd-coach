@@ -129,6 +129,14 @@ describe("The open question on the board (#97)", () => {
       expect(board().querySelectorAll(".relates-edge")).toHaveLength(2);
     });
 
+    it("draws the dotted lines above the cards, so none runs hidden under a term card (#127)", async () => {
+      await askedAboutARow();
+
+      const layers = [...board().querySelectorAll(".relates-edge")].map((edge) => Number((edge.closest("svg") as SVGElement).style.zIndex));
+
+      expect(Math.min(...layers)).toBeGreaterThan(10);
+    });
+
     it("counts the row on the pinned question's chip", async () => {
       await askedAboutARow();
       const pinned = screen.getByRole("complementary", { name: "Current question" });

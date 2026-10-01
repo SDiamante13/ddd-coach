@@ -68,8 +68,11 @@ const relates = (id: string, source: string, sourceHandle: string, target: strin
   target,
   targetHandle,
   className: "relates-edge",
+  zIndex: RELATES_ABOVE_CARDS,
   domAttributes: { "aria-hidden": true },
 });
+
+const RELATES_ABOVE_CARDS = 20;
 
 export function relatesEdgesOf({ hotspot }: BoardView, nodes: readonly Node[]): Edge[] {
   if (hotspot === null) return [];
