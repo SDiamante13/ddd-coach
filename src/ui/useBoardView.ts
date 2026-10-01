@@ -66,6 +66,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     hotspot: hotspotOf(exchanges, board, restoreNames),
     words,
     rovingId: focused ?? board.cards[0]?.id ?? words.terms[0]?.id ?? null,
+    focusedId: focused,
     setRovingId,
     questionReveals,
     revealQuestion: () => setQuestionReveals((count) => count + 1),

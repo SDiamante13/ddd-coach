@@ -34,6 +34,7 @@ export type BoardView = {
   hotspot: Hotspot | null;
   words: WordsLane;
   rovingId: EntityId | null;
+  focusedId: EntityId | null;
   setRovingId: (id: EntityId) => void;
   questionReveals: number;
   revealQuestion: () => void;

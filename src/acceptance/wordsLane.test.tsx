@@ -1,5 +1,5 @@
-import { screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { addSwap, startConversation } from "../test/appDriver.tsx";
 import { WORDS_ONLY_REPLY, WORDS_PASTE, WORDS_REPLY } from "../test/wordReplies.ts";
 
@@ -94,5 +94,27 @@ describe("The Words lane (#109)", () => {
     within(term("on time")).getByRole("group", { name: "Term “on time”" }).focus();
     await conversation.user.keyboard("{Shift>}{ArrowRight}{/Shift}");
     expect(term("on time").style.transform).toBe("translate(16px,0px)");
+  });
+
+  describe("reaching the Words lane at 100% (#109 hotfix)", () => {
+    beforeEach(() => {
+      vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query, addEventListener: () => {}, removeEventListener: () => {} }));
+      vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("board-lane") ? 900 : 0;
+      });
+      vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(function (this: HTMLElement) {
+        return this.classList.contains("board-lane") ? 400 : 0;
+      });
+    });
+    afterEach(() => vi.restoreAllMocks());
+
+    it("brings a term card below the fold into view when you move to it", async () => {
+      const { user } = await replied();
+      within(board()).getByRole("button", { name: /^Event 1 of 1/ }).focus();
+
+      await user.keyboard("{ArrowDown}");
+
+      await waitFor(() => expect(board().querySelector(".react-flow__viewport")).toHaveStyle({ transform: "translate(8px,-404px) scale(1)" }));
+    });
   });
 });
