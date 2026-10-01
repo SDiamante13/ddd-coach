@@ -12,6 +12,7 @@ import { EdgeChips } from "./EdgeChips.tsx";
 import { BoardHint, useBoardHint } from "./BoardHint.tsx";
 import { useDragging } from "./useDragging.ts";
 import { type LaneSize, useLaneSize } from "./useLaneSize.ts";
+import { useRevealSelected } from "./useRevealSelected.ts";
 import { BoardControls } from "./BoardControls.tsx";
 import { QuestionNode, type QuestionNodeType, questionNodesOf, relatesEdgesOf } from "./QuestionNode.tsx";
 import { usePanToChanges } from "./usePanToChanges.ts";
@@ -108,6 +109,7 @@ function Lane(props: LaneProps) {
   const edges = useMemo(() => [...thenEdgesOf(props.view.board.cards), ...linkEdgesOf(props), ...relatesEdgesOf(props.view)], [props]);
   usePanToChanges(props.view, root);
   const lane = useLaneSize(root);
+  useRevealSelected(props.view, lane);
   const hint = useBoardHint();
   useRevealQuestion(props.view, root);
   useLayoutEffect(() => asList(root.current), [nodes.length]);
