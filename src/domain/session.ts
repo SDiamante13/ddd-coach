@@ -27,7 +27,14 @@ export function sessionOf(stored: unknown): Session {
   const visitorActions = field(stored, "visitorActions");
   const valid =
     field(stored, "version") === SESSION_VERSION && everyIs(exchanges, isExchange) && everyIs(visitorActions, isVisitorAction);
-  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")), followingCoach: field(stored, "followingCoach") !== false } : EMPTY_SESSION;
+  return valid ? { exchanges: exchanges.map(unanswered), visitorActions, savedAt: savedAtOf(stored), viewport: viewportOf(field(stored, "viewport")), followingCoach: followingOf(stored) } : EMPTY_SESSION;
+}
+
+function followingOf(stored: unknown): boolean {
+  const kept = field(stored, "followingCoach");
+  if (typeof kept === "boolean") return kept;
+  const touched = (field(stored, "visitorActions") as unknown[]).length > 0 || viewportOf(field(stored, "viewport")) !== null;
+  return touched ? false : FOLLOW_COACH_AT_START;
 }
 
 function viewportOf(stored: unknown): Viewport | null {

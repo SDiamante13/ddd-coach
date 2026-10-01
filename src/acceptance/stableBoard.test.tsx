@@ -129,4 +129,21 @@ describe("A board that holds still once you've touched it (#124, #20)", () => {
     expect(newChip()).not.toBeInTheDocument();
     expect(within(conversation.log()).queryByRole("button", { name: /off-screen/ })).not.toBeInTheDocument();
   });
+
+  describe("a session saved before Follow coach existed", () => {
+    const restoreFrom = async (extra: object) => {
+      const exchange = { id: "e1", prompt: "Here is our #booking-split thread.", status: "replied", reply: FIRST_BOARD_REPLY, signature: "sig-1" };
+      localStorage.setItem("ddd-coach.session.v1", JSON.stringify({ version: 1, exchanges: [exchange], visitorActions: [], ...extra }));
+      await renderApp();
+      return within(await screen.findByRole("region", { name: "Event board" })).findByRole("button", { name: "Follow coach" });
+    };
+
+    it("comes back not following once the visitor had moved the board, so the next reply doesn't yank it", async () => {
+      expect(await restoreFrom({ viewport: { x: -300, y: 16, zoom: 1 } })).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("comes back following when the visitor never touched the board", async () => {
+      expect(await restoreFrom({})).toHaveAttribute("aria-pressed", "true");
+    });
+  });
 });
