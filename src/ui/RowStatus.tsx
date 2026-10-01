@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef, useState } from "react";
+import { type FocusEvent, type KeyboardEvent, useEffect, useRef, useState } from "react";
 import type { Verdict } from "../domain/boardFromReplies.ts";
 import { shortDay } from "../domain/dates.ts";
 import type { RowCheck } from "../domain/rowChecks.ts";
@@ -66,32 +66,37 @@ function CheckMenu({ onCheck, onClear }: CheckMenuProps) {
     setOpen(false);
     if (refocus) trigger.current?.focus();
   };
+  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Escape" || !open) return;
+    event.stopPropagation();
+    close(true);
+  };
+  const closeOnLeave = (event: FocusEvent<HTMLElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
+  };
   return (
-    <>
+    <span className="row-check-wrap" onKeyDown={closeOnEscape} onBlur={closeOnLeave}>
       <button ref={trigger} type="button" className="row-check" aria-expanded={open} aria-label="I checked" onClick={() => setOpen(!open)}>
         I checked ▾
       </button>
       {open && <CheckMenuPanel onCheck={onCheck} onClear={onClear} onClose={close} />}
-    </>
+    </span>
   );
 }
 
 function CheckMenuPanel({ onCheck, onClear, onClose }: CheckMenuProps & { onClose: (refocus: boolean) => void }) {
   const [where, setWhere] = useState("");
-  const closeOnEscape = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Escape") return;
-    event.stopPropagation();
-    onClose(true);
-  };
+  const first = useRef<HTMLButtonElement>(null);
+  useEffect(() => first.current?.focus(), []);
   const then = (act: () => void) => () => {
     onClose(false);
     act();
   };
   return (
-    <div className="row-check-menu" onKeyDown={closeOnEscape}>
+    <div className="row-check-menu">
       <input aria-label="Where? (optional)" placeholder="Where? e.g. app/models/booking.rb:212" value={where} onChange={(event) => setWhere(event.target.value)} />
-      {CHOICES.map(([verdict, label]) => (
-        <button key={verdict} type="button" onClick={then(() => onCheck(verdict, where.trim()))}>
+      {CHOICES.map(([verdict, label], index) => (
+        <button key={verdict} ref={index === 0 ? first : undefined} type="button" onClick={then(() => onCheck(verdict, where.trim()))}>
           {label}
         </button>
       ))}

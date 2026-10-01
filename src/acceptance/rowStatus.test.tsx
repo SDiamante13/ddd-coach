@@ -246,6 +246,40 @@ describe("Checking a term row yourself (#90a)", () => {
       expect(row("Billing")).toHaveTextContent("OPEN");
     });
 
+    it("opens with Enter or Space and puts focus on the first answer", async () => {
+      const { user } = await onTheWords();
+
+      await press(user, menuButton("Billing"));
+      expect(within(row("Billing")).getByRole("button", { name: "Yes, it holds" })).toHaveFocus();
+
+      await user.keyboard("{Escape}");
+      menuButton("Billing").focus();
+      await user.keyboard(" ");
+      expect(menuButton("Billing")).toHaveAttribute("aria-expanded", "true");
+      expect(within(row("Billing")).getByRole("button", { name: "Yes, it holds" })).toHaveFocus();
+    });
+
+    it("closes on Esc with focus still on I checked, and the board's own Esc never fires", async () => {
+      const { user } = await onTheWords();
+      await user.click(menuButton("Billing"));
+      menuButton("Billing").focus();
+
+      await user.keyboard("{Escape}");
+
+      expect(menuButton("Billing")).toHaveAttribute("aria-expanded", "false");
+      expect(menuButton("Billing")).toHaveFocus();
+    });
+
+    it("closes when Tab leaves the menu", async () => {
+      const { user } = await onTheWords();
+      await press(user, menuButton("Billing"));
+      within(row("Billing")).getByRole("button", { name: "Couldn't tell" }).focus();
+
+      await user.tab();
+
+      expect(menuButton("Billing")).toHaveAttribute("aria-expanded", "false");
+    });
+
     it("closes the menu on Esc and puts focus back on I checked", async () => {
       const { user } = await onTheWords();
       await press(user, menuButton("Billing"));

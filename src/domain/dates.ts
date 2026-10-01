@@ -12,3 +12,5 @@ export function shortDay(isoDate: string): string {
   const [year, month, day] = isoDate.split("-").map(Number);
   return shortDate(new Date(year!, month! - 1, day!));
 }
+
+export const dayAndMonth = (isoDate: string): string => shortDay(isoDate).replace(/ \d{4}$/, "");

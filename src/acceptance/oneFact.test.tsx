@@ -44,11 +44,12 @@ describe("One fact, one place (#90b)", () => {
   it("collapses the lines to a count, then shows one line per term with the open desks inline, from your table (#132)", async () => {
     const { user } = await asked();
     expect(within(pinned()).queryByRole("list", { name: /^Lines for / })).not.toBeInTheDocument();
+    expect(within(pinned()).getByText("from your table · only what's open")).toBeInTheDocument();
 
     await openLines(user);
 
-    expect(within(pinned()).getByText("Lines for the billing lead · only what's open")).toBeInTheDocument();
-    expect(within(pinned()).getByText("from your table")).toBeInTheDocument();
+    expect(within(pinned()).getByRole("button", { name: "1 line for the billing lead ▾" })).toHaveAttribute("aria-expanded", "true");
+    expect(within(pinned()).getByText("from your table · only what's open")).toBeInTheDocument();
     expect(lineTexts()).toEqual(["“late”: still current for Ops (day desk), Billing, Code?"]);
     expect(hotspot()).toHaveTextContent("0 OF 3 ANSWERED");
   });

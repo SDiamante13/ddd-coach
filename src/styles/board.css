@@ -1049,9 +1049,10 @@ ol[role="log"] > li > p.correction-line[data-settled] {
 /* #132: Settle by sits on the right of the counts, giving the canvas its line back. */
 .board-counts {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--space-2) var(--space-4);
+  min-width: 0;
 }
 
 .board-counts .board-header,
@@ -1133,19 +1134,15 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   cursor: pointer;
 }
 
-/* #132: 'I checked' only on the card being worked on; the status chip stays on every row. Opacity keeps it in the Tab order. */
-.term-card .row-check {
-  opacity: 0;
-}
-
-.term-card:hover .row-check,
-.term-card:focus-within .row-check,
-.term-card .row-check[aria-expanded="true"] {
-  opacity: 1;
-}
-
-@media (hover: none) {
+/* #132: with a mouse, 'I checked' shows only on the card being worked on; touch always shows it. The status chip stays on every row. Opacity keeps it in the Tab order. */
+@media (hover: hover) {
   .term-card .row-check {
+    opacity: 0;
+  }
+
+  .term-card:hover .row-check,
+  .term-card:focus-within .row-check,
+  .term-card .row-check[aria-expanded="true"] {
     opacity: 1;
   }
 }
@@ -1199,19 +1196,6 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   font-size: var(--text-sm);
 }
 
-.expert-lines-head {
-  margin: 0 0 var(--space-1);
-  color: var(--color-coach);
-  font: 500 11px / 1.4 var(--font-label);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-}
-
-.expert-lines .from-table {
-  color: var(--color-ink-muted);
-  text-transform: none;
-}
-
 .expert-lines ol {
   margin: 0;
   padding-left: var(--space-5);
@@ -1261,8 +1245,7 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   color: var(--color-ink-muted);
 }
 
-.expert-lines-toggle,
-.expert-lines-hide {
+.expert-lines-toggle {
   min-height: 28px;
   margin-top: var(--space-1);
   padding: 2px 10px;
@@ -1354,4 +1337,37 @@ ol[role="log"] > li > p.correction-line[data-settled] {
   flex-basis: 100%;
   font-size: 12px;
   color: var(--color-coach);
+}
+
+/* #132: settle-by stays one line on the counts line; the full text is in its title. */
+.settle-by {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 6rem;
+  white-space: nowrap;
+}
+
+.settle-by-text {
+  min-width: 0;
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settle-by-edit {
+  min-height: 0;
+  line-height: 1;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+}
+
+.expert-lines-sub {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--color-ink-muted);
 }

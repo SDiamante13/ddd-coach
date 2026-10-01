@@ -1,25 +1,41 @@
 import { type FormEvent, useState } from "react";
-import { shortDay } from "../domain/dates.ts";
+import { dayAndMonth, shortDay } from "../domain/dates.ts";
 import type { SettleBy } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
 
 type SettleByLineProps = { settleBy: SettleBy | null; onKeep: (settleBy: SettleBy) => void; restoreNames: RestoreNames };
 
 export function SettleByLine({ settleBy, onKeep, restoreNames }: SettleByLineProps) {
-  const [adding, setAdding] = useState(false);
-  if (settleBy) return <p className="settle-by">{`Settle by: ${settleByText(settleBy, restoreNames)} · typed by you`}</p>;
-  if (!adding)
-    return (
-      <button type="button" className="settle-by-add" onClick={() => setAdding(true)}>
-        + Add a settle-by date (only if you have one)
-      </button>
-    );
-  return <SettleByForm onKeep={onKeep} onCancel={() => setAdding(false)} />;
+  const [editing, setEditing] = useState(false);
+  const keep = (next: SettleBy) => {
+    setEditing(false);
+    onKeep(next);
+  };
+  if (editing) return <SettleByForm initial={settleBy && { forum: restoreNames(settleBy.forum).text, on: settleBy.on }} onKeep={keep} onCancel={() => setEditing(false)} />;
+  if (settleBy) return <SettledBy settleBy={settleBy} restoreNames={restoreNames} onEdit={() => setEditing(true)} />;
+  return (
+    <button type="button" className="settle-by-add" onClick={() => setEditing(true)}>
+      + Add a settle-by date (only if you have one)
+    </button>
+  );
 }
 
-function SettleByForm({ onKeep, onCancel }: { onKeep: (settleBy: SettleBy) => void; onCancel: () => void }) {
-  const [forum, setForum] = useState("");
-  const [on, setOn] = useState("");
+function SettledBy({ settleBy, restoreNames, onEdit }: { settleBy: SettleBy; restoreNames: RestoreNames; onEdit: () => void }) {
+  return (
+    <p className="settle-by">
+      <span className="settle-by-text" title={`Settle by: ${settleByText(settleBy, restoreNames)} · typed by you`}>
+        {`Settle by ${dayAndMonth(settleBy.on)} · ${restoreNames(settleBy.forum).text}`}
+      </span>
+      <button type="button" className="settle-by-edit" aria-label="Change the settle-by" onClick={onEdit}>
+        ✎
+      </button>
+    </p>
+  );
+}
+
+function SettleByForm({ initial, onKeep, onCancel }: { initial: SettleBy | null; onKeep: (settleBy: SettleBy) => void; onCancel: () => void }) {
+  const [forum, setForum] = useState(initial?.forum ?? "");
+  const [on, setOn] = useState(initial?.on ?? "");
   const keep = (event: FormEvent) => {
     event.preventDefault();
     if (forum.trim() !== "" && on !== "") onKeep({ forum: forum.trim(), on });

@@ -27,7 +27,7 @@ describe("A settle-by date, only if you have one (#90d)", () => {
     await asked();
 
     expect(within(board()).getByRole("button", { name: "+ Add a settle-by date (only if you have one)" })).toBeInTheDocument();
-    expect(screen.queryByText(/Settle by:/)).toBeNull();
+    expect(screen.queryByText(/^Settle by /)).toBeNull();
     expect(within(pinned()).queryByText(/^Before /)).toBeNull();
   });
 
@@ -36,7 +36,8 @@ describe("A settle-by date, only if you have one (#90d)", () => {
 
     await settleBy(user, "Finance review", "2026-10-27");
 
-    expect(within(board()).getByText("Settle by: Finance review, 27 Oct 2026 · typed by you")).toBeInTheDocument();
+    const line = within(board()).getByText("Settle by 27 Oct · Finance review");
+    expect(line).toHaveAttribute("title", "Settle by: Finance review, 27 Oct 2026 · typed by you");
     expect(within(pinned()).getByText("Before Finance review, 27 Oct 2026.")).toBeInTheDocument();
   });
 
@@ -50,7 +51,7 @@ describe("A settle-by date, only if you have one (#90d)", () => {
     cleanup();
     await renderApp();
 
-    expect(await within(board()).findByText("Settle by: Acme Foods QBR, 27 Oct 2026 · typed by you")).toBeInTheDocument();
+    expect(await within(board()).findByText("Settle by 27 Oct · Acme Foods QBR")).toBeInTheDocument();
   });
 
   it("clears it with New conversation", async () => {
@@ -60,7 +61,7 @@ describe("A settle-by date, only if you have one (#90d)", () => {
     await user.click(screen.getByRole("button", { name: "New conversation" }));
     await user.click(screen.getByRole("button", { name: "Clear" }));
 
-    expect(screen.queryByText(/Settle by:/)).toBeNull();
+    expect(screen.queryByText(/^Settle by /)).toBeNull();
   });
 
   it("puts what you typed at the top of the RFC copy (#90e)", async () => {
@@ -78,6 +79,18 @@ describe("A settle-by date, only if you have one (#90d)", () => {
 
     await settleBy(user, "Finance review", "2026-10-27");
 
-    expect(within(board()).getByText("Settle by: Finance review, 27 Oct 2026 · typed by you").closest(".board-counts")).not.toBeNull();
+    expect(within(board()).getByText("Settle by 27 Oct · Finance review").closest(".board-counts")).not.toBeNull();
+  });
+
+  it("lets you change it from ✎ (#132)", async () => {
+    const { user } = await asked();
+    await settleBy(user, "Finance review", "2026-10-27");
+
+    await user.click(within(board()).getByRole("button", { name: "Change the settle-by" }));
+    await user.clear(within(board()).getByRole("textbox", { name: "Where it gets settled" }));
+    await pasteInto(user, within(board()).getByRole("textbox", { name: "Where it gets settled" }), "Ops review");
+    await user.click(within(board()).getByRole("button", { name: "Keep settle-by" }));
+
+    expect(within(board()).getByText("Settle by 27 Oct · Ops review")).toBeInTheDocument();
   });
 });
