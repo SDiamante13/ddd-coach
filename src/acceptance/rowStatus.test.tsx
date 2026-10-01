@@ -104,4 +104,25 @@ describe("Checking a term row yourself (#90a)", () => {
     await renderApp();
     expect(await within(board()).findByText("Any load past the booked appointment.")).toBeInTheDocument();
   });
+
+  it("offers Clear check only on a row you've checked", async () => {
+    const { user } = await onTheWords();
+
+    await user.click(within(row("Billing")).getByRole("button", { name: "I checked" }));
+
+    expect(within(row("Billing")).queryByRole("button", { name: "Clear check" })).not.toBeInTheDocument();
+  });
+
+  it("keeps your correction when you clear a no", async () => {
+    const { user } = await onTheWords();
+    await checkRow(user, "Billing", "No, it's wrong");
+    await pasteInto(user, within(row("Billing")).getByRole("textbox", { name: "Correct this meaning" }), " Past the appointment.");
+    await user.keyboard("{Enter}");
+
+    await checkRow(user, "Billing", "Clear check");
+
+    expect(row("Billing")).toHaveTextContent("OPEN");
+    expect(row("Billing")).toHaveTextContent("YOU SAID");
+    expect(row("Billing").querySelector(".term-meaning")).toHaveTextContent("Past the appointment.");
+  });
 });

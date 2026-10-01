@@ -37,6 +37,7 @@ export type BoardView = {
   correctRow: (row: EntityId, text: string) => void;
   justChecked: EntityId | null;
   check: (row: EntityId, verdict: Verdict, where: string) => void;
+  clearCheck: (row: EntityId) => void;
   move: (id: EntityId, position: Position) => void;
   newOffScreen: OffScreenOffer | null;
   offerNew: (offer: OffScreenOffer | null) => void;

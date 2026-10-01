@@ -26,6 +26,7 @@ type RowChecks = {
   checks: ReadonlyMap<string, RowCheck>;
   onCheck: (row: TermRow["id"], verdict: Verdict, where: string) => void;
   onCorrect: (row: TermRow["id"], text: string) => void;
+  onClear: (row: TermRow["id"]) => void;
   justChecked: string | null;
 };
 type TermData = { term: TermCard; change: TermChange; restoreNames: RestoreNames; nudge: (by: Position) => void; roving: Roving; rowChecks: RowChecks };
@@ -77,6 +78,7 @@ function TermRowItem({ row, shown, rowChecks }: { row: TermRow; shown: (text: st
         shown={shown}
         onCheck={(verdict, where) => rowChecks.onCheck(row.id, verdict, where)}
         onCorrect={(text) => rowChecks.onCorrect(row.id, text)}
+        onClear={() => rowChecks.onClear(row.id)}
       />
     </li>
   );
@@ -100,7 +102,7 @@ function termNodeOf(term: TermCard, position: Position, view: BoardView, restore
     height: HEADER_HEIGHT + term.rows.reduce((sum, row) => sum + rowHeightOf(row), 0),
     ariaRole: "listitem",
     ariaLabel: termNameOf(term, restoreNames),
-    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id), rowChecks: { checks: view.checks, onCheck: view.check, onCorrect: view.correctRow, justChecked: view.justChecked } },
+    data: { term, change: view.atRest || view.quietRings ? null : changeOf(term, view.words), restoreNames, nudge, roving: rovingOf(view, term.id), rowChecks: { checks: view.checks, onCheck: view.check, onCorrect: view.correctRow, onClear: view.clearCheck, justChecked: view.justChecked } },
   };
 }
 

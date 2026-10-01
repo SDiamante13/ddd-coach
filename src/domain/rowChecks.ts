@@ -8,3 +8,5 @@ const isCheck = (action: VisitorAction): action is Check => action.kind === "che
 export function checksOf(actions: readonly VisitorAction[]): Map<EntityId, RowCheck> {
   return new Map(actions.filter(isCheck).map(({ row, verdict, where, at }) => [row, { verdict, at, ...(where !== undefined && { where }) }]));
 }
+
+export const withoutCheck = (actions: readonly VisitorAction[], row: EntityId): VisitorAction[] => actions.filter((action) => !(isCheck(action) && action.row === row));

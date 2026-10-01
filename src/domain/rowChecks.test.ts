@@ -3,7 +3,7 @@ import { boardOf, type VisitorAction } from "./boardFromReplies.ts";
 import { compactMoves, lastEdit } from "./cardMoves.ts";
 import { entityId } from "./entityId.ts";
 import type { Exchange, ExchangeId, Prompt } from "./exchange.ts";
-import { checksOf } from "./rowChecks.ts";
+import { checksOf, withoutCheck } from "./rowChecks.ts";
 
 const e1 = "e1" as ExchangeId;
 const billing = entityId("meaning", "late|Billing");
@@ -22,6 +22,12 @@ describe("row checks", () => {
   it("saves only each row's latest check, and Undo skips checks", () => {
     expect(compactMoves([check(billing, "unknown"), link, check(billing, "holds")])).toEqual([link, check(billing, "holds")]);
     expect(lastEdit([link, check(billing, "holds")])).toBe(link);
+  });
+
+  it("clears a row's check, leaving other rows' checks and every other edit", () => {
+    const fix: VisitorAction = { kind: "correct", id: billing, text: "Any load past the booked appointment.", after: e1 };
+
+    expect(withoutCheck([check(billing, "unknown"), link, fix, check(code, "holds"), check(billing, "wrong")], billing)).toEqual([link, fix, check(code, "holds")]);
   });
 
   it("leaves the board's events untouched by checks", () => {

@@ -19,4 +19,3 @@ export function compactMoves(actions: readonly VisitorAction[]): VisitorAction[]
 }
 
 export const lastEdit = (actions: readonly VisitorAction[]): VisitorAction | undefined => actions.filter((action) => latestKeyOf(action) === null).at(-1);
-

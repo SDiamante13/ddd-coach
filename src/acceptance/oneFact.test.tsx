@@ -74,4 +74,15 @@ describe("One fact, one place (#90b)", () => {
     expect(within(lines()).getAllByRole("listitem").map((line) => line.textContent)).not.toContainEqual(expect.stringContaining("Ops (day desk)"));
     expect(hotspot()).toHaveTextContent("1 OF 3 ANSWERED");
   });
+
+  it("returns a row you clear to open, asking its line again and uncounting it", async () => {
+    const { user } = await asked();
+    await checkRow(user, "Billing", "Yes, it holds");
+
+    await checkRow(user, "Billing", "Clear check");
+
+    expect(row("Billing")).toHaveTextContent("OPEN");
+    expect(within(lines()).getAllByRole("listitem")).toHaveLength(3);
+    expect(hotspot()).toHaveTextContent("0 OF 3 ANSWERED");
+  });
 });

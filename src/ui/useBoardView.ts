@@ -78,6 +78,7 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
       const after = board.latest ?? words.latest;
       if (after !== null) edits.check(row, verdict, where, after);
     }),
+    clearCheck: touching(edits.clearCheck),
     move: (id: EntityId, position: Position) => {
       follow.setFollowingCoach(false);
       const after = board.latest ?? words.latest;

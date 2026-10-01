@@ -4,6 +4,7 @@ import { isoDay } from "../domain/dates.ts";
 import type { EntityId } from "../domain/entityId.ts";
 import type { ExchangeId } from "../domain/exchange.ts";
 import { lastEdit, type Position } from "../domain/cardMoves.ts";
+import { withoutCheck } from "../domain/rowChecks.ts";
 
 export function useVisitorActions(outgoing: (text: string) => string, initial: readonly VisitorAction[] = []) {
   const [actions, setActions] = useState<readonly VisitorAction[]>(initial);
@@ -13,10 +14,11 @@ export function useVisitorActions(outgoing: (text: string) => string, initial: r
   const move = (id: EntityId, { x, y }: Position, after: ExchangeId) => setActions((list) => [...list, { kind: "move", id, x, y, after }]);
   const check = (row: EntityId, verdict: Verdict, where: string, after: ExchangeId) =>
     setActions((list) => [...list, { kind: "check", row, verdict, at: isoDay(new Date()), after, ...(where !== "" && { where: outgoing(where) }) }]);
+  const clearCheck = (row: EntityId) => setActions((list) => withoutCheck(list, row));
   const undo = () =>
     setActions((list) => {
       const last = lastEdit(list);
       return last === undefined ? list : list.filter((action) => action !== last);
     });
-  return { actions, correct, connect, move, check, undo, clear: () => setActions([]) };
+  return { actions, correct, connect, move, check, clearCheck, undo, clear: () => setActions([]) };
 }

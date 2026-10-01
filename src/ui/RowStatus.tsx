@@ -16,9 +16,10 @@ type RowStatusProps = {
   shown: (text: string) => string;
   onCheck: (verdict: Verdict, where: string) => void;
   onCorrect: (text: string) => void;
+  onClear: () => void;
 };
 
-export function RowStatus({ check, meaning, shown, onCheck, onCorrect }: RowStatusProps) {
+export function RowStatus({ check, meaning, shown, onCheck, onCorrect, onClear }: RowStatusProps) {
   const [correcting, setCorrecting] = useState(false);
   const checked = (verdict: Verdict, where: string) => {
     onCheck(verdict, where);
@@ -31,7 +32,7 @@ export function RowStatus({ check, meaning, shown, onCheck, onCorrect }: RowStat
   return (
     <div className="row-status nodrag nopan">
       {check ? <CheckedBadge check={check} shown={shown} /> : <span className="row-open">OPEN</span>}
-      <CheckMenu onCheck={checked} />
+      <CheckMenu onCheck={checked} onClear={check ? onClear : undefined} />
       {correcting && <MeaningEditor initial={meaning} onKeep={keep} onCancel={() => setCorrecting(false)} />}
     </div>
   );
@@ -57,7 +58,9 @@ function CheckedBadge({ check, shown }: { check: RowCheck; shown: (text: string)
   );
 }
 
-function CheckMenu({ onCheck }: { onCheck: (verdict: Verdict, where: string) => void }) {
+type CheckMenuProps = { onCheck: (verdict: Verdict, where: string) => void; onClear: (() => void) | undefined };
+
+function CheckMenu({ onCheck, onClear }: CheckMenuProps) {
   const [open, setOpen] = useState(false);
   const [where, setWhere] = useState("");
   const choose = (verdict: Verdict) => {
@@ -78,6 +81,18 @@ function CheckMenu({ onCheck }: { onCheck: (verdict: Verdict, where: string) => 
               {label}
             </button>
           ))}
+          {onClear && (
+            <button
+              type="button"
+              className="row-clear"
+              onClick={() => {
+                setOpen(false);
+                onClear();
+              }}
+            >
+              Clear check
+            </button>
+          )}
         </div>
       )}
     </>
