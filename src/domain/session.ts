@@ -72,6 +72,9 @@ function isExchange(value: unknown): value is Exchange {
   }
 }
 
+const VERDICTS: readonly unknown[] = ["holds", "wrong", "unknown"];
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
 function isVisitorAction(value: unknown): value is VisitorAction {
   const texts = (...keys: string[]) => keys.every((key) => Boolean(stringField(value, key)));
   switch (field(value, "kind")) {
@@ -79,6 +82,8 @@ function isVisitorAction(value: unknown): value is VisitorAction {
       return texts("id", "text", "after");
     case "connect":
       return texts("from", "to", "after");
+    case "check":
+      return texts("row", "after") && VERDICTS.includes(field(value, "verdict")) && DAY.test(stringField(value, "at") ?? "") && ["undefined", "string"].includes(typeof field(value, "where"));
     case "move":
       return texts("id", "after") && [field(value, "x"), field(value, "y")].every((n) => typeof n === "number" && Number.isFinite(n));
     default:

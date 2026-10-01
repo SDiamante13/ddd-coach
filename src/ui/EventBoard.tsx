@@ -10,6 +10,8 @@ import type { Hotspot } from "./hotspot.ts";
 import type { WordsLane } from "../domain/words.ts";
 import { wordsSummaryOf } from "./TermNode.tsx";
 import type { Position } from "../domain/cardMoves.ts";
+import type { RowCheck } from "../domain/rowChecks.ts";
+import type { Verdict } from "../domain/boardFromReplies.ts";
 import type { OffScreenOffer } from "./useOffScreenOffer.ts";
 import type { Viewport } from "../domain/session.ts";
 import type { RestoreNames } from "./ReplyView.tsx";
@@ -28,6 +30,8 @@ export type BoardView = {
   highlightedLine: string | null;
   followingCoach: boolean;
   positions: ReadonlyMap<EntityId, Position>;
+  checks: ReadonlyMap<EntityId, RowCheck>;
+  check: (row: EntityId, verdict: Verdict, where: string) => void;
   move: (id: EntityId, position: Position) => void;
   newOffScreen: OffScreenOffer | null;
   offerNew: (offer: OffScreenOffer | null) => void;

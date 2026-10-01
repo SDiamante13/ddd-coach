@@ -12,6 +12,8 @@ import { useAnnouncedEdits } from "./useAnnouncedEdits.ts";
 import { type Hotspot, hotspotOf } from "./hotspot.ts";
 import { type WordsLane, wordsOf } from "../domain/words.ts";
 import { lastEdit, type Position, positionsOf } from "../domain/cardMoves.ts";
+import { checksOf } from "../domain/rowChecks.ts";
+import type { Verdict } from "../domain/boardFromReplies.ts";
 import { useOffScreenOffer } from "./useOffScreenOffer.ts";
 import { justDrawnOf, type LinkLine, linkLinesOf } from "./linkLines.ts";
 import { useBoardSelection } from "./useBoardSelection.ts";
@@ -59,6 +61,11 @@ export function useBoardView(exchanges: readonly Exchange[], restoreNames: Resto
     quietRings: !atRest && freshCount > RINGS_UP_TO,
     undoable: undoableOf(board, lastEdit(edits.actions)),
     positions: positionsOf(edits.actions),
+    checks: checksOf(edits.actions),
+    check: touching((row: EntityId, verdict: Verdict, where: string) => {
+      const after = board.latest ?? words.latest;
+      if (after !== null) edits.check(row, verdict, where, after);
+    }),
     move: (id: EntityId, position: Position) => {
       follow.setFollowingCoach(false);
       const after = board.latest ?? words.latest;
