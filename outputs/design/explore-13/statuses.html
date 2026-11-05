@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive statuses</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 13 for #90: "I checked" per row, one fact in one place (row, question card, expert line change together), settle-by only if typed. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 10px/1 var(--font-label);text-transform:uppercase;letter-spacing:.05em}
+.muted{color:var(--color-ink-muted)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{opacity:.8;margin-right:8px}
+.stage{position:absolute;inset:36px 360px 0 0;padding:18px 32px;overflow:hidden}
+.settle{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--radius-pill);font-size:13px;margin-bottom:16px}
+.settle.empty{border:1px dashed var(--color-line-strong);color:var(--color-ink-muted)}
+.settle.set{border:1px solid var(--color-ink);font-weight:600}
+.settle.typing{border:2px solid var(--color-coach)}
+.caret{display:inline-block;width:2px;height:14px;background:var(--color-coach);vertical-align:-2px}
+.row2{display:flex;gap:28px;align-items:flex-start}
+.term{width:470px;background:var(--color-surface);border:1px solid var(--color-line-strong);border-radius:6px;box-shadow:var(--shadow-card);padding:12px 14px 8px}
+.term h3{margin:0 0 2px;font:700 22px/1.1 var(--font-display)}
+.row{border-top:1px solid var(--color-line);padding:9px 0 8px;font-size:13.5px;line-height:1.35;position:relative;display:grid;grid-template-columns:1fr auto;gap:4px 12px}
+.row .who{font-weight:600}
+.row .src{grid-column:1;font:500 10.5px/1.35 var(--font-label);color:var(--color-ink-muted)}
+.row .ctl{grid-column:2;grid-row:1 / span 3;align-self:start}
+.chip{display:inline-block;padding:2px 7px;border-radius:4px;font:500 10px/1.5 var(--font-label);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.chip.open{color:var(--color-card-question);border:1px solid var(--color-card-question)}
+.chip.checked{color:var(--color-ok);border:1px solid var(--color-ok);background:rgb(156 207 148 / .14)}
+.chip.no{color:var(--color-alert);border:1px solid var(--color-alert)}
+.chip.cant{color:var(--color-warn);border:1px dashed var(--color-warn)}
+.btn{display:inline-block;padding:5px 11px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-size:12.5px;font-weight:500;background:var(--color-surface-sunken);white-space:nowrap}
+.menu{position:absolute;right:0;top:36px;z-index:5;width:250px;padding:8px;border-radius:10px;background:var(--color-surface);border:1px solid var(--color-line-strong);box-shadow:var(--shadow-float);display:flex;flex-direction:column;gap:6px;font-size:13px}
+.menu .opt{padding:6px 10px;border-radius:8px}
+.menu .opt.sel{background:var(--color-coach-tint);outline:1px solid var(--color-coach)}
+.menu .field{border:1px solid var(--color-coach);border-radius:6px;padding:6px 8px;color:var(--color-ink)}
+.menu .ok{align-self:flex-end;padding:5px 12px;border-radius:var(--radius-pill);background:var(--color-coach);color:var(--color-on-coach);font-weight:600}
+.ring{outline:2px dashed var(--color-coach);outline-offset:3px;border-radius:4px}
+.qcard{width:260px;padding:10px 12px;border-radius:var(--radius-card);background:var(--color-card-question);color:var(--color-card-ink);box-shadow:var(--shadow-card);font-size:13px}
+.qcard .t{font:600 15px/1.25 var(--font-display);margin:4px 0 8px}
+.qcard ul{margin:0;padding-left:16px}
+.qcard li.done{text-decoration:line-through;opacity:.55}
+.qcard .top{display:flex;justify-content:space-between;color:rgb(28 27 24 / .72)}
+.dock{position:absolute;top:36px;right:0;bottom:0;width:360px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);padding:12px 16px;display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.lines{border:1px solid var(--color-line-strong);border-radius:var(--radius-md);background:var(--color-surface);padding:10px 12px}
+.lines ol{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.lines li.gone{text-decoration:line-through;opacity:.5}
+.lines li.add{color:var(--color-ink)}
+.coach{border-radius:var(--radius-md);padding:9px 12px;background:var(--color-coach-tint)}
+.who2{color:var(--color-coach);margin-bottom:5px}
+.composer{margin-top:auto;border:1px solid var(--color-coach);border-radius:var(--radius-sm);padding:7px 9px;color:var(--color-ink-muted)}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="stage board-bg" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const CAPS = {
+  1: "1 · Every open row has “I checked ▾”. The open question and the lines for the expert come from the same rows",
+  2: "2 · I checked the code: Yes, and where. The source is optional, but it's what makes the check worth keeping",
+  3: "3 · One fact, one place: the row, the question card and the expert's line change together, ringed for 3 s",
+  4: "4 · Couldn't tell: the row says so, and the expert's line asks for evidence instead of an answer",
+  5: "5 · Settle-by appears only when she types it. It's never guessed, and it sits above the whole table",
+};
+
+const ROWS = [
+  { id: "night", who: "Ops (night shift)", m: "Same booking, marked REBOOKED, for a date or carrier change", src: "Maya, §4 comment, 8 Oct 2026", q: "Does night shift's “rebook” cover a lane change?" },
+  { id: "code", who: "Code", m: "Old row REBOOKED, new row points back", src: "Booking#rebook!, per the thread, 14 Oct 2026", q: "Does the code still insert a new row on a rebook?" },
+  { id: "day", who: "Ops (day desk)", m: "A same-carrier date change is AMENDED; a lane change is a new booking", src: "Dana's sheet, 29 Sep 2026", q: "Is Dana's sheet still the day desk's rule?" },
+];
+
+function status(id, s) {
+  if (id === "code" && s >= 3) return { chip: `<span class="chip checked">Checked by you · 15 Oct</span>`, src: "Booking#rebook!, read by you 15 Oct 2026 · app/models/booking.rb:212", done: true };
+  if (id === "day" && s >= 4) return { chip: `<span class="chip cant">Couldn't tell · 15 Oct</span>`, src: "Dana's sheet, 29 Sep 2026 · you couldn't confirm it's current" };
+  return { chip: `<span class="chip open">Open</span>`, src: null };
+}
+
+function rowHtml(r, s) {
+  const st = status(r.id, s);
+  const ring = (s === 3 && r.id === "code") || (s === 4 && r.id === "day") ? "ring" : "";
+  const ctl = st.done || (r.id === "day" && s >= 4) ? "" : `<span class="btn">I checked ▾</span>`;
+  const menu = s === 2 && r.id === "code" ? `<div class="menu"><div class="label muted">I checked this row</div><div class="opt sel">✓ Yes, it holds</div><div class="opt">✗ No, it's wrong</div><div class="opt">? Couldn't tell</div><div class="label muted" style="margin-top:4px">Where? (optional)</div><div class="field">app/models/booking.rb:212<span class="caret"></span></div><span class="ok">Keep</span></div>` : "";
+  return `<div class="row ${ring}"><div><span class="who">${r.who}</span> ${st.chip}</div><div class="ctl">${ctl}</div><div>${r.m}</div><span class="src">${st.src || r.src}</span>${menu}</div>`;
+}
+
+function qcard(s) {
+  const items = ROWS.map(r => {
+    const st = status(r.id, s);
+    const done = st.done ? "done" : "";
+    return `<li class="${done}">${r.q}</li>`;
+  }).join("");
+  const count = s >= 3 ? "1 of 3 answered" : "3 open";
+  const ring = s === 3 ? "ring" : "";
+  return `<div class="qcard ${ring}"><div class="top label"><span>Question</span><span>${count}</span></div><div class="t">What does “rebook” mean on each desk today?</div><ul>${items}</ul></div>`;
+}
+
+function settle(s) {
+  if (s < 5) return `<div class="settle empty">+ Add a settle-by date <span class="muted">(only if you have one)</span></div>`;
+  return `<div class="settle set">Settle by: Finance review, Tue 27 Oct <span class="muted" style="font-weight:400">· typed by you</span></div>`;
+}
+
+function renderStage(s) {
+  document.getElementById("stage").innerHTML = `${settle(s)}<div class="label muted" style="margin-bottom:10px">Words · rebook · 3 rows</div><div class="row2"><div class="term"><h3>“rebook”</h3>${ROWS.map(r => rowHtml(r, s)).join("")}</div>${qcard(s)}</div>`;
+}
+
+function renderDock(s) {
+  const line = (text, cls = "") => `<li class="${cls}">${text}</li>`;
+  const code = s === 3 ? line("Does the code still insert a new row on a rebook?", "gone ring") : s > 3 ? "" : line("Does the code still insert a new row on a rebook?");
+  const day = s >= 4 ? line("Is Dana's sheet still the day desk's rule? <b>Can you point me to where it's written down now?</b>", s === 4 ? "add ring" : "add") : line("Is Dana's sheet still the day desk's rule?");
+  const settleLine = s >= 5 ? `<div class="muted" style="margin-top:8px;font-size:12.5px">Before the Finance review, Tue 27 Oct</div>` : "";
+  const lines = `<div class="lines"><div class="label" style="color:var(--color-coach)">Lines for the ops lead · only what's open</div><ol>${line("Does night shift's “rebook” cover a lane change?")}${code}${day}</ol>${settleLine}</div>`;
+  const note = s === 3 ? `<div class="coach"><div class="who2 label">Coach</div>Updated in 3 places: the row, the question card and the ops lead's lines. I dropped the code question, since you checked it yourself.</div>`
+    : s === 4 ? `<div class="coach"><div class="who2 label">Coach</div>Marked “couldn't tell”. I changed the ops lead's line to ask where the rule is written down, not for a yes or no.</div>` : "";
+  document.getElementById("dock").innerHTML = `${lines}${note}<div class="composer">Paste a thread or ask a follow-up</div>`;
+}
+
+function show(s) {
+  document.getElementById("cap").innerHTML = `<b>Exploration 13 · Interactive statuses (#90)</b>${CAPS[s]}`;
+  renderStage(s);
+  renderDock(s);
+}
+window.runTo = show;
+show(Number(new URLSearchParams(location.search).get("state") || 1));
+</script>
+</body>
+</html>

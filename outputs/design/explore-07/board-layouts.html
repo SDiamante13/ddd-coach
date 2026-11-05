@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event board layouts</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 07 for #94: where the event board lives. Three layouts, four states each. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 11px/1 var(--font-label);text-transform:uppercase;letter-spacing:var(--tracking-label)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{font-weight:700;opacity:.8;margin-right:8px}
+
+/* Sticky, per the board components sheet */
+.sticky{position:relative;flex:none;width:168px;min-height:118px;padding:10px 12px 12px;border-radius:var(--radius-card);background:var(--color-card-event);color:var(--color-card-ink);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.sticky .top{display:flex;justify-content:space-between;gap:6px;color:rgb(28 27 24 / .72);white-space:nowrap}
+.sticky .top.label{font-size:10px;letter-spacing:.05em}
+.sticky .t{font:600 16px/1.18 var(--font-display)}
+.sticky.guess{background:#f9d4ae;border:2px dashed #a0581a;box-shadow:none}
+.sticky.q{background:var(--color-card-question)}
+.sticky.new{animation:land .45s var(--ease-out) both}
+.sticky.new::after{content:"";position:absolute;inset:-7px;border:2px dashed var(--color-coach);border-radius:4px;animation:ring var(--highlight-hold) linear forwards;pointer-events:none}
+.sticky.new .tag{position:absolute;top:-24px;left:-7px;padding:3px 6px;border-radius:3px;background:var(--color-coach);color:var(--color-on-coach);animation:ring var(--highlight-hold) linear forwards}
+.hold .sticky.new::after,.hold .sticky.new .tag{animation:none}
+.sticky.sel{outline:3px solid var(--color-ink);outline-offset:3px}
+@keyframes land{from{opacity:0;transform:translateY(-18px) rotate(-3deg) scale(.92)}to{opacity:1;transform:none}}
+@keyframes ring{0%,80%{opacity:1}100%{opacity:0}}
+.then{flex:none;align-self:center;width:34px;height:2px;background:var(--color-ink);position:relative}
+.then::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:9px solid var(--color-ink);border-right:0}
+.lane{display:flex;align-items:flex-start;gap:0}
+.lane>.then{margin:0 6px}
+.ghost{border:2px dashed var(--color-line-strong);border-radius:6px;color:var(--color-ink-muted);display:grid;place-items:center;text-align:center;padding:16px}
+
+/* Conversation pieces */
+.purpose{color:var(--color-ink-muted);font-size:var(--text-sm)}
+.you,.coach{border-radius:var(--radius-md);padding:10px 14px;font-size:var(--text-sm)}
+.you{background:var(--color-surface);border:1px solid var(--color-line);align-self:flex-end;max-width:88%}
+.coach{background:var(--color-coach-tint)}
+.who{color:var(--color-coach);margin-bottom:6px}
+.you .who{color:var(--color-ink-muted)}
+.pending{font-style:italic;color:var(--color-ink-muted)}
+.qcard{border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-surface);padding:12px 14px}
+.qcard .role{color:var(--color-coach);margin-bottom:6px;line-height:1.4}
+.qcard .qt{font-weight:600;line-height:1.35}
+.qcard blockquote{margin:8px 0 0;padding-left:10px;border-left:2px solid var(--color-line-strong);color:var(--color-ink-muted);font-size:var(--text-sm)}
+.words{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.words td{padding:4px 6px;border-top:1px solid var(--color-line);vertical-align:top}
+.words td:first-child{font-weight:600}
+.placed{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--radius-pill);border:1px solid var(--color-coach);color:var(--color-coach);font-size:13px;font-weight:500}
+.composer{border:1px solid var(--color-line);border-radius:var(--radius-md);background:var(--color-surface);padding:10px}
+.composer .box{border:1px solid var(--color-coach);border-radius:var(--radius-sm);padding:8px 10px;color:var(--color-ink-muted);font-size:var(--text-sm);min-height:44px}
+.composer .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.send{padding:8px 18px;border-radius:var(--radius-pill);background:var(--color-coach);color:var(--color-on-coach);font-weight:600;font-size:var(--text-sm)}
+.thread{font:400 12.5px/1.5 var(--font-label);white-space:pre-wrap;color:var(--color-ink-muted);max-height:none}
+.thread mark{background:rgb(246 166 92 / .28);color:var(--color-ink);outline:2px solid var(--color-card-event);border-radius:2px}
+.popover{position:absolute;z-index:5;width:300px;padding:10px 12px;border-radius:var(--radius-md);background:var(--color-surface);border:1px solid var(--color-line-strong);box-shadow:var(--shadow-float);font-size:13px}
+.popover .label{color:var(--color-ink-muted);margin-bottom:4px}
+
+/* Layout B: the board is the page, the conversation sits in the margin */
+#B .stage{position:absolute;inset:0 360px 0 0;padding:64px 40px 40px;overflow:hidden}
+#B .dock{position:absolute;top:0;right:0;bottom:0;width:360px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);display:flex;flex-direction:column}
+#B .dockhead{padding:44px 16px 10px;border-bottom:1px solid var(--color-line)}
+#B .log{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+#B .dockfoot{padding:12px 16px 16px}
+#B h1{font:700 26px/1 var(--font-display);letter-spacing:var(--tracking-display);margin:0 0 4px}
+#B .lanehead{display:flex;align-items:baseline;gap:12px;margin:18px 0 26px}
+#B .lanehead .label{color:var(--color-ink-muted)}
+#B .lane{flex-wrap:nowrap}
+#B .lane .sticky{width:136px}
+#B .lane>.then{width:24px}
+
+#B .qstrip{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:7px 10px;border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-surface)}
+#B .qstrip .label{color:var(--color-coach);font-size:10px}
+#B .qstrip .qline{grid-column:1;font-weight:600;font-size:13.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#B .qstrip .more{grid-column:2;grid-row:1 / span 2;align-self:center;color:var(--color-coach)}
+.compactmode #B .dockhead{padding:10px 16px 8px}
+.compactmode #B .composer .box{min-height:0;padding:6px 10px}
+.compactmode #B .composer .row{display:none}
+.compactmode #B .composer{display:flex;gap:8px;align-items:center}
+.compactmode #B .composer .box{flex:1}
+.gtag{display:inline-block;margin-right:4px;padding:0 5px;border:1px dashed var(--color-warn);border-radius:4px;color:var(--color-warn);font:500 10px/1.5 var(--font-label);text-transform:uppercase;letter-spacing:.05em}
+/* Layout C: a filmstrip timeline across the top */
+#C .strip{position:absolute;top:36px;left:0;right:0;height:214px;border-bottom:1px solid var(--color-line-strong);padding:16px 24px 0;overflow:hidden}
+#C .strip .meta{display:flex;gap:14px;align-items:baseline;color:var(--color-ink-muted);margin-bottom:28px}
+#C .strip .lane .sticky{width:150px;min-height:104px}
+#C .divider{flex:none;align-self:stretch;width:0;border-left:2px dashed var(--color-line-strong);margin:0 18px;position:relative}
+#C .divider span{position:absolute;bottom:-24px;left:-30px;width:60px;text-align:center;color:var(--color-ink-muted)}
+#C .chat{position:absolute;top:250px;left:0;right:0;bottom:0;overflow:hidden}
+#C .col{max-width:720px;margin:0 auto;padding:16px 24px;display:flex;flex-direction:column;gap:12px}
+
+/* Layout A: events turn into stickies in place, then peel onto a board */
+#A .col{max-width:760px;margin:0 auto;padding:56px 24px 24px;display:flex;flex-direction:column;gap:12px;transition:all .6s var(--ease-out)}
+#A .inplace{display:flex;flex-wrap:nowrap;align-items:flex-start;margin-top:30px}
+#A .inplace .sticky{width:112px;min-height:96px;padding:8px 9px}
+#A .inplace .sticky .top span:first-child{display:none}
+#A .inplace .sticky .t{font-size:14px}
+#A .inplace>.then{width:14px;margin:0 5px}
+#A .peelbtn{align-self:flex-start;margin-top:10px}
+#A.peeled .col{position:absolute;right:0;top:0;bottom:0;width:400px;max-width:none;margin:0;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);padding-top:48px;overflow:hidden}
+#A .boardwrap{position:absolute;inset:0 400px 0 0;padding:64px 40px;overflow:hidden;opacity:0;transition:opacity .5s}
+#A.peeled .boardwrap{opacity:1}
+#A .blane .sticky{width:136px}
+#A .blane>.then{width:24px}
+#A .ghostslot{width:44px;height:34px;border:2px dashed var(--color-line-strong);border-radius:3px;opacity:.6}
+
+.layout{position:absolute;inset:0;display:none}
+.layout.on{display:block}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="layout board-bg" id="A"></div>
+<div class="layout" id="B"></div>
+<div class="layout" id="C"></div>
+<script>
+const EVENTS = [
+  { src: "FROM THREAD", t: "Customer booked a delivery appointment", line: 2 },
+  { src: "FROM THREAD", t: "Truck picked up after the pickup window", line: 4 },
+  { src: "FROM THREAD", t: "Load 7731 delivered past the appointment", line: 6 },
+  { src: "FROM THREAD", t: "Weekly late report listed 7731", line: 8 },
+  { src: "GUESS", t: "Service credit issued to Customer D?", line: 9 },
+];
+const LATER = [
+  { src: "FROM THREAD", t: "Credit reversed after review", line: 0 },
+  { src: "GUESS", t: "Q3 on-time % recalculated?", line: 0 },
+];
+const THREAD = [
+  "Example thread (fictional). #late-loads at a made-up freight broker.",
+  "",
+  "Mon 08:11  Account team: in the contract a load is late when we miss the delivery appointment the customer booked.",
+  "",
+  "Tue 06:40  Carrier desk: 7731 picked up 50 min after the window, driver held at the shipper",
+  "",
+  "Tue 16:05  Ops (day desk): 7731 delivered, 2h past the appointment",
+  "",
+  "Thu 09:30  Billing: 7731 is on this week's late report",
+  "Thu 09:32  Billing: issued Customer D a service credit for 7731, it's on this week's late report",
+];
+const QUESTION = {
+  role: "Question for the account team lead and the billing lead, at Friday's service review",
+  text: "Which definition decides whether load 7731 counts as late: the delivery appointment, the pickup window, or both?",
+  quotes: ["“in the contract a load is late when we miss the delivery appointment”", "“issued Customer D a service credit for 7731”"],
+};
+const CAPTIONS = {
+  A: ["A · In place, then peel", "1 · Today's page: a pasted thread", "2 · The coach is thinking", "3 · The events list arrives as stickies, in place", "4 · “Put on the board”: the stickies peel off, the chat moves to the margin"],
+  B: ["B · The board is the page", "1 · An empty board waits; the conversation lives in the margin", "2 · The coach is thinking; the lane shows where events will land", "3 · Events land on the board in order; the question stays pinned in the margin", "4 · Click a sticky: the margin scrolls to the thread line it came from"],
+  C: ["C · Filmstrip", "1 · A timeline strip across the top, empty", "2 · The coach is thinking", "3 · The strip fills from the first paste", "4 · A second paste extends the strip; clicking a sticky finds its line"],
+};
+
+const esc = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+
+function sticky(e, i, opts = {}) {
+  const guess = e.src === "GUESS";
+  const cls = ["sticky", guess ? "guess" : "", opts.fresh ? "new" : "", opts.sel ? "sel" : ""].join(" ");
+  const at = new URLSearchParams(location.search).get("at");
+  const timing = at === null ? `animation-delay:${i * 140}ms` : `animation-delay:${i * 140 - Number(at)}ms;animation-play-state:paused`;
+  const delay = opts.fresh ? `style="${timing}"` : "";
+  const tag = opts.fresh ? `<span class="tag label">Just added</span>` : "";
+  return `<div class="${cls}" ${delay} data-i="${i}">${tag}<div class="top label"><span>Event</span><span>${e.src}</span></div><div class="t">${esc(e.t)}</div></div>`;
+}
+
+function lane(events, opts = {}) {
+  return events.map((e, i) => sticky(e, i, { fresh: opts.fresh, sel: opts.sel === i })).join(`<div class="then" aria-label="then"></div>`);
+}
+
+function questionCard() {
+  return `<div class="qcard"><div class="role label">${QUESTION.role}</div><div class="qt">${QUESTION.text}</div>${QUESTION.quotes.map(q => `<blockquote>${q}</blockquote>`).join("")}</div>`;
+}
+
+function wordsTable() {
+  return `<table class="words"><tr><td>late</td><td>Account team</td><td>Missed the booked delivery appointment</td></tr><tr><td></td><td>Carrier desk</td><td>Picked up after the window</td></tr><tr><td></td><td>Billing</td><td>On the weekly late report</td></tr><tr><td></td><td>Code</td><td><span class="gtag">Guess</span> Late when pickup is after the window end</td></tr></table>`;
+}
+
+function threadExcerpt(markLine) {
+  return THREAD.map((l, i) => i === markLine ? `<mark>${esc(l)}</mark>` : esc(l)).join("\n");
+}
+
+function youPaste(open, markLine) {
+  const body = open ? `<div class="thread">${threadExcerpt(markLine)}</div>` : `Example thread (fictional). #late-loads… <span class="purpose">· 3,492 characters</span>`;
+  return `<div class="you"><div class="who label">You</div>${body}</div>`;
+}
+
+function composer(text) {
+  return `<div class="composer"><div class="box">${text || "Paste a thread or ask a follow-up"}</div><div class="row"><span class="purpose">Enter sends</span><span class="send">Send</span></div></div>`;
+}
+
+function renderB(state) {
+  const empty = `<div class="lane"><div class="ghost" style="width:560px;height:118px">Events from your paste land here, left to right, in order.</div></div>`;
+  const thinking = `<div class="lane">${[0, 1, 2].map(() => `<div class="ghost" style="width:168px;height:118px;opacity:.5"></div>`).join(`<div class="then" style="opacity:.3"></div>`)}</div>`;
+  const board = state <= 1 ? empty : state === 2 ? thinking : `<div class="lane">${lane(EVENTS, { fresh: state === 3, sel: state === 4 ? 2 : null })}</div>`;
+  const pop = state === 4 ? `<div class="popover" style="left:330px;top:300px"><div class="label">Source · Tue 16:05, Ops (day desk)</div>“7731 delivered, 2h past the appointment”<div class="purpose" style="margin-top:6px">Shown in your paste on the right →</div></div>` : "";
+  const compact = new URLSearchParams(location.search).has("compact");
+  const strip = `<div class="qstrip"><span class="label">Question · account team lead + billing lead</span><span class="qline">${QUESTION.text}</span><span class="more">▾</span></div>`;
+  const pinned = state >= 3 ? `<div style="padding:${compact ? "8px 12px" : "10px 16px 12px"};border-bottom:1px solid var(--color-line)">${compact ? strip : questionCard()}</div>` : "";
+  let log = "";
+  if (state === 1) log = `<div class="purpose">Paste a messy thread. Its events go on the board, in order; the words each team uses differently and one question stay here.</div>`;
+  if (state >= 2) log += youPaste(state === 4, 6);
+  if (state === 2) log += `<div class="coach"><div class="who label">Coach</div><span class="pending">Coach is thinking…</span></div>`;
+  if (state === 3) log += `<div class="coach"><div class="who label">Coach</div><span class="placed">← 5 new on the board</span><div class="label" style="margin-top:10px;color:var(--color-ink-muted)">Words that don't match</div>${wordsTable()}</div>`;
+  document.getElementById("B").innerHTML = `
+    <div class="stage board-bg"><h1>DDD Coach</h1><div class="lanehead"><span class="label">Timeline · Events</span><span class="purpose">${state >= 3 ? "5 events · 1 guess" : ""}</span></div>${board}${pop}</div>
+    <div class="dock"><div class="dockhead"><div class="label" style="color:var(--color-ink-muted)">Conversation</div></div>${pinned}<div class="log">${log}</div><div class="dockfoot">${composer(state === 1 ? "Example thread (fictional). #late-loads at a made-up freight broker…" : "")}</div></div>`;
+}
+
+function renderC(state) {
+  const events = state === 4 ? EVENTS : EVENTS;
+  let strip = `<div class="ghost" style="width:560px;height:104px">Your timeline grows here with each paste.</div>`;
+  if (state === 2) strip = [0, 1, 2].map(() => `<div class="ghost" style="width:150px;height:104px;opacity:.5"></div>`).join(`<div class="then" style="opacity:.3"></div>`);
+  if (state >= 3) strip = lane(events, { fresh: state === 3, sel: state === 4 ? 3 : null });
+  if (state === 4) strip += `<div class="divider"><span class="label">Paste 2</span></div>` + LATER.map((e, i) => sticky(e, i, { fresh: true })).join(`<div class="then"></div>`);
+  let col = `<div class="purpose">Paste a messy thread or meeting notes. Events go on the strip above; words and one question come back here.</div>`;
+  if (state >= 2) col += youPaste(state === 4, 8);
+  if (state === 2) col += `<div class="coach"><div class="who label">Coach</div><span class="pending">Coach is thinking…</span></div>`;
+  if (state >= 3) col += `<div class="coach"><div class="who label">Coach</div><span class="placed">↑ 5 events on the timeline</span><div class="label" style="margin-top:10px;color:var(--color-ink-muted)">Words that don't match</div>${wordsTable()}<div style="margin-top:12px">${questionCard()}</div></div>`;
+  if (state < 4) col += composer(state === 1 ? "Example thread (fictional). #late-loads at a made-up freight broker…" : "");
+  const shift = state === 4 ? "transform:translateY(-8px)" : "";
+  document.getElementById("C").innerHTML = `
+    <div class="strip board-bg"><div class="meta"><span class="label">Timeline</span><span class="purpose">${state >= 3 ? (state === 4 ? "2 pastes · 7 events" : "1 paste · 5 events") : ""}</span></div><div class="lane" style="flex-wrap:nowrap;${state === 4 ? 'transform:translateX(-330px)' : ''}">${strip}</div></div>
+    <div class="chat"><div class="col" style="${shift}">${col}</div></div>`;
+}
+
+function renderA(state) {
+  const root = document.getElementById("A");
+  root.classList.toggle("peeled", state === 4);
+  let col = `<h1 style="font:700 30px/1 var(--font-display);margin:0">DDD Coach</h1><div class="purpose">Paste a messy thread or meeting notes. The coach puts the events in order, shows which words each team uses differently, and gives you one question.</div>`;
+  if (state >= 2) col += youPaste(false);
+  if (state === 2) col += `<div class="coach"><div class="who label">Coach</div><span class="pending">Coach is thinking…</span></div>`;
+  if (state === 3) col += `<div class="coach"><div class="who label">Coach</div><div class="label" style="color:var(--color-ink-muted)">Events, in order</div><div class="inplace">${lane(EVENTS, { fresh: true })}</div><span class="placed peelbtn">Put on the board ↗</span><div class="label" style="margin-top:12px;color:var(--color-ink-muted)">Words that don't match</div>${wordsTable()}<div style="margin-top:12px">${questionCard()}</div></div>`;
+  if (state === 4) col = `${questionCard()}${youPaste(false)}<div class="coach"><div class="who label">Coach</div><div class="label" style="color:var(--color-ink-muted)">Events, in order</div><div class="inplace" style="margin-top:8px">${EVENTS.map(() => `<div class="ghostslot"></div>`).join(`<div class="then" style="opacity:.25"></div>`)}</div><span class="placed peelbtn">← Moved to the board</span></div>`;
+  if (state <= 2) col += composer(state === 1 ? "Example thread (fictional). #late-loads at a made-up freight broker…" : "");
+  const board = state === 4 ? `<div class="boardwrap"><div class="label" style="color:var(--color-ink-muted);margin:18px 0 26px">Timeline · Events</div><div class="lane blane">${lane(EVENTS, { fresh: true })}</div></div>` : "";
+  root.innerHTML = `${board}<div class="col">${col}</div>`;
+}
+
+const RENDER = { A: renderA, B: renderB, C: renderC };
+
+function show(layout, state) {
+  for (const id of "ABC") document.getElementById(id).classList.toggle("on", id === layout);
+  document.getElementById("cap").innerHTML = `<b>${CAPTIONS[layout][0]}</b>${CAPTIONS[layout][state]}`;
+  RENDER[layout](state);
+}
+
+window.runTo = (layout, state) => show(layout, state);
+const params = new URLSearchParams(location.search);
+if (params.has("hold")) document.body.classList.add("hold");
+if (params.has("compact")) document.body.classList.add("compactmode");
+show(params.get("layout") || "B", Number(params.get("state") || 1));
+</script>
+</body>
+</html>

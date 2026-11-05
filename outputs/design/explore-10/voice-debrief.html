@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice debrief on the board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 10: voice where research says it fits: a debrief right after the expert call. Notes stay "yours, unconfirmed" until the expert confirms. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 10px/1 var(--font-label);text-transform:uppercase;letter-spacing:.05em}
+.muted{color:var(--color-ink-muted)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{opacity:.8;margin-right:8px}
+.stage{position:absolute;inset:36px 380px 0 0;overflow:hidden}
+.stage h1{position:absolute;left:32px;top:14px;margin:0;font:700 24px/1 var(--font-display);letter-spacing:var(--tracking-display)}
+.lanehead{position:absolute;left:32px;top:56px;display:flex;gap:12px;align-items:baseline}
+svg.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.card{position:absolute;width:140px;min-height:100px;padding:8px 10px 10px;border-radius:var(--radius-card);background:var(--color-card-event);color:var(--color-card-ink);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:5px}
+.card .top{display:flex;justify-content:space-between;gap:6px;color:rgb(28 27 24 / .72);white-space:nowrap}
+.card .t{font:600 14.5px/1.18 var(--font-display)}
+.card.guess{background:#f9d4ae;border:2px dashed #a0581a;box-shadow:none}
+.card.q{background:var(--color-card-question);width:190px}
+.card.note{background:#cfe2f7;border:2px dashed #2e4fa3;box-shadow:none;width:210px}
+.card.note.ok{border-style:solid;box-shadow:var(--shadow-card)}
+.card.note .t{font:600 13.5px/1.25 var(--font-body)}
+.card.note .top{flex-direction:column;gap:4px}
+.card .was{font:400 12px/1.3 var(--font-body);text-decoration:line-through;color:rgb(28 27 24 / .6)}
+.card.new::after{content:"";position:absolute;inset:-7px;border:2px dashed var(--color-coach);border-radius:4px}
+.card .tag{position:absolute;top:-22px;left:-7px;padding:3px 6px;border-radius:3px;background:var(--color-coach);color:var(--color-on-coach)}
+.card.closed{opacity:.55}
+.card .res{font:500 10px/1.3 var(--font-label);text-transform:uppercase;letter-spacing:.05em;color:#2f6b3a}
+
+.dock{position:absolute;top:36px;right:0;bottom:0;width:380px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);display:flex;flex-direction:column}
+.dockhead{padding:12px 16px 10px;border-bottom:1px solid var(--color-line)}
+.mode{display:flex;gap:6px;margin-bottom:10px}
+.mode span{padding:4px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-size:12.5px}
+.mode span.on{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.ctx{font-size:13px;color:var(--color-ink-muted)}
+.talk{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:22px 18px 12px}
+.mic{position:relative;width:92px;height:92px;border-radius:50%;background:var(--color-coach);display:grid;place-items:center}
+.mic svg{width:34px;height:34px}
+.mic.listening::before,.mic.listening::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:2px solid var(--color-coach);opacity:.5}
+.mic.listening::after{inset:-24px;opacity:.25}
+.mic.idle{background:var(--color-surface);border:2px solid var(--color-coach)}
+.mic.idle svg path{fill:var(--color-coach)}
+.hint{font-size:13px;color:var(--color-ink-muted);text-align:center}
+.captions{align-self:stretch;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.45}
+.captions p{margin:0;padding:6px 10px;border-radius:8px;background:var(--color-surface)}
+.captions p.live{border:1px dashed var(--color-coach);color:var(--color-ink)}
+.coach{align-self:stretch;border-radius:var(--radius-md);padding:9px 12px;background:var(--color-coach-tint);font-size:13.5px}
+.who2{color:var(--color-coach);margin-bottom:5px}
+.draft{align-self:stretch;border:1px solid var(--color-line-strong);border-radius:var(--radius-md);background:var(--color-surface);padding:10px 12px;font-size:13.5px;line-height:1.45}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.btn{padding:6px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-weight:500;font-size:12.5px}
+.btn.primary{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.foot{padding:10px 16px 14px;border-top:1px solid var(--color-line)}
+.typebox{border:1px solid var(--color-line);border-radius:var(--radius-sm);padding:7px 9px;color:var(--color-ink-muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="stage board-bg" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const CAPS = {
+  1: "1 · Right after the call with the ops lead: two questions are still open on the board",
+  2: "2 · Talk while it's fresh. Captions show exactly what was heard; the typing box stays",
+  3: "3 · Your notes land on the questions they answer, labelled YOUR NOTES · UNCONFIRMED, never “she said”",
+  4: "4 · One click drafts a two-line check for the ops lead, in your words",
+  5: "5 · She answered: one note confirmed, one corrected. Solid, dated to the role; the unconfirmed words stay struck",
+};
+
+const MIC = `<svg viewBox="0 0 24 24"><path fill="#10172b" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>`;
+
+function cards(s) {
+  const c = [
+    { id: "e1", t: "Night shift rebooks 48877 onto the Laredo lane", src: "FROM THREAD", x: 32, y: 140 },
+    { id: "e2", t: "Dashboard counts two bookings", src: "FROM THREAD", x: 204, y: 140 },
+    { id: "e3", t: "Finance invoices both rows?", src: "GUESS", guess: true, x: 376, y: 140 },
+    { id: "q1", q: true, t: "Is a same-carrier date change AMENDED or a rebook?", src: "OPEN", x: 60, y: 330, closed: s === 5 },
+    { id: "q2", q: true, t: "Is a second invoice ever legitimate?", src: "OPEN", x: 470, y: 330, closed: s === 5 },
+  ];
+  if (s >= 3) {
+    const ok = s === 5;
+    c.push({ id: "n1", note: true, ok, fresh: s === 3, src: ok ? "OPS LEAD · 27 SEP · CORRECTED" : "YOUR NOTES · UNCONFIRMED", t: ok ? "A date change is AMENDED; a lane change is a new booking" : "Same booking unless the lane or the date changes; then it's AMENDED", was: ok ? "Same booking unless the lane or the date changes; then it's AMENDED" : null, x: 40, y: 520 });
+    c.push({ id: "n2", note: true, ok, fresh: s === 3, src: ok ? "OPS LEAD · 27 SEP" : "YOUR NOTES · UNCONFIRMED", t: "Sometimes legit: a TONU fee when the first carrier already sent a truck", x: 450, y: 520 });
+  }
+  return c;
+}
+
+const WIRES = s => {
+  const w = [["e1", "e2", "then"], ["e2", "e3", "then"], ["q1", "e1", "rel"], ["q2", "e3", "rel"]];
+  if (s >= 3) w.push(["n1", "q1", "ans"], ["n2", "q2", "ans"]);
+  return w;
+};
+
+const size = c => [c.note ? 210 : c.q ? 190 : 140, 100];
+function anchor(c, side) {
+  const [w, h] = size(c);
+  return { r: [c.x + w, c.y + h / 2], l: [c.x, c.y + h / 2], t: [c.x + w / 2, c.y], b: [c.x + w / 2, c.y + h] }[side];
+}
+function path(a, b) {
+  if (Math.abs(a.y - b.y) < 10) { const [x1, y1] = anchor(a, "r"), [x2, y2] = anchor(b, "l"); return `M${x1},${y1} L${x2 - 4},${y2}`; }
+  const down = a.y < b.y;
+  const [x1, y1] = anchor(a, down ? "b" : "t"), [x2, y2] = anchor(b, down ? "t" : "b");
+  const my = (y1 + y2) / 2;
+  return `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2 + (down ? -4 : 4)}`;
+}
+
+function renderStage(s) {
+  const cs = cards(s), by = Object.fromEntries(cs.map(c => [c.id, c]));
+  const style = { then: `stroke="var(--color-ink)" stroke-width="2" marker-end="url(#ah)"`, rel: `stroke="var(--color-card-question)" stroke-width="2" stroke-dasharray="2 5"`, ans: `stroke="#93abec" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ahb)"` };
+  const svg = `<svg class="wires"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--color-ink)"/></marker><marker id="ahb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#93abec"/></marker></defs>${WIRES(s).map(([a, b, k]) => `<path d="${path(by[a], by[b])}" fill="none" ${style[k]}/>`).join("")}</svg>`;
+  const html = cs.map(c => {
+    const cls = ["card", c.guess ? "guess" : "", c.q ? "q" : "", c.note ? "note" : "", c.ok ? "ok" : "", c.fresh ? "new" : "", c.closed ? "closed" : ""].join(" ");
+    const kind = c.note ? "Answer" : c.q ? "Question" : "Event";
+    const tag = c.fresh ? `<span class="tag label">Just added</span>` : "";
+    const res = c.closed ? `<div class="res">Answered · ops lead, 27 Sep</div>` : "";
+    return `<div class="${cls}" style="left:${c.x}px;top:${c.y}px">${tag}<div class="top label"><span>${kind}</span><span>${c.closed ? "CLOSED" : c.src}</span></div><div class="t">${c.t}</div>${c.was ? `<div class="was">${c.was}</div>` : ""}${res}</div>`;
+  }).join("");
+  const count = s === 5 ? "3 events · 2 questions answered" : "3 events · 2 open questions";
+  document.getElementById("stage").innerHTML = `<h1>DDD Coach</h1><div class="lanehead"><span class="label muted">Board</span><span class="muted" style="font-size:13px">${count}</span></div>${svg}${html}`;
+}
+
+function renderDock(s) {
+  const mode = `<div class="mode"><span class="on">Debrief</span><span>Paste a thread</span></div>`;
+  const ctx = `<div class="ctx">After your call with the ops lead · 26 Sep, 15:40 · ${s === 5 ? "2 answered" : "2 open questions"}</div>`;
+  let body = "";
+  if (s === 1) body = `<div class="mic idle">${MIC}</div><div class="hint">Hold to talk. Say what you heard while it's fresh; your notes stay yours until she confirms them.</div>`;
+  if (s === 2) body = `<div class="mic listening">${MIC}</div><div class="hint">Listening · release to stop</div><div class="captions"><p>RB is same booking unless lane or date changes, then it's an amend</p><p class="live">and the second invoice is sometimes legit, a TONU fee, when the first carrier already sent a truck…</p></div>`;
+  if (s === 3) body = `<div class="captions"><p>RB is same booking unless lane or date changes, then it's an amend</p><p>and the second invoice is sometimes legit, a TONU fee, when the first carrier already sent a truck</p></div><div class="coach"><div class="who2 label">Coach</div>I put your two notes on the questions they answer, as your notes, unconfirmed. I didn't call the second invoice a bug.<div class="btns"><span class="btn primary">Draft a check for the ops lead</span><span class="btn">Edit my notes</span></div></div>`;
+  if (s === 4) body = `<div class="draft"><div class="label muted" style="margin-bottom:6px">Draft · in your words · copy to Slack</div>Checking my notes from our call today:<br>1. A rebook keeps the same booking unless the lane or the date changes; then it's AMENDED.<br>2. A second invoice is sometimes legit: a TONU fee when the first carrier already sent a truck.<br>Did I get both right?<div class="btns"><span class="btn primary">Copy</span><span class="btn">Record her answer…</span></div></div>`;
+  if (s === 5) body = `<div class="coach"><div class="who2 label">Coach</div>The ops lead answered on 27 Sep. She corrected note 1: a lane change is a new booking, not an amend. Your old note stays struck under it. Note 2 is confirmed. Both questions are closed, and the glossary rows carry her role and the date.</div>`;
+  document.getElementById("dock").innerHTML = `<div class="dockhead">${mode}${ctx}</div><div class="talk">${body}</div><div class="foot"><div class="typebox">Or type your notes…</div></div>`;
+}
+
+function show(s) {
+  document.getElementById("cap").innerHTML = `<b>Exploration 10 · Voice debrief</b>${CAPS[s]}`;
+  renderStage(s);
+  renderDock(s);
+}
+window.runTo = show;
+show(Number(new URLSearchParams(location.search).get("state") || 1));
+</script>
+</body>
+</html>

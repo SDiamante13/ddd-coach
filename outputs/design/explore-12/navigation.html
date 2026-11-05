@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Board navigation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 12 for #20 (+ #117): a lane longer than the screen. Never yank the view; show what's off-screen; let the visitor choose to follow. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 10px/1 var(--font-label);text-transform:uppercase;letter-spacing:.05em}
+.muted{color:var(--color-ink-muted)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{opacity:.8;margin-right:8px}
+.stage{position:absolute;inset:36px 360px 0 0;overflow:hidden}
+.stage h1{position:absolute;left:32px;top:14px;margin:0;font:700 24px/1 var(--font-display);letter-spacing:var(--tracking-display);z-index:3}
+.lanehead{position:absolute;left:32px;top:56px;display:flex;gap:12px;align-items:baseline;z-index:3}
+.world{position:absolute;left:0;top:0;transform-origin:0 0}
+.card{position:absolute;top:130px;width:136px;height:112px;padding:8px 10px;border-radius:var(--radius-card);background:var(--color-card-event);color:var(--color-card-ink);box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:5px}
+.card .top{display:flex;justify-content:space-between;color:rgb(28 27 24 / .72);white-space:nowrap}
+.card .t{font:600 14px/1.2 var(--font-display);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.card.guess{background:#f9d4ae;border:2px dashed #a0581a;box-shadow:none}
+.card.q{background:var(--color-card-question);top:330px;width:190px}
+.card.new::after{content:"";position:absolute;inset:-7px;border:2px dashed var(--color-coach);border-radius:4px}
+.card .tag{position:absolute;top:-22px;left:-7px;padding:3px 6px;border-radius:3px;background:var(--color-coach);color:var(--color-on-coach)}
+.card.focus{outline:3px solid var(--color-coach);outline-offset:3px}
+.then{position:absolute;top:185px;height:2px;background:var(--color-ink)}
+.then::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:9px solid var(--color-ink);border-right:0}
+.fade{position:absolute;top:0;bottom:0;width:90px;z-index:2;pointer-events:none}
+.fade.l{left:0;background:linear-gradient(90deg,var(--color-paper) 20%,transparent)}
+.fade.r{right:0;background:linear-gradient(270deg,var(--color-paper) 20%,transparent)}
+.edgechip{position:absolute;top:218px;z-index:4;padding:6px 12px;border-radius:var(--radius-pill);background:var(--color-surface);border:1px solid var(--color-line-strong);font-size:13px;font-weight:500;white-space:nowrap}
+.edgechip.new{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.controls{position:absolute;left:24px;bottom:22px;z-index:4;display:flex;gap:6px;align-items:center}
+.ctl{height:36px;min-width:36px;padding:0 12px;display:grid;place-items:center;border-radius:10px;background:var(--color-surface);border:1px solid var(--color-line-strong);font-size:14px;font-weight:500}
+.ctl.on{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.follow{display:flex;gap:8px;align-items:center}
+.sw{width:30px;height:18px;border-radius:9px;background:var(--color-line-strong);position:relative}
+.sw::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--color-surface)}
+.on .sw{background:var(--color-on-coach)}
+.on .sw::after{left:14px;background:var(--color-coach)}
+.keys{position:absolute;right:24px;bottom:22px;z-index:4;padding:8px 12px;border-radius:10px;background:var(--color-surface);border:1px solid var(--color-line-strong);font-size:12.5px;color:var(--color-ink-muted)}
+.keys kbd{font:500 11px/1 var(--font-label);padding:2px 5px;border:1px solid var(--color-line-strong);border-radius:4px;color:var(--color-ink)}
+.minimap{position:absolute;right:24px;top:14px;z-index:4;width:180px;height:44px;border-radius:8px;background:var(--color-surface);border:1px solid var(--color-line-strong);padding:6px}
+.minimap i{position:absolute;top:14px;width:12px;height:12px;border-radius:2px;background:var(--color-card-event)}
+.minimap i.n{background:var(--color-coach)}
+.minimap .vp{position:absolute;top:4px;height:34px;border:2px solid var(--color-ink);border-radius:4px}
+.dock{position:absolute;top:36px;right:0;bottom:0;width:360px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);padding:12px 16px;display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.qstrip{display:flex;flex-direction:column;gap:3px;padding:7px 10px;border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-surface)}
+.qstrip .label{color:var(--color-coach)}
+.qstrip .q{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coach{border-radius:var(--radius-md);padding:9px 12px;background:var(--color-coach-tint)}
+.who2{color:var(--color-coach);margin-bottom:5px}
+.chip{display:inline-block;padding:3px 10px;border-radius:var(--radius-pill);border:1px solid var(--color-coach);color:var(--color-coach);font-size:12.5px;font-weight:500}
+.composer{margin-top:auto;border:1px solid var(--color-coach);border-radius:var(--radius-sm);padding:7px 9px;color:var(--color-ink-muted)}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="stage board-bg" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const EVENTS = [
+  ["FROM THREAD", "Customer books a delivery appointment for 7731"],
+  ["FROM THREAD", "Carrier desk tenders 7731 to Carrier 3"],
+  ["FROM THREAD", "Truck picks up 50 min after the window"],
+  ["FROM THREAD", "Load 7731 is delivered 2 h past the appointment"],
+  ["FROM THREAD", "Billing issues Customer D a service credit for 7731 because it is on the weekly late report"],
+  ["FROM THREAD", "Account team takes the 7731 credit and Customer D's Q3 on-time percentage to Friday's service review"],
+  ["FROM THREAD", "Carrier 3 rejects the 7731 rebook"],
+  ["GUESS", "Ops books another carrier for 7731"],
+  ["FROM THREAD", "Finance reverses the credit after the review"],
+];
+const NEW = [["FROM THREAD", "Carrier 3 is charged the late pickup fee"], ["GUESS", "Q3 on-time % is recalculated?"]];
+const STEP = 172, X0 = 32;
+
+const CAPS = {
+  1: "1 · The lane outgrew the screen: soft edges and counts say what's off-screen. Titles clamp at 4 lines",
+  2: "2 · The coach adds 2 cards off-screen. The view doesn't move; the right chip turns blue: “2 new ▸”",
+  3: "3 · Click “2 new ▸”: the board pans to them, and they're ringed as Just added",
+  4: "4 · Fit: the whole board at 45%, minimap shows where you are. Follow coach is off because you moved the board",
+  5: "5 · Keyboard: Tab into the board, arrows move between cards, Shift+arrows nudge, Enter edits",
+};
+
+function world(s) {
+  const all = EVENTS.concat(s >= 2 ? NEW : []);
+  const cards = all.map(([src, t], i) => {
+    const fresh = s === 3 && i >= EVENTS.length;
+    const focus = s === 5 && i === 4;
+    const tag = fresh ? `<span class="tag label">Just added</span>` : "";
+    return `<div class="card ${src === "GUESS" ? "guess" : ""} ${fresh ? "new" : ""} ${focus ? "focus" : ""}" style="left:${X0 + i * STEP}px">${tag}<div class="top label"><span>Event</span><span>${src}</span></div><div class="t">${t}</div></div>`;
+  }).join("");
+  const arrows = all.slice(1).map((_, i) => `<div class="then" style="left:${X0 + i * STEP + 136 + 6}px;width:${STEP - 136 - 16}px"></div>`).join("");
+  const q = `<div class="card q" style="left:${X0 + 4 * STEP}px"><div class="top label"><span>Question</span><span>OPEN</span></div><div class="t">For load 7731, which counts as late: the missed pickup window or the delivery appointment?</div></div>`;
+  return { html: cards + arrows + q, count: all.length };
+}
+
+function viewFor(s, count) {
+  if (s === 4) return { x: 14, y: 70, scale: 0.45 };
+  if (s === 3) return { x: -(X0 + 7 * STEP) + 60, scale: 1 };
+  return { x: -(X0 + 3 * STEP) + 60, scale: 1 };
+}
+
+function minimap(s, count) {
+  const w = 168, per = w / count;
+  const dots = Array.from({ length: count }, (_, i) => `<i class="${i >= EVENTS.length ? "n" : ""}" style="left:${6 + i * per}px"></i>`).join("");
+  const vpStart = s === 4 ? 0 : s === 3 ? 7 : 3, vpLen = s === 4 ? count : 5;
+  return `<div class="minimap">${dots}<div class="vp" style="left:${4 + vpStart * per}px;width:${Math.min(vpLen, count - vpStart) * per}px"></div></div>`;
+}
+
+function renderStage(s) {
+  const { html, count } = world(s);
+  const v = viewFor(s, count);
+  const first = Math.max(0, Math.round((-v.x - X0 + 60) / STEP));
+  const visible = s === 4 ? count : 4;
+  const later = count - first - visible;
+  const left = first > 0 && s !== 4 ? `<div class="edgechip" style="left:16px">◂ ${first} earlier</div>` : "";
+  let right = "";
+  if (s !== 4 && later > 0) right = s === 2 ? `<div class="edgechip new" style="right:16px">2 new ▸</div>` : `<div class="edgechip" style="right:16px">${later} later ▸</div>`;
+  const fades = s === 4 ? "" : `<div class="fade l"></div><div class="fade r"></div>`;
+  const zoom = s === 4 ? "45%" : "100%";
+  const follow = `<div class="ctl follow"><span>Follow coach</span><span class="sw"></span></div>`;
+  const controls = `<div class="controls"><div class="ctl">−</div><div class="ctl">${zoom}</div><div class="ctl">+</div><div class="ctl ${s === 4 ? "on" : ""}">Fit</div>${follow}</div>`;
+  const keys = s === 5 ? `<div class="keys"><kbd>←</kbd> <kbd>→</kbd> move between cards · <kbd>Shift</kbd>+arrows nudge · <kbd>Enter</kbd> edit · <kbd>Esc</kbd> leave the board</div>` : "";
+  document.getElementById("stage").innerHTML = `<h1>DDD Coach</h1><div class="lanehead"><span class="label muted">Timeline · Events</span><span class="muted" style="font-size:13px">${count} events · 1 open question</span></div>
+    <div class="world" style="transform:translate(${v.x}px,${v.y || 0}px) scale(${v.scale})">${html}</div>${fades}${left}${right}${minimap(s, count)}${controls}${keys}`;
+}
+
+function renderDock(s) {
+  const reply = s >= 2 ? `<div class="coach"><div class="who2 label">Coach</div><span class="chip">${s === 2 ? "2 new on the board ▸ off-screen" : "← 2 new on the board"}</span><div style="margin-top:8px">The late pickup fee went to Carrier 3; I've marked the Q3 recalculation as a guess.</div></div>` : "";
+  document.getElementById("dock").innerHTML = `<div class="qstrip"><span class="label">Question · carrier desk lead + account team lead</span><span class="q">For load 7731, which counts as late: the missed pickup window or the delivery appointment?</span></div>${reply}<div class="composer">Paste a thread or ask a follow-up</div>`;
+}
+
+function show(s) {
+  document.getElementById("cap").innerHTML = `<b>Exploration 12 · Board navigation (#20)</b>${CAPS[s]}`;
+  renderStage(s);
+  renderDock(s);
+}
+window.runTo = show;
+show(Number(new URLSearchParams(location.search).get("state") || 1));
+</script>
+</body>
+</html>

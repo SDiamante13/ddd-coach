@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Living glossary on the board</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 08 for #100 x #94: the kept glossary lives on the board, drift is a visible link, settled rows are never re-asked. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 11px/1 var(--font-label);text-transform:uppercase;letter-spacing:var(--tracking-label)}
+.muted{color:var(--color-ink-muted)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{opacity:.8;margin-right:8px}
+
+.stage{position:absolute;inset:36px 360px 0 0;padding:20px 32px;overflow:hidden}
+.dock{position:absolute;top:36px;right:0;bottom:0;width:360px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);display:flex;flex-direction:column}
+.lanehead{display:flex;align-items:baseline;gap:12px;margin:10px 0 14px}
+
+/* Events lane, compact */
+.lane{display:flex;align-items:center}
+.ev{flex:none;width:118px;min-height:78px;padding:7px 9px;border-radius:var(--radius-card);background:var(--color-card-event);color:var(--color-card-ink);box-shadow:var(--shadow-card);font:600 13px/1.2 var(--font-display)}
+.ev .label{font-size:9px;color:rgb(28 27 24 / .7);display:flex;justify-content:space-between;margin-bottom:4px}
+.ev.guess{background:#f9d4ae;border:2px dashed #a0581a;box-shadow:none}
+.then{flex:none;width:18px;height:2px;margin:0 5px;background:var(--color-ink);position:relative}
+.then::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:8px solid var(--color-ink);border-right:0}
+.faded{opacity:.35}
+
+/* Words lane: term cards */
+.words{display:flex;gap:18px;align-items:flex-start;position:relative}
+.term{flex:none;width:262px;background:var(--color-surface);border:1px solid var(--color-line-strong);border-radius:6px;box-shadow:var(--shadow-card);padding:10px 12px 8px}
+.term h3{margin:0 0 2px;font:700 20px/1.1 var(--font-display)}
+.term .kept{margin-bottom:8px}
+.row{border-top:1px solid var(--color-line);padding:7px 0 6px;font-size:13px;line-height:1.35;position:relative}
+.row .who{font-weight:600}
+.row .src{display:block;margin-top:3px;font:500 10.5px/1.35 var(--font-label);color:var(--color-ink-muted)}
+.chip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;font:500 10px/1.5 var(--font-label);text-transform:uppercase;letter-spacing:.06em;vertical-align:1px}
+.chip.settled{background:rgb(156 207 148 / .16);color:var(--color-ok);border:1px solid var(--color-ok)}
+.chip.open{background:rgb(238 155 176 / .14);color:var(--color-card-question);border:1px solid var(--color-card-question)}
+.chip.drift{background:var(--color-alert-tint);color:var(--color-alert);border:1px dashed var(--color-alert)}
+.chip.retired{color:var(--color-ink-muted);border:1px solid var(--color-line-strong)}
+.chip.updated{background:var(--color-coach);color:var(--color-on-coach)}
+.row.retired .m{text-decoration:line-through;color:var(--color-ink-muted)}
+.row .was{display:block;text-decoration:line-through;color:var(--color-ink-muted);font-size:12px}
+.row.new{margin:6px -6px 0;padding:7px 6px 6px;border:2px dashed var(--color-alert);border-radius:4px;background:var(--color-alert-tint)}
+.row.ring{outline:2px dashed var(--color-coach);outline-offset:3px}
+.ne{display:inline-block;width:20px;height:20px;margin-right:6px;border-radius:50%;border:2px solid var(--color-alert);background:var(--color-surface);color:var(--color-alert);font:700 13px/16px var(--font-body);text-align:center;vertical-align:-4px}
+.row.vs{box-shadow:inset 3px 0 0 var(--color-alert);padding-left:9px;margin-left:-9px}
+.row .differs{display:block;margin-top:4px;font-size:12px;color:var(--color-alert)}
+.link{position:absolute;left:-58px;width:30px;border-top:2px dashed var(--color-alert)}
+
+/* Dock */
+.dockhead{padding:12px 16px 10px;border-bottom:1px solid var(--color-line)}
+.qcard{border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-surface);padding:11px 13px}
+.qcard .role{color:var(--color-coach);margin-bottom:6px;line-height:1.4}
+.qcard .qt{font-weight:600;line-height:1.35;font-size:15px}
+.qcard blockquote{margin:7px 0 0;padding-left:9px;border-left:2px solid var(--color-line-strong);color:var(--color-ink-muted);font-size:13px}
+.log{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.you,.coach{border-radius:var(--radius-md);padding:9px 12px}
+.you{background:var(--color-surface);border:1px solid var(--color-line);align-self:flex-end;max-width:92%}
+.coach{background:var(--color-coach-tint)}
+.who2{color:var(--color-coach);margin-bottom:5px}
+.stat{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btns{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.btn{padding:7px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-weight:500;font-size:13px;background:var(--color-surface)}
+.btn.primary{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.foot{padding:12px 16px 14px}
+.composer{border:1px solid var(--color-line);border-radius:var(--radius-md);background:var(--color-surface);padding:9px}
+.composer .box{border:1px solid var(--color-coach);border-radius:var(--radius-sm);padding:7px 9px;color:var(--color-ink-muted);font-size:13px}
+
+/* Export preview */
+.doc{position:absolute;left:32px;right:32px;top:20px;bottom:20px;background:#fbfaf7;color:#1c1b18;border-radius:6px;box-shadow:var(--shadow-float);padding:26px 34px;font-size:14px}
+.doc h2{margin:0 0 4px;font:700 22px/1.2 var(--font-body)}
+.doc .asof{color:#5c574d;margin-bottom:12px}
+.doc table{width:100%;border-collapse:collapse;font-size:13px}
+.doc th,.doc td{border:1px solid #d6d0c3;padding:6px 8px;text-align:left;vertical-align:top}
+.doc th{background:#efeae0}
+.doc h3{margin:16px 0 6px;font:700 16px/1.2 var(--font-body)}
+.doc .strike{text-decoration:line-through;color:#8a8478}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="stage board-bg" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const CAPTIONS = [
+  "",
+  "1 · The kept glossary lives on the board: every row dated and sourced, settled or open",
+  "2 · A new thread (14 Oct): events land; the coach checks them against what's kept",
+  "3 · Drift: night ops now use “rebook” for lane changes. Linked ≠ to the settled row; settled rows aren't re-asked",
+  "4 · She decides: raise it at the review. The settled row stays; the drift joins the open questions",
+  "5 · Export for the RFC: as of a date, sources and dates in every row, drift listed, retired row shown struck",
+];
+
+const EVENTS_2 = [
+  ["FROM THREAD", "Night desk rebooks 48877 onto a new lane"],
+  ["FROM THREAD", "Dashboard counts two bookings"],
+  ["GUESS", "Finance invoices both rows?"],
+];
+
+const TERMS = state => [
+  { word: "booking", kept: "Kept 25 Sep 2026 · 2 rows", rows: [
+    { who: "Finance", m: "Exists once it's invoiceable", src: "Slack #booking-split, 22 Sep 2026", chip: "settled", chipText: "Settled · 29 Sep" },
+    { who: "Ops", m: "Exists when the customer submits", src: "Slack #booking-split, 22 Sep 2026", chip: "settled", chipText: "Settled · 29 Sep" },
+  ]},
+  { word: "rebook", kept: "Kept 8 Oct 2026 · 3 rows", rows: [
+    { who: "Ops, current practice", m: "Same booking, marked REBOOKED — since the 2024 portal release", src: "Maya, RFC comment, 8 Oct 2026", chip: "settled", chipText: "Settled · 8 Oct", drift: state >= 3 },
+    { who: "Ops, Dana's sheet", m: "A new booking for any change", src: "Dana's sheet, retired 8 Oct 2026", chip: "retired", chipText: "Retired", retired: true },
+    { who: "Code", m: "Old row REBOOKED, new row points back", src: "Booking#rebook!, read 1 Oct 2026", chip: "settled", chipText: "Settled · 1 Oct" },
+  ]},
+  { word: "late", kept: "Kept 25 Sep 2026 · 2 rows", rows: [
+    { who: "Account team", m: "Missed the booked delivery appointment", src: "Contract §4, quoted 25 Sep 2026", chip: "open", chipText: "Open · review 27 Oct" },
+    { who: "Billing", m: "On the weekly late report", src: "Slack #late-loads, 24 Sep 2026", chip: "open", chipText: "Open · review 27 Oct" },
+  ]},
+];
+
+const NEW_ROW = { who: "Ops, night desk", m: "Rebook also covers a lane change", src: "Slack #night-desk, 14 Oct 2026 · this thread" };
+
+function eventsLane(state) {
+  if (state < 2) return `<div class="lane faded">${["Thread 1 · 25 Sep", "Thread 2 · 8 Oct"].map(t => `<div class="ev" style="background:transparent;border:2px dashed var(--color-line-strong);box-shadow:none;color:var(--color-ink-muted)">${t}</div>`).join(`<div class="then"></div>`)}</div>`;
+  return `<div class="lane">${EVENTS_2.map(([src, t]) => `<div class="ev ${src === "GUESS" ? "guess" : ""}"><div class="label"><span>Event</span><span>${src}</span></div>${t}</div>`).join(`<div class="then"></div>`)}</div>`;
+}
+
+function rowHtml(r, state) {
+  const cls = ["row", r.retired ? "retired" : "", r.drift ? "vs" : ""].join(" ");
+  return `<div class="${cls}"><span class="who">${r.who}</span><span class="chip ${r.chip}">${r.chipText}</span><div class="m">${r.m}</div><span class="src">${r.src}</span></div>`;
+}
+
+function newRowHtml(state) {
+  if (state < 3) return "";
+  const chip = state === 3 ? `<span class="chip drift">Drift · not kept</span>` : `<span class="chip open">Open · raise 27 Oct</span>`;
+  return `<div class="row new"><span class="ne">≠</span><span class="who">${NEW_ROW.who}</span>${chip}<div class="m">${NEW_ROW.m}</div><span class="src">${NEW_ROW.src}</span><span class="differs">Differs from “Ops, current practice”, settled 8 Oct</span></div>`;
+}
+
+function termCard(t, state) {
+  const extra = t.word === "rebook" ? newRowHtml(state) : "";
+  const dim = state >= 3 && t.word !== "rebook" ? "opacity:.72" : "";
+  return `<div class="term" style="${dim}"><h3>“${t.word}”</h3><div class="kept label muted">${t.kept}</div>${t.rows.map(r => rowHtml(r, state)).join("")}${extra}</div>`;
+}
+
+function exportDoc() {
+  const rows = [
+    ["booking", "Finance", "Exists once it's invoiceable", "Slack #booking-split, 22 Sep 2026", "Settled"],
+    ["", "Ops", "Exists when the customer submits", "Slack #booking-split, 22 Sep 2026", "Settled"],
+    ["rebook", "Ops, current practice", "Same booking, marked REBOOKED, since the 2024 portal release", "Maya, RFC comment, 8 Oct 2026", "Settled"],
+    ["", "Ops, Dana's sheet", "<span class=strike>A new booking for any change</span>", "Retired 8 Oct 2026", "Retired"],
+    ["", "Code", "Old row REBOOKED, new row points back", "Booking#rebook!, read 1 Oct 2026", "Settled"],
+    ["late", "Account team", "Missed the booked delivery appointment", "Contract §4, quoted 25 Sep 2026", "Open"],
+    ["", "Billing", "On the weekly late report", "Slack #late-loads, 24 Sep 2026", "Open"],
+  ];
+  return `<div class="doc"><h2>4. Glossary</h2><div class="asof">As of 14 Oct 2026 · to settle at the RFC review, Tue 27 Oct</div>
+  <table><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Source</th><th>Status</th></tr>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>
+  <h3>Open questions</h3><div>1. <b>Drift on “rebook”:</b> night desk now uses it for a lane change (Slack #night-desk, 14 Oct 2026). Current practice says same booking. For the ops lead, at the review.<br>2. Which definition of “late” decides the service credit? For the account team lead and the billing lead.</div></div>`;
+}
+
+function renderStage(state) {
+  const stage = document.getElementById("stage");
+  if (state === 5) { stage.innerHTML = exportDoc(); return; }
+  stage.innerHTML = `
+    <div class="lanehead"><span class="label muted">Timeline · Events</span><span class="muted" style="font-size:13px">${state >= 2 ? "Thread 3 · 14 Oct 2026" : "2 threads kept"}</span></div>
+    ${eventsLane(state)}
+    <div class="lanehead" style="margin-top:22px"><span class="label muted">Words · kept in this browser</span><span class="muted" style="font-size:13px">3 terms · 7 rows · 5 settled · 2 open${state >= 3 ? " · <b style='color:var(--color-alert)'>1 drift</b>" : ""}</span></div>
+    <div class="words">${TERMS(state).map(t => termCard(t, state)).join("")}</div>`;
+}
+
+function question(state) {
+  if (state === 3) return { role: "Question for the ops lead, at the RFC review, Tue 27 Oct", qt: "Night desk rebooked load 48877 onto a new lane. Does “rebook” now cover lane changes, or is that a new booking under current practice?", quotes: ["“rebooked 48877 onto the Laredo lane, same ref” — #night-desk, 14 Oct", "“Same booking, marked REBOOKED” — kept 8 Oct"] };
+  return { role: "Open at the RFC review, Tue 27 Oct", qt: "Which definition of “late” decides the service credit?", quotes: [] };
+}
+
+function renderDock(state) {
+  const q = question(state);
+  const qcard = `<div class="qcard"><div class="role label">${q.role}</div><div class="qt">${q.qt}</div>${q.quotes.map(x => `<blockquote>${x}</blockquote>`).join("")}</div>`;
+  let log = "";
+  if (state === 1) log = `<div class="muted">Your glossary is kept in this browser and sent swapped with every thread, so the coach checks new threads against it.</div>`;
+  if (state >= 2) log += `<div class="you"><div class="who2 label muted">You</div>#night-desk export, 14 Oct… <span class="muted">· 2,180 characters</span></div>`;
+  if (state === 2) log += `<div class="coach"><div class="who2 label">Coach</div><i class="muted">Checking against 7 kept rows…</i></div>`;
+  if (state === 3) log += `<div class="coach"><div class="who2 label">Coach</div>3 new on the board. Checked against your 7 kept rows:<div class="stat"><span class="chip drift">1 drift</span><span class="chip settled">5 settled · not re-asked</span></div><div class="btns"><span class="btn primary">Raise at the review</span><span class="btn">Update the kept row</span><span class="btn">Not a change</span></div></div>`;
+  if (state === 4) log += `<div class="coach"><div class="who2 label">Coach</div>Added to the open questions for 27 Oct. The settled row is unchanged.<div class="btns"><span class="btn primary">Copy for your RFC</span></div></div>`;
+  if (state === 5) log += `<div class="coach"><div class="who2 label">Coach</div>Copied for your RFC: 3 terms, 7 rows, 2 open questions, as of 14 Oct 2026.</div>`;
+  document.getElementById("dock").innerHTML = `
+    <div class="dockhead">${qcard}</div>
+    <div class="log">${log}</div>
+    <div class="foot"><div class="composer"><div class="box">${state === 1 ? "#night-desk export, 14 Oct…" : "Paste a thread or ask a follow-up"}</div></div></div>`;
+}
+
+function show(state) {
+  document.getElementById("cap").innerHTML = `<b>Exploration 08 · Living glossary on the board</b>${CAPTIONS[state]}`;
+  renderStage(state);
+  renderDock(state);
+}
+
+window.runTo = show;
+show(Number(new URLSearchParams(location.search).get("state") || 1));
+</script>
+</body>
+</html>

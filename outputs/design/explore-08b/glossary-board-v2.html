@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Living glossary, after interview 09</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 08 for #100 x #94: the kept glossary lives on the board, drift is a visible link, settled rows are never re-asked. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 11px/1 var(--font-label);text-transform:uppercase;letter-spacing:var(--tracking-label)}
+.muted{color:var(--color-ink-muted)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{opacity:.8;margin-right:8px}
+
+.stage{position:absolute;inset:36px 360px 0 0;padding:20px 32px;overflow:hidden}
+.dock{position:absolute;top:36px;right:0;bottom:0;width:360px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);display:flex;flex-direction:column}
+.lanehead{display:flex;align-items:baseline;gap:12px;margin:10px 0 14px}
+
+/* Events lane, compact */
+.lane{display:flex;align-items:center}
+.ev{flex:none;width:118px;min-height:78px;padding:7px 9px;border-radius:var(--radius-card);background:var(--color-card-event);color:var(--color-card-ink);box-shadow:var(--shadow-card);font:600 13px/1.2 var(--font-display)}
+.ev .label{font-size:9px;color:rgb(28 27 24 / .7);display:flex;justify-content:space-between;margin-bottom:4px}
+.ev.guess{background:#f9d4ae;border:2px dashed #a0581a;box-shadow:none}
+.then{flex:none;width:18px;height:2px;margin:0 5px;background:var(--color-ink);position:relative}
+.then::after{content:"";position:absolute;right:-1px;top:-5px;border:6px solid transparent;border-left:8px solid var(--color-ink);border-right:0}
+.faded{opacity:.35}
+
+/* Words lane: term cards */
+.words{display:flex;gap:18px;align-items:flex-start;position:relative}
+.term{flex:none;width:262px;background:var(--color-surface);border:1px solid var(--color-line-strong);border-radius:6px;box-shadow:var(--shadow-card);padding:10px 12px 8px}
+.term h3{margin:0 0 2px;font:700 20px/1.1 var(--font-display)}
+.term .kept{margin-bottom:8px}
+.row{border-top:1px solid var(--color-line);padding:7px 0 6px;font-size:13px;line-height:1.35;position:relative}
+.row .who{font-weight:600}
+.row .src{display:block;margin-top:3px;font:500 10.5px/1.35 var(--font-label);color:var(--color-ink-muted)}
+.chip{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:4px;font:500 10px/1.5 var(--font-label);text-transform:uppercase;letter-spacing:.06em;vertical-align:1px}
+.chip.settled{background:rgb(156 207 148 / .16);color:var(--color-ok);border:1px solid var(--color-ok)}
+.chip.open{background:rgb(238 155 176 / .14);color:var(--color-card-question);border:1px solid var(--color-card-question)}
+.chip.drift{background:var(--color-alert-tint);color:var(--color-alert);border:1px dashed var(--color-alert)}
+.chip.retired{color:var(--color-ink-muted);border:1px solid var(--color-line-strong)}
+.chip.updated{background:var(--color-coach);color:var(--color-on-coach)}
+.row.retired .m{text-decoration:line-through;color:var(--color-ink-muted)}
+.row .was{display:block;text-decoration:line-through;color:var(--color-ink-muted);font-size:12px}
+.row.new{margin:6px -6px 0;padding:7px 6px 6px;border:2px dashed var(--color-alert);border-radius:4px;background:var(--color-alert-tint)}
+.row.ring{outline:2px dashed var(--color-coach);outline-offset:3px}
+.ne{display:inline-block;width:20px;height:20px;margin-right:6px;border-radius:50%;border:2px solid var(--color-alert);background:var(--color-surface);color:var(--color-alert);font:700 13px/16px var(--font-body);text-align:center;vertical-align:-4px}
+.row.vs{box-shadow:inset 3px 0 0 var(--color-alert);padding-left:9px;margin-left:-9px}
+.row .differs{display:block;margin-top:4px;font-size:12px;color:var(--color-alert)}
+.link{position:absolute;left:-58px;width:30px;border-top:2px dashed var(--color-alert)}
+
+/* Dock */
+.dockhead{padding:12px 16px 10px;border-bottom:1px solid var(--color-line)}
+.qcard{border:1px solid var(--color-coach);border-radius:var(--radius-md);background:var(--color-surface);padding:11px 13px}
+.qcard .role{color:var(--color-coach);margin-bottom:6px;line-height:1.4}
+.qcard .qt{font-weight:600;line-height:1.35;font-size:15px}
+.qcard blockquote{margin:7px 0 0;padding-left:9px;border-left:2px solid var(--color-line-strong);color:var(--color-ink-muted);font-size:13px}
+.log{flex:1;overflow:hidden;padding:12px 16px;display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.you,.coach{border-radius:var(--radius-md);padding:9px 12px}
+.you{background:var(--color-surface);border:1px solid var(--color-line);align-self:flex-end;max-width:92%}
+.coach{background:var(--color-coach-tint)}
+.who2{color:var(--color-coach);margin-bottom:5px}
+.stat{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btns{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.btn{padding:7px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-weight:500;font-size:13px;background:var(--color-surface)}
+.btn.primary{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.foot{padding:12px 16px 14px}
+.composer{border:1px solid var(--color-line);border-radius:var(--radius-md);background:var(--color-surface);padding:9px}
+.composer .box{border:1px solid var(--color-coach);border-radius:var(--radius-sm);padding:7px 9px;color:var(--color-ink-muted);font-size:13px}
+
+/* Export preview */
+.doc{position:absolute;left:32px;right:32px;top:20px;bottom:20px;background:#fbfaf7;color:#1c1b18;border-radius:6px;box-shadow:var(--shadow-float);padding:26px 34px;font-size:14px}
+.doc h2{margin:0 0 4px;font:700 22px/1.2 var(--font-body)}
+.doc .asof{color:#5c574d;margin-bottom:12px}
+.doc table{width:100%;border-collapse:collapse;font-size:13px}
+.doc th,.doc td{border:1px solid #d6d0c3;padding:6px 8px;text-align:left;vertical-align:top}
+.doc th{background:#efeae0}
+.doc h3{margin:16px 0 6px;font:700 16px/1.2 var(--font-body)}
+.doc .strike{text-decoration:line-through;color:#8a8478}
+
+/* 08b: a new-in-thread row reads as an open question, not an error */
+.row.new2{margin:6px -6px 0;padding:7px 6px 6px;border:2px dashed var(--color-card-question);border-radius:4px;background:rgb(238 155 176 / .10)}
+.ne2{display:inline-block;width:20px;height:20px;margin-right:6px;border-radius:50%;border:2px solid var(--color-card-question);color:var(--color-card-question);font:700 13px/16px var(--font-body);text-align:center;vertical-align:-4px}
+.row.vs{box-shadow:inset 3px 0 0 var(--color-card-question) !important}
+.row q{background:rgb(238 155 176 / .18);border-radius:2px;padding:0 2px}
+.differs2{display:block;margin-top:5px;font-size:12px;line-height:1.4;color:var(--color-ink)}
+.chip.settled.on{outline:2px solid var(--color-ok);outline-offset:1px}
+.checks{margin-top:8px;display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+.ck{display:flex;flex-direction:column;padding:5px 8px;border-radius:6px;background:var(--color-surface)}
+.ckw{font-weight:600}
+.cks.holds{color:var(--color-ok)}
+.cks.absent{color:var(--color-ink-muted)}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="stage board-bg" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const CAPTIONS = [
+  "",
+  "1 · Started from her Confluence §4 table (pasted 14 Oct): every row dated and sourced, per desk",
+  "2 · A new thread: events land; the coach checks them against the kept rows",
+  "3 · New in this thread: night shift now rebooks a lane change. It quotes the kept clause it goes beyond",
+  "4 · “4 settled, not re-asked” opens: one line per row, holds or not in this thread",
+  "5 · She asks the desk owner first. Cell, question and line all say the same thing",
+  "6 · Export for the RFC: as of a date; the open row, its question and its line agree",
+];
+
+const EVENTS_2 = [
+  ["FROM THREAD", "Night shift rebooks 48877 onto the Laredo lane"],
+  ["FROM THREAD", "Invoice goes out at POD"],
+  ["GUESS", "Tender sent by phone, not EDI?"],
+];
+
+const KEPT = [
+  { word: "booking", kept: "Kept 14 Oct 2026 · from your §4", rows: [
+    { id: "b-fin", who: "Finance", m: "Exists once it's invoiceable", src: "Slack #booking-split, 22 Sep 2026", status: "settled", date: "29 Sep", check: ["holds", "22:14 “invoice goes out at POD”"] },
+    { id: "b-ops", who: "Ops (day desk)", m: "Exists when the customer submits", src: "Slack #booking-split, 22 Sep 2026", status: "settled", date: "29 Sep", check: ["absent", "not in this thread"] },
+  ]},
+  { word: "rebook", kept: "Kept 14 Oct 2026 · from your §4", rows: [
+    { id: "r-night", who: "Ops (night shift)", m: "Same booking, marked REBOOKED, <q>for a date or carrier change</q>", src: "Maya, §4 comment, 8 Oct 2026", status: "settled", date: "8 Oct", drift: true },
+    { id: "r-day", who: "Ops (day desk)", m: "A same-carrier date change is AMENDED; a lane change is a new booking", src: "Dana's sheet, confirmed 29 Sep 2026", status: "settled", date: "29 Sep", check: ["absent", "not in this thread"] },
+    { id: "r-code", who: "Code", m: "Old row REBOOKED, new row points back", src: "Booking#rebook!, read 1 Oct 2026", status: "settled", date: "1 Oct", check: ["holds", "21:52 “old row shows REBOOKED”"] },
+  ]},
+  { word: "tender", kept: "Kept 14 Oct 2026 · from your §4", rows: [
+    { id: "t-car", who: "Carrier desk", m: "The EDI 204 sent to the carrier", src: "§4, typed 2 Oct 2026", status: "open", date: "review 27 Oct" },
+  ]},
+];
+
+const THREAD_LINE = "21:50 “rebooked 48877 onto the Laredo lane, same ref”";
+
+function statusChip(r, state) {
+  if (r.drift && state >= 5) return `<span class="chip open">Open · asked the owner 14 Oct</span>`;
+  if (r.status === "settled") return `<span class="chip settled">Settled · ${r.date}</span>`;
+  if (r.status === "open") return `<span class="chip open">Open · ${r.date}</span>`;
+  return "";
+}
+
+function rowHtml(r, state) {
+  if (r.status === "empty") return `<div class="row"><span class="who">${r.who}</span><div class="m muted" style="font-style:italic">${r.m}</div></div>`;
+  const vs = r.drift && state >= 3 ? "vs" : "";
+  return `<div class="row ${vs}" id="${r.id}"><span class="who">${r.who}</span>${statusChip(r, state)}<div class="m">${r.m}</div><span class="src">${r.src}</span></div>`;
+}
+
+function newRowHtml(state) {
+  if (state < 3) return "";
+  const chip = state >= 5 ? `<span class="chip open">Open · asked the owner</span>` : `<span class="chip open">New in this thread</span>`;
+  return `<div class="row new2"><span class="ne2">≠</span><span class="who">Ops (night shift)</span>${chip}<div class="m">Rebook covers a lane change too</div><span class="src">Slack #night-shift, 14 Oct 2026 · ${THREAD_LINE}</span><span class="differs2">Goes beyond your row: <q>for a date or carrier change</q> — Ops (night shift), settled 8 Oct. Not in your glossary yet.</span></div>`;
+}
+
+function termCard(t, state) {
+  const extra = t.word === "rebook" ? newRowHtml(state) : "";
+  const dim = state >= 3 && state <= 5 && t.word !== "rebook" ? "opacity:.72" : "";
+  return `<div class="term" style="${dim}"><h3>“${t.word}”</h3><div class="kept label muted">${t.kept}</div>${t.rows.map(r => rowHtml(r, state)).join("")}${extra}</div>`;
+}
+
+function eventsLane(state) {
+  if (state < 2) return `<div class="lane"><div class="ev" style="width:360px;background:transparent;border:2px dashed var(--color-line-strong);box-shadow:none;color:var(--color-ink-muted);font-weight:500">Events from your next thread land here</div></div>`;
+  return `<div class="lane">${EVENTS_2.map(([src, t]) => `<div class="ev ${src === "GUESS" ? "guess" : ""}"><div class="label"><span>Event</span><span>${src}</span></div>${t}</div>`).join(`<div class="then"></div>`)}</div>`;
+}
+
+function exportDoc() {
+  const rows = [
+    ["booking", "Finance", "Exists once it's invoiceable", "Slack #booking-split, 22 Sep 2026", "Settled 29 Sep"],
+    ["", "Ops (day desk)", "Exists when the customer submits", "Slack #booking-split, 22 Sep 2026", "Settled 29 Sep"],
+    ["rebook", "Ops (night shift)", "Same booking, marked REBOOKED, for a date or carrier change. <b>Lane changes: open, see Q1</b>", "Maya, §4 comment, 8 Oct 2026 · Slack #night-shift, 14 Oct 2026", "Open (asked the owner 14 Oct)"],
+    ["", "Ops (day desk)", "A same-carrier date change is AMENDED; a lane change is a new booking", "Dana's sheet, confirmed 29 Sep 2026", "Settled 29 Sep"],
+    ["", "Code", "Old row REBOOKED, new row points back", "Booking#rebook!, read 1 Oct 2026", "Settled 1 Oct"],
+    ["tender", "Carrier desk", "The EDI 204 sent to the carrier", "§4, typed 2 Oct 2026", "Open"],
+  ];
+  return `<div class="doc"><h2>4. Glossary</h2><div class="asof">As of 14 Oct 2026 · to settle at the RFC review, Tue 27 Oct</div>
+  <table><tr><th>Term</th><th>Team</th><th>Meaning</th><th>Source</th><th>Status</th></tr>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>
+  <h3>Open questions</h3><div>1. <b>“rebook” on a lane change, night shift:</b> “rebooked 48877 onto the Laredo lane, same ref” (Slack #night-shift, 14 Oct 2026) goes beyond “for a date or carrier change” (Maya, 8 Oct). Asked the desk owner 14 Oct; to the review only if it stays open.<br>2. Is a tender the EDI 204 only, or also a phone call? For the carrier desk lead.</div></div>`;
+}
+
+function renderStage(state) {
+  const stage = document.getElementById("stage");
+  if (state === 6) { stage.innerHTML = exportDoc(); return; }
+  stage.innerHTML = `
+    <div class="lanehead"><span class="label muted">Timeline · Events</span><span class="muted" style="font-size:13px">${state >= 2 ? "Slack #night-shift · 14 Oct 2026" : ""}</span></div>
+    ${eventsLane(state)}
+    <div class="lanehead" style="margin-top:22px"><span class="label muted">Words · from your Confluence §4, pasted 14 Oct</span><span class="muted" style="font-size:13px">3 terms · 6 rows · 5 settled · 1 open${state >= 3 ? " · <b style='color:var(--color-card-question)'>1 new in this thread</b>" : ""}</span></div>
+    <div class="words">${KEPT.map(t => termCard(t, state)).join("")}</div>`;
+}
+
+function checksList() {
+  const rows = KEPT.flatMap(t => t.rows.filter(r => r.check).map(r => ({ ...r, word: t.word })));
+  return `<div class="checks">${rows.map(r => `<div class="ck"><span class="ckw">${r.word} · ${r.who}</span><span class="cks ${r.check[0]}">${r.check[0] === "holds" ? "holds · " + r.check[1] : r.check[1]}</span></div>`).join("")}</div>`;
+}
+
+function renderDock(state) {
+  const q = state >= 3 && state <= 5
+    ? { role: "For the night shift desk owner", qt: "Load 48877 was rebooked onto a new lane with the same ref. Does night shift's “rebook” now cover lane changes?", quotes: [THREAD_LINE + " — #night-shift, 14 Oct", "“for a date or carrier change” — your row, settled 8 Oct"] }
+    : { role: "Open at the RFC review, Tue 27 Oct", qt: "Is a tender the EDI 204 only, or also a phone call?", quotes: [] };
+  const qcard = `<div class="qcard"><div class="role label">${q.role}</div><div class="qt">${q.qt}</div>${q.quotes.map(x => `<blockquote>${x}</blockquote>`).join("")}</div>`;
+  let log = "";
+  if (state === 1) log = `<div class="muted">You pasted your §4 table. It's kept in this browser, sent swapped with each thread, and dated so you can see when it's older than Confluence.</div>`;
+  if (state >= 2) log += `<div class="you"><div class="who2 label muted">You</div>#night-shift export, 14 Oct… <span class="muted">· 2,180 characters</span></div>`;
+  if (state === 2) log += `<div class="coach"><div class="who2 label">Coach</div><i class="muted">Checking against 6 kept rows…</i></div>`;
+  const summary = open => `<div class="stat"><span class="chip open">1 new in this thread</span><span class="chip settled ${open ? "on" : ""}">4 settled · not re-asked ${open ? "▾" : "▸"}</span></div>`;
+  const actions = `<div class="btns"><span class="btn primary">Ask the desk owner first</span><span class="btn">Raise at the review</span><span class="btn">Update the kept row (needs a source)</span><span class="btn">Not a change (remembered)</span></div>`;
+  if (state === 3) log += `<div class="coach"><div class="who2 label">Coach</div>3 new on the board. Checked against your 6 kept rows:${summary(false)}${actions}</div>`;
+  if (state === 4) log += `<div class="coach"><div class="who2 label">Coach</div>3 new on the board. Checked against your 6 kept rows:${summary(true)}${checksList()}</div>`;
+  if (state === 5) log += `<div class="coach"><div class="who2 label">Coach</div>Copied a message for the night shift owner with both lines. The row is marked open, and the question and the export line say the same.<div class="btns"><span class="btn primary">Copy for your RFC</span></div></div>`;
+  if (state === 6) log += `<div class="coach"><div class="who2 label">Coach</div>Copied for your RFC: 3 terms, 6 rows, 2 open questions, as of 14 Oct 2026.</div>`;
+  document.getElementById("dock").innerHTML = `<div class="dockhead">${qcard}</div><div class="log">${log}</div><div class="foot"><div class="composer"><div class="box">${state === 1 ? "#night-shift export, 14 Oct…" : "Paste a thread or ask a follow-up"}</div></div></div>`;
+}
+
+function show(state) {
+  document.getElementById("cap").innerHTML = `<b>Exploration 08b · Living glossary, after interview 09</b>${CAPTIONS[state]}`;
+  renderStage(state);
+  renderDock(state);
+}
+
+window.runTo = show;
+show(Number(new URLSearchParams(location.search).get("state") || 1));
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who's who</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../../src/styles/tokens.css">
+<style>
+/* Exploration 14 for #133: speakers are people, rows are teams. A one-time, skippable "Who's who" in the margin maps people to teams, locally; rows then find their source lines. */
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:400 var(--text-base)/var(--leading-body) var(--font-body);color:var(--color-ink);background:var(--color-paper);overflow:hidden}
+.board-bg{background-color:var(--color-paper);background-image:radial-gradient(var(--color-paper-dot) 1px,transparent 1.2px);background-size:22px 22px}
+.label{font:500 10px/1 var(--font-label);text-transform:uppercase;letter-spacing:.05em}
+.muted{color:var(--color-ink-muted)}
+.cap{position:fixed;left:0;right:0;top:0;z-index:50;padding:8px 16px;background:#1d4ed8;color:#fff;font:600 15px/1.3 var(--font-body)}
+.cap b{opacity:.8;margin-right:8px}
+.stage{position:absolute;inset:36px 380px 0 0;padding:16px 28px;overflow:hidden}
+.stage h1{margin:0 0 6px;font:700 26px/1 var(--font-display);letter-spacing:var(--tracking-display)}
+.head{display:flex;gap:10px;align-items:baseline;margin-bottom:16px}
+.terms{display:flex;gap:16px;align-items:flex-start}
+.term{width:262px;background:var(--color-surface);border:1px solid var(--color-line);border-radius:6px;box-shadow:var(--shadow-card);padding:10px 12px 6px}
+.term h3{margin:0 0 4px;font:700 19px/1.1 var(--font-display)}
+.row{border-top:1px solid var(--color-line);padding:6px 0;font-size:12.5px;line-height:1.35}
+.row .who{font-weight:600}
+.src{display:block;margin-top:2px;font:500 10px/1.35 var(--font-label)}
+.src.none{color:var(--color-ink-muted);font-style:italic}
+.src.found{color:var(--color-ink)}
+.chip{display:inline-block;margin-left:5px;padding:0 5px;border:1px solid var(--color-line-strong);border-radius:4px;font:500 9.5px/1.6 var(--font-label);text-transform:uppercase;color:var(--color-ink-muted)}
+.ring{outline:2px dashed var(--color-coach);outline-offset:2px;border-radius:3px}
+.dock{position:absolute;top:36px;right:0;bottom:0;width:380px;background:var(--color-surface-sunken);border-left:1px solid var(--color-line);padding:12px 14px;display:flex;flex-direction:column;gap:10px;font-size:13.5px}
+.coach{border-radius:var(--radius-md);padding:10px 12px;background:var(--color-coach-tint)}
+.who2{color:var(--color-coach);margin-bottom:6px}
+.pill{display:inline-block;padding:4px 11px;border-radius:var(--radius-pill);border:1px solid var(--color-coach);color:var(--color-coach);font-size:12.5px;font-weight:500;background:var(--color-surface)}
+.callout{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--color-surface);border:1px solid var(--color-line-strong)}
+.callout b{font-weight:600}
+.btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn{padding:6px 12px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-size:12.5px;font-weight:500;background:var(--color-surface)}
+.btn.primary{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.strip{padding:10px 12px;border-radius:10px;background:var(--color-surface);border:1px solid var(--color-coach)}
+.person{display:grid;grid-template-columns:118px 1fr;gap:6px;align-items:start;padding:7px 0;border-top:1px solid var(--color-line)}
+.person:first-of-type{border-top:0}
+.pname{font-weight:600;font-size:13px;padding-top:3px}
+.pname small{display:block;font-weight:400;color:var(--color-ink-muted);font-size:11px}
+.opts{display:flex;flex-wrap:wrap;gap:4px}
+.opt{padding:2px 8px;border-radius:var(--radius-pill);border:1px solid var(--color-line-strong);font-size:11.5px}
+.opt.on{background:var(--color-coach);color:var(--color-on-coach);border-color:var(--color-coach)}
+.opt.hint{border-style:dashed;border-color:var(--color-coach);color:var(--color-coach)}
+.note{font-size:11.5px;color:var(--color-ink-muted);margin-top:6px}
+.small{font-size:12px}
+.composer{margin-top:auto;border:1px solid var(--color-coach);border-radius:var(--radius-sm);padding:7px 9px;color:var(--color-ink-muted)}
+.mini{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:10px;background:var(--color-surface);border:1px solid var(--color-line-strong);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="cap" id="cap"></div>
+<div class="stage board-bg" id="stage"></div>
+<div class="dock" id="dock"></div>
+<script>
+const CAPS = {
+  1: "1 · Real paste, people not teams: most rows say “No line in your paste matches”. The coach says why, once, under the reply",
+  2: "2 · Who's who, in the margin: one row per speaker, team chips from this reply. A speaker's own words suggest a team; she confirms",
+  3: "3 · Applied: 9 rows find their lines at once, so one chip instead of 9 rings (the >5 rule). 2 stay honest about having no line",
+  4: "4 · Next paste: people she's mapped are remembered here. One new speaker gets a one-line ask, not the whole strip",
+};
+
+const PEOPLE = [
+  { name: "Luis Ortega", lines: 7, pick: "Billing", hint: null },
+  { name: "Maya Chen", lines: 5, pick: "Ops (night desk)", hint: null },
+  { name: "Dana Ruiz", lines: 4, pick: null, hint: "Ops (day desk)", why: "“we on the day desk…”" },
+  { name: "Sam Patel", lines: 3, pick: "Account team", hint: null },
+  { name: "Jo Kim", lines: 1, pick: null, hint: null },
+];
+const TEAMS = ["Billing", "Account team", "Ops (day desk)", "Ops (night desk)", "Carrier desk", "Code", "Not sure"];
+
+const TERMS = [
+  { w: "late", rows: [
+    ["Account team", "Missing the booked delivery appointment", "Mon 08:11 Sam Patel: in the contract a load is late when…"],
+    ["Ops (day desk)", "Not at pickup by the end of the window", "Mon 09:40 Dana Ruiz: for us it's late if the truck…"],
+    ["Ops (night desk)", "An ETA past the appointment", "Mon 22:02 Maya Chen: nights call it late once the ETA…"],
+    ["Billing", "On the weekly late report", "Mon 11:15 Luis Ortega: it's on the late report, so…"],
+  ]},
+  { w: "weekly late report", rows: [
+    ["Billing", "The basis for service credits", "Tue 09:02 Luis Ortega: credits come off the weekly…"],
+    ["Account team", "The numbers for the Q3 on-time %", "Tue 09:05 Sam Patel: Q3 on-time uses the weekly…"],
+    ["Code", "late_loads query on missed pickup windows", null],
+  ]},
+  { w: "on time", rows: [
+    ["Account team", "Meeting the booked delivery appointment", "Mon 08:12 Sam Patel: on time means we hit the appt"],
+    ["Ops (day desk)", "Recovered by delivering before the appointment", "Mon 09:44 Dana Ruiz: if we deliver before the appt…"],
+    ["Ops (night desk)", "Delivered inside the window", "Mon 22:10 Maya Chen: night shift counts on time when…"],
+    ["Carrier desk", "Picked up inside the window", null],
+    ["Billing", "Not on the late report", "Tue 09:10 Luis Ortega: if it's not on the report it's…"],
+  ]},
+];
+
+function found(state, src) { return state >= 3 && src; }
+
+function renderStage(s) {
+  const total = TERMS.reduce((n, t) => n + t.rows.length, 0);
+  const sourced = s >= 3 ? TERMS.reduce((n, t) => n + t.rows.filter(r => r[2]).length, 0) : 1;
+  const cards = TERMS.map(t => `<div class="term"><h3>“${t.w}”</h3>${t.rows.map(([who, m, src], i) => {
+    const has = found(s, src) || (s < 3 && i === 0 && t.w === "late");
+    const line = has ? `<span class="src found">${src}</span>` : `<span class="src none">No line in your paste matches ${who}</span>`;
+    return `<div class="row"><span class="who">${who}</span><span class="chip">From thread</span><div>${m}</div>${line}</div>`;
+  }).join("")}</div>`).join("");
+  document.getElementById("stage").innerHTML = `<h1>DDD Coach</h1><div class="head"><span class="label muted">Words · ${TERMS.length} terms · ${total} rows</span><span class="muted small">${sourced} with a source line</span></div><div class="terms">${cards}</div>`;
+}
+
+function personRow(p, s) {
+  const opts = TEAMS.map(t => {
+    const on = p.pick === t || (s >= 3 && p.hint === t);
+    const hint = s === 2 && p.hint === t ? "hint" : "";
+    return `<span class="opt ${on ? "on" : ""} ${hint}">${t}${hint ? "?" : ""}</span>`;
+  }).join("");
+  const why = s === 2 && p.why ? `<div class="note" style="grid-column:2">Suggested from ${p.why}; tap to confirm</div>` : "";
+  return `<div class="person"><div class="pname">${p.name}<small>${p.lines} line${p.lines > 1 ? "s" : ""}</small></div><div class="opts">${opts}</div>${why}</div>`;
+}
+
+function renderDock(s) {
+  const chips = `<span class="pill">← 3 terms on the board · 12 rows</span>`;
+  let body = "";
+  if (s === 1) body = `<div class="coach"><div class="who2 label">Coach</div>${chips}<div class="callout"><b>11 of 12 rows have no source line.</b> Your thread is written by people, and the rows are by team. Say who's on which team (about 30 s) and the rows find their lines.<div class="btns"><span class="btn primary">Who's who · 5 people</span><span class="btn">Not now</span></div></div></div>`;
+  if (s === 2) body = `<div class="strip"><div class="label" style="color:var(--color-coach);margin-bottom:6px">Who's who · 3 of 5 set</div>${PEOPLE.map(p => personRow(p, s)).join("")}<div class="note">Stays in this browser. Never sent: names are swapped before anything leaves (Your swaps).</div><div class="btns"><span class="btn primary">Apply · find source lines</span><span class="btn">Skip</span></div></div>`;
+  if (s === 3) body = `<div class="coach"><div class="who2 label">Coach</div>${chips}<div class="btns"><span class="pill">9 more source lines found · 2 still none</span></div><div class="note" style="margin-top:8px">No line speaks for Code or the carrier desk, so those 2 rows still say so. Jo Kim stays “Not sure”.</div></div><div class="mini"><span>Who's who · 5 people</span><span class="pill" style="padding:2px 9px">Edit</span></div>`;
+  if (s === 4) body = `<div class="mini"><span>Who's who · 5 people, kept from 30 Sep</span><span class="pill" style="padding:2px 9px">Edit</span></div><div class="coach"><div class="who2 label">Coach</div>${chips}<div class="callout small">One new speaker in this paste: <b>Priya Rao</b> (3 lines). Which team?<div class="opts" style="margin-top:6px">${TEAMS.map(t => `<span class="opt">${t}</span>`).join("")}</div></div></div>`;
+  document.getElementById("dock").innerHTML = `${body}<div class="composer">Paste a thread or ask a follow-up</div>`;
+}
+
+function show(s) {
+  document.getElementById("cap").innerHTML = `<b>Exploration 14 · Who's who (#133)</b>${CAPS[s]}`;
+  renderStage(s);
+  renderDock(s);
+}
+window.runTo = show;
+show(Number(new URLSearchParams(location.search).get("state") || 1));
+</script>
+</body>
+</html>
